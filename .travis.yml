@@ -14,6 +14,7 @@ install:
   - make 2>&1 > phpbuild.log
   - make install 2>&1 >> phpbuild.log
 script:
+  - cd $TRAVIS_BUILD_DIR
   - ls
 env:
   global:
