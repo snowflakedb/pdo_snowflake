@@ -8,7 +8,7 @@ install:
   - mkdir -p $TRAVIS_BUILD_DIR/dep
   - cd $TRAVIS_BUILD_DIR/dep
   - wget http://php.net/distributions/php-${PHP_VERSION}.tar.xz
-  - tar xvf php-${PHP_VERSION}.tar.xz
+  - tar xf php-${PHP_VERSION}.tar.xz
   - cd php-${PHP_VERSION}
   - ./configure --prefix=$TRAVIS_BUILD_DIR/dep/install-php-${PHP_VERSION}
   - make
