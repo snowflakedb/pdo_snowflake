@@ -10,9 +10,9 @@ install:
   - wget http://php.net/distributions/php-${PHP_VERSION}.tar.xz
   - tar xf php-${PHP_VERSION}.tar.xz
   - cd php-${PHP_VERSION}
-  - ./configure --prefix=$TRAVIS_BUILD_DIR/dep/install-php-${PHP_VERSION}
-  - make
-  - make install
+  - ./configure --prefix=$TRAVIS_BUILD_DIR/dep/install-php-${PHP_VERSION} --enable-phpdbg
+  - make 2>&1 > phpbuild.log
+  - make install 2>&1 >> phpbuild.log
 script:
   - ls
 env:
