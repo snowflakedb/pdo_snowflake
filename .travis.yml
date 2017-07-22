@@ -1,4 +1,4 @@
-sudo: false
+sudo: required
 language: c
 before_install:
   - openssl aes-256-cbc -k "$super_secret_password" -in parameters.json.enc -out parameters.json -d
