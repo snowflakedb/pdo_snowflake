@@ -18,6 +18,8 @@ Create a database handle with connection parameters:
         echo 'Connection failed: ' . $e->getMessage();
     }
 
+Build and Tests
+================================================================================
 
 Download the PHP source code to build PHP PDO driver for Snowflake.
 
@@ -48,7 +50,7 @@ Extract and build PHP
     make
     make install
 
-Clone the this repository and run ``phpize`` followed by ``configure``
+Clone the this repository and run ``phpize``, ``configure``, ``make`` and ``make test``:
 
 .. code-block:: bash
 
@@ -57,4 +59,6 @@ Clone the this repository and run ``phpize`` followed by ``configure``
     $WORKSPACE/install-php-$SF_PHP_VERSION/bin/phpize
     ./configure \
         --with-php-config=$WORKSPACE/install-php-$SF_PHP_VERSION/bin/php-config
-        --with-pdo-odbc=unixODBC,/usr
+        --enable-pdo_snowflake
+    make
+    make test # currently this won't pass
