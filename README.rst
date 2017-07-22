@@ -61,4 +61,14 @@ Clone the this repository and run ``phpize``, ``configure``, ``make`` and ``make
         --with-php-config=$WORKSPACE/install-php-$SF_PHP_VERSION/bin/php-config
         --enable-pdo_snowflake
     make
-    make test # currently this won't pass
+    make test
+
+
+Check if the PDO Snowflake module can be loaded
+--------------------
+
+Run the following command to check if PHP PDO Driver for Snowflake is successfully loaded in memory.
+
+.. code-block:: bash
+
+    php -dextension=modules/pdo_snowflake.so -m | grep pdo_snowflake

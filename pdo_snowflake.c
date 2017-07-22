@@ -14,6 +14,13 @@
 
 ZEND_DECLARE_MODULE_GLOBALS(pdo_snowflake)
 
+#ifdef COMPILE_DL_PDO_SNOWFLAKE
+#ifdef ZTS
+ZEND_TSRMLS_CACHE_DEFINE()
+#endif
+ZEND_GET_MODULE(pdo_snowflake)
+#endif
+
 /* {{{ PHP_INI_BEGIN
 */
 PHP_INI_BEGIN()
