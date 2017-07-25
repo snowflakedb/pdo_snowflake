@@ -15,11 +15,13 @@
 ZEND_DECLARE_MODULE_GLOBALS(pdo_snowflake)
 
 #ifdef COMPILE_DL_PDO_SNOWFLAKE
-#ifdef ZTS
+#   if (PHP_VERSION_ID>=70000)
+#       ifdef ZTS
 ZEND_TSRMLS_CACHE_DEFINE()
-#endif
+#       endif /* ZTS */
+#   endif /* PHP_VERSION_ID */
 ZEND_GET_MODULE(pdo_snowflake)
-#endif
+#endif /* COMPILE_DL_PDO_SNOWFLAKE */
 
 /* {{{ PHP_INI_BEGIN
 */
@@ -75,8 +77,10 @@ static PHP_MINFO_FUNCTION(pdo_snowflake)
 /* {{{ PHP_GINIT_FUNCTION */
 static PHP_GINIT_FUNCTION(pdo_snowflake)
 {
+#if (PHP_VERSION_ID>=70000)
 #if defined(COMPILE_DL_PDO_SNOWFLAKE) && defined(ZTS)
 ZEND_TSRMLS_CACHE_UPDATE();
+#endif
 #endif
 }
 /* }}} */

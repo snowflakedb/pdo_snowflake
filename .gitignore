@@ -39,3 +39,4 @@ parameters.json
 *.gcda
 *.gcno
 *.gcov
+junit.xml
