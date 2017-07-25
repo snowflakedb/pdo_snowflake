@@ -7,10 +7,13 @@ ZEND_BEGIN_MODULE_GLOBALS(pdo_snowflake)
 ZEND_END_MODULE_GLOBALS(pdo_snowflake)
 
 ZEND_EXTERN_MODULE_GLOBALS(pdo_snowflake)
-#define PDO_SNOWFLAKE_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(pdo_snowflake, v)
-#if defined(ZTS) && defined(COMPILE_DL_PDO_SNOWFLAKE)
+
+#if (PHP_VERSION_ID>=70000)
+#   define PDO_SNOWFLAKE_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(pdo_snowflake, v)
+#   if defined(ZTS) && defined(COMPILE_DL_PDO_SNOWFLAKE)
 ZEND_TSRMLS_CACHE_EXTERN()
-#endif
+#   endif
+#endif /* PHP_VERSION_ID */
 
 extern pdo_driver_t pdo_snowflake_driver;
 extern struct pdo_stmt_methods snowflake_stmt_methods;
