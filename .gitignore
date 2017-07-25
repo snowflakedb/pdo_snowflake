@@ -36,3 +36,6 @@ tests/*/*.log
 tests/*/*.sh
 tmp-php.ini
 parameters.json
+*.gcda
+*.gcno
+*.gcov
