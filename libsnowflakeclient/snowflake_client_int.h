@@ -1,0 +1,18 @@
+//
+// Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
+//
+
+#ifndef PDO_SNOWFLAKE_SNOWFLAKE_CLIENT_INT_H
+#define PDO_SNOWFLAKE_SNOWFLAKE_CLIENT_INT_H
+
+#define HEADER_SNOWFLAKE_TOKEN "Snowflake Token=%s"
+#define HEADER_AUTHRIZATION_KEY "Authorization"
+
+#define HEADER_CONTENT_TYPE_APPLICATION_JSON "application/json"
+#define HEADER_ACCEPT_TYPE_APPLICATION_SNOWFLAKE "application/snowflake"
+
+#define SESSION_EXPIRE_CODE "390112"
+#define QUERY_IN_PROGRESS_CODE "333333"
+#define QUERY_IN_PROGRESS_ASYNC_CODE "333334"
+
+#endif //PDO_SNOWFLAKE_SNOWFLAKE_CLIENT_INT_H
