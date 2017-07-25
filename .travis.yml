@@ -4,6 +4,7 @@ before_install:
   - openssl aes-256-cbc -k "$super_secret_password" -in parameters.json.enc -out parameters.json -d
 install:
   - sudo apt-get update
+  - sudo apt-get install lcov
   - export PHP_VERSION=7.1.6
   - mkdir -p $TRAVIS_BUILD_DIR/dep
   - cd $TRAVIS_BUILD_DIR/dep
