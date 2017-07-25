@@ -13,6 +13,8 @@ ZEND_EXTERN_MODULE_GLOBALS(pdo_snowflake)
 #   if defined(ZTS) && defined(COMPILE_DL_PDO_SNOWFLAKE)
 ZEND_TSRMLS_CACHE_EXTERN()
 #   endif
+#else
+typedef long zend_long;
 #endif /* PHP_VERSION_ID */
 
 extern pdo_driver_t pdo_snowflake_driver;
