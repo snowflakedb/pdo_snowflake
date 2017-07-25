@@ -5,7 +5,7 @@ PHP PDO driver for Snowflake
 .. image:: https://travis-ci.org/snowflakedb/pdo_snowflake.svg?branch=master
     :target: https://travis-ci.org/snowflakedb/pdo_snowflake
 
-.. image:: https://codecov.io/gh/snowflakedb/pdo_snowflake.svg
+.. image:: https://codecov.io/gh/snowflakedb/pdo_snowflake/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/snowflakedb/pdo_snowflake
 
 .. image:: http://img.shields.io/:license-Apache%202-brightgreen.svg
