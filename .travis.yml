@@ -1,23 +1,16 @@
 sudo: required
-language: c
+language: php
+php:
+  - '5.6'
+  - '7.1'
 before_install:
   - openssl aes-256-cbc -k "$super_secret_password" -in parameters.json.enc -out parameters.json -d
 install:
   - sudo apt-get update
   - sudo apt-get install lcov
-  - export PHP_VERSION=7.1.6
-  - mkdir -p $TRAVIS_BUILD_DIR/dep
-  - cd $TRAVIS_BUILD_DIR/dep
-  - wget http://php.net/distributions/php-${PHP_VERSION}.tar.xz
-  - tar xf php-${PHP_VERSION}.tar.xz
-  - cd php-${PHP_VERSION}
-  - ./configure --prefix=$TRAVIS_BUILD_DIR/dep/install-php-${PHP_VERSION} --enable-phpdbg
-  - make 2>&1 > phpbuild.log
-  - make install 2>&1 >> phpbuild.log
 script:
-  - cd $TRAVIS_BUILD_DIR
-  - $TRAVIS_BUILD_DIR/dep/install-php-${PHP_VERSION}/bin/phpize
-  - ./configure --with-php-config=$TRAVIS_BUILD_DIR/dep/install-php-${PHP_VERSION}/bin/php-config --enable-pdo_snowflake --enable-coverage
+  - phpize
+  - ./configure --enable-pdo_snowflake --enable-coverage
   - make clean
   - make
   - REPORT_EXIT_STATUS=1 NO_INTERACTION=true make test
