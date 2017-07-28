@@ -1,6 +1,6 @@
-//
-// Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
-//
+/*
+ * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
+ */
 
 #ifndef PDO_SNOWFLAKE_SNOWFLAKE_CLIENT_VERSION_H
 #define PDO_SNOWFLAKE_SNOWFLAKE_CLIENT_VERSION_H
