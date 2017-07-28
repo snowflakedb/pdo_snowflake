@@ -12,9 +12,9 @@ set(CMAKE_C_FLAGS
 set(CMAKE_C_FLAGS
         "${CMAKE_C_FLAGS} -g -O0 -ggdb -fprofile-arcs -ftest-coverage")
 
-if(UNIX AND NOT APPLE)
+if (UNIX AND NOT APPLE)
     set(LINUX TRUE)
-endif()
+endif ()
 
 # PHP home: dev env not used in TravisCI
 set(PHP_HOME /tmp/install-php-7.1.6)
@@ -22,7 +22,7 @@ set(PHP_HOME /tmp/install-php-7.1.6)
 set(SOURCE_FILES
         snowflake_driver.c
         snowflake_stmt.c
-        pdo_snowflake.c libsnowflakeclient/snowflake_client.c libsnowflakeclient/snowflake_client.h libsnowflakeclient/snowflake_client_version.h libsnowflakeclient/snowflake_client_constant.h libsnowflakeclient/snowflake_client_int.h)
+        pdo_snowflake.c)
 
 include_directories(
         "."
@@ -35,6 +35,7 @@ include_directories(
         ${PHP_HOME}/include/php/ext
         ${PHP_HOME}/include/php/ext/date/lib
 )
+add_subdirectory(libsnowflakeclient)
 
 add_library(pdo_snowflake SHARED ${SOURCE_FILES})
 
