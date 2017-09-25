@@ -1,0 +1,16 @@
+curl-config
+lib/curl_config.h
+lib/libcurl.vers
+lib/stamp-h1
+lib/vauth/.dirstamp
+lib/vauth/*.o
+lib/vtls/.dirstamp
+lib/vtls/*.o
+libcurl.pc
+packages/AIX/RPM/curl.spec
+packages/EPM/curl.list
+packages/Linux/RPM/curl-ssl.spec
+packages/Linux/RPM/curl.spec
+src/curl
+tests/configurehelp.pm
+
