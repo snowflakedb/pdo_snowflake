@@ -11,8 +11,9 @@ function usage() {
 set -o pipefail
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-OPENSSL_SOURCE_DIR=$DIR/../openssl-1.1.0f/
-LIBCURL_SOURCE_DIR=$DIR/../curl-7.54.1/
+DEPS_DIR=$(cd $DIR/../deps && pwd)
+OPENSSL_SOURCE_DIR=$DEPS_DIR/openssl-1.1.0f/
+LIBCURL_SOURCE_DIR=$DEPS_DIR/curl-7.54.1/
 
 target=Release
 while getopts ":ht:s:" opt; do
@@ -31,7 +32,7 @@ echo "Options:"
 echo "  target       = $target"
 echo "PATH="$PATH
 
-DEPENDENCY_LINUX=$DIR/../deps/linux
+DEPENDENCY_LINUX=$DIR/../build/linux
 rm -rf $DEPENDENCY_LINUX
 mkdir -p $DEPENDENCY_LINUX
 
