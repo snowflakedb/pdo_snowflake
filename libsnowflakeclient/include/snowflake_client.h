@@ -17,39 +17,59 @@ extern "C" {
 
 #include "libsnowflakeclient/lib/snowflake_client_version.h"
 
-typedef double float64;
-typedef float float32;
+typedef char int8;
+typedef unsigned char uint8;
 typedef unsigned long int uint32;
 typedef long int int32;
 typedef unsigned long long int uint64;
 typedef long long int int64;
+typedef double float64;
+typedef float float32;
 
 /**
- * Snowflake database session context.
+ * Snowflake Data types
  */
-typedef struct st_snowflake_connection
-{
-  /* TODO */
-} SNOWFLAKE;
-
 typedef enum sf_type
 {
-  SF_TYPE_INTEGER
+  SF_TYPE_FIXED,
+  SF_TYPE_REAL,
+  SF_TYPE_TEXT,
+  SF_TYPE_DATE,
+  SF_TYPE_TIMESTAMP_LTZ,
+  SF_TYPE_TIMESTAMP_NTZ,
+  SF_TYPE_TIMESTAMP_TZ,
+  SF_TYPE_VARIANT,
+  SF_TYPE_OBJECT,
+  SF_TYPE_ARRAY,
+  SF_TYPE_BINARY,
+  SF_TYPE_TIME,
+  SF_TYPE_BOOLEAN
 } SNOWFLAKE_TYPE;
 
+/**
+ * C data types
+ */
 typedef enum sf_c_type
 {
-  SF_C_TYPE_INTEGER,
+  SF_C_TYPE_INT8,
+  SF_C_TYPE_UINT8,
+  SF_C_TYPE_INT64,
+  SF_C_TYPE_UINT64,
   SF_C_TYPE_STRING,
   SF_C_TYPE_TIMESTAMP
 } SNOWFLAKE_C_TYPE;
 
+/**
+ * Snowflake API status
+ */
 typedef enum sf_status
 {
   SF_STATUS_SUCCESS,
   SF_STATUS_ERROR,
-  SF_STATUS_WARNING
+  SF_STATUS_WARNING,
+  SF_STATUS_EOL
 } SNOWFLAKE_STATUS;
+
 /**
  * Attributes for Snowflake database session context.
  */
@@ -62,14 +82,22 @@ typedef enum sf_attribute
   SF_CON_SCHEMA,
   SF_CON_WAREHOUSE,
   SF_CON_ROLE,
+  SF_CON_HOST,
+  SF_CON_PORT,
+  SF_CON_PROTOCOL,
+  SF_CON_PASSCODE,
+  SF_CON_PASSCODE_IN_PASSWORD,
+  SF_CON_APPLICATION,
+  SF_CON_AUTHENTICATOR,
+  SF_CON_INSECURE_MODE,
+  SF_SESSION_PARAMETER,
   SF_CON_LOGIN_TIMEOUT,
-  SF_CON_REQUEST_TIMEOUT,
+  SF_CON_NETWORK_TIMEOUT,
   SF_CON_AUTOCOMMIT
 } SNOWFLAKE_ATTRIBUTE;
 
-
 /**
- * Attributes for statement context.
+ * Attributes for Snowflake statement context.
  */
 typedef enum sf_stmt_attribute
 {
@@ -77,11 +105,43 @@ typedef enum sf_stmt_attribute
 } SNOWFLAKE_STMT_ATTRIBUTE;
 
 /**
+ * Snowflake Error
+ */
+typedef struct sf_error
+{
+  int errno;
+  const char *msg;
+  const char *sfqid;
+} SNOWFLAKE_ERROR;
+
+/**
+ * Snowflake database session context.
+ */
+typedef struct st_snowflake_connection
+{
+  char *account;
+  char *user;
+  char *password;
+  char *database;
+  char *schema;
+  char *warehouse;
+  char *role;
+  char *host;
+  char *port;
+
+  int64 login_timeout;
+  int64 network_timeout;
+} SNOWFLAKE;
+
+/**
  * Statement context
  */
 typedef struct sf_snowflake_statement
 {
   /* TODO */
+  char *sfqid;
+  SNOWFLAKE_ERROR error;
+  SNOWFLAKE *connection;
 } SNOWFLAKE_STMT;
 
 /**
@@ -104,12 +164,11 @@ typedef struct sf_snowflake_output
   void *value;
 } SNOWFLAKE_OUTPUT;
 
-typedef struct sf_error
-{
-  int errno;
-  const char *msg;
-  const char *sfqid;
-} SNOWFLAKE_ERROR;
+/**
+ * Constants
+ */
+extern int8 SF_BOOLEAN_TRUE;
+extern int8 SF_BOOLEAN_FALSE;
 
 /**
  * Initializes a SNOWFLAKE connection context
@@ -173,10 +232,10 @@ SNOWFLAKE_STMT *STDCALL snowflake_stmt(SNOWFLAKE *sf);
 
 /**
  * Closes a statement.
- * @param sfres SNOWFLAKE_STMT context.
+ * @param sfstmt SNOWFLAKE_STMT context.
  * @return 0 if success, otherwise an errno is returned.
  */
-SNOWFLAKE_STATUS STDCALL snowflake_stmt_close(SNOWFLAKE_STMT *sfres);
+void STDCALL snowflake_stmt_close(SNOWFLAKE_STMT *sfstmt);
 
 /**
  * Begins a new transaction.
@@ -235,26 +294,26 @@ int64 STDCALL snowflake_affected_rows(SNOWFLAKE_STMT *sfstmt);
 /**
  * Returns the number of rows can be fetched from the result set.
  *
- * @param sfres SNOWFLAKE_RESULTSET context.
+ * @param sfstmt SNOWFLAKE_RESULTSET context.
  * @return the number of rows.
  */
-uint64 STDCALL snowflake_num_rows(SNOWFLAKE_STMT *sfres);
+uint64 STDCALL snowflake_num_rows(SNOWFLAKE_STMT *sfstmt);
 
 /**
  * Returns the number of fields in the result set.
  *
- * @param sfres SNOWFLAKE_RESULTSET context.
+ * @param sfstmt SNOWFLAKE_RESULTSET context.
  * @return the number of fields.
  */
-uint64 STDCALL snowflake_num_fields(SNOWFLAKE_STMT *sfres);
+uint64 STDCALL snowflake_num_fields(SNOWFLAKE_STMT *sfstmt);
 
 /**
  * Returns a SQLState for the result set.
  *
- * @param sfres SNOWFLAKE_STMT context.
+ * @param sfstmt SNOWFLAKE_STMT context.
  * @return SQL State
  */
-const char *STDCALL snowflake_sqlstate(SNOWFLAKE_STMT *sf);
+const char *STDCALL snowflake_sqlstate(SNOWFLAKE_STMT *sfstmt);
 
 /**
  * Prepares a statement.

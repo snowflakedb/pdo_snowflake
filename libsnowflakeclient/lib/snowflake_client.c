@@ -3,20 +3,28 @@
  */
 
 #include <stddef.h>
+#include <stdlib.h>
 #include "../include/snowflake_client.h"
+
+int8 SF_BOOLEAN_TRUE = 1;
+int8 SF_BOOLEAN_FALSE = 0;
 
 SNOWFLAKE *STDCALL snowflake_init()
 {
-  return NULL;
+  // TODO: track memory usage
+  return (SNOWFLAKE *) calloc(1, sizeof(SNOWFLAKE));
 }
 
 void STDCALL snowflake_term(SNOWFLAKE *sf)
 {
-  // TODO
+  // TODO: track memory usage
+  free(sf);
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf)
 {
+  // TODO: connect to Snowflake
+  sf->account;
   return SF_STATUS_SUCCESS;
 }
 
@@ -33,7 +41,16 @@ SNOWFLAKE_STATUS STDCALL snowflake_set_attr(
 
 SNOWFLAKE_STMT *STDCALL snowflake_stmt(SNOWFLAKE *sf)
 {
-  return NULL;
+  // TODO: track memory usage
+  SNOWFLAKE_STMT *ret = (SNOWFLAKE_STMT *) calloc(1, sizeof(SNOWFLAKE_STMT));
+  ret->connection = sf;
+  return ret;
+}
+
+void STDCALL snowflake_stmt_close(SNOWFLAKE_STMT *sfstmt)
+{
+  // TODO: track memory usage
+  free(sfstmt);
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_bind_param(
@@ -54,12 +71,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_query(
   return SF_STATUS_SUCCESS;
 }
 
-SNOWFLAKE_STATUS STDCALL snowflake_fetch(SNOWFLAKE_STMT *sfres)
-{
-  return SF_STATUS_SUCCESS;
-}
-
-SNOWFLAKE_STATUS STDCALL snowflake_stmt_close(SNOWFLAKE_STMT *sfres)
+SNOWFLAKE_STATUS STDCALL snowflake_fetch(SNOWFLAKE_STMT *sfstmt)
 {
   return SF_STATUS_SUCCESS;
 }
@@ -97,10 +109,10 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt)
 
 SNOWFLAKE_ERROR *STDCALL snowflake_error(SNOWFLAKE_STMT *sfstmt)
 {
-  return NULL;
+  return &sfstmt->error;
 }
 
-uint64 STDCALL snowflake_num_rows(SNOWFLAKE_STMT *sfres)
+uint64 STDCALL snowflake_num_rows(SNOWFLAKE_STMT *sfstmt)
 {
   return (uint64) 1;
 }
