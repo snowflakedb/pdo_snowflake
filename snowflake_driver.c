@@ -121,6 +121,7 @@ static int pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /*
 {
 	PDO_DBG_RETURN(1);
 }
+/* }}} */
 
 pdo_driver_t pdo_snowflake_driver = {
 	PDO_DRIVER_HEADER(snowflake),
