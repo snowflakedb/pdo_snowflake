@@ -29,7 +29,7 @@ void main()
   /* execute a DML */
   SNOWFLAKE_STMT *sfstmt = snowflake_stmt(sf);
   snowflake_prepare(sfstmt, "INSERT INTO testtable(1,?,?)");
-  SNOWFLAKE_INPUT p1, p2;
+  SNOWFLAKE_BIND_INPUT p1, p2;
   p1.idx = 1;
   p1.type = SF_C_TYPE_STRING;
   p1.value = (void *) "test1";
