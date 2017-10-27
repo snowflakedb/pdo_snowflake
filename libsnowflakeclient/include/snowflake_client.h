@@ -179,13 +179,6 @@ extern const char C_API_USER_AGENT[];
 
 
 /**
- * Initializes a SNOWFLAKE connection context
- *
- * @return SNOWFLAKE context if success
- */
-SNOWFLAKE *STDCALL snowflake_init();
-
-/**
  * Global Snowflake initialization.
  *
  * @return 0 if successful, errno otherwise
@@ -193,11 +186,18 @@ SNOWFLAKE *STDCALL snowflake_init();
 SNOWFLAKE_STATUS STDCALL snowflake_global_init();
 
 /**
- * Global Snowflake initialization.
+ * Global Snowflake cleanup.
  *
  * @return 0 if successful, errno otherwise
  */
 SNOWFLAKE_STATUS STDCALL snowflake_global_cleanup();
+
+/**
+ * Initializes a SNOWFLAKE connection context
+ *
+ * @return SNOWFLAKE context if success
+ */
+SNOWFLAKE *STDCALL snowflake_init();
 
 /**
  * Purge a SNOWFLAKE connection context
