@@ -15,6 +15,7 @@ extern "C" {
 #define STDCALL __stdcall
 #endif
 
+#include <jmorecfg.h>
 #include "libsnowflakeclient/lib/snowflake_client_version.h"
 
 typedef char int8;
@@ -29,119 +30,121 @@ typedef float float32;
 /**
  * Snowflake Data types
  */
-typedef enum sf_type
-{
-  SF_TYPE_FIXED,
-  SF_TYPE_REAL,
-  SF_TYPE_TEXT,
-  SF_TYPE_DATE,
-  SF_TYPE_TIMESTAMP_LTZ,
-  SF_TYPE_TIMESTAMP_NTZ,
-  SF_TYPE_TIMESTAMP_TZ,
-  SF_TYPE_VARIANT,
-  SF_TYPE_OBJECT,
-  SF_TYPE_ARRAY,
-  SF_TYPE_BINARY,
-  SF_TYPE_TIME,
-  SF_TYPE_BOOLEAN
+typedef enum sf_type {
+    SF_TYPE_FIXED,
+    SF_TYPE_REAL,
+    SF_TYPE_TEXT,
+    SF_TYPE_DATE,
+    SF_TYPE_TIMESTAMP_LTZ,
+    SF_TYPE_TIMESTAMP_NTZ,
+    SF_TYPE_TIMESTAMP_TZ,
+    SF_TYPE_VARIANT,
+    SF_TYPE_OBJECT,
+    SF_TYPE_ARRAY,
+    SF_TYPE_BINARY,
+    SF_TYPE_TIME,
+    SF_TYPE_BOOLEAN
 } SNOWFLAKE_TYPE;
 
 /**
  * C data types
  */
-typedef enum sf_c_type
-{
-  SF_C_TYPE_INT8,
-  SF_C_TYPE_UINT8,
-  SF_C_TYPE_INT64,
-  SF_C_TYPE_UINT64,
-  SF_C_TYPE_STRING,
-  SF_C_TYPE_TIMESTAMP
+typedef enum sf_c_type {
+    SF_C_TYPE_INT8,
+    SF_C_TYPE_UINT8,
+    SF_C_TYPE_INT64,
+    SF_C_TYPE_UINT64,
+    SF_C_TYPE_STRING,
+    SF_C_TYPE_TIMESTAMP
 } SNOWFLAKE_C_TYPE;
 
 /**
  * Snowflake API status
  */
-typedef enum sf_status
-{
-  SF_STATUS_SUCCESS,
-  SF_STATUS_ERROR,
-  SF_STATUS_WARNING,
-  SF_STATUS_EOL
+typedef enum sf_status {
+    SF_STATUS_SUCCESS,
+    SF_STATUS_ERROR,
+    SF_STATUS_WARNING,
+    SF_STATUS_EOL
 } SNOWFLAKE_STATUS;
 
 /**
  * Attributes for Snowflake database session context.
  */
-typedef enum sf_attribute
-{
-  SF_CON_ACCOUNT,
-  SF_CON_USER,
-  SF_CON_PASSWORD,
-  SF_CON_DATABASE,
-  SF_CON_SCHEMA,
-  SF_CON_WAREHOUSE,
-  SF_CON_ROLE,
-  SF_CON_HOST,
-  SF_CON_PORT,
-  SF_CON_PROTOCOL,
-  SF_CON_PASSCODE,
-  SF_CON_PASSCODE_IN_PASSWORD,
-  SF_CON_APPLICATION,
-  SF_CON_AUTHENTICATOR,
-  SF_CON_INSECURE_MODE,
-  SF_SESSION_PARAMETER,
-  SF_CON_LOGIN_TIMEOUT,
-  SF_CON_NETWORK_TIMEOUT,
-  SF_CON_AUTOCOMMIT
+typedef enum sf_attribute {
+    SF_CON_ACCOUNT,
+    SF_CON_USER,
+    SF_CON_PASSWORD,
+    SF_CON_DATABASE,
+    SF_CON_SCHEMA,
+    SF_CON_WAREHOUSE,
+    SF_CON_ROLE,
+    SF_CON_HOST,
+    SF_CON_PORT,
+    SF_CON_PROTOCOL,
+    SF_CON_PASSCODE,
+    SF_CON_PASSCODE_IN_PASSWORD,
+    SF_CON_APPLICATION,
+    SF_CON_AUTHENTICATOR,
+    SF_CON_INSECURE_MODE,
+    SF_SESSION_PARAMETER,
+    SF_CON_LOGIN_TIMEOUT,
+    SF_CON_NETWORK_TIMEOUT,
+    SF_CON_AUTOCOMMIT
 } SNOWFLAKE_ATTRIBUTE;
 
 /**
  * Attributes for Snowflake statement context.
  */
-typedef enum sf_stmt_attribute
-{
-  INTERNAL
+typedef enum sf_stmt_attribute {
+    INTERNAL
 } SNOWFLAKE_STMT_ATTRIBUTE;
 
 /**
  * Snowflake Error
  */
-typedef struct sf_error
-{
-  int errno;
-  const char *msg;
-  const char *sfqid;
+typedef struct sf_error {
+    int errno;
+    const char *msg;
+    const char *sfqid;
 } SNOWFLAKE_ERROR;
 
 /**
  * Snowflake database session context.
  */
-typedef struct st_snowflake_connection
-{
-  char *account;
-  char *user;
-  char *password;
-  char *database;
-  char *schema;
-  char *warehouse;
-  char *role;
-  char *host;
-  char *port;
+typedef struct st_snowflake_connection {
+    const char *account;
+    const char *user;
+    const char *password;
+    const char *database;
+    const char *schema;
+    const char *warehouse;
+    const char *role;
+    const char *host;
+    const char *port;
+    const char *protocol;
 
-  int64 login_timeout;
-  int64 network_timeout;
+    const char *passcode;
+    boolean passcode_in_password;
+    boolean insecure_mode;
+    boolean autocommit;
+
+    // Session info
+    char *token;
+    char *master_token;
+
+    int64 login_timeout;
+    int64 network_timeout;
 } SNOWFLAKE;
 
 /**
  * Statement context
  */
-typedef struct sf_snowflake_statement
-{
-  /* TODO */
-  char *sfqid;
-  SNOWFLAKE_ERROR error;
-  SNOWFLAKE *connection;
+typedef struct sf_snowflake_statement {
+    /* TODO */
+    char *sfqid;
+    SNOWFLAKE_ERROR error;
+    SNOWFLAKE *connection;
 } SNOWFLAKE_STMT;
 
 /**
@@ -155,7 +158,7 @@ typedef struct sf_snowflake_input
 } SNOWFLAKE_BIND_INPUT;
 
 /**
- * Bind input parameter context
+ * Bind output parameter context
  */
 typedef struct sf_snowflake_output
 {
@@ -169,6 +172,25 @@ typedef struct sf_snowflake_output
  */
 extern int8 SF_BOOLEAN_TRUE;
 extern int8 SF_BOOLEAN_FALSE;
+extern const char EMPTY_STRING[];
+extern const char CONTENT_TYPE_APPLICATION_JSON[];
+extern const char ACCEPT_TYPE_APPLICATION_SNOWFLAKE[];
+extern const char C_API_USER_AGENT[];
+
+
+/**
+ * Global Snowflake initialization.
+ *
+ * @return 0 if successful, errno otherwise
+ */
+SNOWFLAKE_STATUS STDCALL snowflake_global_init();
+
+/**
+ * Global Snowflake cleanup.
+ *
+ * @return 0 if successful, errno otherwise
+ */
+SNOWFLAKE_STATUS STDCALL snowflake_global_cleanup();
 
 /**
  * Initializes a SNOWFLAKE connection context
@@ -210,7 +232,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_close(SNOWFLAKE *sf);
  * @return 0 if success, otherwise an errno is returned.
  */
 SNOWFLAKE_STATUS STDCALL snowflake_set_attr(
-    SNOWFLAKE *sf, SNOWFLAKE_ATTRIBUTE type, const void *value);
+        SNOWFLAKE *sf, SNOWFLAKE_ATTRIBUTE type, const void *value);
 
 /**
  * Gets the attribute value from the session.
@@ -221,7 +243,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_set_attr(
  * @return 0 if success, otherwise an errno is returned.
  */
 SNOWFLAKE_STATUS STDCALL snowflake_get_attr(
-    SNOWFLAKE *sf, SNOWFLAKE_ATTRIBUTE type, void *value);
+        SNOWFLAKE *sf, SNOWFLAKE_ATTRIBUTE type, void *value);
 
 /**
  * Creates sf SNOWFLAKE_STMT context.
@@ -278,8 +300,7 @@ SNOWFLAKE_ERROR *STDCALL snowflake_error(SNOWFLAKE_STMT *sfstmt);
  * @param command a query or command that returns results.
  * @return 0 if success, otherwise an errno is returned.
  */
-SNOWFLAKE_STATUS STDCALL snowflake_query(
-    SNOWFLAKE_STMT *sfstmt, const char *command);
+SNOWFLAKE_STATUS STDCALL snowflake_query(SNOWFLAKE_STMT *sfstmt, const char *command);
 
 /**
  * Returns the number of affected rows in the last execution.  This function
@@ -323,7 +344,7 @@ const char *STDCALL snowflake_sqlstate(SNOWFLAKE_STMT *sfstmt);
  * @return 0 if success, otherwise an errno is returned.
  */
 SNOWFLAKE_STATUS STDCALL snowflake_prepare(
-    SNOWFLAKE_STMT *sfstmt, const char *command);
+        SNOWFLAKE_STMT *sfstmt, const char *command);
 
 /**
  * Sets the statement attribute to the session.
@@ -334,7 +355,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_prepare(
  * @return 0 if success, otherwise an errno is returned.
  */
 SNOWFLAKE_STATUS STDCALL snowflake_stmt_set_attr(
-    SNOWFLAKE_STMT *sf, SNOWFLAKE_STMT_ATTRIBUTE type, const void *value);
+        SNOWFLAKE_STMT *sf, SNOWFLAKE_STMT_ATTRIBUTE type, const void *value);
 
 /**
  * Gets the statement attribute value from the session.
@@ -345,7 +366,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_stmt_set_attr(
  * @return 0 if success, otherwise an errno is returned.
  */
 SNOWFLAKE_STATUS STDCALL snowflake_stmt_get_attr(
-    SNOWFLAKE_STMT *sf, SNOWFLAKE_STMT_ATTRIBUTE type, void *value);
+        SNOWFLAKE_STMT *sf, SNOWFLAKE_STMT_ATTRIBUTE type, void *value);
 
 /**
  * Executes a statement.
