@@ -12,8 +12,15 @@ set(SOURCE_FILES
         lib/snowflake_client_int.h
         lib/snowflake_client_version.h
         lib/snowflake_client.c
-        )
+        lib/cJSON.h
+        lib/cJSON.c)
+
+include_directories(deps/curl-7.54.1/include)
+
+link_directories(deps/curl-7.54.1/lib)
 
 add_library(snowflakeclient STATIC ${SOURCE_FILES})
+
+target_link_libraries(snowflakeclient curl)
 
 add_subdirectory(examples)
