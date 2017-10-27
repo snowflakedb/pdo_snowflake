@@ -187,7 +187,15 @@ SNOWFLAKE *STDCALL snowflake_init();
  * Global Snowflake initialization.
  *
  * @return 0 if successful, errno otherwise
- * /
+ */
+SNOWFLAKE_STATUS STDCALL snowflake_global_init();
+
+/**
+ * Global Snowflake initialization.
+ *
+ * @return 0 if successful, errno otherwise
+ */
+SNOWFLAKE_STATUS STDCALL snowflake_global_cleanup();
 
 /**
  * Purge a SNOWFLAKE connection context

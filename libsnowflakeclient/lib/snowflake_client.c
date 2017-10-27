@@ -429,5 +429,6 @@ uint64 STDCALL snowflake_num_rows(SNOWFLAKE_STMT *sfstmt) {
 }
 
 const char *STDCALL snowflake_sfqid(SNOWFLAKE_STMT *sfstmt) {
-    return "abcdef-abdef";
+    // TODO check if sfstmt is NULL
+    return sfstmt->sfqid;
 }
