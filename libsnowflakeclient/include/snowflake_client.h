@@ -152,7 +152,7 @@ typedef struct sf_snowflake_input
   int idx;
   SNOWFLAKE_C_TYPE type;
   void *value;
-} SNOWFLAKE_INPUT;
+} SNOWFLAKE_BIND_INPUT;
 
 /**
  * Bind input parameter context
@@ -162,7 +162,7 @@ typedef struct sf_snowflake_output
   int idx;
   SNOWFLAKE_C_TYPE type;
   void *value;
-} SNOWFLAKE_OUTPUT;
+} SNOWFLAKE_BIND_OUTPUT;
 
 /**
  * Constants
@@ -376,21 +376,21 @@ uint64 STDCALL snowflake_param_count(SNOWFLAKE_STMT *sfstmt);
  * Binds parameters with the statement for execution.
  *
  * @param sfstmt SNOWFLAKE_STMT context.
- * @param sfbind SNOWFLAKE_BIND context array.
+ * @param sfbind SNOWFLAKE_BIND_INPUT context array.
  * @return 0 if success, otherwise an errno is returned.
  */
 SNOWFLAKE_STATUS STDCALL snowflake_bind_param(
-    SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_INPUT *sfbind);
+    SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_BIND_INPUT *sfbind);
 
 /**
  * Binds buffers with the statement for result set processing.
  *
  * @param sfstmt SNOWFLAKE_STMT context.
- * @param sfbind_array SNOWFLAKE_BIND context array.
+ * @param sfbind_array SNOWFLAKE_BIND_OUTPUT context array.
  * @return 0 if success, otherwise an errno is returned.
  */
 SNOWFLAKE_STATUS STDCALL snowflake_bind_result(
-    SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_OUTPUT *sfbind);
+    SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_BIND_OUTPUT *sfbind);
 
 /**
  * Returns a query id associated with the statement after execution. If not

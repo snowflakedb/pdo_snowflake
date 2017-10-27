@@ -26,7 +26,7 @@ void main()
 
   /* query */
   SNOWFLAKE_STMT *sfstmt = snowflake_stmt(sf);
-  SNOWFLAKE_OUTPUT c1;
+  SNOWFLAKE_BIND_OUTPUT c1;
   int out = 0;
   c1.idx = 1;
   c1.type = SF_C_TYPE_INT64;

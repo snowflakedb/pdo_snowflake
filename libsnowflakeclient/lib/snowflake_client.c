@@ -54,13 +54,13 @@ void STDCALL snowflake_stmt_close(SNOWFLAKE_STMT *sfstmt)
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_bind_param(
-    SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_INPUT *sfbind)
+    SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_BIND_INPUT *sfbind)
 {
   return SF_STATUS_SUCCESS;
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_bind_result(
-    SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_OUTPUT *sfbind_array)
+    SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_BIND_OUTPUT *sfbind_array)
 {
   return SF_STATUS_SUCCESS;
 }
