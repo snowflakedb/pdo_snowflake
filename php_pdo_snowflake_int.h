@@ -3,6 +3,10 @@
 #ifndef PHP_PDO_SNOWFLAKE_INT_H
 #define PHP_PDO_SNOWFLAKE_INT_H
 
+#include "libsnowflakeclient/include/snowflake_client.h"
+
+#define PDO_DBG_RETURN(value)	return (value)
+
 ZEND_BEGIN_MODULE_GLOBALS(pdo_snowflake)
 ZEND_END_MODULE_GLOBALS(pdo_snowflake)
 
@@ -16,6 +20,10 @@ ZEND_TSRMLS_CACHE_EXTERN()
 #else
 typedef long zend_long;
 #endif /* PHP_VERSION_ID */
+
+typedef struct {
+    SNOWFLAKE *server;
+} pdo_snowflake_db_handle;
 
 extern pdo_driver_t pdo_snowflake_driver;
 extern struct pdo_stmt_methods snowflake_stmt_methods;

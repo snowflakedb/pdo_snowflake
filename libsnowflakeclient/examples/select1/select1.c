@@ -37,7 +37,7 @@ void main()
 
   while (snowflake_fetch(sfstmt) != SF_STATUS_EOL)
   {
-    printf("result: %d\n", (int) c1.value);
+    printf("result: %d\n", *((int *) c1.value));
   }
   snowflake_stmt_close(sfstmt);
 

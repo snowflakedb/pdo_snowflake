@@ -68,21 +68,33 @@ int json_resp_cb(char *data, size_t size, size_t nmemb, cJSON **json) {
     return (int) (size * nmemb);
 }
 
+/*
+ * Convenience method to find string size, create buffer, copy over, and return.
+ */
+char *alloc_buffer_and_copy(const char *str) {
+    size_t str_size;
+    char *buffer;
+    str_size = strlen(str);
+    buffer = (char *) calloc(1, str_size);
+    strncpy(buffer, str, str_size);
+    return buffer;
+}
+
 SNOWFLAKE *STDCALL snowflake_init() {
     // TODO: track memory usage
     SNOWFLAKE *sf = (SNOWFLAKE *) calloc(1, sizeof(SNOWFLAKE));
 
     // Initialize object with default values
-    sf->host = "snowflake.reg.local";
-    sf->port = "8082";
-    sf->user = EMPTY_STRING;
-    sf->password = EMPTY_STRING;
+    sf->host = alloc_buffer_and_copy("127.0.0.1");
+    sf->port = alloc_buffer_and_copy("8080");
+    sf->user = NULL;
+    sf->password = NULL;
     sf->database = NULL;
     sf->account = NULL;
     sf->role = NULL;
     sf->warehouse = NULL;
     sf->schema = NULL;
-    sf->protocol = "http";
+    sf->protocol = alloc_buffer_and_copy("http");
     sf->passcode = NULL;
     sf->passcode_in_password = SF_BOOLEAN_FALSE;
     sf->insecure_mode = SF_BOOLEAN_FALSE;
@@ -319,29 +331,61 @@ SNOWFLAKE_STATUS STDCALL snowflake_close(SNOWFLAKE *sf) {
 
 SNOWFLAKE_STATUS STDCALL snowflake_set_attr(
         SNOWFLAKE *sf, SNOWFLAKE_ATTRIBUTE type, const void *value) {
-
     if (type == SF_CON_ACCOUNT) {
-        sf->account = ((const char *) value);
+        if (sf->account) {
+            free(sf->account);
+        }
+        sf->account = alloc_buffer_and_copy(value);
     } else if (type == SF_CON_USER) {
-        sf->user = ((const char *) value);
+        if (sf->user) {
+            free(sf->user);
+        }
+        sf->user = alloc_buffer_and_copy(value);
     } else if (type == SF_CON_PASSWORD) {
-        sf->password = ((const char *) value);
+        if (sf->password) {
+            free(sf->password);
+        }
+        sf->password = alloc_buffer_and_copy(value);
     } else if (type == SF_CON_DATABASE) {
-        sf->database = ((const char *) value);
+        if (sf->database) {
+            free(sf->database);
+        }
+        sf->database = alloc_buffer_and_copy(value);
     } else if (type == SF_CON_SCHEMA) {
-        sf->schema = ((const char *) value);
+        if (sf->schema) {
+            free(sf->schema);
+        }
+        sf->schema = alloc_buffer_and_copy(value);
     } else if (type == SF_CON_WAREHOUSE) {
-        sf->warehouse = ((const char *) value);
+        if (sf->warehouse) {
+            free(sf->warehouse);
+        }
+        sf->warehouse = alloc_buffer_and_copy(value);
     } else if (type == SF_CON_ROLE) {
-        sf->role = ((const char *) value);
+        if (sf->role) {
+            free(sf->role);
+        }
+        sf->role = alloc_buffer_and_copy(value);
     } else if (type == SF_CON_HOST) {
-        sf->host = ((const char *) value);
+        if (sf->host) {
+            free(sf->host);
+        }
+        sf->host = alloc_buffer_and_copy(value);
     } else if (type == SF_CON_PORT) {
-        sf->port = ((const char *) value);
+        if (sf->port) {
+            free(sf->port);
+        }
+        sf->port = alloc_buffer_and_copy(value);
     } else if (type == SF_CON_PROTOCOL) {
-        sf->protocol = ((const char *) value);
+        if (sf->protocol) {
+            free(sf->protocol);
+        }
+        sf->protocol = alloc_buffer_and_copy(value);
     } else if (type == SF_CON_PASSCODE) {
-        sf->passcode = ((const char *) value);
+        if (sf->passcode) {
+            free(sf->passcode);
+        }
+        sf->passcode = alloc_buffer_and_copy(value);
     } else if (type == SF_CON_PASSCODE_IN_PASSWORD) {
         sf->passcode_in_password = *((boolean *) value);
     } else if (type == SF_CON_APPLICATION) {
