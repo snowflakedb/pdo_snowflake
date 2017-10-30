@@ -17,12 +17,14 @@ if (UNIX AND NOT APPLE)
 endif ()
 
 # PHP home: dev env not used in TravisCI
-set(PHP_HOME /tmp/install-php-7.1.6)
+set(PHP_HOME /home/kwagner/php_source/install-php-7.1.8)
 
 set(SOURCE_FILES
         snowflake_driver.c
         snowflake_stmt.c
         pdo_snowflake.c)
+
+# set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
 
 include_directories(
         "."
@@ -40,7 +42,9 @@ add_subdirectory(libsnowflakeclient)
 add_library(pdo_snowflake SHARED ${SOURCE_FILES})
 
 SET_TARGET_PROPERTIES(pdo_snowflake PROPERTIES PREFIX "")
+set_target_properties(pdo_snowflake PROPERTIES LINK_FLAGS "-Wl,-E")
 
 target_link_libraries(pdo_snowflake
+        snowflakeclient
         -fprofile-arcs
         -Wl,-soname -Wl,pdo_snowflake.so)

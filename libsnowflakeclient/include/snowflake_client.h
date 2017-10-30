@@ -104,7 +104,7 @@ typedef enum sf_stmt_attribute {
  * Snowflake Error
  */
 typedef struct sf_error {
-    int errno;
+    int err_number;
     const char *msg;
     const char *sfqid;
 } SNOWFLAKE_ERROR;
@@ -113,18 +113,18 @@ typedef struct sf_error {
  * Snowflake database session context.
  */
 typedef struct st_snowflake_connection {
-    const char *account;
-    const char *user;
-    const char *password;
-    const char *database;
-    const char *schema;
-    const char *warehouse;
-    const char *role;
-    const char *host;
-    const char *port;
-    const char *protocol;
+    char *account;
+    char *user;
+    char *password;
+    char *database;
+    char *schema;
+    char *warehouse;
+    char *role;
+    char *host;
+    char *port;
+    char *protocol;
 
-    const char *passcode;
+    char *passcode;
     boolean passcode_in_password;
     boolean insecure_mode;
     boolean autocommit;
@@ -190,7 +190,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_global_init();
  *
  * @return 0 if successful, errno otherwise
  */
-SNOWFLAKE_STATUS STDCALL snowflake_global_cleanup();
+SNOWFLAKE_STATUS STDCALL snowflake_global_term();
 
 /**
  * Initializes a SNOWFLAKE connection context

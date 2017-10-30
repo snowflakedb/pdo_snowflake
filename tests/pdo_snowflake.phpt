@@ -7,6 +7,6 @@ if (!extension_loaded('pdo') || !extension_loaded('pdo_snowflake')) die('skip no
 --FILE--
 <?php
 echo "OK\n";
-
+?>
 --EXPECT--
 OK
