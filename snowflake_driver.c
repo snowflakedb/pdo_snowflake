@@ -28,6 +28,16 @@ static int pdo_snowflake_fetch_error_func(pdo_dbh_t *dbh, pdo_stmt_t *stmt, zval
 
 static int snowflake_handle_closer(pdo_dbh_t *dbh) /* {{{ */
 {
+    pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *)dbh->driver_data;
+
+    if (H) {
+        if (H->server) {
+            snowflake_term(H->server);
+            H->server = NULL;
+        }
+        pefree(H, dbh->is_persistent);
+        dbh->driver_data = NULL;
+    }
     PDO_DBG_RETURN(1);
 }
 /* }}} */
@@ -141,6 +151,8 @@ static int pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /*
     // Parse the input data parameters
     php_pdo_parse_data_source(dbh->data_source, dbh->data_source_len, vars, 9);
 
+    // Run global init and allocate snowflake handle memory
+    snowflake_global_init();
     H = pecalloc(1, sizeof(pdo_snowflake_db_handle), dbh->is_persistent);
 
     //TODO set error stuff
