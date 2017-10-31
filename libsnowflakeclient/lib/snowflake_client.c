@@ -80,6 +80,27 @@ char *alloc_buffer_and_copy(const char *str) {
     return buffer;
 }
 
+SNOWFLAKE_STATUS STDCALL snowflake_global_init() {
+    SNOWFLAKE_STATUS ret;
+    CURLcode curl_ret;
+    curl_ret = curl_global_init(CURL_GLOBAL_DEFAULT);
+    if(curl_ret != CURLE_OK) {
+        fprintf(stderr, "curl_global_init() failed: %s\n", curl_easy_strerror(curl_ret));
+        ret = SF_STATUS_ERROR;
+        goto cleanup;
+    }
+
+    ret = SF_STATUS_SUCCESS;
+
+cleanup:
+    return ret;
+}
+
+SNOWFLAKE_STATUS STDCALL snowflake_global_term() {
+    curl_global_cleanup();
+    return SF_STATUS_SUCCESS;
+}
+
 SNOWFLAKE *STDCALL snowflake_init() {
     // TODO: track memory usage
     SNOWFLAKE *sf = (SNOWFLAKE *) calloc(1, sizeof(SNOWFLAKE));
@@ -109,6 +130,39 @@ SNOWFLAKE *STDCALL snowflake_init() {
 
 void STDCALL snowflake_term(SNOWFLAKE *sf) {
     // TODO: track memory usage
+    if (sf->host) {
+        free(sf->host);
+    }
+    if (sf->port) {
+        free(sf->port);
+    }
+    if (sf->user) {
+        free(sf->user);
+    }
+    if (sf->password) {
+        free(sf->password);
+    }
+    if (sf->database) {
+        free(sf->database);
+    }
+    if (sf->account) {
+        free(sf->account);
+    }
+    if (sf->role) {
+        free(sf->role);
+    }
+    if (sf->warehouse) {
+        free(sf->warehouse);
+    }
+    if (sf->schema) {
+        free(sf->schema);
+    }
+    if (sf->protocol) {
+        free(sf->protocol);
+    }
+    if (sf->passcode) {
+        free(sf->passcode);
+    }
     if (sf->master_token) {
         free(sf->master_token);
     }
@@ -156,7 +210,6 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
     resp = calloc(1, sizeof(cJSON **));
     *resp = NULL;
 
-    curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
     if (curl) {
 
@@ -296,7 +349,6 @@ cleanup:
     if (curl) {
         curl_easy_cleanup(curl);
     }
-    curl_global_cleanup();
     if (s_body) {
         cJSON_free(s_body);
     }
