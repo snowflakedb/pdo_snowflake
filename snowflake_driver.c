@@ -38,6 +38,7 @@ static int snowflake_handle_closer(pdo_dbh_t *dbh) /* {{{ */
         pefree(H, dbh->is_persistent);
         dbh->driver_data = NULL;
     }
+    snowflake_global_term();
     PDO_DBG_RETURN(1);
 }
 /* }}} */
