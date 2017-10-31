@@ -55,7 +55,7 @@ cJSON *STDCALL create_json_body(SNOWFLAKE *sf,
 /*
  * libcurl write function callback to write response to a buffer
  */
-int json_resp_cb(char *data, size_t size, size_t nmemb, cJSON **json) {
+size_t json_resp_cb(char *data, size_t size, size_t nmemb, cJSON **json) {
     // If there is already an allocated JSON object, free it before creating a new one.
     printf("Data input size: %zu\n", strlen(data));
     if (*json) {
@@ -65,7 +65,7 @@ int json_resp_cb(char *data, size_t size, size_t nmemb, cJSON **json) {
     }
     *json = cJSON_Parse(data);
     printf("Parsed JSON\n");
-    return (int) (size * nmemb);
+    return (size * nmemb);
 }
 
 /*
@@ -78,6 +78,62 @@ char *alloc_buffer_and_copy(const char *str) {
     buffer = (char *) calloc(1, str_size);
     strncpy(buffer, str, str_size);
     return buffer;
+}
+
+/*
+ * Set up a curl connection. If the provided connection pointer is NULL, a connection will be created for you
+ */
+boolean STDCALL curl_call_setup(CURL **curl,
+                                char *url,
+                                struct curl_slist *header,
+                                char *body,
+                                void *buffer,
+                                size_t (*writer)(char *, size_t, size_t, void *)) {
+    CURLcode res;
+    CURL *conn = *curl;
+    
+    if (conn == NULL) {
+        conn = curl_easy_init();
+    }
+
+    if(conn == NULL) {
+        fprintf(stderr, "Failed to create CURL connection\n");
+        return SF_BOOLEAN_FALSE;
+    }
+
+    //TODO set error buffer
+
+    res = curl_easy_setopt(conn, CURLOPT_URL, url);
+    if(res != CURLE_OK) {
+        fprintf(stderr, "Failed to set URL [%s]\n", curl_easy_strerror(res));
+        return SF_BOOLEAN_FALSE;
+    }
+
+    res = curl_easy_setopt(conn, CURLOPT_HTTPHEADER, header);
+    if(res != CURLE_OK) {
+        fprintf(stderr, "Failed to set header [%s]\n", curl_easy_strerror(res));
+        return SF_BOOLEAN_FALSE;
+    }
+
+    res = curl_easy_setopt(conn, CURLOPT_POSTFIELDS, body);
+    if(res != CURLE_OK) {
+        fprintf(stderr, "Failed to set body [%s]\n", curl_easy_strerror(res));
+        return SF_BOOLEAN_FALSE;
+    }
+
+    res = curl_easy_setopt(conn, CURLOPT_WRITEFUNCTION, writer);
+    if(res != CURLE_OK) {
+        fprintf(stderr, "Failed to set writer [%s]\n", curl_easy_strerror(res));
+        return SF_BOOLEAN_FALSE;
+    }
+
+    res = curl_easy_setopt(conn, CURLOPT_WRITEDATA, &buffer);
+    if(res != CURLE_OK) {
+        fprintf(stderr, "Failed to set write data [%s]\n", curl_easy_strerror(res));
+        return SF_BOOLEAN_FALSE;
+    }
+
+    return SF_BOOLEAN_TRUE;
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_global_init() {
@@ -178,14 +234,11 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
     CURLcode res;
     // Use curl header list
     struct curl_slist *header = NULL;
-    FILE *output = NULL;
     cJSON *body = NULL;
     cJSON **resp;
     cJSON *data = NULL;
     cJSON *blob = NULL;
     size_t blob_size;
-    char *master_token = NULL;
-    char *token = NULL;
     char *s_header = NULL;
     char *s_body = NULL;
     char *s_resp = NULL;
@@ -267,8 +320,6 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
             goto cleanup;
         }
 
-        //TODO check that string was fully copied
-
         s_body = cJSON_Print(body);
         //s_header = cJSON_Print(header);
         printf("Here is constructed body:\n%s\n", s_body);
@@ -276,14 +327,8 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
         printf("\nHere is constructed url: %s\n", encoded_url);
         printf("Encoded URL sizes. Expected size: %zu     Actual Size: %i\n", encoded_url_size, bytes_written);
 
-        // Open up file to store curl call info
-        output = fopen("/home/kwagner/curl_info.txt", "w+");
         // Setup curl call
-        res = curl_easy_setopt(curl, CURLOPT_URL, encoded_url);
-        res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
-        res = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, s_body);
-        res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, resp);
-        res = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &json_resp_cb);
+        curl_call_setup(&curl, encoded_url, header, s_body, resp, &json_resp_cb);
         printf("Running curl call\n");
         res = curl_easy_perform(curl);
         /* Check for errors */
@@ -291,6 +336,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
             fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
             goto cleanup;
         }
+        // TODO refactor JSON response/token obtainment code
         if (*resp) {
             s_resp = cJSON_Print(*resp);
             printf("Here is JSON response:\n%s\n", s_resp);
@@ -369,9 +415,6 @@ cleanup:
     }
     if (role_value) {
         free(role_value);
-    }
-    if (output) {
-        fclose(output);
     }
 
     return ret;

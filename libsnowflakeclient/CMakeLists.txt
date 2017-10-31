@@ -13,7 +13,9 @@ set(SOURCE_FILES
         lib/snowflake_client_version.h
         lib/snowflake_client.c
         lib/cJSON.h
-        lib/cJSON.c)
+        lib/cJSON.c
+        lib/log.h
+        lib/log.c)
 
 include_directories(deps/curl-7.54.1/include)
 
