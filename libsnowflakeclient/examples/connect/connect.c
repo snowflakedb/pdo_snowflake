@@ -11,6 +11,7 @@ int main()
 {
     /* init */
     SNOWFLAKE_STATUS status;
+    snowflake_global_init();
     SNOWFLAKE *sf = snowflake_init();
 
     /* connect*/
@@ -26,6 +27,7 @@ int main()
 
     /* term */
     snowflake_term(sf); // purge snowflake context
+    snowflake_global_term();
 
     return status;
 }
