@@ -15,17 +15,10 @@ extern "C" {
 #define STDCALL __stdcall
 #endif
 
-#include <jmorecfg.h>
+#include <libsnowflakeclient/lib/cJSON.h>
 #include "libsnowflakeclient/lib/snowflake_client_version.h"
-
-typedef char int8;
-typedef unsigned char uint8;
-typedef unsigned long int uint32;
-typedef long int int32;
-typedef unsigned long long int uint64;
-typedef long long int int64;
-typedef double float64;
-typedef float float32;
+#include "libsnowflakeclient/lib/arraylist.h"
+#include "libsnowflakeclient/lib/basic_types.h"
 
 /**
  * Snowflake Data types
@@ -112,7 +105,7 @@ typedef struct sf_error {
 /**
  * Snowflake database session context.
  */
-typedef struct st_snowflake_connection {
+typedef struct sf_snowflake_connection {
     char *account;
     char *user;
     char *password;
@@ -125,9 +118,9 @@ typedef struct st_snowflake_connection {
     char *protocol;
 
     char *passcode;
-    boolean passcode_in_password;
-    boolean insecure_mode;
-    boolean autocommit;
+    sf_bool passcode_in_password;
+    sf_bool insecure_mode;
+    sf_bool autocommit;
 
     // Session info
     char *token;
@@ -135,6 +128,11 @@ typedef struct st_snowflake_connection {
 
     int64 login_timeout;
     int64 network_timeout;
+
+    // Session specific fields
+    int64 sequence_counter;
+    // TODO free this?
+    char *request_id;
 } SNOWFLAKE;
 
 /**
@@ -143,8 +141,15 @@ typedef struct st_snowflake_connection {
 typedef struct sf_snowflake_statement {
     /* TODO */
     char *sfqid;
+    char *sqlstate;
+    int sequence_counter;
     SNOWFLAKE_ERROR error;
     SNOWFLAKE *connection;
+    char *prepared_command;
+    cJSON *raw_results;
+    // TODO Create Bind list
+    ARRAY_LIST *params;
+    ARRAY_LIST *results;
 } SNOWFLAKE_STMT;
 
 /**
@@ -152,7 +157,7 @@ typedef struct sf_snowflake_statement {
  */
 typedef struct sf_snowflake_input
 {
-  int idx;
+  size_t idx;
   SNOWFLAKE_C_TYPE type;
   void *value;
 } SNOWFLAKE_BIND_INPUT;
@@ -162,7 +167,7 @@ typedef struct sf_snowflake_input
  */
 typedef struct sf_snowflake_output
 {
-  int idx;
+  size_t idx;
   SNOWFLAKE_C_TYPE type;
   void *value;
 } SNOWFLAKE_BIND_OUTPUT;
@@ -172,7 +177,6 @@ typedef struct sf_snowflake_output
  */
 extern int8 SF_BOOLEAN_TRUE;
 extern int8 SF_BOOLEAN_FALSE;
-extern const char EMPTY_STRING[];
 extern const char CONTENT_TYPE_APPLICATION_JSON[];
 extern const char ACCEPT_TYPE_APPLICATION_SNOWFLAKE[];
 extern const char C_API_USER_AGENT[];
@@ -383,7 +387,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt);
  * @param sfstmt SNOWFLAKE_RESULTSET context.
  * @return 0 if success, otherwise an errno is returned.
  */
-SNOWFLAKE_STATUS STDCALL snowflake_fetch(SNOWFLAKE_STMT *sfres);
+SNOWFLAKE_STATUS STDCALL snowflake_fetch(SNOWFLAKE_STMT *sfstmt);
 
 /**
  * Returns the number of binding parameters in the statement.

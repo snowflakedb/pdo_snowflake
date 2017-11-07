@@ -8,12 +8,15 @@
 #include "snowflake_client.h"
 
 
-void main() {
+int main() {
     /* init */
-    SNOWFLAKE *sf = snowflake_init();
+    SNOWFLAKE_STATUS status;
     snowflake_global_init();
+    SNOWFLAKE *sf = snowflake_init();
 
     /* connect*/
+    snowflake_set_attr(sf, SF_CON_HOST, getenv("SNOWFLAKE_TEST_HOST"));
+    snowflake_set_attr(sf, SF_CON_PORT, getenv("SNOWFLAKE_TEST_PORT"));
     snowflake_set_attr(sf, SF_CON_ACCOUNT, getenv("SNOWFLAKE_TEST_ACCOUNT"));
     snowflake_set_attr(sf, SF_CON_USER, getenv("SNOWFLAKE_TEST_USER"));
     snowflake_set_attr(sf, SF_CON_PASSWORD, getenv("SNOWFLAKE_TEST_PASSWORD"));
@@ -22,7 +25,7 @@ void main() {
     snowflake_set_attr(sf, SF_CON_ROLE, getenv("SNOWFLAKE_TEST_ROLE"));
     snowflake_set_attr(sf, SF_CON_WAREHOUSE, getenv("SNOWFLAKE_TEST_WAREHOUSE"));
     snowflake_set_attr(sf, SF_CON_AUTOCOMMIT, &SF_BOOLEAN_TRUE);
-    snowflake_connect(sf);
+    status = snowflake_connect(sf);
 
     /* query */
     SNOWFLAKE_STMT *sfstmt = snowflake_stmt(sf);
@@ -32,12 +35,12 @@ void main() {
     c1.type = SF_C_TYPE_INT64;
     c1.value = (void *) &out;
     snowflake_bind_result(sfstmt, &c1);
-    snowflake_query(sfstmt, "SELECT 1");
+    snowflake_query(sfstmt, "SELECT 1;");
     printf("Number of rows: %d", (int) snowflake_num_rows(sfstmt));
 
-    while (snowflake_fetch(sfstmt) != SF_STATUS_EOL) {
-        printf("result: %d\n", *((int *) c1.value));
-    }
+//    while (snowflake_fetch(sfstmt) != SF_STATUS_EOL) {
+//        printf("result: %d\n", *((int *) c1.value));
+//    }
     snowflake_stmt_close(sfstmt);
 
     /* disconnect */
@@ -46,4 +49,6 @@ void main() {
     /* term */
     snowflake_term(sf); // purge snowflake context
     snowflake_global_term();
+
+    return status;
 }

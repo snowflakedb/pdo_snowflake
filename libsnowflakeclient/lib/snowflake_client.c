@@ -2,147 +2,129 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
+#include <assert.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../include/snowflake_client.h"
-#include "../deps/curl-7.54.1/include/curl/curl.h"
-#include "cJSON.h"
+#include <sys/stat.h>
+#include <errno.h>
+#include "libsnowflakeclient/include/snowflake_client.h"
+#include "connection.h"
+#include "snowflake_memory.h"
+#include "log.h"
 
 #define curl_easier_escape(curl, string) curl_easy_escape(curl, string, 0)
 
-int8 SF_BOOLEAN_TRUE = 1;
-int8 SF_BOOLEAN_FALSE = 0;
-const char EMPTY_STRING[] = "";
 const char CONTENT_TYPE_APPLICATION_JSON[] = "Content-Type: application/json";
 const char ACCEPT_TYPE_APPLICATION_SNOWFLAKE[] = "accept: application/snowflake";
 const char C_API_USER_AGENT[] = "User-Agent: c_api/0.1";
-
-cJSON *STDCALL create_json_body(SNOWFLAKE *sf,
-                                const char *application,
-                                const char *int_app_name,
-                                const char *int_app_version) {
-    cJSON *body;
-    cJSON *data;
-    cJSON *client_env;
-
-    //Create Client Environment JSON blob
-    client_env = cJSON_CreateObject();
-    cJSON_AddStringToObject(client_env, "APPLICATION", application);
-    cJSON_AddStringToObject(client_env, "OS_VERSION", "Linux");
-
-    //Create Request Data JSON blob
-    data = cJSON_CreateObject();
-    cJSON_AddStringToObject(data, "CLIENT_APP_ID", int_app_name);
-    cJSON_AddStringToObject(data, "CLIENT_APP_VERSION", int_app_version);
-    cJSON_AddStringToObject(data, "SVN_REVISION", "12345"); //TODO Add SVN Revision Here
-    cJSON_AddStringToObject(data, "ACCOUNT_NAME", sf->account);
-    cJSON_AddStringToObject(data, "LOGIN_NAME", sf->user);
-    // Add password if one exists
-    if (sf->password && *(sf->password)) {
-        cJSON_AddStringToObject(data, "PASSWORD", sf->password);
-    }
-    cJSON_AddItemToObject(data, "CLIENT_ENVIRONMENT", client_env);
-
-    //Create body
-    body = cJSON_CreateObject();
-    cJSON_AddItemToObject(body, "data", data);
-
-
-    return body;
-}
-
-/*
- * libcurl write function callback to write response to a buffer
- */
-size_t json_resp_cb(char *data, size_t size, size_t nmemb, cJSON **json) {
-    // If there is already an allocated JSON object, free it before creating a new one.
-    printf("Data input size: %zu\n", strlen(data));
-    if (*json) {
-        printf("Deleting old JSON blob\n");
-        cJSON_Delete(*json);
-        *json = NULL;
-    }
-    *json = cJSON_Parse(data);
-    printf("Parsed JSON\n");
-    return (size * nmemb);
-}
+const char TOKEN_HEADER_FORMAT[] = "Authorization: Snowflake Token=\"%s\"";
+const char SESSION_URL[] = "/session/v1/login-request?";
+const char QUERY_URL[] = "/queries/v1/query-request?";
+static char *LOG_PATH = NULL;
+static FILE *LOG_FP = NULL;
 
 /*
  * Convenience method to find string size, create buffer, copy over, and return.
  */
-char *alloc_buffer_and_copy(const char *str) {
+void alloc_buffer_and_copy(char **var, const char *str) {
     size_t str_size;
-    char *buffer;
-    str_size = strlen(str);
-    buffer = (char *) calloc(1, str_size);
-    strncpy(buffer, str, str_size);
-    return buffer;
+    sf_free(*var);
+    str_size = strlen(str) + 1; // For null terminator
+    *var = (char *) sf_calloc(1, str_size);
+    strncpy(*var, str, str_size);
+}
+
+int mkpath(char* file_path, mode_t mode) {
+    assert(file_path && *file_path);
+    char* p;
+    for (p=strchr(file_path+1, '/'); p; p=strchr(p+1, '/')) {
+        *p='\0';
+        if (mkdir(file_path, mode)==-1) {
+            if (errno!=EEXIST) { *p='/'; return -1; }
+        }
+        *p='/';
+    }
+    return 0;
 }
 
 /*
- * Set up a curl connection. If the provided connection pointer is NULL, a connection will be created for you
+ * Initializes logging file
  */
-boolean STDCALL curl_call_setup(CURL **curl,
-                                char *url,
-                                struct curl_slist *header,
-                                char *body,
-                                void *buffer,
-                                size_t (*writer)(char *, size_t, size_t, void *)) {
-    CURLcode res;
-    CURL *conn = *curl;
-    
-    if (conn == NULL) {
-        conn = curl_easy_init();
+sf_bool STDCALL log_init() {
+    sf_bool ret = SF_BOOLEAN_FALSE;
+    int res;
+    struct stat st = {0};
+    char *directory;
+    time_t current_time;
+    struct tm * time_info;
+    char time_str[15];
+    time(&current_time);
+    time_info = localtime(&current_time);
+    strftime(time_str, sizeof(time_str), "%Y%m%d%H%M%S", time_info);
+
+    size_t log_path_size = 1; //Start with 1 to include null terminator
+    log_path_size += strlen(time_str);
+    char *sf_log_path = getenv("SNOWFLAKE_LOG_PATH");
+    // If log path is specified, use absolute path. Otherwise set logging dir to be relative to current directory
+    if (sf_log_path != NULL) {
+        log_path_size += strlen(sf_log_path);
+        log_path_size += 16; // Size of static format characters
+        LOG_PATH = (char *) sf_calloc(1, log_path_size);
+        snprintf(LOG_PATH, log_path_size, "%s/.capi/logs/%s.txt", sf_log_path, (char *)time_str);
+    } else {
+        log_path_size += 9; // Size of static format characters
+        LOG_PATH = (char *) sf_calloc(1, log_path_size);
+        snprintf(LOG_PATH, log_path_size, "logs/%s.txt", (char *)time_str);
+    }
+    if (LOG_PATH != NULL) {
+        // Create log file path (if it already doesn't exist)
+        if (mkpath(LOG_PATH, 0755) == -1) {
+            fprintf(stderr, "Error creating log directory. Error code: %s\n", strerror(errno));
+            goto cleanup;
+        }
+        // Open log file
+        LOG_FP = fopen(LOG_PATH, "w+");
+        if (LOG_FP) {
+            // Set log file
+            log_set_fp(LOG_FP);
+        } else {
+            fprintf(stderr, "Error opening file from file path: %s\nError code: %s\n", LOG_PATH, strerror(errno));
+            goto cleanup;
+        }
+
+    } else {
+        fprintf(stderr, "Log path is NULL. Was there an error during path construction?\n");
+        goto cleanup;
     }
 
-    if(conn == NULL) {
-        fprintf(stderr, "Failed to create CURL connection\n");
-        return SF_BOOLEAN_FALSE;
+    ret = SF_BOOLEAN_TRUE;
+
+cleanup:
+    return ret;
+}
+
+/*
+ * Cleans up memory allocated for log init and closes log file.
+ */
+void STDCALL log_term() {
+    sf_free(LOG_PATH);
+    if (LOG_FP) {
+        fclose(LOG_FP);
     }
-
-    //TODO set error buffer
-
-    res = curl_easy_setopt(conn, CURLOPT_URL, url);
-    if(res != CURLE_OK) {
-        fprintf(stderr, "Failed to set URL [%s]\n", curl_easy_strerror(res));
-        return SF_BOOLEAN_FALSE;
-    }
-
-    res = curl_easy_setopt(conn, CURLOPT_HTTPHEADER, header);
-    if(res != CURLE_OK) {
-        fprintf(stderr, "Failed to set header [%s]\n", curl_easy_strerror(res));
-        return SF_BOOLEAN_FALSE;
-    }
-
-    res = curl_easy_setopt(conn, CURLOPT_POSTFIELDS, body);
-    if(res != CURLE_OK) {
-        fprintf(stderr, "Failed to set body [%s]\n", curl_easy_strerror(res));
-        return SF_BOOLEAN_FALSE;
-    }
-
-    res = curl_easy_setopt(conn, CURLOPT_WRITEFUNCTION, writer);
-    if(res != CURLE_OK) {
-        fprintf(stderr, "Failed to set writer [%s]\n", curl_easy_strerror(res));
-        return SF_BOOLEAN_FALSE;
-    }
-
-    res = curl_easy_setopt(conn, CURLOPT_WRITEDATA, &buffer);
-    if(res != CURLE_OK) {
-        fprintf(stderr, "Failed to set write data [%s]\n", curl_easy_strerror(res));
-        return SF_BOOLEAN_FALSE;
-    }
-
-    return SF_BOOLEAN_TRUE;
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_global_init() {
-    SNOWFLAKE_STATUS ret;
+    SNOWFLAKE_STATUS ret = SF_STATUS_ERROR;
     CURLcode curl_ret;
+    // TODO Add log init error handling
+    if (!log_init()) {
+        fprintf(stderr, "Error during log initialization");
+        goto cleanup;
+    }
     curl_ret = curl_global_init(CURL_GLOBAL_DEFAULT);
     if(curl_ret != CURLE_OK) {
-        fprintf(stderr, "curl_global_init() failed: %s\n", curl_easy_strerror(curl_ret));
-        ret = SF_STATUS_ERROR;
+        log_fatal("curl_global_init() failed: %s", curl_easy_strerror(curl_ret));
         goto cleanup;
     }
 
@@ -153,17 +135,18 @@ cleanup:
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_global_term() {
+    log_term();
     curl_global_cleanup();
     return SF_STATUS_SUCCESS;
 }
 
 SNOWFLAKE *STDCALL snowflake_init() {
     // TODO: track memory usage
-    SNOWFLAKE *sf = (SNOWFLAKE *) calloc(1, sizeof(SNOWFLAKE));
+    SNOWFLAKE *sf = (SNOWFLAKE *) sf_calloc(1, sizeof(SNOWFLAKE));
 
     // Initialize object with default values
-    sf->host = alloc_buffer_and_copy("127.0.0.1");
-    sf->port = alloc_buffer_and_copy("8080");
+    alloc_buffer_and_copy(&sf->host, "127.0.0.1");
+    alloc_buffer_and_copy(&sf->port, "8080");
     sf->user = NULL;
     sf->password = NULL;
     sf->database = NULL;
@@ -171,7 +154,7 @@ SNOWFLAKE *STDCALL snowflake_init() {
     sf->role = NULL;
     sf->warehouse = NULL;
     sf->schema = NULL;
-    sf->protocol = alloc_buffer_and_copy("http");
+    alloc_buffer_and_copy(&sf->protocol, "http");
     sf->passcode = NULL;
     sf->passcode_in_password = SF_BOOLEAN_FALSE;
     sf->insecure_mode = SF_BOOLEAN_FALSE;
@@ -180,197 +163,100 @@ SNOWFLAKE *STDCALL snowflake_init() {
     sf->master_token = NULL;
     sf->login_timeout = 120;
     sf->network_timeout = 0;
+    sf->sequence_counter = 0;
+    // TODO set request id upon struct initialization
+    sf->request_id = "fa6d6346-a2fd-49c1-926f-e05c4db0bd1c";
 
     return sf;
 }
 
 void STDCALL snowflake_term(SNOWFLAKE *sf) {
     // TODO: track memory usage
-    if (sf->host) {
-        free(sf->host);
+    if (sf) {
+        sf_free(sf->host);
+        sf_free(sf->port);
+        sf_free(sf->user);
+        sf_free(sf->password);
+        sf_free(sf->database);
+        sf_free(sf->account);
+        sf_free(sf->role);
+        sf_free(sf->warehouse);
+        sf_free(sf->schema);
+        sf_free(sf->protocol);
+        sf_free(sf->passcode);
+        sf_free(sf->master_token);
+        sf_free(sf->token);
     }
-    if (sf->port) {
-        free(sf->port);
-    }
-    if (sf->user) {
-        free(sf->user);
-    }
-    if (sf->password) {
-        free(sf->password);
-    }
-    if (sf->database) {
-        free(sf->database);
-    }
-    if (sf->account) {
-        free(sf->account);
-    }
-    if (sf->role) {
-        free(sf->role);
-    }
-    if (sf->warehouse) {
-        free(sf->warehouse);
-    }
-    if (sf->schema) {
-        free(sf->schema);
-    }
-    if (sf->protocol) {
-        free(sf->protocol);
-    }
-    if (sf->passcode) {
-        free(sf->passcode);
-    }
-    if (sf->master_token) {
-        free(sf->master_token);
-    }
-    if (sf->token) {
-        free(sf->token);
-    }
-    free(sf);
+    sf_free(sf);
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
-    // TODO: connect to Snowflake
-    CURL *curl;
-    CURLcode res;
+    CURL *curl = NULL;
     // Use curl header list
     struct curl_slist *header = NULL;
     cJSON *body = NULL;
-    cJSON **resp;
     cJSON *data = NULL;
-    cJSON *blob = NULL;
-    size_t blob_size;
-    char *s_header = NULL;
+    cJSON *resp = NULL;
     char *s_body = NULL;
     char *s_resp = NULL;
-    // Base URL
-    const char *url;
     // Encoded URL to use with libcurl
-    char *encoded_url;
-    char *request_id_value = NULL;
-    char *database_value = NULL;
-    char *schema_value = NULL;
-    char *warehouse_value = NULL;
-    char *role_value = NULL;
-    const char *request_id_key = "request_id=";
-    const char *database_key = NULL;
-    const char *schema_key = NULL;
-    const char *warehouse_key = NULL;
-    const char *role_key = NULL;
-    // Used to determine allocation size for encoded url string
-    size_t encoded_url_size = 0;
-    int bytes_written;
+    char *encoded_url = NULL;
+    URL_KEY_VALUE url_params[] = {
+            {"request_id=", sf->request_id, NULL, NULL, 0, 0},
+            {"&databaseName=", sf->database, NULL, NULL, 0, 0},
+            {"&schemaName=", sf->schema, NULL, NULL, 0, 0},
+            {"&warehouse=", sf->warehouse, NULL, NULL, 0, 0},
+            {"&roleName=", sf->role, NULL, NULL, 0, 0},
+    };
+    RAW_JSON_BUFFER *raw_json;
+    struct data config;
+    config.trace_ascii = 1;
     SNOWFLAKE_STATUS ret = SF_STATUS_ERROR;
-    resp = calloc(1, sizeof(cJSON **));
-    *resp = NULL;
+
+    raw_json = (RAW_JSON_BUFFER *) sf_calloc(1, sizeof(RAW_JSON_BUFFER));
+    raw_json->size = 0;
+    raw_json->buffer = NULL;
 
     curl = curl_easy_init();
+
     if (curl) {
 
         // Create header
-        header = curl_slist_append(header, CONTENT_TYPE_APPLICATION_JSON);
-        header = curl_slist_append(header, ACCEPT_TYPE_APPLICATION_SNOWFLAKE);
-        header = curl_slist_append(header, C_API_USER_AGENT);
-        printf("Created header\n");
+        header = create_header_no_token();
+        log_info("Created header");
 
-        //Create body
-        body = create_json_body(sf, "C API", "C API", "0.1");
-        printf("Created body\n");
-        url = "/session/v1/login-request?";
-        request_id_value = curl_easier_escape(curl, "1");
-        if (sf->database && *(sf->database)) {
-            database_key = "&databaseName=";
-            database_value = curl_easier_escape(curl, sf->database);
-        } else {
-            database_key = "";
-            database_value = curl_easier_escape(curl, "");
-        }
-        if (sf->schema && *(sf->schema)) {
-            schema_key = "&schemaName=";
-            schema_value = curl_easier_escape(curl, sf->schema);
-        } else {
-            schema_key = "";
-            schema_value = curl_easier_escape(curl, "");
-        }
-        if (sf->warehouse && *(sf->warehouse)) {
-            warehouse_key = "&warehouse=";
-            warehouse_value = curl_easier_escape(curl, sf->warehouse);
-        } else {
-            warehouse_key = "";
-            warehouse_value = curl_easier_escape(curl, "");
-        }
-        if (sf->role && *(sf->role)) {
-            role_key = "&roleName=";
-            role_value = curl_easier_escape(curl, sf->role);
-        } else {
-            role_key = "";
-            role_value = curl_easier_escape(curl, "");
-        }
-        encoded_url_size = strlen(sf->protocol) + strlen(sf->host) + strlen(sf->port) + 4 +
-                strlen(url) + strlen(request_id_key) + strlen(request_id_value) +
-                strlen(database_key) + strlen(database_value) + strlen(schema_key) + strlen(schema_key) +
-                strlen(warehouse_key) + strlen(warehouse_value) + strlen(role_key) + strlen(role_value);
-        encoded_url = (char *) calloc(1, encoded_url_size);
-        bytes_written = snprintf(encoded_url, encoded_url_size, "%s://%s:%s%s%s%s%s%s%s%s%s%s%s%s",
-                 sf->protocol, sf->host, sf->port, url, request_id_key, request_id_value, database_key, database_value,
-                 schema_key, schema_value, warehouse_key, warehouse_value, role_key, role_value);
+        // Create body
+        body = create_auth_json_body(sf, "C API", "C API", "0.1");
+        log_info("Created body");
+        s_body = cJSON_Print(body);
+        log_trace("Here is constructed body:\n%s", s_body);
 
-        if (bytes_written < 0 || bytes_written >= encoded_url_size) {
-            printf("Encoded url was not properly constructed. Expected size: %zu     Actual Size: %i\n",
-                   encoded_url_size, bytes_written);
+
+        // Add up the string lengths and add 5 (4 for the static characters in the encoded url and 1 for the null terminator)
+        encoded_url = encode_url(curl, sf->protocol, sf->host, sf->port, SESSION_URL, url_params, 5);
+
+        if (encoded_url == NULL) {
             goto cleanup;
         }
-
-        s_body = cJSON_Print(body);
-        //s_header = cJSON_Print(header);
-        printf("Here is constructed body:\n%s\n", s_body);
-        //printf("\nHere is constructed header:\n%s\n", s_header);
-        printf("\nHere is constructed url: %s\n", encoded_url);
-        printf("Encoded URL sizes. Expected size: %zu     Actual Size: %i\n", encoded_url_size, bytes_written);
 
         // Setup curl call
-        curl_call_setup(&curl, encoded_url, header, s_body, resp, &json_resp_cb);
-        printf("Running curl call\n");
-        res = curl_easy_perform(curl);
-        /* Check for errors */
-        if(res != CURLE_OK) {
-            fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-            goto cleanup;
-        }
-        // TODO refactor JSON response/token obtainment code
-        if (*resp) {
-            s_resp = cJSON_Print(*resp);
-            printf("Here is JSON response:\n%s\n", s_resp);
-            data = cJSON_GetObjectItem(*resp, "data");
+        curl_post_call(&curl, encoded_url, header, s_body, raw_json, &json_resp_cb, &config);
+        resp = cJSON_Parse(raw_json->buffer);
+        // TODO refactor JSON response
+        if (resp) {
+            s_resp = cJSON_Print(resp);
+            log_trace("Here is JSON response:\n%s", s_resp);
+            data = cJSON_GetObjectItem(resp, "data");
             // Get token
-            blob = cJSON_GetObjectItem(data, "token");
-            if (cJSON_IsString(blob)) {
-                blob_size = strlen(blob->valuestring);
-                if (sf->token) {
-                    free(sf->token);
-                    sf->token = NULL;
-                }
-                sf->token = calloc(1, blob_size);
-                strncpy(sf->token, blob->valuestring, blob_size);
-                printf("Token: %s\n", sf->token);
-            } else {
-                printf("Token field does not contain a string\n");
+            if (!json_copy_string(&sf->token, data, "token")) {
+                log_error("No valid token found in response");
             }
             // Get master token
-            blob = cJSON_GetObjectItem(data, "masterToken");
-            if (cJSON_IsString(blob)) {
-                blob_size = strlen(blob->valuestring);
-                if (sf->master_token) {
-                    free(sf->master_token);
-                    sf->master_token = NULL;
-                }
-                sf->master_token = calloc(1, blob_size);
-                strncpy(sf->master_token, blob->valuestring, blob_size);
-                printf("Master token: %s\n", sf->master_token);
-            } else {
-                printf("Master token field does not contain a string\n");
+            if (!json_copy_string(&sf->master_token, data, "masterToken")) {
+                log_error("No valid master token found in response");
             }
         } else {
-            printf("No response\n");
+            log_error("No response");
         }
 
         /* we are done... */
@@ -379,43 +265,23 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
 
 cleanup:
     if (header) {
-        //cJSON_Delete(header);
         curl_slist_free_all(header);
     }
     if (body) {
         cJSON_Delete(body);
     }
-    if (*resp) {
-        cJSON_Delete(*resp);
-        *resp = NULL;
-    }
     if (resp) {
-        free(resp);
-    }
-    if (curl) {
-        curl_easy_cleanup(curl);
+        cJSON_Delete(resp);
     }
     if (s_body) {
         cJSON_free(s_body);
     }
-    if (s_header) {
-        cJSON_free(s_header);
-    }
     if (s_resp) {
         cJSON_free(s_resp);
     }
-    if (database_value) {
-        free(database_value);
-    }
-    if (schema_value) {
-        free(schema_value);
-    }
-    if (warehouse_value) {
-        free(warehouse_value);
-    }
-    if (role_value) {
-        free(role_value);
-    }
+    sf_free(raw_json->buffer);
+    sf_free(raw_json);
+    sf_free(encoded_url);
 
     return ret;
 }
@@ -426,109 +292,131 @@ SNOWFLAKE_STATUS STDCALL snowflake_close(SNOWFLAKE *sf) {
 
 SNOWFLAKE_STATUS STDCALL snowflake_set_attr(
         SNOWFLAKE *sf, SNOWFLAKE_ATTRIBUTE type, const void *value) {
-    if (type == SF_CON_ACCOUNT) {
-        if (sf->account) {
-            free(sf->account);
-        }
-        sf->account = alloc_buffer_and_copy(value);
-    } else if (type == SF_CON_USER) {
-        if (sf->user) {
-            free(sf->user);
-        }
-        sf->user = alloc_buffer_and_copy(value);
-    } else if (type == SF_CON_PASSWORD) {
-        if (sf->password) {
-            free(sf->password);
-        }
-        sf->password = alloc_buffer_and_copy(value);
-    } else if (type == SF_CON_DATABASE) {
-        if (sf->database) {
-            free(sf->database);
-        }
-        sf->database = alloc_buffer_and_copy(value);
-    } else if (type == SF_CON_SCHEMA) {
-        if (sf->schema) {
-            free(sf->schema);
-        }
-        sf->schema = alloc_buffer_and_copy(value);
-    } else if (type == SF_CON_WAREHOUSE) {
-        if (sf->warehouse) {
-            free(sf->warehouse);
-        }
-        sf->warehouse = alloc_buffer_and_copy(value);
-    } else if (type == SF_CON_ROLE) {
-        if (sf->role) {
-            free(sf->role);
-        }
-        sf->role = alloc_buffer_and_copy(value);
-    } else if (type == SF_CON_HOST) {
-        if (sf->host) {
-            free(sf->host);
-        }
-        sf->host = alloc_buffer_and_copy(value);
-    } else if (type == SF_CON_PORT) {
-        if (sf->port) {
-            free(sf->port);
-        }
-        sf->port = alloc_buffer_and_copy(value);
-    } else if (type == SF_CON_PROTOCOL) {
-        if (sf->protocol) {
-            free(sf->protocol);
-        }
-        sf->protocol = alloc_buffer_and_copy(value);
-    } else if (type == SF_CON_PASSCODE) {
-        if (sf->passcode) {
-            free(sf->passcode);
-        }
-        sf->passcode = alloc_buffer_and_copy(value);
-    } else if (type == SF_CON_PASSCODE_IN_PASSWORD) {
-        sf->passcode_in_password = *((boolean *) value);
-    } else if (type == SF_CON_APPLICATION) {
-        //TODO Implement this
-    } else if (type == SF_CON_AUTHENTICATOR) {
-        //TODO Implement this
-    } else if (type == SF_CON_INSECURE_MODE) {
-        sf->insecure_mode = *((boolean *) value);
-    } else if (type == SF_SESSION_PARAMETER) {
-        //TODO Implement this
-    } else if (type == SF_CON_LOGIN_TIMEOUT) {
-        sf->login_timeout = *((int64 *) value);
-    } else if (type == SF_CON_NETWORK_TIMEOUT) {
-        sf->network_timeout = *((int64 *) value);
-    } else if (type == SF_CON_AUTOCOMMIT) {
-        sf->autocommit = *((boolean *) value);
-    } else {
-        return SF_STATUS_ERROR;
+    switch (type) {
+        case SF_CON_ACCOUNT:
+            alloc_buffer_and_copy(&sf->account, value);
+            break;
+        case SF_CON_USER:
+            alloc_buffer_and_copy(&sf->user, value);
+            break;
+        case SF_CON_PASSWORD:
+            alloc_buffer_and_copy(&sf->password, value);
+            break;
+        case SF_CON_DATABASE:
+            alloc_buffer_and_copy(&sf->database, value);
+            break;
+        case SF_CON_SCHEMA:
+            alloc_buffer_and_copy(&sf->schema, value);
+            break;
+        case SF_CON_WAREHOUSE:
+            alloc_buffer_and_copy(&sf->warehouse, value);
+            break;
+        case SF_CON_ROLE:
+            alloc_buffer_and_copy(&sf->role, value);
+            break;
+        case SF_CON_HOST:
+            alloc_buffer_and_copy(&sf->host, value);
+            break;
+        case SF_CON_PORT:
+            alloc_buffer_and_copy(&sf->port, value);
+            break;
+        case SF_CON_PROTOCOL:
+            alloc_buffer_and_copy(&sf->protocol, value);
+            break;
+        case SF_CON_PASSCODE:
+            alloc_buffer_and_copy(&sf->passcode, value);
+            break;
+        case SF_CON_PASSCODE_IN_PASSWORD:
+            sf->passcode_in_password = *((sf_bool *) value);
+            break;
+        case SF_CON_APPLICATION:
+            // TODO Implement this
+            break;
+        case SF_CON_AUTHENTICATOR:
+            // TODO Implement this
+            break;
+        case SF_CON_INSECURE_MODE:
+            sf->insecure_mode = *((sf_bool *) value);
+            break;
+        case SF_SESSION_PARAMETER:
+            // TODO Implement this
+            break;
+        case SF_CON_LOGIN_TIMEOUT:
+            sf->login_timeout = *((int64 *) value);
+            break;
+        case SF_CON_NETWORK_TIMEOUT:
+            sf->network_timeout = *((int64 *) value);
+            break;
+        case SF_CON_AUTOCOMMIT:
+            sf->autocommit = *((sf_bool *) value);
+            break;
+        default:
+            // TODO Set error
+            return SF_STATUS_ERROR;
     }
     return SF_STATUS_SUCCESS;
 }
 
+SNOWFLAKE_STATUS STDCALL snowflake_get_attr(
+        SNOWFLAKE *sf, SNOWFLAKE_ATTRIBUTE type, void *value) {
+    //TODO Implement this
+}
+
 SNOWFLAKE_STMT *STDCALL snowflake_stmt(SNOWFLAKE *sf) {
     // TODO: track memory usage
-    SNOWFLAKE_STMT *ret = (SNOWFLAKE_STMT *) calloc(1, sizeof(SNOWFLAKE_STMT));
-    ret->connection = sf;
-    return ret;
+    SNOWFLAKE_STMT *sfstmt = (SNOWFLAKE_STMT *) sf_calloc(1, sizeof(SNOWFLAKE_STMT));
+    sfstmt->connection = sf;
+    sfstmt->sfqid = NULL;
+    //sfstmt->error = NULL;
+    sfstmt->raw_results = NULL;
+    sfstmt->params = NULL;
+    sfstmt->results = NULL;
+    sfstmt->prepared_command = NULL;
+    return sfstmt;
 }
 
 void STDCALL snowflake_stmt_close(SNOWFLAKE_STMT *sfstmt) {
     // TODO: track memory usage
-    free(sfstmt);
+    if (sfstmt) {
+        sf_free(sfstmt->sfqid);
+        if (sfstmt->raw_results) {
+            cJSON_Delete(sfstmt->raw_results);
+        }
+        sf_free(sfstmt->prepared_command);
+        array_list_deallocate(sfstmt->params);
+        array_list_deallocate(sfstmt->results);
+    }
+    sf_free(sfstmt);
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_bind_param(
     SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_BIND_INPUT *sfbind)
 {
-  return SF_STATUS_SUCCESS;
+    if (sfstmt->params == NULL) {
+        sfstmt->params = array_list_create();
+    }
+    array_list_set(sfstmt->params, sfbind, sfbind->idx);
+    return SF_STATUS_SUCCESS;
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_bind_result(
-    SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_BIND_OUTPUT *sfbind_array)
+    SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_BIND_OUTPUT *sfbind)
 {
-  return SF_STATUS_SUCCESS;
+    if (sfstmt->results == NULL) {
+        sfstmt->results = array_list_create();
+    }
+    array_list_set(sfstmt->results, sfbind, sfbind->idx);
+    return SF_STATUS_SUCCESS;
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_query(
         SNOWFLAKE_STMT *sfstmt, const char *command) {
+    if (snowflake_prepare(sfstmt, command) != SF_STATUS_SUCCESS) {
+        return SF_STATUS_ERROR;
+    }
+    if (snowflake_execute(sfstmt) != SF_STATUS_SUCCESS) {
+        return SF_STATUS_ERROR;
+    }
     return SF_STATUS_SUCCESS;
 }
 
@@ -554,11 +442,139 @@ int64 STDCALL snowflake_affected_rows(SNOWFLAKE_STMT *sfstmt) {
 
 SNOWFLAKE_STATUS STDCALL snowflake_prepare(
         SNOWFLAKE_STMT *sfstmt, const char *command) {
+    size_t prepared_cmd_size = 1; // Don't forget about null terminator
+    // If no input params, just set prepared_command to command and return
+    if (sfstmt->params == NULL) {
+        prepared_cmd_size += strlen(command);
+        sfstmt->prepared_command = (char *) sf_calloc(1, prepared_cmd_size);
+        strncpy(sfstmt->prepared_command, command, prepared_cmd_size);
+        goto cleanup;
+    }
+
+    // TODO Actually process params and prepare statement
+
+cleanup:
     return SF_STATUS_SUCCESS;
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
-    return SF_STATUS_SUCCESS;
+    CURL *curl;
+    SNOWFLAKE_STATUS ret = SF_STATUS_ERROR;
+    struct curl_slist *header = NULL;
+    cJSON *body = NULL;
+    cJSON *data = NULL;
+    cJSON *resp = NULL;
+    char *s_body = NULL;
+    char *s_resp = NULL;
+    char *header_token = NULL;
+    sf_bool success = SF_BOOLEAN_FALSE;
+    // -2 since there is a placeholder in the token format; +1 for null terminator
+    size_t header_token_size = strlen(TOKEN_HEADER_FORMAT) - 2 + strlen(sfstmt->connection->token) + 1;
+    char *encoded_url = NULL;
+    URL_KEY_VALUE url_params[] = {
+            {"requestId=", sfstmt->connection->request_id, NULL, NULL, 0, 0}
+    };
+    RAW_JSON_BUFFER *raw_json;
+    struct data config;
+    config.trace_ascii = 1;
+    raw_json = (RAW_JSON_BUFFER *) sf_calloc(1, sizeof(RAW_JSON_BUFFER));
+    raw_json->size = 0;
+    raw_json->buffer = NULL;
+
+    curl = curl_easy_init();
+
+    if (curl) {
+        // Create header
+        header_token = (char *) sf_calloc(1, header_token_size);
+        snprintf(header_token, header_token_size, TOKEN_HEADER_FORMAT, sfstmt->connection->token);
+        header = create_header_token(header_token);
+        log_info("Created header with token");
+
+        // Create Body
+        body = create_query_json_body(sfstmt->prepared_command, ++sfstmt->connection->sequence_counter);
+        s_body = cJSON_Print(body);
+        log_info("Created body");
+        log_trace("Here is constructed body:\n%s", s_body);
+
+        // Encode URL parameters
+        encoded_url = encode_url(curl, sfstmt->connection->protocol, sfstmt->connection->host, sfstmt->connection->port, QUERY_URL, url_params, 1);
+
+        if (encoded_url == NULL) {
+            goto cleanup;
+        }
+
+        /* Check for errors */
+        if(!curl_post_call(&curl, encoded_url, header, s_body, raw_json, &json_resp_cb, &config)) {
+            goto cleanup;
+        }
+        resp = cJSON_Parse(raw_json->buffer);
+        if (resp) {
+            s_resp = cJSON_Print(resp);
+            log_trace("Here is JSON response:\n%s", s_resp);
+            data = cJSON_GetObjectItem(resp, "data");
+            if (!json_copy_string(&sfstmt->sfqid, data, "queryId")) {
+                log_error("No valid sfqid found in response");
+            }
+            if (!json_copy_string(&sfstmt->sqlstate, data, "sqlState")) {
+                log_error("No valid sqlstate found in response");
+            }
+            json_copy_bool(&success, resp, "success");
+            if (success) {
+                // Set Database info
+                if (!json_copy_string(&sfstmt->connection->database, data, "finalDatabaseName")) {
+                    log_warn("No valid database found in response");
+                }
+                if (!json_copy_string(&sfstmt->connection->schema, data, "finalSchemaName")) {
+                    log_warn("No valid database found in response");
+                }
+                if (!json_copy_string(&sfstmt->connection->warehouse, data, "finalWarehouseName")) {
+                    log_warn("No valid database found in response");
+                }
+                if (!json_copy_string(&sfstmt->connection->role, data, "finalRoleName")) {
+                    log_warn("No valid database found in response");
+                }
+
+                // Set results array
+                if (!json_detach_array_from_object(&sfstmt->raw_results, data, "rowset")) {
+                    log_error("No valid rowset found in response");
+                }
+            }
+        } else {
+            log_trace("Error response:\n%s", raw_json->buffer);
+        }
+    } else {
+        // TODO Add error statement here
+        goto cleanup;
+    }
+
+    // Everything went well if we got to this point
+    ret = SF_STATUS_SUCCESS;
+
+cleanup:
+    if (header) {
+        curl_slist_free_all(header);
+    }
+    if (body) {
+        cJSON_Delete(body);
+    }
+    if (resp) {
+        cJSON_Delete(resp);
+    }
+    if (s_body) {
+        cJSON_free(s_body);
+    }
+    if (s_resp) {
+        cJSON_free(s_resp);
+    }
+    if (curl) {
+        curl_easy_cleanup(curl);
+    }
+    sf_free(raw_json->buffer);
+    sf_free(raw_json);
+    sf_free(header_token);
+    sf_free(encoded_url);
+
+    return ret;
 }
 
 SNOWFLAKE_ERROR *STDCALL snowflake_error(SNOWFLAKE_STMT *sfstmt) {
