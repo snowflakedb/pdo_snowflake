@@ -31,11 +31,11 @@ void main()
   snowflake_prepare(sfstmt, "INSERT INTO testtable(1,?,?)");
   SNOWFLAKE_BIND_INPUT p1, p2;
   p1.idx = 1;
-  p1.type = SF_C_TYPE_STRING;
+  p1.c_type = SF_C_TYPE_STRING;
   p1.value = (void *) "test1";
   snowflake_bind_param(sfstmt, &p1);
   p1.idx = 2;
-  p1.type = SF_C_TYPE_TIMESTAMP;
+  p1.c_type = SF_C_TYPE_TIMESTAMP;
   p1.value = (void *) "test1";
   snowflake_bind_param(sfstmt, &p2);
   if (snowflake_execute(sfstmt) != SF_STATUS_SUCCESS)

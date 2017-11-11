@@ -12,6 +12,7 @@
 #include "connection.h"
 #include "snowflake_memory.h"
 #include "log.h"
+#include "results.h"
 
 #define curl_easier_escape(curl, string) curl_easy_escape(curl, string, 0)
 
@@ -164,8 +165,7 @@ SNOWFLAKE *STDCALL snowflake_init() {
     sf->login_timeout = 120;
     sf->network_timeout = 0;
     sf->sequence_counter = 0;
-    // TODO set request id upon struct initialization
-    sf->request_id = "fa6d6346-a2fd-49c1-926f-e05c4db0bd1c";
+    uuid4_generate(sf->request_id);
 
     return sf;
 }
@@ -264,21 +264,12 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
     }
 
 cleanup:
-    if (header) {
-        curl_slist_free_all(header);
-    }
-    if (body) {
-        cJSON_Delete(body);
-    }
-    if (resp) {
-        cJSON_Delete(resp);
-    }
-    if (s_body) {
-        cJSON_free(s_body);
-    }
-    if (s_resp) {
-        cJSON_free(s_resp);
-    }
+    curl_slist_free_all(header);
+    curl_easy_cleanup(curl);
+    cJSON_Delete(body);
+    cJSON_Delete(resp);
+    sf_free(s_body);
+    sf_free(s_resp);
     sf_free(raw_json->buffer);
     sf_free(raw_json);
     sf_free(encoded_url);
@@ -367,11 +358,17 @@ SNOWFLAKE_STMT *STDCALL snowflake_stmt(SNOWFLAKE *sf) {
     SNOWFLAKE_STMT *sfstmt = (SNOWFLAKE_STMT *) sf_calloc(1, sizeof(SNOWFLAKE_STMT));
     sfstmt->connection = sf;
     sfstmt->sfqid = NULL;
+    sfstmt->sequence_counter = ++sf->sequence_counter;
+    uuid4_generate(sfstmt->request_id);
     //sfstmt->error = NULL;
+    sfstmt->prepared_command = NULL;
     sfstmt->raw_results = NULL;
+    sfstmt->total_rowcount = -1;
+    sfstmt->total_fieldcount = -1;
+    sfstmt->total_row_index = -1;
     sfstmt->params = NULL;
     sfstmt->results = NULL;
-    sfstmt->prepared_command = NULL;
+    sfstmt->desc = NULL;
     return sfstmt;
 }
 
@@ -385,6 +382,7 @@ void STDCALL snowflake_stmt_close(SNOWFLAKE_STMT *sfstmt) {
         sf_free(sfstmt->prepared_command);
         array_list_deallocate(sfstmt->params);
         array_list_deallocate(sfstmt->results);
+        //TODO deallocate description
     }
     sf_free(sfstmt);
 }
@@ -421,7 +419,73 @@ SNOWFLAKE_STATUS STDCALL snowflake_query(
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_fetch(SNOWFLAKE_STMT *sfstmt) {
-    return SF_STATUS_SUCCESS;
+    SNOWFLAKE_STATUS ret = SF_STATUS_ERROR;
+    int64 i;
+    cJSON *row = NULL;
+    cJSON *raw_result;
+    SNOWFLAKE_BIND_OUTPUT *result;
+
+    // If no more results, set return to SF_STATUS_EOL
+    if (cJSON_GetArraySize(sfstmt->raw_results) == 0) {
+        ret = SF_STATUS_EOL;
+        goto cleanup;
+    }
+
+    // Check that we can write to the provided result bindings
+    for (i = 0; i < sfstmt->total_fieldcount; i++) {
+        result = array_list_get(sfstmt->results, i + 1);
+        if (result == NULL) {
+            continue;
+        } else {
+            // TODO do we really need strict parameter checking? We can probably get away with less strict parameter checking
+            if (result->type != sfstmt->desc[i]->c_type) {
+                // TODO add error msg
+                goto cleanup;
+            }
+        }
+    }
+
+    // Get next result row
+    row = cJSON_DetachItemFromArray(sfstmt->raw_results, 0);
+
+    // Write to results
+    for (i = 0; i < sfstmt->total_fieldcount; i++) {
+        result = array_list_get(sfstmt->results, i + 1);
+        if (result == NULL) {
+            continue;
+        } else {
+            raw_result = cJSON_GetArrayItem(row, i);
+            if (result->type == SF_C_TYPE_INT8) {
+                if (sfstmt->desc[i]->type == SF_TYPE_BOOLEAN) {
+                    *(int8 *) result->value = cJSON_IsTrue(raw_result) ? SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
+                } else {
+                    // field is a char?
+                    *(int8 *) result->value = (int8) raw_result->valuestring[0];
+                }
+            } else if (result->type == SF_C_TYPE_UINT8) {
+                *(uint8 *) result->value = (uint8) raw_result->valuestring[0];
+            } else if (result->type == SF_C_TYPE_INT64) {
+                *(int64 *) result->value = (int64) strtoll(raw_result->valuestring, NULL, 10);
+            } else if (result->type == SF_C_TYPE_UINT64) {
+                *(uint64 *) result->value = (uint64) strtoull(raw_result->valuestring, NULL, 10);
+            } else if (result->type == SF_C_TYPE_FLOAT64) {
+                *(float64 *) result->value = (float64) strtod(raw_result->valuestring, NULL);
+            } else if (result->type == SF_C_TYPE_STRING) {
+                // TODO should we assume that we always have enough space?
+                strcpy(result->value, raw_result->valuestring);
+            } else if (result->type == SF_C_TYPE_TIMESTAMP) {
+                // TODO Do some timestamp stuff here
+            } else {
+                // TODO Create default case
+            }
+        }
+    }
+
+    ret = SF_STATUS_SUCCESS;
+
+cleanup:
+    cJSON_Delete(row);
+    return ret;
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_trans_begin(SNOWFLAKE *sf) {
@@ -436,7 +500,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_trans_rollback(SNOWFLAKE *sf) {
     return SF_STATUS_SUCCESS;
 }
 
-int64 STDCALL snowflake_affected_rows(SNOWFLAKE_STMT *sfstmt) {
+uint64 STDCALL snowflake_affected_rows(SNOWFLAKE_STMT *sfstmt) {
     return 0;
 }
 
@@ -463,16 +527,22 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
     struct curl_slist *header = NULL;
     cJSON *body = NULL;
     cJSON *data = NULL;
+    cJSON *rowtype = NULL;
     cJSON *resp = NULL;
     char *s_body = NULL;
     char *s_resp = NULL;
     char *header_token = NULL;
     sf_bool success = SF_BOOLEAN_FALSE;
+    if (sfstmt->connection->token == NULL || sfstmt->connection->master_token == NULL) {
+        if (snowflake_connect(sfstmt->connection) != SF_STATUS_SUCCESS) {
+            goto cleanup;
+        }
+    }
     // -2 since there is a placeholder in the token format; +1 for null terminator
     size_t header_token_size = strlen(TOKEN_HEADER_FORMAT) - 2 + strlen(sfstmt->connection->token) + 1;
     char *encoded_url = NULL;
     URL_KEY_VALUE url_params[] = {
-            {"requestId=", sfstmt->connection->request_id, NULL, NULL, 0, 0}
+            {"requestId=", sfstmt->request_id, NULL, NULL, 0, 0}
     };
     RAW_JSON_BUFFER *raw_json;
     struct data config;
@@ -491,7 +561,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
         log_info("Created header with token");
 
         // Create Body
-        body = create_query_json_body(sfstmt->prepared_command, ++sfstmt->connection->sequence_counter);
+        body = create_query_json_body(sfstmt->prepared_command, sfstmt->sequence_counter);
         s_body = cJSON_Print(body);
         log_info("Created body");
         log_trace("Here is constructed body:\n%s", s_body);
@@ -525,19 +595,25 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
                     log_warn("No valid database found in response");
                 }
                 if (!json_copy_string(&sfstmt->connection->schema, data, "finalSchemaName")) {
-                    log_warn("No valid database found in response");
+                    log_warn("No valid schema found in response");
                 }
                 if (!json_copy_string(&sfstmt->connection->warehouse, data, "finalWarehouseName")) {
-                    log_warn("No valid database found in response");
+                    log_warn("No valid warehouse found in response");
                 }
                 if (!json_copy_string(&sfstmt->connection->role, data, "finalRoleName")) {
-                    log_warn("No valid database found in response");
+                    log_warn("No valid role found in response");
                 }
-
+                rowtype = cJSON_GetObjectItem(data, "rowtype");
+                if (cJSON_IsArray(rowtype)) {
+                    sfstmt->desc = set_description(rowtype);
+                    sfstmt->total_fieldcount = cJSON_GetArraySize(rowtype);
+                }
                 // Set results array
                 if (!json_detach_array_from_object(&sfstmt->raw_results, data, "rowset")) {
                     log_error("No valid rowset found in response");
                 }
+                // TODO get from total field
+                sfstmt->total_rowcount = cJSON_GetArraySize(sfstmt->raw_results);
             }
         } else {
             log_trace("Error response:\n%s", raw_json->buffer);
@@ -551,24 +627,12 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
     ret = SF_STATUS_SUCCESS;
 
 cleanup:
-    if (header) {
-        curl_slist_free_all(header);
-    }
-    if (body) {
-        cJSON_Delete(body);
-    }
-    if (resp) {
-        cJSON_Delete(resp);
-    }
-    if (s_body) {
-        cJSON_free(s_body);
-    }
-    if (s_resp) {
-        cJSON_free(s_resp);
-    }
-    if (curl) {
-        curl_easy_cleanup(curl);
-    }
+    curl_slist_free_all(header);
+    cJSON_Delete(body);
+    cJSON_Delete(resp);
+    sf_free(s_body);
+    sf_free(s_resp);
+    curl_easy_cleanup(curl);
     sf_free(raw_json->buffer);
     sf_free(raw_json);
     sf_free(header_token);
@@ -582,10 +646,20 @@ SNOWFLAKE_ERROR *STDCALL snowflake_error(SNOWFLAKE_STMT *sfstmt) {
 }
 
 uint64 STDCALL snowflake_num_rows(SNOWFLAKE_STMT *sfstmt) {
-    return (uint64) 1;
+    // TODO fix int vs uint stuff
+    return sfstmt->total_rowcount;
+}
+
+uint64 STDCALL snowflake_num_fields(SNOWFLAKE_STMT *sfstmt) {
+    // TODO fix int vs uint stuff
+    return sfstmt->total_fieldcount;
+}
+
+uint64 STDCALL snowflake_param_count(SNOWFLAKE_STMT *sfstmt) {
+    return sfstmt->params->used;
 }
 
 const char *STDCALL snowflake_sfqid(SNOWFLAKE_STMT *sfstmt) {
-    // TODO check if sfstmt is NULL
+    // TODO check if sfstmt is NULL for ALL statement functions
     return sfstmt->sfqid;
 }

@@ -7,6 +7,8 @@
 
 ARRAY_LIST *array_list_create() {
     ARRAY_LIST *al = (ARRAY_LIST *) calloc(1, sizeof(ARRAY_LIST));
+    // No spots are used yet
+    al->used = 0;
     // Always initialize to 8
     al->size = 8;
     // Initialize array to NULL
@@ -38,6 +40,11 @@ void array_list_grow(ARRAY_LIST *al, size_t min_size) {
 void array_list_set(ARRAY_LIST *al, void *item, size_t index) {
     if (al->size < index) {
         array_list_grow(al, index);
+    }
+    // If element we are writing to is NULL, we want to increment 'used'.
+    // Otherwise we are writing to a spot that already contains an element
+    if (al->data[index] == NULL) {
+        al->used++;
     }
     al->data[index] = item;
 }

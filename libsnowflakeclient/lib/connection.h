@@ -53,6 +53,7 @@ struct curl_slist * STDCALL create_header_token(char *header_token);
 sf_bool STDCALL curl_post_call(CURL **curl, char *url, struct curl_slist *header, char *body, void *buffer, size_t (*writer)(char *, size_t, size_t, void *), struct data* config);
 char * STDCALL encode_url(CURL *curl, const char *protocol, const char *host, const char *port, const char *url, URL_KEY_VALUE* vars, int num_args);
 sf_bool STDCALL json_copy_bool(sf_bool *dest, cJSON *data, const char *item);
+sf_bool STDCALL json_copy_int(int64 *dest, cJSON *data, const char *item);
 sf_bool STDCALL json_copy_string(char **dest, cJSON *data, const char *item);
 sf_bool STDCALL json_detach_array_from_object(cJSON **dest, cJSON *data, const char *item);
 sf_bool STDCALL json_detach_array_from_array(cJSON **dest, cJSON *data, int index);

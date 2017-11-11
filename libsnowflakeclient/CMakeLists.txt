@@ -24,7 +24,11 @@ set(SOURCE_FILES
         lib/snowflake_memory.c
         lib/connection.h
         lib/connection.c
-        lib/basic_types.h lib/results.h lib/results.c)
+        lib/basic_types.h
+        lib/results.h
+        lib/results.c
+        lib/uuid4.h
+        lib/uuid4.c)
 
 include_directories(deps/curl-7.54.1/include)
 

@@ -19,6 +19,7 @@ extern "C" {
 #include "libsnowflakeclient/lib/snowflake_client_version.h"
 #include "libsnowflakeclient/lib/arraylist.h"
 #include "libsnowflakeclient/lib/basic_types.h"
+#include "libsnowflakeclient/lib/uuid4.h"
 
 /**
  * Snowflake Data types
@@ -47,6 +48,7 @@ typedef enum sf_c_type {
     SF_C_TYPE_UINT8,
     SF_C_TYPE_INT64,
     SF_C_TYPE_UINT64,
+    SF_C_TYPE_FLOAT64,
     SF_C_TYPE_STRING,
     SF_C_TYPE_TIMESTAMP
 } SNOWFLAKE_C_TYPE;
@@ -60,6 +62,16 @@ typedef enum sf_status {
     SF_STATUS_WARNING,
     SF_STATUS_EOL
 } SNOWFLAKE_STATUS;
+
+/**
+ * Snowflake API status
+ */
+typedef enum sf_error_code {
+    SF_OUT_OF_MEMORY,
+    SF_REQUEST_TIMEOUT,
+    SF_BAD_REQUEST,
+    SF_DATA_CONVERSION,
+} SNOWFLAKE_ERROR_CODE;
 
 /**
  * Attributes for Snowflake database session context.
@@ -132,8 +144,22 @@ typedef struct sf_snowflake_connection {
     // Session specific fields
     int64 sequence_counter;
     // TODO free this?
-    char *request_id;
+    char request_id[UUID4_LEN];
 } SNOWFLAKE;
+
+/**
+ * Column description context
+ */
+typedef struct sf_snowflake_column_desc {
+    char *name;
+    SNOWFLAKE_TYPE type;
+    SNOWFLAKE_C_TYPE c_type;
+    int64 byte_size;
+    int64 internal_size;
+    int64 precision;
+    int64 scale;
+    sf_bool null_ok;
+} SNOWFLAKE_COLUMN_DESC;
 
 /**
  * Statement context
@@ -142,14 +168,19 @@ typedef struct sf_snowflake_statement {
     /* TODO */
     char *sfqid;
     char *sqlstate;
-    int sequence_counter;
+    int64 sequence_counter;
+    char request_id[UUID4_LEN];
     SNOWFLAKE_ERROR error;
     SNOWFLAKE *connection;
     char *prepared_command;
     cJSON *raw_results;
+    int64 total_rowcount;
+    int64 total_fieldcount;
+    int64 total_row_index;
     // TODO Create Bind list
     ARRAY_LIST *params;
     ARRAY_LIST *results;
+    SNOWFLAKE_COLUMN_DESC **desc;
 } SNOWFLAKE_STMT;
 
 /**
@@ -158,7 +189,7 @@ typedef struct sf_snowflake_statement {
 typedef struct sf_snowflake_input
 {
   size_t idx;
-  SNOWFLAKE_C_TYPE type;
+  SNOWFLAKE_C_TYPE c_type;
   void *value;
 } SNOWFLAKE_BIND_INPUT;
 
@@ -167,9 +198,10 @@ typedef struct sf_snowflake_input
  */
 typedef struct sf_snowflake_output
 {
-  size_t idx;
-  SNOWFLAKE_C_TYPE type;
-  void *value;
+    size_t idx;
+    SNOWFLAKE_C_TYPE type;
+    void *value;
+    size_t max_length;
 } SNOWFLAKE_BIND_OUTPUT;
 
 /**
@@ -314,7 +346,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_query(SNOWFLAKE_STMT *sfstmt, const char *com
  * @param sf SNOWFLAKE_STMT context.
  * @return the number of affected rows
  */
-int64 STDCALL snowflake_affected_rows(SNOWFLAKE_STMT *sfstmt);
+uint64 STDCALL snowflake_affected_rows(SNOWFLAKE_STMT *sfstmt);
 
 /**
  * Returns the number of rows can be fetched from the result set.

@@ -278,7 +278,7 @@ char * encode_url(CURL *curl, const char *protocol, const char *host, const char
     }
 
     log_debug("Here is constructed url: %s", encoded_url);
-    log_trace("Encoded URL sizes. Expected size: %zu     Actual Size: %i", encoded_url_size, bytes_written);
+    log_trace("Encoded Base URL sizes. Expected size: %zu     Actual Size: %i", base_url_size, bytes_written);
 
 cleanup:
     // Free created memory
@@ -292,7 +292,7 @@ cleanup:
 sf_bool json_copy_string(char **dest, cJSON *data, const char *item) {
     size_t blob_size;
     cJSON *blob = cJSON_GetObjectItem(data, item);
-    if (blob && cJSON_IsString(blob)) {
+    if (cJSON_IsString(blob)) {
         blob_size = strlen(blob->valuestring) + 1;
         sf_free(*dest);
         *dest = (char *) sf_calloc(1, blob_size);
@@ -306,9 +306,20 @@ sf_bool json_copy_string(char **dest, cJSON *data, const char *item) {
 
 sf_bool json_copy_bool(sf_bool *dest, cJSON *data, const char *item) {
     cJSON *blob = cJSON_GetObjectItem(data, item);
-    if (blob && cJSON_IsBool(blob)) {
-        *dest = blob->type ? SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
-        log_debug("Found item and value; %s: %s", item, *dest);
+    if (cJSON_IsBool(blob)) {
+        *dest = cJSON_IsTrue(blob) ? SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
+        log_debug("Found item and value; %s: %i", item, *dest);
+        return SF_BOOLEAN_TRUE;
+    }
+
+    return SF_BOOLEAN_FALSE;
+}
+
+sf_bool json_copy_int(int64 *dest, cJSON *data, const char *item) {
+    cJSON *blob = cJSON_GetObjectItem(data, item);
+    if (cJSON_IsNumber(blob)) {
+        *dest = (int64) blob->valuedouble;
+        log_debug("Found item and value; %s: %i", item, *dest);
         return SF_BOOLEAN_TRUE;
     }
 
@@ -317,7 +328,7 @@ sf_bool json_copy_bool(sf_bool *dest, cJSON *data, const char *item) {
 
 sf_bool json_detach_array_from_object(cJSON **dest, cJSON *data, const char *item) {
     cJSON *blob = cJSON_DetachItemFromObject(data, item);
-    if (blob && cJSON_IsArray(blob)) {
+    if (cJSON_IsArray(blob)) {
         if (*dest) {
             cJSON_Delete(*dest);
         }
@@ -343,13 +354,13 @@ sf_bool json_detach_array_from_array(cJSON **dest, cJSON *data, int index) {
     return SF_BOOLEAN_FALSE;
 }
 
-/*
+/**
  * libcurl write function callback to write response to a buffer
  */
 size_t json_resp_cb(char *data, size_t size, size_t nmemb, RAW_JSON_BUFFER *raw_json) {
     size_t data_size = size * nmemb;
-    log_debug("Data input size: %zu\n", data_size);
-    raw_json->buffer = sf_realloc(raw_json->buffer, raw_json->size + data_size + 1);
+    log_debug("Curl response size: %zu\n", data_size);
+    raw_json->buffer = (char *) sf_realloc(raw_json->buffer, raw_json->size + data_size + 1);
     // Start copying where last null terminator existed
     memcpy(&raw_json->buffer[raw_json->size], data, data_size);
     raw_json->size += data_size;
