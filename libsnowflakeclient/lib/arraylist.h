@@ -20,6 +20,7 @@ extern "C" {
 typedef struct sf_array_list {
     void **data;
     size_t size;
+    size_t used;
 } ARRAY_LIST;
 
 ARRAY_LIST * STDCALL array_list_create();
