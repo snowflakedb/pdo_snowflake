@@ -15,7 +15,8 @@ extern "C" {
 #define STDCALL __stdcall
 #endif
 
-#include "libsnowflakeclient/deps/curl-7.54.1/include/curl/curl.h"
+#include <stdio.h>
+#include "libsnowflakeclient/deps/curl/include/curl/curl.h"
 #include "cJSON.h"
 #include "basic_types.h"
 #include "libsnowflakeclient/include/snowflake_client.h"

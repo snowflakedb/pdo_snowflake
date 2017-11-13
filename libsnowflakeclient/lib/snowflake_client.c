@@ -30,10 +30,12 @@ static FILE *LOG_FP = NULL;
  */
 void alloc_buffer_and_copy(char **var, const char *str) {
     size_t str_size;
-    sf_free(*var);
-    str_size = strlen(str) + 1; // For null terminator
-    *var = (char *) sf_calloc(1, str_size);
-    strncpy(*var, str, str_size);
+    SF_FREE(*var);
+    if (str) {
+        str_size = strlen(str) + 1; // For null terminator
+        *var = (char *) SF_CALLOC(1, str_size);
+        strncpy(*var, str, str_size);
+    }
 }
 
 int mkpath(char* file_path, mode_t mode) {
@@ -71,11 +73,11 @@ sf_bool STDCALL log_init() {
     if (sf_log_path != NULL) {
         log_path_size += strlen(sf_log_path);
         log_path_size += 16; // Size of static format characters
-        LOG_PATH = (char *) sf_calloc(1, log_path_size);
+        LOG_PATH = (char *) SF_CALLOC(1, log_path_size);
         snprintf(LOG_PATH, log_path_size, "%s/.capi/logs/%s.txt", sf_log_path, (char *)time_str);
     } else {
         log_path_size += 9; // Size of static format characters
-        LOG_PATH = (char *) sf_calloc(1, log_path_size);
+        LOG_PATH = (char *) SF_CALLOC(1, log_path_size);
         snprintf(LOG_PATH, log_path_size, "logs/%s.txt", (char *)time_str);
     }
     if (LOG_PATH != NULL) {
@@ -109,7 +111,7 @@ cleanup:
  * Cleans up memory allocated for log init and closes log file.
  */
 void STDCALL log_term() {
-    sf_free(LOG_PATH);
+    SF_FREE(LOG_PATH);
     if (LOG_FP) {
         fclose(LOG_FP);
     }
@@ -143,7 +145,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_global_term() {
 
 SNOWFLAKE *STDCALL snowflake_init() {
     // TODO: track memory usage
-    SNOWFLAKE *sf = (SNOWFLAKE *) sf_calloc(1, sizeof(SNOWFLAKE));
+    SNOWFLAKE *sf = (SNOWFLAKE *) SF_CALLOC(1, sizeof(SNOWFLAKE));
 
     // Initialize object with default values
     alloc_buffer_and_copy(&sf->host, "127.0.0.1");
@@ -173,21 +175,21 @@ SNOWFLAKE *STDCALL snowflake_init() {
 void STDCALL snowflake_term(SNOWFLAKE *sf) {
     // TODO: track memory usage
     if (sf) {
-        sf_free(sf->host);
-        sf_free(sf->port);
-        sf_free(sf->user);
-        sf_free(sf->password);
-        sf_free(sf->database);
-        sf_free(sf->account);
-        sf_free(sf->role);
-        sf_free(sf->warehouse);
-        sf_free(sf->schema);
-        sf_free(sf->protocol);
-        sf_free(sf->passcode);
-        sf_free(sf->master_token);
-        sf_free(sf->token);
+        SF_FREE(sf->host);
+        SF_FREE(sf->port);
+        SF_FREE(sf->user);
+        SF_FREE(sf->password);
+        SF_FREE(sf->database);
+        SF_FREE(sf->account);
+        SF_FREE(sf->role);
+        SF_FREE(sf->warehouse);
+        SF_FREE(sf->schema);
+        SF_FREE(sf->protocol);
+        SF_FREE(sf->passcode);
+        SF_FREE(sf->master_token);
+        SF_FREE(sf->token);
     }
-    sf_free(sf);
+    SF_FREE(sf);
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
@@ -208,12 +210,17 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
             {"&warehouse=", sf->warehouse, NULL, NULL, 0, 0},
             {"&roleName=", sf->role, NULL, NULL, 0, 0},
     };
-    RAW_JSON_BUFFER *raw_json;
+    RAW_JSON_BUFFER *raw_json = NULL;
     struct data config;
     config.trace_ascii = 1;
     SNOWFLAKE_STATUS ret = SF_STATUS_ERROR;
 
-    raw_json = (RAW_JSON_BUFFER *) sf_calloc(1, sizeof(RAW_JSON_BUFFER));
+    if(!sf->protocol || !sf->host || !sf->port) {
+        // Invalid connection
+        goto cleanup;
+    }
+
+    raw_json = (RAW_JSON_BUFFER *) SF_CALLOC(1, sizeof(RAW_JSON_BUFFER));
     raw_json->size = 0;
     raw_json->buffer = NULL;
 
@@ -268,11 +275,13 @@ cleanup:
     curl_easy_cleanup(curl);
     cJSON_Delete(body);
     cJSON_Delete(resp);
-    sf_free(s_body);
-    sf_free(s_resp);
-    sf_free(raw_json->buffer);
-    sf_free(raw_json);
-    sf_free(encoded_url);
+    SF_FREE(s_body);
+    SF_FREE(s_resp);
+    if (raw_json) {
+        SF_FREE(raw_json->buffer);
+    }
+    SF_FREE(raw_json);
+    SF_FREE(encoded_url);
 
     return ret;
 }
@@ -355,7 +364,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_get_attr(
 
 SNOWFLAKE_STMT *STDCALL snowflake_stmt(SNOWFLAKE *sf) {
     // TODO: track memory usage
-    SNOWFLAKE_STMT *sfstmt = (SNOWFLAKE_STMT *) sf_calloc(1, sizeof(SNOWFLAKE_STMT));
+    SNOWFLAKE_STMT *sfstmt = (SNOWFLAKE_STMT *) SF_CALLOC(1, sizeof(SNOWFLAKE_STMT));
     sfstmt->connection = sf;
     sfstmt->sfqid = NULL;
     sfstmt->sequence_counter = ++sf->sequence_counter;
@@ -375,23 +384,23 @@ SNOWFLAKE_STMT *STDCALL snowflake_stmt(SNOWFLAKE *sf) {
 void STDCALL snowflake_stmt_close(SNOWFLAKE_STMT *sfstmt) {
     // TODO: track memory usage
     if (sfstmt) {
-        sf_free(sfstmt->sfqid);
+        SF_FREE(sfstmt->sfqid);
         if (sfstmt->raw_results) {
             cJSON_Delete(sfstmt->raw_results);
         }
-        sf_free(sfstmt->prepared_command);
+        SF_FREE(sfstmt->prepared_command);
         array_list_deallocate(sfstmt->params);
         array_list_deallocate(sfstmt->results);
         //TODO deallocate description
     }
-    sf_free(sfstmt);
+    SF_FREE(sfstmt);
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_bind_param(
     SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_BIND_INPUT *sfbind)
 {
     if (sfstmt->params == NULL) {
-        sfstmt->params = array_list_create();
+        sfstmt->params = array_list_init();
     }
     array_list_set(sfstmt->params, sfbind, sfbind->idx);
     return SF_STATUS_SUCCESS;
@@ -401,7 +410,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_bind_result(
     SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_BIND_OUTPUT *sfbind)
 {
     if (sfstmt->results == NULL) {
-        sfstmt->results = array_list_create();
+        sfstmt->results = array_list_init();
     }
     array_list_set(sfstmt->results, sfbind, sfbind->idx);
     return SF_STATUS_SUCCESS;
@@ -510,7 +519,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_prepare(
     // If no input params, just set prepared_command to command and return
     if (sfstmt->params == NULL) {
         prepared_cmd_size += strlen(command);
-        sfstmt->prepared_command = (char *) sf_calloc(1, prepared_cmd_size);
+        sfstmt->prepared_command = (char *) SF_CALLOC(1, prepared_cmd_size);
         strncpy(sfstmt->prepared_command, command, prepared_cmd_size);
         goto cleanup;
     }
@@ -522,7 +531,7 @@ cleanup:
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
-    CURL *curl;
+    CURL *curl = NULL;
     SNOWFLAKE_STATUS ret = SF_STATUS_ERROR;
     struct curl_slist *header = NULL;
     cJSON *body = NULL;
@@ -534,6 +543,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
     char *header_token = NULL;
     sf_bool success = SF_BOOLEAN_FALSE;
     if (sfstmt->connection->token == NULL || sfstmt->connection->master_token == NULL) {
+        // If not set, then try to connect. If connecting fails, then go to cleanup
         if (snowflake_connect(sfstmt->connection) != SF_STATUS_SUCCESS) {
             goto cleanup;
         }
@@ -544,10 +554,16 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
     URL_KEY_VALUE url_params[] = {
             {"requestId=", sfstmt->request_id, NULL, NULL, 0, 0}
     };
-    RAW_JSON_BUFFER *raw_json;
+    RAW_JSON_BUFFER *raw_json = NULL;
     struct data config;
     config.trace_ascii = 1;
-    raw_json = (RAW_JSON_BUFFER *) sf_calloc(1, sizeof(RAW_JSON_BUFFER));
+
+    if(!sfstmt->connection->protocol || !sfstmt->connection->host || !sfstmt->connection->port) {
+        // Invalid connection
+        goto cleanup;
+    }
+
+    raw_json = (RAW_JSON_BUFFER *) SF_CALLOC(1, sizeof(RAW_JSON_BUFFER));
     raw_json->size = 0;
     raw_json->buffer = NULL;
 
@@ -555,7 +571,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
 
     if (curl) {
         // Create header
-        header_token = (char *) sf_calloc(1, header_token_size);
+        header_token = (char *) SF_CALLOC(1, header_token_size);
         snprintf(header_token, header_token_size, TOKEN_HEADER_FORMAT, sfstmt->connection->token);
         header = create_header_token(header_token);
         log_info("Created header with token");
@@ -630,13 +646,14 @@ cleanup:
     curl_slist_free_all(header);
     cJSON_Delete(body);
     cJSON_Delete(resp);
-    sf_free(s_body);
-    sf_free(s_resp);
+    SF_FREE(s_body);
+    SF_FREE(s_resp);
     curl_easy_cleanup(curl);
-    sf_free(raw_json->buffer);
-    sf_free(raw_json);
-    sf_free(header_token);
-    sf_free(encoded_url);
+    if (raw_json) {
+        SF_FREE(raw_json->buffer);
+    }
+    SF_FREE(header_token);
+    SF_FREE(encoded_url);
 
     return ret;
 }

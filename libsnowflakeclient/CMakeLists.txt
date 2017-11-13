@@ -30,14 +30,20 @@ set(SOURCE_FILES
         lib/uuid4.h
         lib/uuid4.c)
 
-include_directories(deps/curl-7.54.1/include)
+find_library(CURL_LIB libcurl.a PATHS deps/curl/lib/ REQUIRED)
+find_library(SSL_LIB libssl.a PATHS deps/openssl/lib/ REQUIRED)
+find_library(CRYPTO_LIB libcrypto.a PATHS deps/openssl/lib/ REQUIRED)
 
-link_directories(deps/curl-7.54.1/lib)
+include_directories(deps/curl/include deps/openssl/include)
+
+message("libcurl is located at " ${CURL_LIB})
+message("libssl is located at " ${SSL_LIB})
+message("libcrypto is located at " ${CRYPTO_LIB})
 
 add_library(snowflakeclient STATIC ${SOURCE_FILES})
 
 set_property(TARGET snowflakeclient PROPERTY C_STANDARD 90)
 
-target_link_libraries(snowflakeclient curl)
+target_link_libraries(snowflakeclient ${CURL_LIB})
 
 add_subdirectory(examples)

@@ -73,10 +73,10 @@ SNOWFLAKE_COLUMN_DESC ** set_description(const cJSON *rowtype) {
     if (rowtype == NULL || array_size == 0) {
         return desc;
     }
-    desc = (SNOWFLAKE_COLUMN_DESC **) sf_calloc(array_size, sizeof(SNOWFLAKE_COLUMN_DESC *));
+    desc = (SNOWFLAKE_COLUMN_DESC **) SF_CALLOC(array_size, sizeof(SNOWFLAKE_COLUMN_DESC *));
     for (i = 0; i < array_size; i++) {
         column = cJSON_GetArrayItem(rowtype, i);
-        desc[i] = (SNOWFLAKE_COLUMN_DESC *) sf_calloc(1, sizeof(SNOWFLAKE_COLUMN_DESC));
+        desc[i] = (SNOWFLAKE_COLUMN_DESC *) SF_CALLOC(1, sizeof(SNOWFLAKE_COLUMN_DESC));
         if(!json_copy_string(&desc[i]->name, column, "name")) {
             desc[i]->name = NULL;
         }

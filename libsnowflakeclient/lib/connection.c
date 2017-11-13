@@ -260,13 +260,13 @@ char * encode_url(CURL *curl, const char *protocol, const char *host, const char
         encoded_url_size += vars[i].key_size + vars[i].value_size;
     }
 
-    encoded_url = (char *) sf_calloc(1, encoded_url_size);
+    encoded_url = (char *) SF_CALLOC(1, encoded_url_size);
     bytes_written = snprintf(encoded_url, base_url_size, format, protocol, host, port, url);
 
     if (bytes_written < 0 || bytes_written >= encoded_url_size) {
         log_warn("Encoded url was not properly constructed. Expected size: %zu     Actual Size: %i",
                  encoded_url_size, bytes_written);
-        sf_free(encoded_url);
+        SF_FREE(encoded_url);
         encoded_url = NULL;
         goto cleanup;
     }
@@ -283,7 +283,7 @@ char * encode_url(CURL *curl, const char *protocol, const char *host, const char
 cleanup:
     // Free created memory
     for (i = 0; i < num_args; i++) {
-        sf_free(vars[i].formatted_value);
+        SF_FREE(vars[i].formatted_value);
     }
 
     return encoded_url;
@@ -294,8 +294,8 @@ sf_bool json_copy_string(char **dest, cJSON *data, const char *item) {
     cJSON *blob = cJSON_GetObjectItem(data, item);
     if (cJSON_IsString(blob)) {
         blob_size = strlen(blob->valuestring) + 1;
-        sf_free(*dest);
-        *dest = (char *) sf_calloc(1, blob_size);
+        SF_FREE(*dest);
+        *dest = (char *) SF_CALLOC(1, blob_size);
         strncpy(*dest, blob->valuestring, blob_size);
         log_debug("Found item and value; %s: %s", item, *dest);
         return SF_BOOLEAN_TRUE;
@@ -360,7 +360,7 @@ sf_bool json_detach_array_from_array(cJSON **dest, cJSON *data, int index) {
 size_t json_resp_cb(char *data, size_t size, size_t nmemb, RAW_JSON_BUFFER *raw_json) {
     size_t data_size = size * nmemb;
     log_debug("Curl response size: %zu\n", data_size);
-    raw_json->buffer = (char *) sf_realloc(raw_json->buffer, raw_json->size + data_size + 1);
+    raw_json->buffer = (char *) SF_REALLOC(raw_json->buffer, raw_json->size + data_size + 1);
     // Start copying where last null terminator existed
     memcpy(&raw_json->buffer[raw_json->size], data, data_size);
     raw_json->size += data_size;
