@@ -25,6 +25,9 @@ typedef double float64;
 typedef float float32;
 typedef int8 sf_bool;
 
+extern int8 SF_BOOLEAN_TRUE;
+extern int8 SF_BOOLEAN_FALSE;
+
 #ifdef __cplusplus
 }
 #endif

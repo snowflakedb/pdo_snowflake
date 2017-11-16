@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 #include <stdio.h>
-#include "libsnowflakeclient/deps/curl/include/curl/curl.h"
+#include "libsnowflakeclient/build/linux/curl/include/curl/curl.h"
 #include "cJSON.h"
 #include "basic_types.h"
 #include "libsnowflakeclient/include/snowflake_client.h"
@@ -46,9 +46,8 @@ static void dump(const char *text, FILE *stream, unsigned char *ptr, size_t size
 static int my_trace(CURL *handle, curl_infotype type, char *data, size_t size, void *userp);
 
 
-
 cJSON *STDCALL create_auth_json_body(SNOWFLAKE *sf, const char *application, const char *int_app_name, const char *int_app_version);
-cJSON *STDCALL create_query_json_body(char *prepared_command, int64 sequence_id);
+cJSON *STDCALL create_query_json_body(char *sql_text, int64 sequence_id);
 struct curl_slist * STDCALL create_header_no_token();
 struct curl_slist * STDCALL create_header_token(char *header_token);
 sf_bool STDCALL curl_post_call(CURL **curl, char *url, struct curl_slist *header, char *body, void *buffer, size_t (*writer)(char *, size_t, size_t, void *), struct data* config);

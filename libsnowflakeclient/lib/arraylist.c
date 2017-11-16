@@ -41,10 +41,14 @@ void array_list_set(ARRAY_LIST *al, void *item, size_t index) {
     if (al->size < index) {
         array_list_grow(al, index);
     }
-    // If element we are writing to is NULL, we want to increment 'used'.
+    // If element we are writing to is NULL and item is not NULL, we want to increment 'used'.
     // Otherwise we are writing to a spot that already contains an element
-    if (al->data[index] == NULL) {
+    if (!al->data[index] && item) {
         al->used++;
+    } else if (al->data[index] && !item) {
+        // If this element exists and item is NULL, then we are deleting from the arraylist
+        // and so we decrement used
+        al->used--;
     }
     al->data[index] = item;
 }

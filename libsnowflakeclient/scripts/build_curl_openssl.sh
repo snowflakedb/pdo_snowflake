@@ -37,7 +37,7 @@ rm -rf $DEPENDENCY_LINUX
 mkdir -p $DEPENDENCY_LINUX
 
 # build openssl
-OPENSSL_BUILD_DIR=$DEPENDENCY_LINUX/openssl 
+OPENSSL_BUILD_DIR=$DEPENDENCY_LINUX/openssl
 openssl_config_opts=()
 openssl_config_opts+=(
     "no-shared"
@@ -50,7 +50,7 @@ cd $OPENSSL_SOURCE_DIR
 ./config ${openssl_config_opts[@]}
 make depend
 echo "Building and Installing OpenSSL"
-make 2>&1 > /dev/null
+make -j 8 2>&1 > /dev/null
 make install_sw install_ssldirs 2>&1 > /dev/null
 
 # build libcurl
@@ -69,6 +69,7 @@ curl_configure_opts+=(
     "--disable-shared"
     "--prefix=$LIBCURL_BUILD_DIR"
     "--without-libssh2"
+    "--without-zlib"
     "--disable-rtsp"
     "--disable-ldap"
     "--disable-ldaps"
@@ -86,7 +87,7 @@ curl_configure_opts+=(
 )
 cd $LIBCURL_SOURCE_DIR
 echo "Building Curl with OpenSSL"
-PKG_CONFIG="pkg-config -static" LIBS="-ldl" ./configure ${curl_configure_opts[@]}
+PKG_CONFIG_PATH="$OPENSSL_BUILD_DIR/lib/pkgconfig" LIBS="-ldl" ./configure ${curl_configure_opts[@]}
 echo "Building and Installing Curl"
 make 2>&1 > /dev/null
 make install 2>&1 > /dev/null

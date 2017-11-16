@@ -14,6 +14,8 @@ int main() {
     snowflake_global_init();
     SNOWFLAKE *sf = snowflake_init();
 
+    snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, "/home/kwagner/cacert.pem");
+
     /* connect*/
     snowflake_set_attr(sf, SF_CON_HOST, getenv("SNOWFLAKE_TEST_HOST"));
     snowflake_set_attr(sf, SF_CON_PORT, getenv("SNOWFLAKE_TEST_PORT"));
@@ -26,41 +28,28 @@ int main() {
     snowflake_set_attr(sf, SF_CON_WAREHOUSE, getenv("SNOWFLAKE_TEST_WAREHOUSE"));
     snowflake_set_attr(sf, SF_CON_AUTOCOMMIT, &SF_BOOLEAN_TRUE);
     status = snowflake_connect(sf);
+    if (status != SF_STATUS_SUCCESS) {
+        fprintf(stderr, "Connecting to snowflake failed, exiting...\n");
+        goto cleanup;
+    }
 
     /* query */
-    SNOWFLAKE_STMT *sfstmt1 = snowflake_stmt(sf);
-    SNOWFLAKE_STMT *sfstmt2 = snowflake_stmt(sf);
-    SNOWFLAKE_STMT *sfstmt3 = snowflake_stmt(sf);
+    SNOWFLAKE_STMT *sfstmt = snowflake_stmt(sf);
     SNOWFLAKE_BIND_OUTPUT c1;
-    SNOWFLAKE_BIND_OUTPUT c2;
-    SNOWFLAKE_BIND_OUTPUT c3;
     int out = 0;
-    double dout = 0;
-    char sout[10];
     c1.idx = 1;
     c1.type = SF_C_TYPE_INT64;
     c1.value = (void *) &out;
-    c2.idx = 2;
-    c2.type = SF_C_TYPE_FLOAT64;
-    c2.value = (void *) &dout;
-    c3.idx = 3;
-    c3.type = SF_C_TYPE_STRING;
-    c3.value = (void *) sout;
-    snowflake_bind_result(sfstmt1, &c1);
-    snowflake_bind_result(sfstmt1, &c2);
-    snowflake_bind_result(sfstmt1, &c3);
-    snowflake_query(sfstmt2, "create or replace warehouse regress;");
-    snowflake_query(sfstmt3, "use warehouse regress;");
-    snowflake_query(sfstmt1, "select 1, 1.5, 'string';");
-    printf("Number of rows: %d\n", (int) snowflake_num_rows(sfstmt1));
+    snowflake_bind_result(sfstmt, &c1);
+    snowflake_query(sfstmt, "select 1;");
+    printf("Number of rows: %d\n", (int) snowflake_num_rows(sfstmt));
 
-    while (snowflake_fetch(sfstmt1) != SF_STATUS_EOL) {
-        printf("result: %d, %lf, %s\n", *((int *) c1.value), *((double *) c2.value), (char *) c3.value);
+    while (snowflake_fetch(sfstmt) != SF_STATUS_EOL) {
+        printf("result: %d\n", *((int *) c1.value));
     }
-    snowflake_stmt_close(sfstmt1);
-    snowflake_stmt_close(sfstmt2);
-    snowflake_stmt_close(sfstmt3);
+    snowflake_stmt_close(sfstmt);
 
+cleanup:
     /* disconnect */
     snowflake_close(sf);
 
