@@ -14,7 +14,7 @@ int main()
     snowflake_global_init();
     SNOWFLAKE *sf = snowflake_init();
 
-    snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, "/home/kwagner/cacert.pem");
+    snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, getenv("SNOWFLAKE_TEST_CA_BUNDLE_FILE"));
 
     /* connect*/
     snowflake_set_attr(sf, SF_CON_HOST, getenv("SNOWFLAKE_TEST_HOST"));
