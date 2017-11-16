@@ -8,9 +8,9 @@ project(snowflakeclient)
 add_definitions(-DLOG_USE_COLOR)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_C_FLAGS -pthread)
 
 set(SOURCE_FILES
-        include/snowflake_client.h
         lib/snowflake_client_int.h
         lib/snowflake_client_version.h
         lib/snowflake_client.c
@@ -28,13 +28,13 @@ set(SOURCE_FILES
         lib/results.h
         lib/results.c
         lib/uuid4.h
-        lib/uuid4.c)
+        lib/uuid4.c lib/constants.h lib/basic_types.c)
 
-find_library(CURL_LIB libcurl.a PATHS deps/curl/lib/ REQUIRED)
-find_library(SSL_LIB libssl.a PATHS deps/openssl/lib/ REQUIRED)
-find_library(CRYPTO_LIB libcrypto.a PATHS deps/openssl/lib/ REQUIRED)
+find_library(CURL_LIB libcurl.a PATHS build/linux/curl/lib/ REQUIRED)
+find_library(SSL_LIB libssl.a PATHS build/linux/openssl/lib/ REQUIRED)
+find_library(CRYPTO_LIB libcrypto.a PATHS build/linux/openssl/lib/ REQUIRED)
 
-include_directories(deps/curl/include deps/openssl/include)
+include_directories(build/linux/curl/include build/linux/openssl/include include)
 
 message("libcurl is located at " ${CURL_LIB})
 message("libssl is located at " ${SSL_LIB})
@@ -44,6 +44,8 @@ add_library(snowflakeclient STATIC ${SOURCE_FILES})
 
 set_property(TARGET snowflakeclient PROPERTY C_STANDARD 90)
 
-target_link_libraries(snowflakeclient ${CURL_LIB})
+target_link_libraries(snowflakeclient rt dl z m
+        "-Wl,--whole-archive ${CURL_LIB} ${SSL_LIB} ${CRYPTO_LIB}" "-Wl,--no-whole-archive"
+        "-Wl,--as-needed -static-libgcc")
 
 add_subdirectory(examples)

@@ -40,6 +40,39 @@ SNOWFLAKE_TYPE string_to_snowflake_type(const char *string) {
     }
 }
 
+const char *snowflake_type_to_string(SNOWFLAKE_TYPE type) {
+    switch (type) {
+        case SF_TYPE_FIXED:
+            return "fixed";
+        case SF_TYPE_REAL:
+            return "real";
+        case SF_TYPE_TEXT:
+            return "text";
+        case SF_TYPE_DATE:
+            return "date";
+        case SF_TYPE_TIMESTAMP_LTZ:
+            return "timestamp_ltz";
+        case SF_TYPE_TIMESTAMP_NTZ:
+            return "timestamp_ntz";
+        case SF_TYPE_TIMESTAMP_TZ:
+            return "timestamp_tz";
+        case SF_TYPE_VARIANT:
+            return "variant";
+        case SF_TYPE_OBJECT:
+            return "object";
+        case SF_TYPE_ARRAY:
+            return "array";
+        case SF_TYPE_BINARY:
+            return "binary";
+        case SF_TYPE_TIME:
+            return "time";
+        case SF_TYPE_BOOLEAN:
+            return "boolean";
+        default:
+            return "text";
+    }
+}
+
 SNOWFLAKE_C_TYPE snowflake_to_c_type(SNOWFLAKE_TYPE type, int64 precision, int64 scale) {
     if (type == SF_TYPE_FIXED) {
         if (scale > 0 || precision >= 19) {
@@ -61,6 +94,74 @@ SNOWFLAKE_C_TYPE snowflake_to_c_type(SNOWFLAKE_TYPE type, int64 precision, int64
     } else {
         // TODO better default case
         return 0;
+    }
+}
+
+SNOWFLAKE_TYPE c_type_to_snowflake(SNOWFLAKE_C_TYPE c_type, SNOWFLAKE_TYPE tsmode) {
+    switch (c_type) {
+        case SF_C_TYPE_INT8:
+            return SF_TYPE_FIXED;
+        case SF_C_TYPE_UINT8:
+            return SF_TYPE_FIXED;
+        case SF_C_TYPE_INT64:
+            return SF_TYPE_FIXED;
+        case SF_C_TYPE_UINT64:
+            return SF_TYPE_FIXED;
+        case SF_C_TYPE_FLOAT64:
+            return SF_TYPE_REAL;
+        case SF_C_TYPE_STRING:
+            return SF_TYPE_TEXT;
+        case SF_C_TYPE_TIMESTAMP:
+            return tsmode;
+        // TODO better default case
+        default:
+            return SF_TYPE_TEXT;
+    }
+}
+
+char *value_to_string(void *value, SNOWFLAKE_C_TYPE c_type) {
+    size_t size;
+    char *ret;
+    switch (c_type) {
+        case SF_C_TYPE_INT8:
+            size = (size_t) snprintf( NULL, 0, "%d", *(int8 *) value) + 1;
+            ret = (char *) SF_CALLOC(1, size);
+            snprintf(ret, size, "%d", *(int8 *) value);
+            return ret;
+        case SF_C_TYPE_UINT8:
+            size = (size_t) snprintf( NULL, 0, "%u", *(uint8 *) value) + 1;
+            ret = (char *) SF_CALLOC(1, size);
+            snprintf(ret, size, "%u", *(uint8 *) value);
+            return ret;
+        case SF_C_TYPE_INT64:
+            size = (size_t) snprintf( NULL, 0, "%lld", *(int64 *) value) + 1;
+            ret = (char *) SF_CALLOC(1, size);
+            snprintf(ret, size, "%lld", *(int64 *) value);
+            return ret;
+        case SF_C_TYPE_UINT64:
+            size = (size_t) snprintf( NULL, 0, "%llu", *(uint64 *) value) + 1;
+            ret = (char *) SF_CALLOC(1, size);
+            snprintf(ret, size, "%llu", *(uint64 *) value);
+            return ret;
+        case SF_C_TYPE_FLOAT64:
+            size = (size_t) snprintf( NULL, 0, "%f", *(float64 *) value) + 1;
+            ret = (char *) SF_CALLOC(1, size);
+            snprintf(ret, size, "%f", *(float64 *) value);
+            return ret;
+        case SF_C_TYPE_STRING:
+            size = strlen((char *) value) + 1;
+            ret = (char *) SF_CALLOC(1, size);
+            strncpy(ret, (char *) value, size);
+            return ret;
+        case SF_C_TYPE_TIMESTAMP:
+            // TODO Add timestamp case
+            return "";
+        default:
+            // TODO better default case
+            // Return empty string in default case
+            ret = (char *) SF_CALLOC(1, 1);
+            ret[0] = '\0';
+            return ret;
     }
 }
 

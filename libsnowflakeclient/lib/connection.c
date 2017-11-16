@@ -4,14 +4,12 @@
 
 #include "connection.h"
 #include <string.h>
-#include "basic_types.h"
 #include "log.h"
 #include "snowflake_memory.h"
+#include "snowflake_client_int.h"
+#include "constants.h"
 
 #define curl_easier_escape(curl, string) curl_easy_escape(curl, string, 0)
-
-int8 SF_BOOLEAN_TRUE = 1;
-int8 SF_BOOLEAN_FALSE = 0;
 
 static
 void dump(const char *text,
@@ -139,11 +137,11 @@ cJSON *STDCALL create_auth_json_body(SNOWFLAKE *sf,
     return body;
 }
 
-cJSON *STDCALL create_query_json_body(char *prepared_command, int64 sequence_id) {
+cJSON *STDCALL create_query_json_body(char *sql_text, int64 sequence_id) {
     cJSON *body;
     // Create body
     body = cJSON_CreateObject();
-    cJSON_AddStringToObject(body, "sqlText", prepared_command);
+    cJSON_AddStringToObject(body, "sqlText", sql_text);
     cJSON_AddNumberToObject(body, "sequenceId", sequence_id);
 
     return body;
@@ -151,18 +149,18 @@ cJSON *STDCALL create_query_json_body(char *prepared_command, int64 sequence_id)
 
 struct curl_slist * STDCALL create_header_no_token() {
     struct curl_slist * header = NULL;
-    header = curl_slist_append(header, CONTENT_TYPE_APPLICATION_JSON);
-    header = curl_slist_append(header, ACCEPT_TYPE_APPLICATION_SNOWFLAKE);
-    header = curl_slist_append(header, C_API_USER_AGENT);
+    header = curl_slist_append(header, HEADER_CONTENT_TYPE_APPLICATION_JSON);
+    header = curl_slist_append(header, HEADER_ACCEPT_TYPE_APPLICATION_SNOWFLAKE);
+    header = curl_slist_append(header, HEADER_C_API_USER_AGENT);
     return header;
 }
 
 struct curl_slist * STDCALL create_header_token(char *header_token) {
     struct curl_slist * header = NULL;
     header = curl_slist_append(header, header_token);
-    header = curl_slist_append(header, CONTENT_TYPE_APPLICATION_JSON);
-    header = curl_slist_append(header, ACCEPT_TYPE_APPLICATION_SNOWFLAKE);
-    header = curl_slist_append(header, C_API_USER_AGENT);
+    header = curl_slist_append(header, HEADER_CONTENT_TYPE_APPLICATION_JSON);
+    header = curl_slist_append(header, HEADER_ACCEPT_TYPE_APPLICATION_SNOWFLAKE);
+    header = curl_slist_append(header, HEADER_C_API_USER_AGENT);
     return header;
 }
 
@@ -186,6 +184,8 @@ sf_bool STDCALL curl_post_call(CURL **curl,
     }
 
     //TODO set error buffer
+
+    //TODO add more comprehensive curl response checking
 
     res = curl_easy_setopt(conn, CURLOPT_URL, url);
     if(res != CURLE_OK) {
@@ -214,6 +214,28 @@ sf_bool STDCALL curl_post_call(CURL **curl,
     res = curl_easy_setopt(conn, CURLOPT_WRITEDATA, buffer);
     if(res != CURLE_OK) {
         fprintf(stderr, "Failed to set write data [%s]\n", curl_easy_strerror(res));
+        return SF_BOOLEAN_FALSE;
+    }
+
+    if(DISABLE_VERIFY_PEER) {
+        res = curl_easy_setopt(conn, CURLOPT_SSL_VERIFYPEER, 0L);
+        if(res != CURLE_OK) {
+            fprintf(stderr, "Failed to disable peer verification [%s]\n", curl_easy_strerror(res));
+            return SF_BOOLEAN_FALSE;
+        }
+    }
+
+    if (CA_BUNDLE_FILE) {
+        res = curl_easy_setopt(conn, CURLOPT_CAINFO, CA_BUNDLE_FILE);
+        if(res != CURLE_OK) {
+            fprintf(stderr, "Unable to set certificate file [%s]\n", curl_easy_strerror(res));
+            return SF_BOOLEAN_FALSE;
+        }
+    }
+
+    res = curl_easy_setopt(conn, CURLOPT_SSLVERSION, SSL_VERSION);
+    if(res != CURLE_OK) {
+        fprintf(stderr, "Unable to set SSL Version [%s]\n", curl_easy_strerror(res));
         return SF_BOOLEAN_FALSE;
     }
 

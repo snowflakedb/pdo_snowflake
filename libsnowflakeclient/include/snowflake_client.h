@@ -99,6 +99,15 @@ typedef enum sf_attribute {
 } SNOWFLAKE_ATTRIBUTE;
 
 /**
+ * Attributes for Snowflake global context.
+ */
+typedef enum sf_global_attribute {
+    SF_GLOBAL_DISABLE_VERIFY_PEER,
+    SF_GLOBAL_CA_BUNDLE_FILE,
+    SF_GLOBAL_SSL_VERSION
+} SNOWFLAKE_GLOBAL_ATTRIBUTE;
+
+/**
  * Attributes for Snowflake statement context.
  */
 typedef enum sf_stmt_attribute {
@@ -172,7 +181,8 @@ typedef struct sf_snowflake_statement {
     char request_id[UUID4_LEN];
     SNOWFLAKE_ERROR error;
     SNOWFLAKE *connection;
-    char *prepared_command;
+    char *sql_text;
+    cJSON *prepared_inputs;
     cJSON *raw_results;
     int64 total_rowcount;
     int64 total_fieldcount;
@@ -207,11 +217,6 @@ typedef struct sf_snowflake_output
 /**
  * Constants
  */
-extern int8 SF_BOOLEAN_TRUE;
-extern int8 SF_BOOLEAN_FALSE;
-extern const char CONTENT_TYPE_APPLICATION_JSON[];
-extern const char ACCEPT_TYPE_APPLICATION_SNOWFLAKE[];
-extern const char C_API_USER_AGENT[];
 
 
 /**
@@ -227,6 +232,14 @@ SNOWFLAKE_STATUS STDCALL snowflake_global_init();
  * @return 0 if successful, errno otherwise
  */
 SNOWFLAKE_STATUS STDCALL snowflake_global_term();
+
+// TODO set description
+SNOWFLAKE_STATUS STDCALL snowflake_global_set_attribute(
+        SNOWFLAKE_GLOBAL_ATTRIBUTE type, const void *value);
+
+// TODO set description
+SNOWFLAKE_STATUS STDCALL snowflake_global_get_attribute(
+        SNOWFLAKE_GLOBAL_ATTRIBUTE type, void *value);
 
 /**
  * Initializes a SNOWFLAKE connection context
