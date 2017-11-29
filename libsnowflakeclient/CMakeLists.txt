@@ -8,7 +8,7 @@ project(snowflakeclient)
 add_definitions(-DLOG_USE_COLOR)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_C_FLAGS -pthread)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 
 set(SOURCE_FILES
         lib/snowflake_client_int.h
@@ -24,11 +24,13 @@ set(SOURCE_FILES
         lib/snowflake_memory.c
         lib/connection.h
         lib/connection.c
-        lib/basic_types.h
+        lib/basic_types.c
         lib/results.h
         lib/results.c
         lib/uuid4.h
-        lib/uuid4.c lib/constants.h lib/basic_types.c)
+        lib/uuid4.c
+        lib/constants.h
+        )
 
 find_library(CURL_LIB libcurl.a PATHS build/linux/curl/lib/ REQUIRED)
 find_library(SSL_LIB libssl.a PATHS build/linux/openssl/lib/ REQUIRED)

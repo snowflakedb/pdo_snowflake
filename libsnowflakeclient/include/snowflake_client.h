@@ -15,10 +15,10 @@ extern "C" {
 #define STDCALL __stdcall
 #endif
 
-#include <libsnowflakeclient/lib/cJSON.h>
+#include "libsnowflakeclient/lib/cJSON.h"
 #include "libsnowflakeclient/lib/snowflake_client_version.h"
 #include "libsnowflakeclient/lib/arraylist.h"
-#include "libsnowflakeclient/lib/basic_types.h"
+#include "basic_types.h"
 #include "libsnowflakeclient/lib/uuid4.h"
 
 /**
@@ -104,7 +104,8 @@ typedef enum sf_attribute {
 typedef enum sf_global_attribute {
     SF_GLOBAL_DISABLE_VERIFY_PEER,
     SF_GLOBAL_CA_BUNDLE_FILE,
-    SF_GLOBAL_SSL_VERSION
+    SF_GLOBAL_SSL_VERSION,
+    SF_GLOBAL_DEBUG
 } SNOWFLAKE_GLOBAL_ATTRIBUTE;
 
 /**
@@ -359,7 +360,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_query(SNOWFLAKE_STMT *sfstmt, const char *com
  * @param sf SNOWFLAKE_STMT context.
  * @return the number of affected rows
  */
-uint64 STDCALL snowflake_affected_rows(SNOWFLAKE_STMT *sfstmt);
+int64 STDCALL snowflake_affected_rows(SNOWFLAKE_STMT *sfstmt);
 
 /**
  * Returns the number of rows can be fetched from the result set.

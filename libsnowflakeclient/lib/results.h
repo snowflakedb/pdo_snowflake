@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 #include "libsnowflakeclient/include/snowflake_client.h"
-#include "basic_types.h"
+#include <basic_types.h>
 #include "arraylist.h"
 #include "cJSON.h"
 

@@ -168,8 +168,8 @@ sf_bool STDCALL curl_post_call(CURL **curl,
                                char *url,
                                struct curl_slist *header,
                                char *body,
-                               void *buffer,
-                               size_t (*writer)(char *, size_t, size_t, void *),
+                               RAW_JSON_BUFFER *buffer,
+                               size_t (*writer)(char *, size_t, size_t, RAW_JSON_BUFFER *),
                                struct data* config) {
     CURLcode res;
     CURL *conn = *curl;
@@ -211,7 +211,7 @@ sf_bool STDCALL curl_post_call(CURL **curl,
         return SF_BOOLEAN_FALSE;
     }
 
-    res = curl_easy_setopt(conn, CURLOPT_WRITEDATA, buffer);
+    res = curl_easy_setopt(conn, CURLOPT_WRITEDATA, (void *) buffer);
     if(res != CURLE_OK) {
         fprintf(stderr, "Failed to set write data [%s]\n", curl_easy_strerror(res));
         return SF_BOOLEAN_FALSE;
@@ -239,13 +239,15 @@ sf_bool STDCALL curl_post_call(CURL **curl,
         return SF_BOOLEAN_FALSE;
     }
 
-//    curl_easy_setopt(conn, CURLOPT_DEBUGFUNCTION, my_trace);
-//    curl_easy_setopt(conn, CURLOPT_DEBUGDATA, config);
-//
-//    /* the DEBUGFUNCTION has no effect until we enable VERBOSE */
-//    curl_easy_setopt(conn, CURLOPT_VERBOSE, 1);
+    if (DEBUG) {
+        curl_easy_setopt(conn, CURLOPT_DEBUGFUNCTION, my_trace);
+        curl_easy_setopt(conn, CURLOPT_DEBUGDATA, config);
 
-    log_info("Running curl call");
+        /* the DEBUGFUNCTION has no effect until we enable VERBOSE */
+        curl_easy_setopt(conn, CURLOPT_VERBOSE, 1);
+    }
+
+    log_debug("Running curl call");
     res = curl_easy_perform(conn);
     /* Check for errors */
     if(res != CURLE_OK) {
