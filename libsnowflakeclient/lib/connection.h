@@ -16,10 +16,8 @@ extern "C" {
 #endif
 
 #include <stdio.h>
-#include "libsnowflakeclient/build/linux/curl/include/curl/curl.h"
-#include "cJSON.h"
-#include <basic_types.h>
-#include "libsnowflakeclient/include/snowflake_client.h"
+#include <curl/curl.h>
+#include <snowflake_client.h>
 
 typedef struct sf_raw_json_buffer {
     char *buffer;
@@ -50,7 +48,7 @@ cJSON *STDCALL create_auth_json_body(SNOWFLAKE *sf, const char *application, con
 cJSON *STDCALL create_query_json_body(char *sql_text, int64 sequence_id);
 struct curl_slist * STDCALL create_header_no_token();
 struct curl_slist * STDCALL create_header_token(char *header_token);
-sf_bool STDCALL curl_post_call(CURL **curl, char *url, struct curl_slist *header, char *body, RAW_JSON_BUFFER *buffer, size_t (*writer)(char *, size_t, size_t, RAW_JSON_BUFFER *), struct data* config);
+sf_bool STDCALL curl_post_call(CURL **curl, char *url, struct curl_slist *header, char *body, void *buffer, size_t (*writer)(char *, size_t, size_t, void *), struct data* config);
 char * STDCALL encode_url(CURL *curl, const char *protocol, const char *host, const char *port, const char *url, URL_KEY_VALUE* vars, int num_args);
 sf_bool STDCALL json_copy_bool(sf_bool *dest, cJSON *data, const char *item);
 sf_bool STDCALL json_copy_int(int64 *dest, cJSON *data, const char *item);

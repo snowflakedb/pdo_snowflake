@@ -10,8 +10,8 @@
 #include <errno.h>
 #include <snowflake_client.h>
 #include <openssl/crypto.h>
-#include "snowflake_client_int.h"
 #include "constants.h"
+#include "snowflake_client_int.h"
 #include "connection.h"
 #include "snowflake_memory.h"
 #include "log.h"

@@ -13,7 +13,7 @@
 #include <wincrypt.h>
 #endif
 
-#include "uuid4.h"
+#include <uuid4.h>
 
 
 static int seeded = 0;

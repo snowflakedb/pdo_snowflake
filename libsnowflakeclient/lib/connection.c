@@ -2,8 +2,8 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
-#include "connection.h"
 #include <string.h>
+#include "connection.h"
 #include "log.h"
 #include "snowflake_memory.h"
 #include "snowflake_client_int.h"

@@ -8,35 +8,27 @@ project(snowflakeclient)
 add_definitions(-DLOG_USE_COLOR)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+set(CMAKE_C_FLAGS -pthread)
 
 set(SOURCE_FILES
-        lib/snowflake_client_int.h
-        lib/snowflake_client_version.h
         lib/snowflake_client.c
-        lib/cJSON.h
         lib/cJSON.c
-        lib/log.h
         lib/log.c
-        lib/arraylist.h
         lib/arraylist.c
-        lib/snowflake_memory.h
         lib/snowflake_memory.c
-        lib/connection.h
         lib/connection.c
-        lib/basic_types.c
-        lib/results.h
         lib/results.c
-        lib/uuid4.h
         lib/uuid4.c
-        lib/constants.h
-        )
+        lib/basic_types.c)
 
 find_library(CURL_LIB libcurl.a PATHS build/linux/curl/lib/ REQUIRED)
 find_library(SSL_LIB libssl.a PATHS build/linux/openssl/lib/ REQUIRED)
 find_library(CRYPTO_LIB libcrypto.a PATHS build/linux/openssl/lib/ REQUIRED)
 
-include_directories(build/linux/curl/include build/linux/openssl/include include)
+include_directories(
+        build/linux/curl/include
+        build/linux/openssl/include
+        include)
 
 message("libcurl is located at " ${CURL_LIB})
 message("libssl is located at " ${SSL_LIB})
