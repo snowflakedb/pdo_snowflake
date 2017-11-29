@@ -15,10 +15,7 @@ extern "C" {
 #define STDCALL __stdcall
 #endif
 
-#include "libsnowflakeclient/include/snowflake_client.h"
-#include "basic_types.h"
-#include "arraylist.h"
-#include "cJSON.h"
+#include <snowflake_client.h>
 
 SNOWFLAKE_TYPE string_to_snowflake_type(const char *string);
 SNOWFLAKE_C_TYPE snowflake_to_c_type(SNOWFLAKE_TYPE type, int64 precision, int64 scale);

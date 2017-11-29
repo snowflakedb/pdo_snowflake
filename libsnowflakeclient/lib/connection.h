@@ -16,10 +16,8 @@ extern "C" {
 #endif
 
 #include <stdio.h>
-#include "libsnowflakeclient/build/linux/curl/include/curl/curl.h"
-#include "cJSON.h"
-#include "basic_types.h"
-#include "libsnowflakeclient/include/snowflake_client.h"
+#include <curl/curl.h>
+#include <snowflake_client.h>
 
 typedef struct sf_raw_json_buffer {
     char *buffer;
