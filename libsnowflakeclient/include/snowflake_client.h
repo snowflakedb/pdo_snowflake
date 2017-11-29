@@ -15,11 +15,11 @@ extern "C" {
 #define STDCALL __stdcall
 #endif
 
-#include <libsnowflakeclient/lib/cJSON.h>
-#include "libsnowflakeclient/lib/snowflake_client_version.h"
-#include "libsnowflakeclient/lib/arraylist.h"
-#include "libsnowflakeclient/lib/basic_types.h"
-#include "libsnowflakeclient/lib/uuid4.h"
+#include "cJSON.h"
+#include "arraylist.h"
+#include "basic_types.h"
+#include "uuid4.h"
+#include "snowflake_client_version.h"
 
 /**
  * Snowflake Data types
