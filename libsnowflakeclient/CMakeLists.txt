@@ -8,7 +8,7 @@ project(snowflakeclient)
 add_definitions(-DLOG_USE_COLOR)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_C_FLAGS -pthread)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 
 set(SOURCE_FILES
         lib/snowflake_client.c

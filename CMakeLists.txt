@@ -10,14 +10,15 @@ set(CMAKE_C_FLAGS
 
 # coverage
 set(CMAKE_C_FLAGS
-        "${CMAKE_C_FLAGS} -g -O0 -ggdb -fprofile-arcs -ftest-coverage")
+        "${CMAKE_C_FLAGS} -g -O0 -ggdb -fprofile-arcs -ftest-coverage -fPIC")
 
 if (UNIX AND NOT APPLE)
     set(LINUX TRUE)
 endif ()
 
 # PHP home: dev env not used in TravisCI
-set(PHP_HOME /home/kwagner/php_source/install-php-7.1.8)
+set(PHP_HOME $ENV{PHP_HOME})
+message("PHP is located at " $ENV{PHP_HOME})
 
 set(SOURCE_FILES
         snowflake_driver.c

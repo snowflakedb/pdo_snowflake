@@ -23,6 +23,7 @@
 sf_bool DISABLE_VERIFY_PEER;
 char *CA_BUNDLE_FILE;
 int32 SSL_VERSION;
+sf_bool DEBUG;
 
 
 static char *LOG_PATH = NULL;
@@ -70,6 +71,14 @@ sf_bool STDCALL log_init() {
     size_t log_path_size = 1; //Start with 1 to include null terminator
     log_path_size += strlen(time_str);
     char *sf_log_path = getenv("SNOWFLAKE_LOG_PATH");
+    // Set logging level
+    if (DEBUG) {
+        log_set_quiet(SF_BOOLEAN_FALSE);
+        log_set_level(LOG_TRACE);
+    } else {
+        log_set_quiet(SF_BOOLEAN_TRUE);
+        log_set_level(LOG_INFO);
+    }
     // If log path is specified, use absolute path. Otherwise set logging dir to be relative to current directory
     if (sf_log_path) {
         log_path_size += strlen(sf_log_path);
@@ -122,6 +131,13 @@ void STDCALL log_term() {
 SNOWFLAKE_STATUS STDCALL snowflake_global_init() {
     SNOWFLAKE_STATUS ret = SF_STATUS_ERROR;
     CURLcode curl_ret;
+
+    // Initialize constants
+    DISABLE_VERIFY_PEER = SF_BOOLEAN_FALSE;
+    CA_BUNDLE_FILE = NULL;
+    SSL_VERSION = CURL_SSLVERSION_TLSv1_2;
+    DEBUG = SF_BOOLEAN_FALSE;
+
     // TODO Add log init error handling
     if (!log_init()) {
         log_fatal("Error during log initialization");
@@ -132,11 +148,6 @@ SNOWFLAKE_STATUS STDCALL snowflake_global_init() {
         log_fatal("curl_global_init() failed: %s", curl_easy_strerror(curl_ret));
         goto cleanup;
     }
-
-    // Initialize constants
-    DISABLE_VERIFY_PEER = SF_BOOLEAN_FALSE;
-    CA_BUNDLE_FILE = NULL;
-    SSL_VERSION = CURL_SSLVERSION_TLSv1_2;
 
     // TODO Create set and get functions for Global constants
 
@@ -167,6 +178,16 @@ SNOWFLAKE_STATUS STDCALL snowflake_global_set_attribute(SNOWFLAKE_GLOBAL_ATTRIBU
             break;
         case SF_GLOBAL_SSL_VERSION:
             SSL_VERSION = *(int32 *) value;
+            break;
+        case SF_GLOBAL_DEBUG:
+            DEBUG = *(sf_bool *) value;
+            if (DEBUG) {
+                log_set_quiet(SF_BOOLEAN_FALSE);
+                log_set_level(LOG_TRACE);
+            } else {
+                log_set_quiet(SF_BOOLEAN_TRUE);
+                log_set_level(LOG_INFO);
+            }
             break;
         default:
             break;
@@ -260,11 +281,11 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
 
         // Create header
         header = create_header_no_token();
-        log_info("Created header");
+        log_debug("Created header");
 
         // Create body
         body = create_auth_json_body(sf, "C API", "C API", "0.1");
-        log_info("Created body");
+        log_debug("Created body");
         s_body = cJSON_Print(body);
         log_trace("Here is constructed body:\n%s", s_body);
 
@@ -302,6 +323,17 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
     }
 
 cleanup:
+    // Delete password and passcode for security's sake
+    if (sf->password) {
+        // Write over password in memory including null terminator
+        memset(sf->password, 0, strlen(sf->password) + 1);
+        SF_FREE(sf->password);
+    }
+    if (sf->passcode) {
+        // Write over passcode in memory including null terminator
+        memset(sf->passcode, 0, strlen(sf->passcode) + 1);
+        SF_FREE(sf->passcode);
+    }
     curl_slist_free_all(header);
     curl_easy_cleanup(curl);
     cJSON_Delete(body);
@@ -486,7 +518,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_fetch(SNOWFLAKE_STMT *sfstmt) {
             continue;
         } else {
             // TODO do we really need strict parameter checking? We can probably get away with less strict parameter checking
-            if (result->type != sfstmt->desc[i]->c_type) {
+            if (result->type != sfstmt->desc[i]->c_type || result->type != SF_C_TYPE_STRING) {
                 // TODO add error msg
                 goto cleanup;
             }
@@ -548,7 +580,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_trans_rollback(SNOWFLAKE *sf) {
     return SF_STATUS_SUCCESS;
 }
 
-uint64 STDCALL snowflake_affected_rows(SNOWFLAKE_STMT *sfstmt) {
+int64 STDCALL snowflake_affected_rows(SNOWFLAKE_STMT *sfstmt) {
     return 0;
 }
 
@@ -570,6 +602,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_prepare(SNOWFLAKE_STMT *sfstmt, const char *c
     strncpy(sfstmt->sql_text, command, sql_text_size);
 
     // TODO Do error handing and checking and stuff
+    // TODO move this to execute function
     if (sfstmt->params && sfstmt->params->used > 0) {
         sfstmt->prepared_inputs = cJSON_CreateObject();
         bindings = cJSON_CreateArray();
@@ -636,12 +669,12 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
         header_token = (char *) SF_CALLOC(1, header_token_size);
         snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sfstmt->connection->token);
         header = create_header_token(header_token);
-        log_info("Created header with token");
+        log_debug("Created header with token");
 
         // Create Body
         body = create_query_json_body(sfstmt->sql_text, sfstmt->sequence_counter);
         s_body = cJSON_Print(body);
-        log_info("Created body");
+        log_debug("Created body");
         log_trace("Here is constructed body:\n%s", s_body);
 
         // Encode URL parameters
@@ -661,10 +694,10 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
             log_trace("Here is JSON response:\n%s", s_resp);
             data = cJSON_GetObjectItem(resp, "data");
             if (!json_copy_string(&sfstmt->sfqid, data, "queryId")) {
-                log_error("No valid sfqid found in response");
+                log_debug("No valid sfqid found in response");
             }
             if (!json_copy_string(&sfstmt->sqlstate, data, "sqlState")) {
-                log_error("No valid sqlstate found in response");
+                log_debug("No valid sqlstate found in response");
             }
             json_copy_bool(&success, resp, "success");
             if (success) {

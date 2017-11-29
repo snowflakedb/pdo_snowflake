@@ -18,12 +18,17 @@ if (!extension_loaded('pdo') || !extension_loaded('pdo_snowflake')) die('skip no
     $protocol = getenv('SNOWFLAKE_TEST_PROTOCOL');
     $insecure_mode = (bool) getenv('SNOWFLAKE_TEST_INSECURE_MODE');
     $dsn = "snowflake:host=$host;port=$port;account=$account;database=$database;schema=$schema;warehouse=$warehouse;role=$role";
+    $ca_bundle_file = getenv('SNOWFLAKE_TEST_CA_BUNDLE_FILE');
+    $options = array(PDO::SNOWFLAKE_ATTR_SSL_CAPATH => $ca_bundle_file);
     try {
-        echo "dsn is: $dsn";
-        $dbh = new PDO($dsn, $user, $password);
+        $dbh = new PDO($dsn, $user, $password, $options);
+        echo 'Connected to Snowflake';
     } catch (PDOException $e) {
         echo 'Connection failed: ' . $e->getMessage();
+        echo "dsn is: $dsn";
     }
+
+    $dbh = null;
 ?>
 --EXPECT--
-OK
+Connected to Snowflake
