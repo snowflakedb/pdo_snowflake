@@ -38,8 +38,10 @@ add_library(snowflakeclient STATIC ${SOURCE_FILES})
 
 set_property(TARGET snowflakeclient PROPERTY C_STANDARD 90)
 
-target_link_libraries(snowflakeclient rt dl z m
-        "-Wl,--whole-archive ${CURL_LIB} ${SSL_LIB} ${CRYPTO_LIB}" "-Wl,--no-whole-archive"
-        "-Wl,--as-needed -static-libgcc")
+target_link_libraries(snowflakeclient
+        rt dl
+        ${CURL_LIB}
+        ${SSL_LIB}
+        ${CRYPTO_LIB})
 
 add_subdirectory(examples)
