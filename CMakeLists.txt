@@ -17,7 +17,7 @@ if (UNIX AND NOT APPLE)
 endif ()
 
 # PHP home: dev env not used in TravisCI
-set(PHP_HOME /home/kwagner/php_source/install-php-7.1.8)
+set(PHP_HOME /var/tmp/php-7.0.26)
 
 set(SOURCE_FILES
         snowflake_driver.c
@@ -27,9 +27,8 @@ set(SOURCE_FILES
 # set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
 
 include_directories(
-        "."
-        "include"
-        "main"
+        include
+        libsnowflakeclient/include
         ${PHP_HOME}/include/php
         ${PHP_HOME}/include/php/main
         ${PHP_HOME}/include/php/TSRM

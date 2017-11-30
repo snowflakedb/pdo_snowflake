@@ -72,6 +72,22 @@ Clone the this repository and run ``phpize``, ``configure``, ``make`` and ``make
         --with-php-config=$WORKSPACE/install-php-$SF_PHP_VERSION/bin/php-config
         --enable-pdo_snowflake
     make
+    # Workaround for libtool issue, which cannot keep the order of Link options
+    # and --whole-archive is ignored.
+    cc -shared \
+        .libs/pdo_snowflake.o \
+        .libs/snowflake_driver.o \
+        .libs/snowflake_stmt.o \
+        -L libsnowflakeclient/cmake-build \
+        -L libsnowflakeclient/build/linux/openssl/lib \
+        -L libsnowflakeclient/build/linux/curl/lib \
+        -Wl,--whole-archive \
+        -lsnowflakeclient -lcrypto -lssl -lcurl \
+        -Wl,--no-whole-archive \
+        -Wl,-soname -Wl,pdo_snowflake.so \
+        -o .libs/pdo_snowflake.so
+    (cd .libs && rm -f pdo_snowflake.la && ln -s ../pdo_snowflake.la pdo_snowflake.la)
+    ./libtool --mode=install cp ./pdo_snowflake.la $(pwd)/modules
     make test
 
 
