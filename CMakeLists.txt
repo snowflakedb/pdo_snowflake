@@ -17,7 +17,8 @@ if (UNIX AND NOT APPLE)
 endif ()
 
 # PHP home: dev env not used in TravisCI
-set(PHP_HOME /var/tmp/php-7.0.26)
+set(PHP_HOME $ENV{PHP_HOME})
+message("PHP is located at " $ENV{PHP_HOME})
 
 set(SOURCE_FILES
         snowflake_driver.c

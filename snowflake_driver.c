@@ -12,7 +12,7 @@
 #include "php_pdo_snowflake.h"
 #include "php_pdo_snowflake_int.h"
 #include "zend_exceptions.h"
-#include "libsnowflakeclient/include/snowflake_client.h"
+#include <snowflake_client.h>
 
 int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file, int line) /* {{{ */
 {
