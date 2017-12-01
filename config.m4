@@ -7,48 +7,46 @@ PHP_ARG_ENABLE(coverage, whether to include code coverage symbols,
     [  --enable-coverage       Enable coverage support], no, no)
 
 if test "$PHP_PDO_SNOWFLAKE" != "no"; then
-  dnl Write more examples of tests here...
+  PHP_SNOWFLAKE_LIBNAME=libsnowflake
 
   dnl # --with-pdo_snowflake -> check with-path
-  dnl SEARCH_PATH="/usr/local /usr"     # you might want to change this
-  dnl SEARCH_FOR="/include/pdo_snowflake.h"  # you most likely want to change this
-  dnl if test -r $PHP_PDO_SNOWFLAKE/$SEARCH_FOR; then # path given as parameter
-  dnl   PDO_SNOWFLAKE_DIR=$PHP_PDO_SNOWFLAKE
-  dnl else # search default path list
-  dnl   AC_MSG_CHECKING([for pdo_snowflake files in default path])
-  dnl   for i in $SEARCH_PATH ; do
-  dnl     if test -r $i/$SEARCH_FOR; then
-  dnl       PDO_SNOWFLAKE_DIR=$i
-  dnl       AC_MSG_RESULT(found in $i)
-  dnl     fi
-  dnl   done
-  dnl fi
-  dnl
-  dnl if test -z "$PDO_SNOWFLAKE_DIR"; then
-  dnl   AC_MSG_RESULT([not found])
-  dnl   AC_MSG_ERROR([Please reinstall the pdo_snowflake distribution])
-  dnl fi
+  SEARCH_PATH="libsnowflakeclient"
+  SEARCH_FOR="include/snowflake_client.h"
+  if test -r $PHP_PDO_SNOWFLAKE/$SEARCH_FOR; then # path given as parameter
+    SNOWFLAKE_CLIENT_DIR=$PHP_PDO_SNOWFLAKE
+  else # search default path list
+    AC_MSG_CHECKING([for libsnowflakeclient files in default path])
+    for i in $SEARCH_PATH ; do
+      if test -r $i/$SEARCH_FOR; then
+        SNOWFLAKE_CLIENT_DIR=$i
+        AC_MSG_RESULT(found in $i)
+      fi
+    done
+  fi
+  if test -z "$SNOWFLAKE_CLIENT_DIR"; then
+    AC_MSG_RESULT([not found])
+    AC_MSG_ERROR([Please reinstall the pdo_snowflake distribution])
+  fi
 
   dnl # --with-pdo_snowflake -> add include path
-  dnl PHP_ADD_INCLUDE($PDO_SNOWFLAKE_DIR/include)
+  PHP_ADD_INCLUDE($SNOWFLAKE_CLIENT_DIR/include)
 
-  dnl # --with-pdo_snowflake -> check for lib and symbol presence
-  dnl LIBNAME=pdo_snowflake # you may want to change this
-  dnl LIBSYMBOL=pdo_snowflake # you most likely want to change this 
+  dnl # link Snowflake client library, not working as
+  dnl # the position of -Wl,--whole-archive is ignored by libtool
+  LDFLAGS="$LDFLAGS -fPIC"
+  LDFLAGS="$LDFLAGS -Wl,--whole-archive"
+  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/cmake-build/libsnowflakeclient.a"
+  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/openssl/lib/libcrypto.a"
+  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/openssl/lib/libssl.a"
+  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/curl/lib/libcurl.a"
+  LDFLAGS="$LDFLAGS -Wl,--no-whole-archive"
 
-  dnl PHP_CHECK_LIBRARY($LIBNAME,$LIBSYMBOL,
-  dnl [
-  dnl   PHP_ADD_LIBRARY_WITH_PATH($LIBNAME, $PDO_SNOWFLAKE_DIR/$PHP_LIBDIR, PDO_SNOWFLAKE_SHARED_LIBADD)
-  dnl   AC_DEFINE(HAVE_PDO_SNOWFLAKELIB,1,[ ])
-  dnl ],[
-  dnl   AC_MSG_ERROR([wrong pdo_snowflake lib version or lib not found])
-  dnl ],[
-  dnl   -L$PDO_SNOWFLAKE_DIR/$PHP_LIBDIR -lm
-  dnl ])
-  dnl
-  dnl PHP_SUBST(PDO_SNOWFLAKE_SHARED_LIBADD)
-
-  PHP_NEW_EXTENSION(pdo_snowflake, pdo_snowflake.c snowflake_driver.c snowflake_stmt.c, $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
+  PHP_NEW_EXTENSION(
+    pdo_snowflake,
+    pdo_snowflake.c snowflake_driver.c snowflake_stmt.c,
+    $ext_shared,
+    ,
+    "-DZEND_ENABLE_STATIC_TSRMLS_CACHE=1")
 fi
 
 if test "$PHP_COVERAGE" = "yes"; then

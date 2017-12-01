@@ -28,9 +28,8 @@ set(SOURCE_FILES
 # set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
 
 include_directories(
-        "."
-        "include"
-        "main"
+        include
+        libsnowflakeclient/include
         ${PHP_HOME}/include/php
         ${PHP_HOME}/include/php/main
         ${PHP_HOME}/include/php/TSRM

@@ -32,7 +32,7 @@ echo "Options:"
 echo "  target       = $target"
 echo "PATH="$PATH
 
-DEPENDENCY_LINUX=$DIR/../build/linux
+DEPENDENCY_LINUX=$DIR/../deps-build/linux
 rm -rf $DEPENDENCY_LINUX
 mkdir -p $DEPENDENCY_LINUX
 
