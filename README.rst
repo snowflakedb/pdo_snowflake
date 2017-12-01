@@ -79,8 +79,8 @@ Clone the this repository and run ``phpize``, ``configure``, ``make`` and ``make
         .libs/snowflake_driver.o \
         .libs/snowflake_stmt.o \
         -L libsnowflakeclient/cmake-build \
-        -L libsnowflakeclient/build/linux/openssl/lib \
-        -L libsnowflakeclient/build/linux/curl/lib \
+        -L libsnowflakeclient/deps-build/linux/openssl/lib \
+        -L libsnowflakeclient/deps-build/linux/curl/lib \
         -Wl,--whole-archive \
         -lsnowflakeclient -lcrypto -lssl -lcurl \
         -Wl,--no-whole-archive \
