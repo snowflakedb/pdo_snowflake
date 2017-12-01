@@ -36,9 +36,9 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
   LDFLAGS="$LDFLAGS -fPIC"
   LDFLAGS="$LDFLAGS -Wl,--whole-archive"
   LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/cmake-build/libsnowflakeclient.a"
-  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/build/linux/openssl/lib/libcrypto.a"
-  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/build/linux/openssl/lib/libssl.a"
-  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/build/linux/curl/lib/libcurl.a"
+  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/openssl/lib/libcrypto.a"
+  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/openssl/lib/libssl.a"
+  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/curl/lib/libcurl.a"
   LDFLAGS="$LDFLAGS -Wl,--no-whole-archive"
 
   PHP_NEW_EXTENSION(
