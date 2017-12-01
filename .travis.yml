@@ -9,7 +9,7 @@ install:
   - sudo apt-get update
   - sudo apt-get install lcov
 script:
-  - echo PHP_HOME: $PHP_HOME
+  - echo $PHP_HOME
   - export PHP_HOME=$( cd "$(dirname $(which php))" && cd .. && pwd )
   - echo PHP_HOME: $PHP_HOME
   - echo PHP_IZE: $(which phpize)

@@ -49,6 +49,7 @@ target_link_libraries(snowflakeclient
         rt dl
         ${CURL_LIB}
         ${SSL_LIB}
-        ${CRYPTO_LIB})
+        ${CRYPTO_LIB}
+        dl)
 
 add_subdirectory(examples)
