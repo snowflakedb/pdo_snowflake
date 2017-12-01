@@ -15,9 +15,15 @@ if [[ -e "Makefile" ]]; then
     mv libsnowflakeclient $tmp_dir/
     make clean
     mv $tmp_dir/libsnowflakeclient .
+    rm -r "$tmp_dir"
+fi
+CONFIGURE_OPTS=("--enable-pdo_snowflake")
+if [[ -n "$REPORT_COVERAGE" ]]; then
+    CONFIGURE_OPTS+=("--enable-coverage")
 fi
 phpize
-./configure --enable-pdo_snowflake 
+echo ./configure "${CONFIGURE_OPTS[@]}"
+./configure "${CONFIGURE_OPTS[@]}"
 make
 
 # workaround for libtool issue, which cannot keep the order of Link options
