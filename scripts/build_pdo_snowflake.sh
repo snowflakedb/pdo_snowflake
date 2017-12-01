@@ -28,6 +28,10 @@ make
 
 # workaround for libtool issue, which cannot keep the order of Link options
 # and --whole-archive is ignored.
+LINK_OPTS=
+if [[ -n "$REPORT_COVERAGE" ]]; then
+    LINK_OPTS="-fprofile-arcs -ftest-coverage"
+fi
 cc -shared \
     .libs/pdo_snowflake.o \
     .libs/snowflake_driver.o \
@@ -38,6 +42,7 @@ cc -shared \
     -Wl,--whole-archive \
     -lsnowflakeclient -lcrypto -lssl -lcurl \
     -Wl,--no-whole-archive \
+    $LINK_OPTS \
     -Wl,-soname -Wl,pdo_snowflake.so \
     -o .libs/pdo_snowflake.so
 (cd .libs && rm -f pdo_snowflake.la && ln -s ../pdo_snowflake.la pdo_snowflake.la)

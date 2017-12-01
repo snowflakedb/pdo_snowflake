@@ -9,11 +9,10 @@ install:
   - sudo apt-get update
   - sudo apt-get install lcov
 script:
-  - echo $PHP_HOME
   - export PHP_HOME=$( cd "$(dirname $(which php))" && cd .. && pwd )
-  - echo PHP_HOME: $PHP_HOME
-  - echo PHP_IZE: $(which phpize)
-  - echo PHP_CONFIG: $(which php-config)
+  - echo $PHP_HOME
+  - echo $(which phpize)
+  - echo $(which php-config)
   - REPORT_COVERAGE=1 ./scripts/build_pdo_snowflake.sh
   - REPORT_EXIT_STATUS=1 NO_INTERACTION=true make test
   - gcov -o .libs snowflake_driver.c snowflake_stmt.c
