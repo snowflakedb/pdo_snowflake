@@ -11,7 +11,9 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_C_FLAGS -pthread)
 
 set(SOURCE_FILES
+        include
         lib/snowflake_client.c
+        lib/constants.h
         lib/cJSON.c
         lib/log.c
         lib/arraylist.c
