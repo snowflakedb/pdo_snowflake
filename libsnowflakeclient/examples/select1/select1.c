@@ -15,6 +15,7 @@ int main() {
     SNOWFLAKE *sf = snowflake_init();
 
     snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, getenv("SNOWFLAKE_TEST_CA_BUNDLE_FILE"));
+    //snowflake_global_set_attribute(SF_GLOBAL_DEBUG, &SF_BOOLEAN_TRUE);
 
     /* connect*/
     snowflake_set_attr(sf, SF_CON_PROTOCOL, getenv("SNOWFLAKE_TEST_PROTOCOL"));
@@ -45,10 +46,19 @@ int main() {
     snowflake_query(sfstmt, "select 1;");
     printf("Number of rows: %d\n", (int) snowflake_num_rows(sfstmt));
 
-    while (snowflake_fetch(sfstmt) != SF_STATUS_EOL) {
+    while ((status = snowflake_fetch(sfstmt)) != SF_STATUS_EOL) {
+        if (status == SF_STATUS_ERROR || status == SF_STATUS_WARNING) {
+            printf("Ran into error during fetch");
+            break;
+        }
         printf("result: %d\n", *((int *) c1.value));
     }
     snowflake_stmt_close(sfstmt);
+
+    // If we reached end of line, then we were successful
+    if (status == SF_STATUS_EOL) {
+        status = SF_STATUS_SUCCESS;
+    }
 
 cleanup:
     /* disconnect */

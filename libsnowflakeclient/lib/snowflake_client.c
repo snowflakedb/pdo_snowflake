@@ -244,16 +244,12 @@ void STDCALL snowflake_term(SNOWFLAKE *sf) {
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
-    CURL *curl = NULL;
-    // Use curl header list
-    struct curl_slist *header = NULL;
     cJSON *body = NULL;
     cJSON *data = NULL;
     cJSON *resp = NULL;
     char *s_body = NULL;
     char *s_resp = NULL;
     // Encoded URL to use with libcurl
-    char *encoded_url = NULL;
     URL_KEY_VALUE url_params[] = {
             {"request_id=", sf->request_id, NULL, NULL, 0, 0},
             {"&databaseName=", sf->database, NULL, NULL, 0, 0},
@@ -261,66 +257,39 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
             {"&warehouse=", sf->warehouse, NULL, NULL, 0, 0},
             {"&roleName=", sf->role, NULL, NULL, 0, 0},
     };
-    RAW_JSON_BUFFER *raw_json = NULL;
-    struct data config;
-    config.trace_ascii = 1;
     SNOWFLAKE_STATUS ret = SF_STATUS_ERROR;
 
-    if(!sf->protocol || !sf->host || !sf->port) {
+    if(!sf->protocol || !sf->user || !sf->account) {
         // Invalid connection
         goto cleanup;
     }
 
-    raw_json = (RAW_JSON_BUFFER *) SF_CALLOC(1, sizeof(RAW_JSON_BUFFER));
-    raw_json->size = 0;
-    raw_json->buffer = NULL;
+    // Create body
+    body = create_auth_json_body(sf, "C API", "C API", "0.1");
+    log_debug("Created body");
+    s_body = cJSON_Print(body);
+    log_trace("Here is constructed body:\n%s", s_body);
 
-    curl = curl_easy_init();
-
-    if (curl) {
-
-        // Create header
-        header = create_header_no_token();
-        log_debug("Created header");
-
-        // Create body
-        body = create_auth_json_body(sf, "C API", "C API", "0.1");
-        log_debug("Created body");
-        s_body = cJSON_Print(body);
-        log_trace("Here is constructed body:\n%s", s_body);
-
-
-        // Add up the string lengths and add 5 (4 for the static characters in the encoded url and 1 for the null terminator)
-        encoded_url = encode_url(curl, sf->protocol, sf->host, sf->port, SESSION_URL, url_params, 5);
-
-        if (encoded_url == NULL) {
-            goto cleanup;
+    // Send request and get data
+    if (request(sf, &resp, SESSION_URL, url_params, 5, s_body, POST_REQUEST_TYPE)) {
+        s_resp = cJSON_Print(resp);
+        log_trace("Here is JSON response:\n%s", s_resp);
+        data = cJSON_GetObjectItem(resp, "data");
+        // Get token
+        if (!json_copy_string(&sf->token, data, "token")) {
+            log_error("No valid token found in response");
         }
-
-        // Setup curl call
-        curl_post_call(&curl, encoded_url, header, s_body, raw_json, &json_resp_cb, &config);
-        resp = cJSON_Parse(raw_json->buffer);
-        // TODO refactor JSON response
-        if (resp) {
-            s_resp = cJSON_Print(resp);
-            log_trace("Here is JSON response:\n%s", s_resp);
-            data = cJSON_GetObjectItem(resp, "data");
-            // Get token
-            if (!json_copy_string(&sf->token, data, "token")) {
-                log_error("No valid token found in response");
-            }
-            // Get master token
-            if (!json_copy_string(&sf->master_token, data, "masterToken")) {
-                log_error("No valid master token found in response");
-            }
-        } else {
-            log_error("No response");
-            goto cleanup;
+        // Get master token
+        if (!json_copy_string(&sf->master_token, data, "masterToken")) {
+            log_error("No valid master token found in response");
         }
-
-        /* we are done... */
-        ret = SF_STATUS_SUCCESS;
+    } else {
+        log_error("No response");
+        goto cleanup;
     }
+
+    /* we are done... */
+    ret = SF_STATUS_SUCCESS;
 
 cleanup:
     // Delete password and passcode for security's sake
@@ -334,17 +303,10 @@ cleanup:
         memset(sf->passcode, 0, strlen(sf->passcode) + 1);
         SF_FREE(sf->passcode);
     }
-    curl_slist_free_all(header);
-    curl_easy_cleanup(curl);
     cJSON_Delete(body);
     cJSON_Delete(resp);
     SF_FREE(s_body);
     SF_FREE(s_resp);
-    if (raw_json) {
-        SF_FREE(raw_json->buffer);
-    }
-    SF_FREE(raw_json);
-    SF_FREE(encoded_url);
 
     return ret;
 }
@@ -518,7 +480,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_fetch(SNOWFLAKE_STMT *sfstmt) {
             continue;
         } else {
             // TODO do we really need strict parameter checking? We can probably get away with less strict parameter checking
-            if (result->type != sfstmt->desc[i]->c_type || result->type != SF_C_TYPE_STRING) {
+            if (result->type != sfstmt->desc[i]->c_type && result->type != SF_C_TYPE_STRING) {
                 // TODO add error msg
                 goto cleanup;
             }
@@ -552,7 +514,11 @@ SNOWFLAKE_STATUS STDCALL snowflake_fetch(SNOWFLAKE_STMT *sfstmt) {
                 *(float64 *) result->value = (float64) strtod(raw_result->valuestring, NULL);
             } else if (result->type == SF_C_TYPE_STRING) {
                 // TODO should we assume that we always have enough space?
-                strcpy(result->value, raw_result->valuestring);
+                strncpy(result->value, raw_result->valuestring, result->max_length);
+                // If string is not null terminated, then add the terminator yourself
+                if (((char *) result->value)[result->max_length - 1] != '\0') {
+                    ((char *) result->value)[result->max_length - 1] == '\0';
+                }
             } else if (result->type == SF_C_TYPE_TIMESTAMP) {
                 // TODO Do some timestamp stuff here
             } else {
@@ -626,130 +592,83 @@ cleanup:
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
-    CURL *curl = NULL;
     SNOWFLAKE_STATUS ret = SF_STATUS_ERROR;
-    struct curl_slist *header = NULL;
     cJSON *body = NULL;
     cJSON *data = NULL;
     cJSON *rowtype = NULL;
     cJSON *resp = NULL;
     char *s_body = NULL;
     char *s_resp = NULL;
-    char *header_token = NULL;
     sf_bool success = SF_BOOLEAN_FALSE;
-    char *encoded_url = NULL;
-    RAW_JSON_BUFFER *raw_json = NULL;
-    struct data config;
-    config.trace_ascii = 1;
-    size_t header_token_size;
     URL_KEY_VALUE url_params[] = {
             {"requestId=", sfstmt->request_id, NULL, NULL, 0, 0}
     };
-    raw_json = (RAW_JSON_BUFFER *) SF_CALLOC(1, sizeof(RAW_JSON_BUFFER));
-    raw_json->size = 0;
-    raw_json->buffer = NULL;
     if (sfstmt->connection->token == NULL || sfstmt->connection->master_token == NULL) {
         log_error("Missing session token or Master token. Are you sure that snowflake_connect was successful?");
         // TODO Set error statement
         goto cleanup;
     }
-    // -2 since there is a placeholder in the token format; +1 for null terminator
-    header_token_size = strlen(HEADER_SNOWFLAKE_TOKEN_FORMAT) - 2 + strlen(sfstmt->connection->token) + 1;
 
-
-    if(!sfstmt->connection->protocol || !sfstmt->connection->host || !sfstmt->connection->port) {
+    if(!sfstmt->connection->protocol || !sfstmt->connection->account) {
         // TODO Set error statement
         goto cleanup;
     }
 
-    curl = curl_easy_init();
+    // Create Body
+    body = create_query_json_body(sfstmt->sql_text, sfstmt->sequence_counter);
+    s_body = cJSON_Print(body);
+    log_debug("Created body");
+    log_trace("Here is constructed body:\n%s", s_body);
 
-    if (curl) {
-        // Create header
-        header_token = (char *) SF_CALLOC(1, header_token_size);
-        snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sfstmt->connection->token);
-        header = create_header_token(header_token);
-        log_debug("Created header with token");
-
-        // Create Body
-        body = create_query_json_body(sfstmt->sql_text, sfstmt->sequence_counter);
-        s_body = cJSON_Print(body);
-        log_debug("Created body");
-        log_trace("Here is constructed body:\n%s", s_body);
-
-        // Encode URL parameters
-        encoded_url = encode_url(curl, sfstmt->connection->protocol, sfstmt->connection->host, sfstmt->connection->port, QUERY_URL, url_params, 1);
-
-        if (encoded_url == NULL) {
-            goto cleanup;
+    if (request(sfstmt->connection, &resp, QUERY_URL, url_params, 1, s_body, POST_REQUEST_TYPE)) {
+        s_resp = cJSON_Print(resp);
+        log_trace("Here is JSON response:\n%s", s_resp);
+        data = cJSON_GetObjectItem(resp, "data");
+        if (!json_copy_string(&sfstmt->sfqid, data, "queryId")) {
+            log_debug("No valid sfqid found in response");
         }
-
-        /* Check for errors */
-        if(!curl_post_call(&curl, encoded_url, header, s_body, raw_json, &json_resp_cb, &config)) {
-            goto cleanup;
+        if (!json_copy_string(&sfstmt->sqlstate, data, "sqlState")) {
+            log_debug("No valid sqlstate found in response");
         }
-        resp = cJSON_Parse(raw_json->buffer);
-        if (resp) {
-            s_resp = cJSON_Print(resp);
-            log_trace("Here is JSON response:\n%s", s_resp);
-            data = cJSON_GetObjectItem(resp, "data");
-            if (!json_copy_string(&sfstmt->sfqid, data, "queryId")) {
-                log_debug("No valid sfqid found in response");
+        json_copy_bool(&success, resp, "success");
+        if (success) {
+            // Set Database info
+            if (!json_copy_string(&sfstmt->connection->database, data, "finalDatabaseName")) {
+                log_warn("No valid database found in response");
             }
-            if (!json_copy_string(&sfstmt->sqlstate, data, "sqlState")) {
-                log_debug("No valid sqlstate found in response");
+            if (!json_copy_string(&sfstmt->connection->schema, data, "finalSchemaName")) {
+                log_warn("No valid schema found in response");
             }
-            json_copy_bool(&success, resp, "success");
-            if (success) {
-                // Set Database info
-                if (!json_copy_string(&sfstmt->connection->database, data, "finalDatabaseName")) {
-                    log_warn("No valid database found in response");
-                }
-                if (!json_copy_string(&sfstmt->connection->schema, data, "finalSchemaName")) {
-                    log_warn("No valid schema found in response");
-                }
-                if (!json_copy_string(&sfstmt->connection->warehouse, data, "finalWarehouseName")) {
-                    log_warn("No valid warehouse found in response");
-                }
-                if (!json_copy_string(&sfstmt->connection->role, data, "finalRoleName")) {
-                    log_warn("No valid role found in response");
-                }
-                rowtype = cJSON_GetObjectItem(data, "rowtype");
-                if (cJSON_IsArray(rowtype)) {
-                    sfstmt->total_fieldcount = cJSON_GetArraySize(rowtype);
-                    sfstmt->desc = set_description(rowtype);
-                }
-                // Set results array
-                if (!json_detach_array_from_object(&sfstmt->raw_results, data, "rowset")) {
-                    log_error("No valid rowset found in response");
-                }
-                // TODO get from total field
-                sfstmt->total_rowcount = cJSON_GetArraySize(sfstmt->raw_results);
+            if (!json_copy_string(&sfstmt->connection->warehouse, data, "finalWarehouseName")) {
+                log_warn("No valid warehouse found in response");
             }
-        } else {
-            log_trace("Error response:\n%s", raw_json->buffer);
+            if (!json_copy_string(&sfstmt->connection->role, data, "finalRoleName")) {
+                log_warn("No valid role found in response");
+            }
+            rowtype = cJSON_GetObjectItem(data, "rowtype");
+            if (cJSON_IsArray(rowtype)) {
+                sfstmt->total_fieldcount = cJSON_GetArraySize(rowtype);
+                sfstmt->desc = set_description(rowtype);
+            }
+            // Set results array
+            if (!json_detach_array_from_object(&sfstmt->raw_results, data, "rowset")) {
+                log_error("No valid rowset found in response");
+            }
+            // TODO get from total field
+            sfstmt->total_rowcount = cJSON_GetArraySize(sfstmt->raw_results);
         }
     } else {
-        // TODO Add error statement here
-        goto cleanup;
+        log_trace("Connection failed");
     }
 
     // Everything went well if we got to this point
     ret = SF_STATUS_SUCCESS;
 
 cleanup:
-    curl_slist_free_all(header);
     cJSON_Delete(body);
     cJSON_Delete(resp);
     SF_FREE(s_body);
     SF_FREE(s_resp);
-    curl_easy_cleanup(curl);
-    if (raw_json) {
-        SF_FREE(raw_json->buffer);
-    }
-    SF_FREE(raw_json);
-    SF_FREE(header_token);
-    SF_FREE(encoded_url);
 
     return ret;
 }
