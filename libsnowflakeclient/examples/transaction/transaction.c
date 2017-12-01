@@ -48,7 +48,7 @@ void main()
   }
 
   printf("Success. Query ID: %s, Affected Rows: %ld",
-         snowflake_sfqid(sfstmt), snowflake_affected_rows(sfstmt));
+         snowflake_sfqid(sfstmt), (long)snowflake_affected_rows(sfstmt));
   snowflake_trans_commit(sf);
   goto end;
 
