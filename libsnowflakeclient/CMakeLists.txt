@@ -38,6 +38,11 @@ add_library(snowflakeclient STATIC ${SOURCE_FILES})
 
 set_property(TARGET snowflakeclient PROPERTY C_STANDARD 90)
 
+link_directories(
+        "${CMAKE_CURRENT_SOURCE_DIR}/build/linux/curl/lib"
+        "${CMAKE_CURRENT_SOURCE_DIR}/build/linux/openssl/lib"
+)
+
 target_link_libraries(snowflakeclient
         rt dl
         ${CURL_LIB}

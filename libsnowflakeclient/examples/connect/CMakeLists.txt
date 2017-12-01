@@ -5,4 +5,8 @@ project(ex_connect)
 
 add_executable(ex_connect connect.c)
 
-target_link_libraries(ex_connect snowflakeclient)
+target_link_libraries(
+        ex_connect
+        snowflakeclient
+        -Wl,--whole-archive curl ssl crypto -Wl,--no-whole-archive
+)
