@@ -15,6 +15,7 @@ int main()
     SNOWFLAKE *sf = snowflake_init();
 
     snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, getenv("SNOWFLAKE_TEST_CA_BUNDLE_FILE"));
+    //snowflake_global_set_attribute(SF_GLOBAL_DEBUG, &SF_BOOLEAN_TRUE);
 
     /* connect*/
     snowflake_set_attr(sf, SF_CON_PROTOCOL, getenv("SNOWFLAKE_TEST_PROTOCOL"));
