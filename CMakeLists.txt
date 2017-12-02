@@ -10,24 +10,26 @@ set(CMAKE_C_FLAGS
 
 # coverage
 set(CMAKE_C_FLAGS
-        "${CMAKE_C_FLAGS} -g -O0 -ggdb -fprofile-arcs -ftest-coverage")
+        "${CMAKE_C_FLAGS} -g -O0 -ggdb -fprofile-arcs -ftest-coverage -fPIC")
 
-if(UNIX AND NOT APPLE)
+if (UNIX AND NOT APPLE)
     set(LINUX TRUE)
-endif()
+endif ()
 
 # PHP home: dev env not used in TravisCI
-set(PHP_HOME /tmp/install-php-7.1.6)
+set(PHP_HOME $ENV{PHP_HOME})
+message("PHP is located at " $ENV{PHP_HOME})
 
 set(SOURCE_FILES
         snowflake_driver.c
         snowflake_stmt.c
-        pdo_snowflake.c libsnowflakeclient/snowflake_client.c libsnowflakeclient/snowflake_client.h libsnowflakeclient/snowflake_client_version.h libsnowflakeclient/snowflake_client_constant.h libsnowflakeclient/snowflake_client_int.h)
+        pdo_snowflake.c)
+
+# set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
 
 include_directories(
-        "."
-        "include"
-        "main"
+        include
+        libsnowflakeclient/include
         ${PHP_HOME}/include/php
         ${PHP_HOME}/include/php/main
         ${PHP_HOME}/include/php/TSRM
@@ -35,11 +37,14 @@ include_directories(
         ${PHP_HOME}/include/php/ext
         ${PHP_HOME}/include/php/ext/date/lib
 )
+add_subdirectory(libsnowflakeclient)
 
 add_library(pdo_snowflake SHARED ${SOURCE_FILES})
 
 SET_TARGET_PROPERTIES(pdo_snowflake PROPERTIES PREFIX "")
+set_target_properties(pdo_snowflake PROPERTIES LINK_FLAGS "-Wl,-E")
 
 target_link_libraries(pdo_snowflake
+        snowflakeclient
         -fprofile-arcs
         -Wl,-soname -Wl,pdo_snowflake.so)

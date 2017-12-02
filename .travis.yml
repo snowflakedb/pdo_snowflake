@@ -1,7 +1,7 @@
 sudo: required
 language: php
 php:
-  - '5.6'
+  - '7.0'
   - '7.1'
 before_install:
   - openssl aes-256-cbc -k "$super_secret_password" -in parameters.json.enc -out parameters.json -d
@@ -9,10 +9,11 @@ install:
   - sudo apt-get update
   - sudo apt-get install lcov
 script:
-  - phpize
-  - ./configure --enable-pdo_snowflake --enable-coverage
-  - make clean
-  - make
+  - export PHP_HOME=$( cd "$(dirname $(which php))" && cd .. && pwd )
+  - echo $PHP_HOME
+  - echo $(which phpize)
+  - echo $(which php-config)
+  - REPORT_COVERAGE=1 ./scripts/build_pdo_snowflake.sh
   - REPORT_EXIT_STATUS=1 NO_INTERACTION=true make test
   - gcov -o .libs snowflake_driver.c snowflake_stmt.c
 after_success:

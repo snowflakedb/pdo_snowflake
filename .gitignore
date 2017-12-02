@@ -16,7 +16,6 @@ config.status
 config.sub
 configure
 configure.in
-include
 install-sh
 libtool
 ltmain.sh
@@ -41,4 +40,6 @@ parameters.json
 *.gcov
 junit.xml
 cmake-build-debug/
+cmake-build/
 .idea/
+logs/

@@ -3,6 +3,10 @@
 #ifndef PHP_PDO_SNOWFLAKE_INT_H
 #define PHP_PDO_SNOWFLAKE_INT_H
 
+#include "libsnowflakeclient/include/snowflake_client.h"
+
+#define PDO_DBG_RETURN(value)	return (value)
+
 ZEND_BEGIN_MODULE_GLOBALS(pdo_snowflake)
 ZEND_END_MODULE_GLOBALS(pdo_snowflake)
 
@@ -17,6 +21,15 @@ ZEND_TSRMLS_CACHE_EXTERN()
 typedef long zend_long;
 #endif /* PHP_VERSION_ID */
 
+typedef struct {
+    SNOWFLAKE *server;
+} pdo_snowflake_db_handle;
+
+typedef struct {
+	pdo_snowflake_db_handle *H;
+	SNOWFLAKE_STMT *stmt;
+} pdo_snowflake_stmt;
+
 extern pdo_driver_t pdo_snowflake_driver;
 extern struct pdo_stmt_methods snowflake_stmt_methods;
 extern int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file, int line);
@@ -25,6 +38,7 @@ extern int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *fi
 
 enum {
     PDO_SNOWFLAKE_ATTR_SSL_CAPATH = PDO_ATTR_DRIVER_SPECIFIC,
+	PDO_SNOWFLAKE_ATTR_SSL_VERSION,
 	PDO_SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS
 };
 
