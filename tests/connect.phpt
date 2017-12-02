@@ -18,9 +18,10 @@ PDO_SNOWFLAKE:
     $options = array(PDO::SNOWFLAKE_ATTR_SSL_CAPATH => $ca_bundle_file);
     try {
         $dbh = new PDO($dsn, $user, $password, $options);
+        echo 'Connected to Snowflake';
     } catch (PDOException $e) {
         echo 'Connection failed: ' . $e->getMessage();
-        echo "dsn is: $dsn\n";
+        echo "dsn is: $dsn";
     }
 
     $dbh = null;
