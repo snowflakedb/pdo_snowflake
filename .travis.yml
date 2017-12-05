@@ -15,6 +15,7 @@ script:
   - echo $(which php-config)
   - REPORT_COVERAGE=1 ./scripts/build_pdo_snowflake.sh
   - REPORT_EXIT_STATUS=1 NO_INTERACTION=true make test
+  - cat tests/*.log
   - gcov -o .libs snowflake_driver.c snowflake_stmt.c
 after_success:
   - bash <(curl -s https://codecov.io/bash)
