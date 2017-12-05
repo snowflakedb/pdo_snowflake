@@ -17,15 +17,15 @@ extern "C" {
 
 #include <snowflake_client.h>
 
-#define SET_SNOWFLAKE_ERROR(e, ec, m, s) create_snowflake_error(e, ec, m, s, __FILE__, __LINE__)
+#define SET_SNOWFLAKE_ERROR(e, ec, m, s) set_snowflake_error(e, ec, m, s, __FILE__, __LINE__)
 
-void *STDCALL set_snowflake_error(SNOWFLAKE_ERROR *error,
+void STDCALL set_snowflake_error(SNOWFLAKE_ERROR *error,
                                   SNOWFLAKE_ERROR_CODE error_code,
                                   const char *msg,
                                   const char *sfqid,
                                   const char *file,
                                   int line);
-void *STDCALL clear_snowflake_error(SNOWFLAKE_ERROR *error);
+void STDCALL clear_snowflake_error(SNOWFLAKE_ERROR *error);
 
 #ifdef __cplusplus
 }

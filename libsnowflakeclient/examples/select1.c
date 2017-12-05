@@ -17,6 +17,8 @@ int main() {
     status = snowflake_connect(sf);
     if (status != SF_STATUS_SUCCESS) {
         fprintf(stderr, "Connecting to snowflake failed, exiting...\n");
+        SNOWFLAKE_ERROR *error = snowflake_error(sf);
+        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
         goto cleanup;
     }
 
@@ -33,7 +35,8 @@ int main() {
 
     while ((status = snowflake_fetch(sfstmt)) != SF_STATUS_EOL) {
         if (status == SF_STATUS_ERROR || status == SF_STATUS_WARNING) {
-            printf("Ran into error during fetch");
+            SNOWFLAKE_ERROR *error = snowflake_stmt_error(sfstmt);
+            fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
             break;
         }
         printf("result: %d\n", *((int *) c1.value));

@@ -21,6 +21,8 @@ extern "C" {
 #include "uuid4.h"
 #include "snowflake_client_version.h"
 
+#define SQLSTATE_LEN 7
+
 /**
  * Snowflake Data types
  */
@@ -68,11 +70,18 @@ typedef enum sf_status {
  */
 typedef enum sf_error_code {
     SF_NO_ERROR,
-    SF_OUT_OF_MEMORY,
-    SF_REQUEST_TIMEOUT,
-    SF_BAD_REQUEST,
-    SF_DATA_CONVERSION,
-    SF_BAD_DATA_OUTPUT_TYPE
+    SF_ERROR_OUT_OF_MEMORY,
+    SF_ERROR_REQUEST_TIMEOUT,
+    SF_ERROR_DATA_CONVERSION,
+    SF_ERROR_BAD_DATA_OUTPUT_TYPE,
+    SF_ERROR_BAD_CONNECTION_PARAMS,
+    SF_ERROR_STRING_FORMATTING,
+    SF_ERROR_STRING_COPY,
+    SF_ERROR_BAD_REQUEST,
+    SF_ERROR_BAD_JSON,
+    SF_ERROR_RETRY,
+    SF_ERROR_CURL,
+    SF_ERROR_BAD_ATTRIBUTE_TYPE
 } SNOWFLAKE_ERROR_CODE;
 
 /**
@@ -123,7 +132,7 @@ typedef enum sf_stmt_attribute {
 typedef struct sf_error {
     SNOWFLAKE_ERROR_CODE error_code;
     const char *msg;
-    char *sfqid;
+    char sfqid[UUID4_LEN];
     const char *file;
     int line;
 } SNOWFLAKE_ERROR;
@@ -182,8 +191,8 @@ typedef struct sf_snowflake_column_desc {
  */
 typedef struct sf_snowflake_statement {
     /* TODO */
-    char *sfqid;
-    char *sqlstate;
+    char sfqid[UUID4_LEN];
+    char sqlstate[SQLSTATE_LEN];
     int64 sequence_counter;
     char request_id[UUID4_LEN];
     SNOWFLAKE_ERROR error;

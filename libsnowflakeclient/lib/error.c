@@ -6,35 +6,32 @@
 #include "error.h"
 #include "snowflake_memory.h"
 
-void *STDCALL set_snowflake_error(SNOWFLAKE_ERROR *error,
+void STDCALL set_snowflake_error(SNOWFLAKE_ERROR *error,
                                   SNOWFLAKE_ERROR_CODE error_code,
                                   const char *msg,
                                   const char *sfqid,
                                   const char *file,
                                   int line) {
-    size_t sfqid_size = 1;
     // NULL error passed in. Should never happen
     if (!error) {
-        return NULL;
+        return;
     }
 
-    // Allocate enough memory for sfqid
-    sfqid_size += strlen(sfqid);
-    error->sfqid = (char *) SF_CALLOC(1, sfqid_size);
-    // If there is an OOM error from trying to create a string for sfqid, then skip copying and just set original error
-    if (error->sfqid) {
-        strncpy(error->sfqid, sfqid, sfqid_size);
+    strncpy(error->sfqid, sfqid, UUID4_LEN);
+    // Null terminate
+    if (error->sfqid[UUID4_LEN - 1] != '\0') {
+        error->sfqid[UUID4_LEN - 1] = '\0';
     }
-
     error->error_code = error_code;
     error->msg = msg;
     error->file = file;
     error->line = line;
 }
 
-void *STDCALL clear_snowflake_error(SNOWFLAKE_ERROR *error) {
-    if (error) {
-        SF_FREE(error->sfqid);
-    }
-
+void STDCALL clear_snowflake_error(SNOWFLAKE_ERROR *error) {
+    error->error_code = SF_NO_ERROR;
+    error->msg = NULL;
+    error->file = NULL;
+    error->line = 0;
+    memset(error->sfqid, 0, UUID4_LEN);
 }
