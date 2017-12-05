@@ -41,4 +41,6 @@ parameters.json
 *.gcov
 junit.xml
 cmake-build-debug/
+cmake-build/
 .idea/
+logs/
