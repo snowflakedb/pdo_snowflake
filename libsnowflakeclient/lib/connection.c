@@ -150,6 +150,7 @@ cJSON *STDCALL create_query_json_body(char *sql_text, int64 sequence_id) {
     // Create body
     body = cJSON_CreateObject();
     cJSON_AddStringToObject(body, "sqlText", sql_text);
+    cJSON_AddBoolToObject(body, "asyncExec", SF_BOOLEAN_FALSE);
     cJSON_AddNumberToObject(body, "sequenceId", sequence_id);
 
     return body;
@@ -188,7 +189,7 @@ sf_bool STDCALL curl_post_call(SNOWFLAKE *sf,
         if(!http_perform(sf, curl, POST_REQUEST_TYPE, url, header, body, json)) {
             //TODO add breaking error case
         }
-        if (!*json || !json_copy_string(&query_code, *json, "code")) {
+        if (!*json || (!cJSON_IsNull(cJSON_GetObjectItem(*json, "code")) && !json_copy_string(&query_code, *json, "code"))) {
             //TODO add breaking error case
         }
 
@@ -202,7 +203,7 @@ sf_bool STDCALL curl_post_call(SNOWFLAKE *sf,
             //TODO renew session
         }
 
-        while (strcmp(query_code, QUERY_IN_PROGRESS_CODE) == 0) {
+        while (query_code && (strcmp(query_code, QUERY_IN_PROGRESS_CODE) == 0 || strcmp(query_code, QUERY_IN_PROGRESS_ASYNC_CODE) == 0)) {
             // Remove old result URL and query code if this isn't our first rodeo
             SF_FREE(result_url);
             SF_FREE(query_code);
@@ -213,15 +214,12 @@ sf_bool STDCALL curl_post_call(SNOWFLAKE *sf,
             }
 
             log_debug("ping pong starting...");
-            // Free JSON response before sending new request to Snowflake. Set data to null since it'll be deleted as well
-            data = NULL;
-            cJSON_Delete(*json);
-            if (!curl_get_call(sf, curl, result_url, header, json)) {
+            if (!request(sf, json, result_url, NULL, 0, NULL, header, GET_REQUEST_TYPE)) {
                 stop = SF_BOOLEAN_TRUE;
                 //TODO add breaking error case
             }
 
-            if (!json_copy_string(&query_code, *json, "code")) {
+            if (!cJSON_IsNull(cJSON_GetObjectItem(*json, "code")) && !json_copy_string(&query_code, *json, "code")) {
                 stop = SF_BOOLEAN_TRUE;
                 //TODO add breaking error case
             }
@@ -251,8 +249,15 @@ sf_bool STDCALL curl_get_call(SNOWFLAKE *sf, CURL *curl, char *url, struct curl_
         if(!http_perform(sf, curl, GET_REQUEST_TYPE, url, header, NULL, json)) {
             //TODO add breaking error case
         }
-        if (!*json || !json_copy_string(&query_code, *json, "code")) {
+        // TODO add case for null query_code
+        if (!*json || !cJSON_IsNull(cJSON_GetObjectItem(*json, "code")) && !json_copy_string(&query_code, *json, "code")) {
             //TODO add breaking error case
+        }
+
+        // No query code means things went well, just break and return
+        if (!query_code) {
+            ret = SF_BOOLEAN_TRUE;
+            break;
         }
 
         if (strcmp(query_code, SESSION_EXPIRE_CODE) == 0) {
@@ -557,7 +562,12 @@ sf_bool STDCALL http_perform(SNOWFLAKE *sf,
 
     // We were successful so parse JSON from text
     if (ret) {
-        SF_FREE(*json);
+        cJSON_Delete(*json);
+        *json = NULL;
+//        FILE *fp;
+//        fp = fopen("/home/kwagner/raw_json.txt", "w+");
+//        fwrite(buffer.buffer, sizeof(buffer.buffer[0]), buffer.size, fp);
+//        fclose(fp);
         *json = cJSON_Parse(buffer.buffer);
         if (*json) {
             ret = SF_BOOLEAN_TRUE;
@@ -581,24 +591,30 @@ sf_bool STDCALL request(SNOWFLAKE *sf,
                         URL_KEY_VALUE* url_params,
                         int num_url_params,
                         char *body,
+                        struct curl_slist *header,
                         SNOWFLAKE_REQUEST_TYPE request_type) {
     sf_bool ret = SF_BOOLEAN_FALSE;
     CURL *curl = NULL;
     char *encoded_url = NULL;
-    struct curl_slist *header = NULL;
+    struct curl_slist *my_header = NULL;
     char *header_token = NULL;
     size_t header_token_size;
 
     curl = curl_easy_init();
     if (curl) {
-        // Create header
-        if (sf->token) {
-            header_token_size = strlen(HEADER_SNOWFLAKE_TOKEN_FORMAT) - 2 + strlen(sf->token) + 1;
-            header_token = (char *) SF_CALLOC(1, header_token_size);
-            snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->token);
-            header = create_header_token(header_token);
+        // Use passed in header if one exists
+        if (header) {
+            my_header = header;
         } else {
-            header = create_header_no_token();
+            // Create header
+            if (sf->token) {
+                header_token_size = strlen(HEADER_SNOWFLAKE_TOKEN_FORMAT) - 2 + strlen(sf->token) + 1;
+                header_token = (char *) SF_CALLOC(1, header_token_size);
+                snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->token);
+                my_header = create_header_token(header_token);
+            } else {
+                my_header = create_header_no_token();
+            }
         }
         log_debug("Created header");
 
@@ -609,16 +625,19 @@ sf_bool STDCALL request(SNOWFLAKE *sf,
 
         // Execute request and set return value to result
         if (request_type == POST_REQUEST_TYPE) {
-            ret = curl_post_call(sf, curl, encoded_url, header, body, json);
+            ret = curl_post_call(sf, curl, encoded_url, my_header, body, json);
         } else if (request_type == GET_REQUEST_TYPE) {
-            ret = curl_get_call(sf, curl, encoded_url, header, json);
+            ret = curl_get_call(sf, curl, encoded_url, my_header, json);
         } else {
             // TODO add default case for bad type
         }
     }
 
 cleanup:
-    curl_slist_free_all(header);
+    // If we created our own header, then delete it
+    if (!header) {
+        curl_slist_free_all(my_header);
+    }
     curl_easy_cleanup(curl);
     SF_FREE(header_token);
     SF_FREE(encoded_url);
