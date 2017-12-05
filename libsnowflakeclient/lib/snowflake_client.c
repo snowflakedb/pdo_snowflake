@@ -271,7 +271,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
     log_trace("Here is constructed body:\n%s", s_body);
 
     // Send request and get data
-    if (request(sf, &resp, SESSION_URL, url_params, 5, s_body, POST_REQUEST_TYPE)) {
+    if (request(sf, &resp, SESSION_URL, url_params, 5, s_body, NULL, POST_REQUEST_TYPE)) {
         s_resp = cJSON_Print(resp);
         log_trace("Here is JSON response:\n%s", s_resp);
         data = cJSON_GetObjectItem(resp, "data");
@@ -383,7 +383,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_set_attr(
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_get_attr(
-        SNOWFLAKE *sf, SNOWFLAKE_ATTRIBUTE type, void *value) {
+        SNOWFLAKE *sf, SNOWFLAKE_ATTRIBUTE type, void **value) {
     //TODO Implement this
 }
 
@@ -620,7 +620,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
     log_debug("Created body");
     log_trace("Here is constructed body:\n%s", s_body);
 
-    if (request(sfstmt->connection, &resp, QUERY_URL, url_params, 1, s_body, POST_REQUEST_TYPE)) {
+    if (request(sfstmt->connection, &resp, QUERY_URL, url_params, 1, s_body, NULL, POST_REQUEST_TYPE)) {
         s_resp = cJSON_Print(resp);
         log_trace("Here is JSON response:\n%s", s_resp);
         data = cJSON_GetObjectItem(resp, "data");
@@ -654,8 +654,10 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
             if (!json_detach_array_from_object(&sfstmt->raw_results, data, "rowset")) {
                 log_error("No valid rowset found in response");
             }
-            // TODO get from total field
-            sfstmt->total_rowcount = cJSON_GetArraySize(sfstmt->raw_results);
+            if (!json_copy_int(&sfstmt->total_rowcount, data, "total")) {
+                log_warn("No total count found in response. Reverting to using array size of results");
+                sfstmt->total_rowcount = cJSON_GetArraySize(sfstmt->raw_results);
+            }
         }
     } else {
         log_trace("Connection failed");
@@ -673,7 +675,11 @@ cleanup:
     return ret;
 }
 
-SNOWFLAKE_ERROR *STDCALL snowflake_error(SNOWFLAKE_STMT *sfstmt) {
+SNOWFLAKE_ERROR *STDCALL snowflake_error(SNOWFLAKE *sf) {
+    return &sf->error;
+}
+
+SNOWFLAKE_ERROR *STDCALL snowflake_stmt_error(SNOWFLAKE_STMT *sfstmt) {
     return &sfstmt->error;
 }
 

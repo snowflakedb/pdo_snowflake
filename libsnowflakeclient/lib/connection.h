@@ -94,6 +94,7 @@ char * STDCALL encode_url(CURL *curl,
                           int num_args);
 sf_bool STDCALL json_copy_bool(sf_bool *dest, cJSON *data, const char *item);
 sf_bool STDCALL json_copy_int(int64 *dest, cJSON *data, const char *item);
+
 sf_bool STDCALL json_copy_string(char **dest, cJSON *data, const char *item);
 sf_bool STDCALL json_detach_array_from_object(cJSON **dest, cJSON *data, const char *item);
 sf_bool STDCALL json_detach_array_from_array(cJSON **dest, cJSON *data, int index);
@@ -106,6 +107,7 @@ sf_bool STDCALL request(SNOWFLAKE *sf,
                         URL_KEY_VALUE* url_params,
                         int num_url_params,
                         char *body,
+                        struct curl_slist *header,
                         SNOWFLAKE_REQUEST_TYPE request_type);
 void STDCALL reset_curl(CURL *curl);
 uint32 STDCALL retry_ctx_next_sleep(RETRY_CONTEXT *retry_ctx);

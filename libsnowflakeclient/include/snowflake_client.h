@@ -67,10 +67,12 @@ typedef enum sf_status {
  * Snowflake API status
  */
 typedef enum sf_error_code {
+    SF_NO_ERROR,
     SF_OUT_OF_MEMORY,
     SF_REQUEST_TIMEOUT,
     SF_BAD_REQUEST,
     SF_DATA_CONVERSION,
+    SF_BAD_DATA_OUTPUT_TYPE
 } SNOWFLAKE_ERROR_CODE;
 
 /**
@@ -119,9 +121,11 @@ typedef enum sf_stmt_attribute {
  * Snowflake Error
  */
 typedef struct sf_error {
-    int err_number;
+    SNOWFLAKE_ERROR_CODE error_code;
     const char *msg;
-    const char *sfqid;
+    char *sfqid;
+    const char *file;
+    int line;
 } SNOWFLAKE_ERROR;
 
 /**
@@ -153,8 +157,10 @@ typedef struct sf_snowflake_connection {
 
     // Session specific fields
     int64 sequence_counter;
-    // TODO free this?
     char request_id[UUID4_LEN];
+
+    // Error
+    SNOWFLAKE_ERROR error;
 } SNOWFLAKE;
 
 /**
@@ -293,7 +299,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_set_attr(
  * @return 0 if success, otherwise an errno is returned.
  */
 SNOWFLAKE_STATUS STDCALL snowflake_get_attr(
-        SNOWFLAKE *sf, SNOWFLAKE_ATTRIBUTE type, void *value);
+        SNOWFLAKE *sf, SNOWFLAKE_ATTRIBUTE type, void **value);
 
 /**
  * Creates sf SNOWFLAKE_STMT context.
@@ -334,12 +340,20 @@ SNOWFLAKE_STATUS STDCALL snowflake_trans_commit(SNOWFLAKE *sf);
 SNOWFLAKE_STATUS STDCALL snowflake_trans_rollback(SNOWFLAKE *sf);
 
 /**
- * Returns an error message for the SNOWFLAKE context.
+ * Returns an error message for the SNOWFLAKE_STMT context.
  *
  * @param sfstmt SNOWFLAKE_STMT context.
  * @return error message
  */
-SNOWFLAKE_ERROR *STDCALL snowflake_error(SNOWFLAKE_STMT *sfstmt);
+SNOWFLAKE_ERROR *STDCALL snowflake_stmt_error(SNOWFLAKE_STMT *sfstmt);
+
+/**
+ * Returns an error message for the SNOWFLAKE context.
+ *
+ * @param sf SNOWFLAKE context.
+ * @return error message
+ */
+SNOWFLAKE_ERROR *STDCALL snowflake_error(SNOWFLAKE *sf);
 
 /**
  * Executes a query and returns result set. This function works only for
