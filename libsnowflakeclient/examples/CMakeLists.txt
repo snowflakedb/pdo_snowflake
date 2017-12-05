@@ -12,7 +12,6 @@ add_executable(ex_connect ${SOURCE_UTILS} connect.c)
 add_executable(ex_select1 ${SOURCE_UTILS} select1.c)
 add_executable(ex_transaction ${SOURCE_UTILS} transaction.c)
 add_executable(ex_ping_pong ${SOURCE_UTILS} ping_pong.c)
-add_executable(ex_json_test ${SOURCE_UTILS} json_test.c)
 
 target_link_libraries(
         ex_connect
@@ -34,12 +33,6 @@ target_link_libraries(
 
 target_link_libraries(
         ex_ping_pong
-        snowflakeclient
-        -Wl,--whole-archive curl ssl crypto -Wl,--no-whole-archive
-)
-
-target_link_libraries(
-        ex_json_test
         snowflakeclient
         -Wl,--whole-archive curl ssl crypto -Wl,--no-whole-archive
 )
