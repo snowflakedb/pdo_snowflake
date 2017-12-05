@@ -11,7 +11,7 @@ install:
 script:
   - export PHP_HOME=$( cd "$(dirname $(which php))" && cd .. && pwd )
   - export LIB_SNOWFLAKE_CLIENT_DIR=$(cd ./libsnowflakeclient && pwd)
-  - export SNOWFLAKE_TEST_CA_BUNDLE_FILE=$(LIB_SNOWFLAKE_CLIENT_DIR)/cacert.pem
+  - export SNOWFLAKE_TEST_CA_BUNDLE_FILE=$LIB_SNOWFLAKE_CLIENT_DIR/cacert.pem
   - echo $PHP_HOME
   - echo $(which phpize)
   - echo $(which php-config)
