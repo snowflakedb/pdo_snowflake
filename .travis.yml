@@ -10,9 +10,18 @@ install:
   - sudo apt-get install lcov
 script:
   - export PHP_HOME=$( cd "$(dirname $(which php))" && cd .. && pwd )
+  - export LIB_SNOWFLAKE_CLIENT_DIR=$(cd ./libsnowflakeclient && pwd)
+  - export SNOWFLAKE_TEST_CA_BUNDLE_FILE=$LIB_SNOWFLAKE_CLIENT_DIR/cacert.pem
+  - eval $(jq -r '.testconnection | to_entries | map("export \(.key)=\(.value|tostring)")|.[]' parameters.json)
   - echo $PHP_HOME
   - echo $(which phpize)
   - echo $(which php-config)
+  - echo $SNOWFLAKE_TEST_CA_BUNDLE_FILE
+  - echo $SNOWFLAKE_TEST_ACCOUNT
+  - echo $SNOWFLAKE_TEST_USER
+  - echo $SNOWFLAKE_TEST_DATABASE
+  - echo $SNOWFLAKE_TEST_SCHEMA
+  - echo $SNOWFLAKE_TEST_WAREHOUSE
   - REPORT_COVERAGE=1 ./scripts/build_pdo_snowflake.sh
   - REPORT_EXIT_STATUS=1 NO_INTERACTION=true make test
   - cat tests/*.log
