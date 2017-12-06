@@ -233,15 +233,15 @@ static int pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /*
 	size_t i;
 	int ret = 0;
 	struct pdo_data_src_parser vars[] = {
-			{"host",NULL,0},
-			{"port",NULL,0 },
-			{"account",NULL,0 },
-			{"database",NULL,0 },
-			{"schema",NULL,0 },
-            {"warehouse",NULL, 0},
-            {"role", NULL, 0},
+			{"host","",0},
+			{"port","",0 },
+			{"account","",0 },
+			{"database","",0 },
+			{"schema","",0 },
+            {"warehouse","", 0},
+            {"role", "", 0},
             {"protocol", "https", 0},
-            {"insecure_mode", NULL, 0}
+            {"insecure_mode", "", 0}
 	}; // 9 input parameters
 
     //PDO_DBG_ENTER("pdo_snowflake_handle_factory");

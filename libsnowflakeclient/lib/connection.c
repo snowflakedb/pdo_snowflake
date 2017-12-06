@@ -327,29 +327,31 @@ char * encode_url(CURL *curl,
                   int num_args,
                   SNOWFLAKE_ERROR *error) {
     int i;
-    const char *format = "%s://%s:%s%s";
+    sf_bool host_empty = (host && strcmp(host, "") != 0) ? SF_BOOLEAN_FALSE : SF_BOOLEAN_TRUE;
+    sf_bool port_empty = (port && strcmp(port, "") != 0) ? SF_BOOLEAN_FALSE : SF_BOOLEAN_TRUE;
+    const char *format;
     char *encoded_url = NULL;
     // Size used for the url format
     size_t base_url_size = 1; //Null terminator
     // Size used to determine buffer size
     size_t encoded_url_size;
     int bytes_written;
-    // Set proper format based on variables passed into encode URL. 
-    // The format includes format specifiers that will be consumed by empty fields 
+    // Set proper format based on variables passed into encode URL.
+    // The format includes format specifiers that will be consumed by empty fields
     // (i.e if port is empty, add an extra specifier so that we have 1 call to snprintf, vs. 4 different calls)
     // Format specifier order is protocol, then account, then host, then port, then url.
-    if (port && host) {
+    if (!port_empty && !host_empty) {
         format = "%s://%s%s:%s%s";
         base_url_size += 4;
         // Set account to an empty string since host overwrites account
         account = "";
-    } else if(!port && host) {
+    } else if(port_empty && !host_empty) {
         format = "%s://%s%s%s%s";
         base_url_size += 3;
         port = "";
         // Set account to an empty string since host overwrites account
         account = "";
-    } else if(port && !host) {
+    } else if(!port_empty && host_empty) {
         format = "%s://%s.%s:%s%s";
         base_url_size += 5;
         host = DEFAULT_SNOWFLAKE_BASE_URL;
