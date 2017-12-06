@@ -20,7 +20,8 @@ PDO_SNOWFLAKE:
         $dbh = new PDO($dsn, $user, $password, $options);
         echo 'Connected to Snowflake';
     } catch (PDOException $e) {
-        echo 'Connection failed: \n' . $e->getMessage();
+        echo 'Connection failed: ' . $e->getMessage();
+        echo "\n"
         echo "dsn is: $dsn\n";
     }
 
