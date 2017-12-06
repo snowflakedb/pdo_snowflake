@@ -246,6 +246,9 @@ void STDCALL snowflake_term(SNOWFLAKE *sf) {
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
+    if (!sf) {
+        return SF_STATUS_ERROR;
+    }
     // Reset error context
     clear_snowflake_error(&sf->error);
     cJSON *body = NULL;
@@ -327,12 +330,18 @@ cleanup:
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_close(SNOWFLAKE *sf) {
+    if (!sf) {
+        return SF_STATUS_ERROR;
+    }
     clear_snowflake_error(&sf->error);
     return SF_STATUS_SUCCESS;
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_set_attr(
         SNOWFLAKE *sf, SNOWFLAKE_ATTRIBUTE type, const void *value) {
+    if (!sf) {
+        return SF_STATUS_ERROR;
+    }
     clear_snowflake_error(&sf->error);
     switch (type) {
         case SF_CON_ACCOUNT:
@@ -401,6 +410,9 @@ SNOWFLAKE_STATUS STDCALL snowflake_set_attr(
 
 SNOWFLAKE_STATUS STDCALL snowflake_get_attr(
         SNOWFLAKE *sf, SNOWFLAKE_ATTRIBUTE type, void **value) {
+    if (!sf) {
+        return SF_STATUS_ERROR;
+    }
     clear_snowflake_error(&sf->error);
     //TODO Implement this
 }
@@ -451,6 +463,9 @@ void STDCALL snowflake_stmt_close(SNOWFLAKE_STMT *sfstmt) {
 
 SNOWFLAKE_STATUS STDCALL snowflake_bind_param(
     SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_BIND_INPUT *sfbind) {
+    if (!sfstmt) {
+        return SF_STATUS_ERROR;
+    }
     clear_snowflake_error(&sfstmt->error);
     if (sfstmt->params == NULL) {
         sfstmt->params = array_list_init();
@@ -461,6 +476,9 @@ SNOWFLAKE_STATUS STDCALL snowflake_bind_param(
 
 SNOWFLAKE_STATUS STDCALL snowflake_bind_result(
     SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_BIND_OUTPUT *sfbind) {
+    if (!sfstmt) {
+        return SF_STATUS_ERROR;
+    }
     clear_snowflake_error(&sfstmt->error);
     if (sfstmt->results == NULL) {
         sfstmt->results = array_list_init();
@@ -471,6 +489,9 @@ SNOWFLAKE_STATUS STDCALL snowflake_bind_result(
 
 SNOWFLAKE_STATUS STDCALL snowflake_query(
         SNOWFLAKE_STMT *sfstmt, const char *command) {
+    if (!sfstmt) {
+        return SF_STATUS_ERROR;
+    }
     clear_snowflake_error(&sfstmt->error);
     if (snowflake_prepare(sfstmt, command) != SF_STATUS_SUCCESS) {
         return SF_STATUS_ERROR;
@@ -482,6 +503,9 @@ SNOWFLAKE_STATUS STDCALL snowflake_query(
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_fetch(SNOWFLAKE_STMT *sfstmt) {
+    if (!sfstmt) {
+        return SF_STATUS_ERROR;
+    }
     clear_snowflake_error(&sfstmt->error);
     SNOWFLAKE_STATUS ret = SF_STATUS_ERROR;
     int64 i;
@@ -557,25 +581,40 @@ cleanup:
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_trans_begin(SNOWFLAKE *sf) {
+    if (!sf) {
+        return SF_STATUS_ERROR;
+    }
     clear_snowflake_error(&sf->error);
     return SF_STATUS_SUCCESS;
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_trans_commit(SNOWFLAKE *sf) {
+    if (!sf) {
+        return SF_STATUS_ERROR;
+    }
     clear_snowflake_error(&sf->error);
     return SF_STATUS_SUCCESS;
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_trans_rollback(SNOWFLAKE *sf) {
+    if (!sf) {
+        return SF_STATUS_ERROR;
+    }
     clear_snowflake_error(&sf->error);
     return SF_STATUS_SUCCESS;
 }
 
 int64 STDCALL snowflake_affected_rows(SNOWFLAKE_STMT *sfstmt) {
+    if (!sfstmt) {
+        return -1;
+    }
     return 0;
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_prepare(SNOWFLAKE_STMT *sfstmt, const char *command) {
+    if (!sfstmt) {
+        return SF_STATUS_ERROR;
+    }
     clear_snowflake_error(&sfstmt->error);
     SNOWFLAKE_STATUS ret = SF_STATUS_ERROR;
     size_t sql_text_size = 1; // Don't forget about null terminator
@@ -618,6 +657,9 @@ cleanup:
 }
 
 SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
+    if (!sfstmt) {
+        return SF_STATUS_ERROR;
+    }
     clear_snowflake_error(&sfstmt->error);
     SNOWFLAKE_STATUS ret = SF_STATUS_ERROR;
     SNOWFLAKE_JSON_ERROR json_error;
@@ -707,33 +749,55 @@ cleanup:
 }
 
 SNOWFLAKE_ERROR *STDCALL snowflake_error(SNOWFLAKE *sf) {
+    if (!sf) {
+        return NULL;
+    }
     return &sf->error;
 }
 
 SNOWFLAKE_ERROR *STDCALL snowflake_stmt_error(SNOWFLAKE_STMT *sfstmt) {
+    if (!sfstmt) {
+        return NULL;
+    }
     return &sfstmt->error;
 }
 
 uint64 STDCALL snowflake_num_rows(SNOWFLAKE_STMT *sfstmt) {
     // TODO fix int vs uint stuff
+    if (!sfstmt) {
+        // TODO change to -1?
+        return 0;
+    }
     return sfstmt->total_rowcount;
 }
 
 uint64 STDCALL snowflake_num_fields(SNOWFLAKE_STMT *sfstmt) {
     // TODO fix int vs uint stuff
+    if (!sfstmt) {
+        // TODO change to -1?
+        return 0;
+    }
     return sfstmt->total_fieldcount;
 }
 
 uint64 STDCALL snowflake_param_count(SNOWFLAKE_STMT *sfstmt) {
+    if (!sfstmt) {
+        // TODO change to -1?
+        return 0;
+    }
     return sfstmt->params->used;
 }
 
 const char *STDCALL snowflake_sfqid(SNOWFLAKE_STMT *sfstmt) {
-    // TODO check if sfstmt is NULL for ALL statement functions
+    if (!sfstmt) {
+        return NULL;
+    }
     return sfstmt->sfqid;
 }
 
 const char *STDCALL snowflake_sqlstate(SNOWFLAKE_STMT *sfstmt) {
-    // TODO check if sfstmt is NULL for ALL statement functions
+    if (!sfstmt) {
+        return NULL;
+    }
     return sfstmt->sqlstate;
 }

@@ -5,14 +5,16 @@ include_directories(
         "../include"
         "utils"
 )
-set(SOURCE_UTILS
-        example_setup.c)
 
 SET(EXAMPLES
         connect
         select1
         transaction
-        ping_pong)
+        ping_pong
+        error_handling)
+
+set(SOURCE_UTILS
+        example_setup.c)
 
 FOREACH(EX ${EXAMPLES})
     add_executable(ex_${EX} ${SOURCE_UTILS} ${EX}.c)

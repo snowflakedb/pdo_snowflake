@@ -23,14 +23,9 @@ script:
   - echo $SNOWFLAKE_TEST_SCHEMA
   - echo $SNOWFLAKE_TEST_WAREHOUSE
   - REPORT_COVERAGE=1 ./scripts/build_pdo_snowflake.sh
-  - echo $SNOWFLAKE_TEST_CA_BUNDLE_FILE
-  - echo $SNOWFLAKE_TEST_ACCOUNT
-  - echo $SNOWFLAKE_TEST_USER
-  - echo $SNOWFLAKE_TEST_DATABASE
-  - echo $SNOWFLAKE_TEST_SCHEMA
-  - echo $SNOWFLAKE_TEST_WAREHOUSE
-  - REPORT_EXIT_STATUS=1 NO_INTERACTION=true SNOWFLAKE_TEST_CA_BUNDLE_FILE=$SNOWFLAKE_TEST_CA_BUNDLE_FILE SNOWFLAKE_TEST_ACCOUNT=$SNOWFLAKE_TEST_ACCOUNT SNOWFLAKE_TEST_USER=$SNOWFLAKE_TEST_USER SNOWFLAKE_TEST_DATABASE=$SNOWFLAKE_TEST_DATABASE SNOWFLAKE_TEST_WAREHOUSE=$SNOWFLAKE_TEST_WAREHOUSE make test
-  - cat tests/*.log
+  - REPORT_EXIT_STATUS=1 NO_INTERACTION=true make test
+  - cat tests/*.log || true
+  - cat logs/*.txt || true
   - gcov -o .libs snowflake_driver.c snowflake_stmt.c
 after_success:
   - bash <(curl -s https://codecov.io/bash)

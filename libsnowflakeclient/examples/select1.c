@@ -41,7 +41,6 @@ int main() {
         }
         printf("result: %d\n", *((int *) c1.value));
     }
-    snowflake_stmt_close(sfstmt);
 
     // If we reached end of line, then we were successful
     if (status == SF_STATUS_EOL) {
@@ -49,6 +48,8 @@ int main() {
     }
 
 cleanup:
+    /* delete statement */
+    snowflake_stmt_close(sfstmt);
     /* disconnect */
     snowflake_close(sf);
 
