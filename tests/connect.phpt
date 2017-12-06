@@ -5,7 +5,6 @@ PDO_SNOWFLAKE:
     $host = getenv('SNOWFLAKE_TEST_HOST');
     $port = getenv('SNOWFLAKE_TEST_PORT');
     $account = getenv('SNOWFLAKE_TEST_ACCOUNT');
-    echo "acount is: $account";
     $user = getenv('SNOWFLAKE_TEST_USER');
     $password = getenv('SNOWFLAKE_TEST_PASSWORD');
     $database = getenv('SNOWFLAKE_TEST_DATABASE');
