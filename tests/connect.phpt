@@ -11,9 +11,8 @@ PDO_SNOWFLAKE:
     $schema = getenv('SNOWFLAKE_TEST_SCHEMA');
     $warehouse = getenv('SNOWFLAKE_TEST_WAREHOUSE');
     $role = getenv('SNOWFLAKE_TEST_ROLE');
-    $protocol = getenv('SNOWFLAKE_TEST_PROTOCOL');
     $insecure_mode = (bool) getenv('SNOWFLAKE_TEST_INSECURE_MODE');
-    $dsn = "snowflake:host=$host;port=$port;account=$account;database=$database;schema=$schema;warehouse=$warehouse;role=$role;protocol=$protocol";
+    $dsn = "snowflake:host=$host;port=$port;account=$account;database=$database;schema=$schema;warehouse=$warehouse;role=$role";
     $ca_bundle_file = getenv('SNOWFLAKE_TEST_CA_BUNDLE_FILE');
     $options = array(PDO::SNOWFLAKE_ATTR_SSL_CAPATH => $ca_bundle_file);
     try {
