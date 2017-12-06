@@ -76,11 +76,10 @@ sf_bool STDCALL log_init() {
     // Set logging level
     if (DEBUG) {
         log_set_quiet(SF_BOOLEAN_FALSE);
-        log_set_level(LOG_TRACE);
     } else {
         log_set_quiet(SF_BOOLEAN_TRUE);
-        log_set_level(LOG_INFO);
     }
+    log_set_level(LOG_TRACE);
     // If log path is specified, use absolute path. Otherwise set logging dir to be relative to current directory
     if (sf_log_path) {
         log_path_size += strlen(sf_log_path);
@@ -281,19 +280,26 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
 
     // Send request and get data
     if (request(sf, &resp, SESSION_URL, url_params, 5, s_body, NULL, POST_REQUEST_TYPE, &sf->error)) {
-        s_resp = cJSON_Print(resp);
-        log_trace("Here is JSON response:\n%s", s_resp);
+        if (DEBUG) {
+            s_resp = cJSON_Print(resp);
+            log_trace("Here is JSON response:\n%s", s_resp);
+        }
         data = cJSON_GetObjectItem(resp, "data");
         // Get token
         if (json_copy_string(&sf->token, data, "token")) {
             log_error("No valid token found in response");
+            SET_SNOWFLAKE_ERROR(&sf->error, SF_ERROR_BAD_JSON, "Cannot find valid session token in response", "");
+            goto cleanup;
         }
         // Get master token
         if (json_copy_string(&sf->master_token, data, "masterToken")) {
             log_error("No valid master token found in response");
+            SET_SNOWFLAKE_ERROR(&sf->error, SF_ERROR_BAD_JSON, "Cannot find valid master token in response", "");
+            goto cleanup;
         }
     } else {
         log_error("No response");
+        SET_SNOWFLAKE_ERROR(&sf->error, SF_ERROR_BAD_JSON, "No valid JSON response", "");
         goto cleanup;
     }
 
