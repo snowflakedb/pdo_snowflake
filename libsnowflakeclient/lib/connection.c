@@ -327,8 +327,8 @@ char * encode_url(CURL *curl,
                   int num_args,
                   SNOWFLAKE_ERROR *error) {
     int i;
-    sf_bool host_empty = (host && strcmp(host, "") != 0) ? SF_BOOLEAN_FALSE : SF_BOOLEAN_TRUE;
-    sf_bool port_empty = (port && strcmp(port, "") != 0) ? SF_BOOLEAN_FALSE : SF_BOOLEAN_TRUE;
+    sf_bool host_empty = is_string_empty(host);
+    sf_bool port_empty = is_string_empty(port);
     const char *format;
     char *encoded_url = NULL;
     // Size used for the url format
@@ -412,6 +412,10 @@ cleanup:
     }
 
     return encoded_url;
+}
+
+sf_bool is_string_empty(const char *str) {
+    return (str && strcmp(str, "") != 0) ? SF_BOOLEAN_FALSE : SF_BOOLEAN_TRUE;
 }
 
 SNOWFLAKE_JSON_ERROR STDCALL json_copy_string(char **dest, cJSON *data, const char *item) {

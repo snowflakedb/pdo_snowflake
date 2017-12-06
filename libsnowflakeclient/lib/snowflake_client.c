@@ -266,7 +266,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
     };
     SNOWFLAKE_STATUS ret = SF_STATUS_ERROR;
 
-    if(!sf->user || !sf->account) {
+    if(is_string_empty(sf->user) || is_string_empty(sf->account)) {
         // Invalid connection
         log_error("Missing essential connection parameters. Either user or account (or both) are missing");
         SET_SNOWFLAKE_ERROR(&sf->error,
@@ -675,7 +675,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
     URL_KEY_VALUE url_params[] = {
             {"requestId=", sfstmt->request_id, NULL, NULL, 0, 0}
     };
-    if (sfstmt->connection->token == NULL || sfstmt->connection->master_token == NULL) {
+    if (is_string_empty(sfstmt->connection->master_token) || is_string_empty(sfstmt->connection->token)) {
         log_error("Missing session token or Master token. Are you sure that snowflake_connect was successful?");
         SET_SNOWFLAKE_ERROR(&sfstmt->error, SF_ERROR_BAD_CONNECTION_PARAMS,
                             "Missing session or master token. Try running snowflake_connect.", "");

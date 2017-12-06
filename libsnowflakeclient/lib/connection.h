@@ -122,6 +122,7 @@ char * STDCALL encode_url(CURL *curl,
                           URL_KEY_VALUE* vars,
                           int num_args,
                           SNOWFLAKE_ERROR *error);
+sf_bool is_string_empty(const char * str);
 SNOWFLAKE_JSON_ERROR STDCALL json_copy_bool(sf_bool *dest, cJSON *data, const char *item);
 SNOWFLAKE_JSON_ERROR STDCALL json_copy_int(int64 *dest, cJSON *data, const char *item);
 
