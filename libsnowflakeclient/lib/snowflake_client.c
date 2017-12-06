@@ -268,6 +268,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
 
     if(!sf->user || !sf->account) {
         // Invalid connection
+        log_error("Missing essential connection parameters. Either user or account (or both) are missing");
         SET_SNOWFLAKE_ERROR(&sf->error,
                             SF_ERROR_BAD_CONNECTION_PARAMS,
                             "Missing essential connection parameters. Either user or account (or both) are missing",
