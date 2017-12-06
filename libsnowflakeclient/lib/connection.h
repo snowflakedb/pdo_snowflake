@@ -115,6 +115,7 @@ sf_bool STDCALL curl_get_call(SNOWFLAKE *sf,
 uint32 decorrelate_jitter_next_sleep(DECORRELATE_JITTER_BACKOFF *djb, uint32 sleep);
 char * STDCALL encode_url(CURL *curl,
                           const char *protocol,
+                          const char *account,
                           const char *host,
                           const char *port,
                           const char *url,
@@ -128,7 +129,6 @@ SNOWFLAKE_JSON_ERROR STDCALL json_copy_string(char **dest, cJSON *data, const ch
 SNOWFLAKE_JSON_ERROR STDCALL json_copy_string_no_alloc(char *dest, cJSON *data, const char *item, size_t dest_size);
 SNOWFLAKE_JSON_ERROR STDCALL json_detach_array_from_object(cJSON **dest, cJSON *data, const char *item);
 SNOWFLAKE_JSON_ERROR STDCALL json_detach_array_from_array(cJSON **dest, cJSON *data, int index);
-const char *STDCALL json_error_to_string(SNOWFLAKE_JSON_ERROR error);
 size_t json_resp_cb(char *data, size_t size, size_t nmemb, RAW_JSON_BUFFER *raw_json);
 sf_bool STDCALL http_perform(SNOWFLAKE *sf,
                              CURL *curl,

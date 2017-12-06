@@ -319,6 +319,7 @@ uint32 decorrelate_jitter_next_sleep(DECORRELATE_JITTER_BACKOFF *djb, uint32 sle
 
 char * encode_url(CURL *curl,
                   const char *protocol,
+                  const char *account,
                   const char *host,
                   const char *port,
                   const char *url,
@@ -329,12 +330,37 @@ char * encode_url(CURL *curl,
     const char *format = "%s://%s:%s%s";
     char *encoded_url = NULL;
     // Size used for the url format
-    size_t base_url_size;
+    size_t base_url_size = 1; //Null terminator
     // Size used to determine buffer size
     size_t encoded_url_size;
     int bytes_written;
-    // Null terminator plus format contains 4 hardcoded characters
-    base_url_size = 5 + strlen(protocol) + strlen(host) + strlen(port) + strlen(url);
+    // Set proper format based on variables passed into encode URL. 
+    // The format includes format specifiers that will be consumed by empty fields 
+    // (i.e if port is empty, add an extra specifier so that we have 1 call to snprintf, vs. 4 different calls)
+    // Format specifier order is protocol, then account, then host, then port, then url.
+    if (port && host) {
+        format = "%s://%s%s:%s%s";
+        base_url_size += 4;
+        // Set account to an empty string since host overwrites account
+        account = "";
+    } else if(!port && host) {
+        format = "%s://%s%s%s%s";
+        base_url_size += 3;
+        port = "";
+        // Set account to an empty string since host overwrites account
+        account = "";
+    } else if(port && !host) {
+        format = "%s://%s.%s:%s%s";
+        base_url_size += 5;
+        host = DEFAULT_SNOWFLAKE_BASE_URL;
+    } else {
+        format = "%s://%s.%s%s%s";
+        base_url_size += 4;
+        host = DEFAULT_SNOWFLAKE_BASE_URL;
+        port = "";
+    }
+    base_url_size += strlen(protocol) + strlen(account) + strlen(host) + strlen(port) + strlen(url);
+
     encoded_url_size = base_url_size;
     // Encode URL parameters and set size info
     for (i = 0; i < num_args; i++) {
@@ -355,7 +381,7 @@ char * encode_url(CURL *curl,
         SET_SNOWFLAKE_ERROR(error, SF_ERROR_OUT_OF_MEMORY, "Ran out of memory trying to create encoded url", "");
         goto cleanup;
     }
-    bytes_written = snprintf(encoded_url, base_url_size, format, protocol, host, port, url);
+    bytes_written = snprintf(encoded_url, base_url_size, format, protocol, account, host, port, url);
 
     if (bytes_written < 0 || bytes_written >= encoded_url_size) {
         log_warn("Encoded url was not properly constructed. Expected size: %zu     Actual Size: %i",
@@ -723,7 +749,7 @@ sf_bool STDCALL request(SNOWFLAKE *sf,
             log_debug("Created header");
         }
 
-        encoded_url = encode_url(curl, sf->protocol, sf->host, sf->port, url, url_params, num_url_params, error);
+        encoded_url = encode_url(curl, sf->protocol, sf->account, sf->host, sf->port, url, url_params, num_url_params, error);
         if (encoded_url == NULL) {
             goto cleanup;
         }

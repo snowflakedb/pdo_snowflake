@@ -14,9 +14,6 @@ void initialize_snowflake_example(sf_bool debug) {
 SNOWFLAKE *setup_snowflake_connection() {
     SNOWFLAKE *sf = snowflake_init();
 
-    snowflake_set_attr(sf, SF_CON_PROTOCOL, getenv("SNOWFLAKE_TEST_PROTOCOL"));
-    snowflake_set_attr(sf, SF_CON_HOST, getenv("SNOWFLAKE_TEST_HOST"));
-    snowflake_set_attr(sf, SF_CON_PORT, getenv("SNOWFLAKE_TEST_PORT"));
     snowflake_set_attr(sf, SF_CON_ACCOUNT, getenv("SNOWFLAKE_TEST_ACCOUNT"));
     snowflake_set_attr(sf, SF_CON_USER, getenv("SNOWFLAKE_TEST_USER"));
     snowflake_set_attr(sf, SF_CON_PASSWORD, getenv("SNOWFLAKE_TEST_PASSWORD"));

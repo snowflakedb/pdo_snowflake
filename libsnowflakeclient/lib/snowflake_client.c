@@ -36,6 +36,7 @@ static FILE *LOG_FP = NULL;
 void alloc_buffer_and_copy(char **var, const char *str) {
     size_t str_size;
     SF_FREE(*var);
+    // If passed in string is null, then return since *var is already null from being freed
     if (str) {
         str_size = strlen(str) + 1; // For null terminator
         *var = (char *) SF_CALLOC(1, str_size);
