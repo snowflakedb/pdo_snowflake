@@ -5,34 +5,22 @@ include_directories(
         "../include"
         "utils"
 )
+
+SET(EXAMPLES
+        connect
+        select1
+        transaction
+        ping_pong
+        stmt_with_bad_connect)
+
 set(SOURCE_UTILS
         example_setup.c)
 
-add_executable(ex_connect ${SOURCE_UTILS} connect.c)
-add_executable(ex_select1 ${SOURCE_UTILS} select1.c)
-add_executable(ex_transaction ${SOURCE_UTILS} transaction.c)
-add_executable(ex_ping_pong ${SOURCE_UTILS} ping_pong.c)
-
-target_link_libraries(
-        ex_connect
-        snowflakeclient
-        -Wl,--whole-archive curl ssl crypto -Wl,--no-whole-archive
-)
-
-target_link_libraries(
-        ex_select1
-        snowflakeclient
-        -Wl,--whole-archive curl ssl crypto -Wl,--no-whole-archive
-)
-
-target_link_libraries(
-        ex_transaction
-        snowflakeclient
-        -Wl,--whole-archive curl ssl crypto -Wl,--no-whole-archive
-)
-
-target_link_libraries(
-        ex_ping_pong
-        snowflakeclient
-        -Wl,--whole-archive curl ssl crypto -Wl,--no-whole-archive
-)
+FOREACH(EX ${EXAMPLES})
+    add_executable(ex_${EX} ${SOURCE_UTILS} ${EX}.c)
+    target_link_libraries(
+            ex_${EX}
+            snowflakeclient
+            -Wl,--whole-archive curl ssl crypto -Wl,--no-whole-archive
+    )
+ENDFOREACH()

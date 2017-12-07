@@ -36,7 +36,8 @@ SNOWFLAKE_TYPE string_to_snowflake_type(const char *string) {
     } else if (strcmp(string, "boolean") == 0) {
         return SF_TYPE_BOOLEAN;
     } else {
-        // TODO default type case
+        // Everybody loves a string, so lets return it by default
+        return SF_TYPE_TEXT;
     }
 }
 
@@ -92,8 +93,8 @@ SNOWFLAKE_C_TYPE snowflake_to_c_type(SNOWFLAKE_TYPE type, int64 precision, int64
             type == SF_TYPE_ARRAY) {
         return SF_C_TYPE_STRING;
     } else {
-        // TODO better default case
-        return 0;
+        // by default return string, since we can do everything with a string
+        return SF_C_TYPE_STRING;
     }
 }
 
@@ -113,7 +114,6 @@ SNOWFLAKE_TYPE c_type_to_snowflake(SNOWFLAKE_C_TYPE c_type, SNOWFLAKE_TYPE tsmod
             return SF_TYPE_TEXT;
         case SF_C_TYPE_TIMESTAMP:
             return tsmode;
-        // TODO better default case
         default:
             return SF_TYPE_TEXT;
     }
@@ -122,6 +122,7 @@ SNOWFLAKE_TYPE c_type_to_snowflake(SNOWFLAKE_C_TYPE c_type, SNOWFLAKE_TYPE tsmod
 char *value_to_string(void *value, SNOWFLAKE_C_TYPE c_type) {
     size_t size;
     char *ret;
+    // TODO turn cases into macro and check to see if ret if null
     switch (c_type) {
         case SF_C_TYPE_INT8:
             size = (size_t) snprintf( NULL, 0, "%d", *(int8 *) value) + 1;
@@ -178,22 +179,22 @@ SNOWFLAKE_COLUMN_DESC ** set_description(const cJSON *rowtype) {
     for (i = 0; i < array_size; i++) {
         column = cJSON_GetArrayItem(rowtype, i);
         desc[i] = (SNOWFLAKE_COLUMN_DESC *) SF_CALLOC(1, sizeof(SNOWFLAKE_COLUMN_DESC));
-        if(!json_copy_string(&desc[i]->name, column, "name")) {
+        if(json_copy_string(&desc[i]->name, column, "name")) {
             desc[i]->name = NULL;
         }
-        if (!json_copy_int(&desc[i]->byte_size, column, "byteLength")) {
+        if (json_copy_int(&desc[i]->byte_size, column, "byteLength")) {
             desc[i]->byte_size = 0;
         }
-        if (!json_copy_int(&desc[i]->internal_size, column, "length")) {
+        if (json_copy_int(&desc[i]->internal_size, column, "length")) {
             desc[i]->internal_size = 0;
         }
-        if (!json_copy_int(&desc[i]->precision, column, "precision")) {
+        if (json_copy_int(&desc[i]->precision, column, "precision")) {
             desc[i]->precision = 0;
         }
-        if (!json_copy_int(&desc[i]->scale, column, "scale")) {
+        if (json_copy_int(&desc[i]->scale, column, "scale")) {
             desc[i]->scale = 0;
         }
-        if (!json_copy_bool(&desc[i]->null_ok, column, "nullable")) {
+        if (json_copy_bool(&desc[i]->null_ok, column, "nullable")) {
             desc[i]->null_ok = SF_BOOLEAN_FALSE;
         }
         // Get type

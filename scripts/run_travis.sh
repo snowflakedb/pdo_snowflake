@@ -24,6 +24,7 @@ if ! make test; then
     echo "Test Failed"
     ls -l tests
     for f in $(ls tests/*); do echo "===> $f"; cat $f; echo; done
+    cat logs/*.txt || true
     exit 1
 else
     gcov -o .libs snowflake_driver.c snowflake_stmt.c
