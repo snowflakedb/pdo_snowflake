@@ -14,11 +14,10 @@ eval $(jq -r '.testconnection | to_entries | map("export \(.key)=\(.value|tostri
 echo "PHP_HOME:   $PHP_HOME"
 echo "phpize:     $(which phpize)"
 echo "php-config: $(which php-config)"
-REPORT_COVERAGE=1 $DIR/build_pdo_snowflake.sh
+REPORT_COVERAGE=1 $DIR/build_pdo_snowflake.sh -r
 export REPORT_EXIT_STATUS=1
 export NO_INTERACTION=true
 echo "===> Test parameters"
-env | grep SNOWFLAKE_TEST > $DIR/../testenv.ini
 cat $DIR/../testenv.ini | grep -v PASSWORD
 echo "===> Running Tests"
 if ! make test; then
