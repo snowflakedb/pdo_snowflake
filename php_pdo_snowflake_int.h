@@ -3,11 +3,32 @@
 #ifndef PHP_PDO_SNOWFLAKE_INT_H
 #define PHP_PDO_SNOWFLAKE_INT_H
 
-#include "libsnowflakeclient/include/snowflake_client.h"
+#include <snowflake_client.h>
 
+#if 1
+#define PDO_DBG_ENABLED 1
+
+#define PDO_DBG_INF(...) pdo_snowflake_log(__LINE__, __FILE__, "info", __VA_ARGS__)
+#define PDO_DBG_ERR(...) pdo_snowflake_log(__LINE__, __FILE__, "error", __VA_ARGS__)
+#define PDO_DBG_ENTER(func_name) pdo_snowflake_log(__LINE__, __FILE__, "enter", func_name)
+#define PDO_DBG_RETURN(value)	do { pdo_snowflake_log(__LINE__, __FILE__, "return", ""); return (value); } while (0)
+#define PDO_DBG_VOID_RETURN(value)	do { pdo_snowflake_log(__LINE__, __FILE__, "return", ""); return; } while (0)
+#else
+#define PDO_DBG_ENABLED 0
+static inline void PDO_DBG_INF(char *format, ...) {}
+static inline void PDO_DBG_ERR(char *format, ...) {}
+static inline void PDO_DBG_ENTER(char *func_name) {}
 #define PDO_DBG_RETURN(value)	return (value)
+#define PDO_DBG_VOID_RETURN		return;
+#endif
 
+/**
+ * Snowflake module global variables.
+ */
 ZEND_BEGIN_MODULE_GLOBALS(pdo_snowflake)
+#if PDO_DBG_ENABLED
+  char          *debug; /* The actual string */
+#endif
 ZEND_END_MODULE_GLOBALS(pdo_snowflake)
 
 ZEND_EXTERN_MODULE_GLOBALS(pdo_snowflake)
@@ -27,7 +48,13 @@ typedef struct {
 
 typedef struct {
 	pdo_snowflake_db_handle *H;
-	SNOWFLAKE_STMT *stmt;
+	SNOWFLAKE_STMT          *stmt;
+	int64                   num_params;
+	SNOWFLAKE_BIND_INPUT    *params;
+	SNOWFLAKE_BIND_OUTPUT   *bound_result;
+	sf_bool					        *out_null;
+	zend_ulong				      *out_length;
+  void                   **data;
 } pdo_snowflake_stmt;
 
 extern pdo_driver_t pdo_snowflake_driver;
@@ -41,5 +68,8 @@ enum {
 	PDO_SNOWFLAKE_ATTR_SSL_VERSION,
 	PDO_SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS
 };
+
+/* TODO: adhoc logger until Snowflake Client provides it. */
+extern void pdo_snowflake_log(int line, const char* filename, const char* severity, char *fmt, ...);
 
 #endif /* PHP_PDO_SNOWFLAKE_INT_H */
