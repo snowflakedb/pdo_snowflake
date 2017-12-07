@@ -562,11 +562,8 @@ SNOWFLAKE_STATUS STDCALL snowflake_fetch(SNOWFLAKE_STMT *sfstmt) {
             } else if (result->type == SF_C_TYPE_FLOAT64) {
                 *(float64 *) result->value = (float64) strtod(raw_result->valuestring, NULL);
             } else if (result->type == SF_C_TYPE_STRING) {
+                /* copy original data as is except Date/Time/Timestamp/Binary type */
                 strncpy(result->value, raw_result->valuestring, result->max_length);
-                // If string is not null terminated, then add the terminator yourself
-                if (((char *) result->value)[result->max_length - 1] != '\0') {
-                    ((char *) result->value)[result->max_length - 1] = '\0';
-                }
             } else if (result->type == SF_C_TYPE_TIMESTAMP) {
                 // TODO Do some timestamp stuff here
             } else {
