@@ -13,13 +13,13 @@ PDO_SNOWFLAKE:
     $role = $p['SNOWFLAKE_TEST_ROLE'];
 
     if (array_key_exists('SNOWFLAKE_TEST_HOST', $p)) {
-        $host = getenv('SNOWFLAKE_TEST_HOST');
+        $host = $p['SNOWFLAKE_TEST_HOST'];
     } else {
         $host = $account . ".snowflakecomputing.com";
     }
     $port = "443";
     if (array_key_exists('SNOWFLAKE_TEST_PORT', $p)) {
-        $port = getenv('SNOWFLAKE_TEST_PORT');
+        $port = $p['SNOWFLAKE_TEST_PORT'];
     }
     $protocol="https";
     if (array_key_exists('SNOWFLAKE_TEST_PROTOCOL', $p)) {
@@ -28,7 +28,7 @@ PDO_SNOWFLAKE:
 
     $dsn = "snowflake:host=$host;port=$port;account=$account;database=$database;schema=$schema;warehouse=$warehouse;role=$role;protocol=$protocol";
 
-    $ca_bundle_file = getenv('SNOWFLAKE_TEST_CA_BUNDLE_FILE');
+    $ca_bundle_file = $p['SNOWFLAKE_TEST_CA_BUNDLE_FILE'];
     $options = array(PDO::SNOWFLAKE_ATTR_SSL_CAPATH => $ca_bundle_file);
     try {
         $dbh = new PDO($dsn, $user, $password, $options);
