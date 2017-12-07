@@ -21,14 +21,12 @@ static int pdo_snowflake_stmt_dtor(pdo_stmt_t *stmt) /* {{{ */
 {
   PDO_DBG_ENTER("pdo_snowflake_stmt_dtor");
   pdo_snowflake_stmt *S = stmt->driver_data;
-  pdo_snowflake_db_handle *H = S->H;
 
   if (S->bound_params)
   {
     efree(S->bound_params);
   }
-  S->bound_params = NULL;
-
+  PDO_DBG_INF("COUNT: %d", stmt->column_count);
   if (S->bound_result)
   {
     int i;
@@ -40,8 +38,10 @@ static int pdo_snowflake_stmt_dtor(pdo_stmt_t *stmt) /* {{{ */
     /* free the array of results */
     efree(S->bound_result);
   }
-  S->bound_result = NULL;
 
+  snowflake_stmt_close(S->stmt);
+  efree(S);
+  stmt->driver_data = NULL;
   PDO_DBG_RETURN(1);
 }
 /* }}} */
