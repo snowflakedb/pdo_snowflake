@@ -2,7 +2,7 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
-#include "example_setup.h"
+#include <example_setup.h>
 
 void initialize_snowflake_example(sf_bool debug) {
     snowflake_global_init();

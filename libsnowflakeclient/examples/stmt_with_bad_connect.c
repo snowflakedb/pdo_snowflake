@@ -13,28 +13,7 @@ int main() {
     /* init */
     SNOWFLAKE_STATUS status;
     initialize_snowflake_example(SF_BOOLEAN_FALSE);
-    SNOWFLAKE *sf = NULL;
-
-    // Try connecting with a NULL connection struct, should fail
-    status = snowflake_connect(sf);
-    if (status != SF_STATUS_SUCCESS) {
-        printf("Connecting to snowflake failed\n");
-    } else {
-        fprintf(stderr, "Connecting to snowflake succeeded...exiting");
-        goto cleanup;
-    }
-
-    // Try to connect with empty connection struct, should fail
-    sf = snowflake_init();
-    status = snowflake_connect(sf);
-    if (status != SF_STATUS_SUCCESS) {
-        printf("Connecting to snowflake failed\n");
-        SNOWFLAKE_ERROR *error = snowflake_error(sf);
-        printf("Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
-    } else {
-        fprintf(stderr, "Connecting to snowflake succeeded...exiting");
-        goto cleanup;
-    }
+    SNOWFLAKE *sf = snowflake_init();
 
     /* query, try running a query with a connection struct that has not connected */
     SNOWFLAKE_STMT *sfstmt = snowflake_stmt(sf);
@@ -47,9 +26,8 @@ int main() {
     snowflake_prepare(sfstmt, "select 1;");
     status = snowflake_execute(sfstmt);
     if (status != SF_STATUS_SUCCESS) {
-        printf("Running query to snowflake failed\n");
         SNOWFLAKE_ERROR *error = snowflake_stmt_error(sfstmt);
-        printf("Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
+        printf("OK, running query to snowflake failed. Error message: %s. In File, %s, Line, %d\n", error->msg, error->file, error->line);
     } else {
         fprintf(stderr, "Running query succeeded...exiting");
         goto cleanup;
@@ -62,8 +40,9 @@ int main() {
     status = snowflake_connect(sf);
     if (status != SF_STATUS_SUCCESS) {
         SNOWFLAKE_ERROR *error = snowflake_error(sf);
+        fprintf(stderr, "Failed connecting with minimum parameters set.\n");
         fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
-        printf("Failed connecting with minimum parameters set.\n");
+        
     } else {
         printf("OK, connected with just account, user, password\n");
     }
@@ -72,8 +51,8 @@ int main() {
     status = snowflake_execute(sfstmt);
     if (status != SF_STATUS_SUCCESS) {
         SNOWFLAKE_ERROR *error = snowflake_stmt_error(sfstmt);
+        fprintf(stderr, "Failed running query with connect snowflake object.\n");
         fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
-        printf("Failed running query with connect snowflake object.\n");
     } else {
         printf("OK, query executed successfully\n");
     }
