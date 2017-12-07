@@ -9,6 +9,7 @@ install:
   - sudo apt-get update
   - sudo apt-get install lcov
 script:
+<<<<<<< HEAD
   - export PHP_HOME=$( cd "$(dirname $(which php))" && cd .. && pwd )
   - export LIB_SNOWFLAKE_CLIENT_DIR=$(cd ./libsnowflakeclient && pwd)
   - export SNOWFLAKE_TEST_CA_BUNDLE_FILE=$LIB_SNOWFLAKE_CLIENT_DIR/cacert.pem
@@ -27,6 +28,9 @@ script:
   - cat tests/*.log || true
   - cat logs/*.txt || true
   - gcov -o .libs snowflake_driver.c snowflake_stmt.c
+=======
+  - ./scripts/run_travis.sh
+>>>>>>> master
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 env:
