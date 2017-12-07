@@ -287,10 +287,8 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
 
     // Send request and get data
     if (request(sf, &resp, SESSION_URL, url_params, 5, s_body, NULL, POST_REQUEST_TYPE, &sf->error)) {
-        if (DEBUG) {
-            s_resp = cJSON_Print(resp);
-            log_trace("Here is JSON response:\n%s", s_resp);
-        }
+        s_resp = cJSON_Print(resp);
+        log_trace("Here is JSON response:\n%s", s_resp);
         data = cJSON_GetObjectItem(resp, "data");
         // Get token
         if (json_copy_string(&sf->token, data, "token")) {
