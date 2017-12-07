@@ -7,6 +7,7 @@ extern zend_module_entry pdo_snowflake_module_entry;
 #define phpext_pdo_snowflake_ptr &pdo_snowflake_module_entry
 
 #include "php_version.h"
+
 #define PHP_PDO_SNOWFLAKE_VERSION PHP_VERSION
 
 #ifdef PHP_WIN32
