@@ -50,11 +50,10 @@ typedef struct {
 	pdo_snowflake_db_handle *H;
 	SNOWFLAKE_STMT          *stmt;
 	int64                   num_params;
-	SNOWFLAKE_BIND_INPUT    *params;
+	SNOWFLAKE_BIND_INPUT    *bound_params;
 	SNOWFLAKE_BIND_OUTPUT   *bound_result;
 	sf_bool					        *out_null;
 	zend_ulong				      *out_length;
-  void                   **data;
 } pdo_snowflake_stmt;
 
 extern pdo_driver_t pdo_snowflake_driver;
