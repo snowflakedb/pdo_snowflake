@@ -27,10 +27,25 @@ ZEND_GET_MODULE(pdo_snowflake)
 */
 PHP_INI_BEGIN()
 #if PDO_DBG_ENABLED
-	STD_PHP_INI_ENTRY("pdo_snowflake.debug",	NULL, PHP_INI_SYSTEM, debug)
+		STD_PHP_INI_ENTRY("pdo_snowflake.debug",	NULL, PHP_INI_SYSTEM, OnUpdateString, debug, zend_pdo_snowflake_globals, pdo_snowflake_globals)
 #endif
 PHP_INI_END()
 /* }}} */
+
+/* TODO: adhoc logger until Snowflake client provides it. */
+void pdo_snowflake_log(int line, const char* filename, const char* severity, char *fmt, ...)
+{
+  va_list args;
+  va_start (args, fmt);
+
+  FILE* fp = fopen("/tmp/php.log", "a");
+  fprintf(fp, "[%-6s] %-70s:%5d - ", severity, filename, line);
+  vfprintf (fp, fmt, args);
+  fprintf(fp, "\n");
+  fclose(fp);
+
+  va_end (args);
+}
 
 /* {{{ PHP_MINIT_FUNCTION
  */
@@ -81,6 +96,9 @@ static PHP_GINIT_FUNCTION(pdo_snowflake)
 #if defined(COMPILE_DL_PDO_SNOWFLAKE) && defined(ZTS)
 ZEND_TSRMLS_CACHE_UPDATE();
 #endif
+#endif
+#if PDO_DBG_ENABLED
+	pdo_snowflake_globals->debug = NULL;	/* The actual string */
 #endif
 }
 /* }}} */

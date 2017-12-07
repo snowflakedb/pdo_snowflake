@@ -26,8 +26,15 @@ static int pdo_snowflake_fetch_error_func(pdo_dbh_t *dbh, pdo_stmt_t *stmt, zval
 }
 /* }}} */
 
+/**
+ * Close an open database.
+ *
+ * @param dbh Pointer to the database handle initialized by the handle factory
+ * @return 1 if success or 0 if error occurs
+ */
 static int snowflake_handle_closer(pdo_dbh_t *dbh) /* {{{ */
 {
+    PDO_DBG_ENTER("snowflake_handle_closer");
     pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *)dbh->driver_data;
 
     if (H) {
@@ -38,21 +45,54 @@ static int snowflake_handle_closer(pdo_dbh_t *dbh) /* {{{ */
         pefree(H, dbh->is_persistent);
         dbh->driver_data = NULL;
     }
-    snowflake_global_term();
+    snowflake_global_term(); // TODO: should be one time per process
     PDO_DBG_RETURN(1);
 }
 /* }}} */
 
+/**
+ * Prepare raw SQL for execution, storing whatever state is appropriate into
+ * the stmt that is passed in called by PDO in response to PDO::query() and
+ * PDO::prepare()
+ *
+ * This function is essentially the constructor for a stmt object. This
+ * function is responsible for processing statement options, and setting
+ * driver-specific option fields in the pdo_stmt_t structure.
+ *
+ * PDO does not process any statement options on the driver's behalf before
+ * calling the preparer function. It is your responsibility to process them
+ * before you return, raising an error for any unknown options that are passed.
+ *
+ * One very important responsibility of this function is the processing of
+ * SQL statement parameters. At the time of this call, PDO does not know if
+ * your driver supports binding parameters into prepared statements, nor does
+ * it know if it supports named or positional parameter naming conventions.
+ *
+ * Your driver is responsible for setting stmt->supports_placeholders as
+ * appropriate for the underlying database. This may involve some run-time
+ * determination on the part of your driver, if this setting depends on the
+ * version of the database server to which it is connected. If your driver
+ * doesn't directly support both named and positional parameter conventions,
+ * you should use the pdo_parse_params() API to have PDO rewrite the query to
+ * take advantage of the support provided by your database.
+ *
+ * @param dbh Pointer to the database handle initialized by the handle factory
+ * @param sql Pointer to a character string containing the SQL statement to be prepared.
+ * @param sql_len The length of the SQL statement.
+ * @param stmt Pointer to the returned statement or NULL if an error occurs.
+ * @param driver_options Any driver specific/defined options.
+ * @return 1 if success or 0 if error occurs
+ */
 static int snowflake_handle_preparer(pdo_dbh_t *dbh, const char *sql, size_t sql_len, pdo_stmt_t *stmt, zval *driver_options) /* {{{ */
 {
+    PDO_DBG_ENTER("snowflake_handle_preparer");
+    PDO_DBG_INF("dbh=%p", dbh);
+    PDO_DBG_INF("sql=%.*s", (int)sql_len, sql);
     pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *)dbh->driver_data;
     pdo_snowflake_stmt *S = ecalloc(1, sizeof(pdo_snowflake_stmt));
     char *nsql = NULL;
     size_t nsql_len = 0;
     int ret;
-//    PDO_DBG_ENTER("mysql_handle_preparer");
-//    PDO_DBG_INF_FMT("dbh=%p", dbh);
-//    PDO_DBG_INF_FMT("sql=%.*s", (int)sql_len, sql);
 
     // TODO Add debugging info stuff
 
@@ -88,24 +128,10 @@ static int snowflake_handle_preparer(pdo_dbh_t *dbh, const char *sql, size_t sql
         }
         PDO_DBG_RETURN(0);
     }
+
     if (nsql) {
         efree(nsql);
     }
-
-    //TODO find out if I really need the code below. Don't think so, but maybe
-
-//    S->num_params = mysql_stmt_param_count(S->stmt);
-//
-//    if (S->num_params) {
-//        S->params_given = 0;
-//#if defined(PDO_USE_MYSQLND)
-//        S->params = NULL;
-//#else
-//        S->params = ecalloc(S->num_params, sizeof(MYSQL_BIND));
-//		S->in_null = ecalloc(S->num_params, sizeof(my_bool));
-//		S->in_length = ecalloc(S->num_params, sizeof(zend_ulong));
-//#endif
-//    }
     dbh->alloc_own_columns = 1;
 
     PDO_DBG_RETURN(1);
@@ -120,8 +146,17 @@ end:
 }
 /* }}} */
 
+/**
+ * Execute a raw SQL statement. No pdo_stmt_t is created.
+ *
+ * @param dbh Pointer to the database handle initialized by the handle factory
+ * @param sql Pointer to a character string containing the SQL statement to be prepared.
+ * @param sql_len The length of the SQL statement.
+ * @return 1 if success or 0 if error occurs
+ */
 static zend_long snowflake_handle_doer(pdo_dbh_t *dbh, const char *sql, size_t sql_len) /* {{{ */
 {
+    PDO_DBG_ENTER("snowflake_handle_doer");
     int ret = 0;
     pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *)dbh->driver_data;
 
@@ -152,58 +187,118 @@ cleanup:
 }
 /* }}} */
 
+/**
+ * Retrieve the ID of the last inserted row.
+ *
+ * Not implemented as Snowflake doesn't support the last inserted ID.
+ * @param dbh Pointer to the database handle initialized by the handle factory
+ * @param name string representing a table or sequence name.
+ * @param len the length of the name parameter.
+ * @return 1 if success or 0 if error occurs
+ */
 static char *pdo_snowflake_last_insert_id(pdo_dbh_t *dbh, const char *name, size_t *len) /* {{{ */
 {
-    return NULL;
-}
-/* }}} */
-
-// Unsupported functionality
-static int snowflake_handle_quoter(pdo_dbh_t *dbh, const char *unquoted, size_t unquotedlen, char **quoted, size_t *quotedlen, enum pdo_param_type paramtype ) /* {{{ */
-{
+    PDO_DBG_ENTER("pdo_snowflake_last_insert_id");
+    /* NOT SUPPORTED */
     PDO_DBG_RETURN(0);
 }
 /* }}} */
 
+/**
+ * Turn an unquoted string into a quoted string for use in a query.
+ *
+ * Not implemented as Snowflake supports server side binding.
+ *
+ * @param dbh Pointer to the database handle initialized by the handle factory
+ * @param unquoted Pointer to a character string containing the string to be quoted.
+ * @param unquotedlen The length of the string to be quoted.
+ * @param quoted Pointer to the address where a pointer to the newly quoted
+ * string will be returned.
+ * @param quotedlen The length of the new string.
+ * @param paramtype A driver specific hint for driver that have alternate
+ * quoting styles
+ * @return 1 if success or 0 if error occurs
+ */
+static int snowflake_handle_quoter(pdo_dbh_t *dbh, const char *unquoted, size_t unquotedlen, char **quoted, size_t *quotedlen, enum pdo_param_type paramtype ) /* {{{ */
+{
+    PDO_DBG_ENTER("snowflake_handle_quoter");
+    /* NOT SUPPORTED */
+    PDO_DBG_RETURN(0);
+}
+/* }}} */
+
+/**
+ * Begin a database transaction.
+ * @param dbh Pointer to the database handle initialized by the handle factory
+ * @return 1 if success or 0 if error occurs
+ */
 static int snowflake_handle_begin(pdo_dbh_t *dbh) /* {{{ */
 {
+    PDO_DBG_ENTER("snowflake_handle_begin");
     PDO_DBG_RETURN(1);
 }
 /* }}} */
 
+/**
+ * Commit a database transaction.
+ * @param dbh Pointer to the database handle initialized by the handle factory
+ * @return 1 if success or 0 if error occurs
+ */
 static int snowflake_handle_commit(pdo_dbh_t *dbh) /* {{{ */
 {
+    PDO_DBG_ENTER("snowflake_handle_commit");
     PDO_DBG_RETURN(1);
 }
 /* }}} */
 
+/**
+ * Rollback a database transaction.
+ * @param dbh Pointer to the database handle initialized by the handle factory
+ * @return 1 if success or 0 if error occurs
+ */
 static int snowflake_handle_rollback(pdo_dbh_t *dbh) /* {{{ */
 {
+    PDO_DBG_ENTER("snowflake_handle_rollback");
     PDO_DBG_RETURN(1);
 }
 /* }}} */
 
 static inline int snowflake_handle_autocommit(pdo_dbh_t *dbh) /* {{{ */
 {
+    PDO_DBG_ENTER("snowflake_handle_autocommit");
     PDO_DBG_RETURN(1);
 }
 /* }}} */
 
 static int pdo_snowflake_set_attribute(pdo_dbh_t *dbh, zend_long attr, zval *val) /* {{{ */
 {
+    PDO_DBG_ENTER("pdo_snowflake_set_attribute");
     PDO_DBG_RETURN(1);
 }
 /* }}} */
 
 static int pdo_snowflake_get_attribute(pdo_dbh_t *dbh, zend_long attr, zval *return_value)
 {
+    PDO_DBG_ENTER("pdo_snowflake_get_attribute");
     PDO_DBG_RETURN(1);
 }
 /* }}} */
 
+/**
+ * Test whether or not a persistent connection to a database is alive and ready
+ * for use.
+ *
+ * This function returns 1 if the database connection is alive and ready for
+ * use, otherwise it should return 0 to indicate failure or lack of support.
+ *
+ * @param dbh Pointer to the database handle initialized by the handle factory
+ * @return 1 if success or 0 if error occurs
+ */
 static int pdo_snowflake_check_liveness(pdo_dbh_t *dbh) /* {{{ */
 {
-    PDO_DBG_RETURN(1);
+    PDO_DBG_ENTER("pdo_snowflake_check_liveness");
+    /* TODO: this can run just run select 1 and check the response */
+    PDO_DBG_RETURN(0);
 }
 /* }}} */
 
@@ -227,8 +322,22 @@ static struct pdo_dbh_methods snowflake_methods = {
 };
 /* }}} */
 
+/**
+ * Create a database handle. For most databases this involves establishing a
+ * connection to the database. In some cases, a persistent connection may be
+ * requested, in other cases connection pooling may be requested. All of these
+ * are database/driver dependent.
+ *
+ * @param dbh Pointer to the database handle initialized by the handle factory
+ * @param driver_options An array of driver options, keyed by integer
+ * option number. See Database and Statement Attributes Table for a list of
+ * possible attributes.
+ * @return 1 if success or 0 if error occurs
+ */
 static int pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
 {
+    PDO_DBG_ENTER("pdo_snowflake_handle_factory");
+    PDO_DBG_INF("dbh=%p", dbh);
 	pdo_snowflake_db_handle *H;
 	size_t i;
 	int ret = 0;
@@ -243,9 +352,6 @@ static int pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /*
             {"protocol", "https", 0},
             {"insecure_mode", "", 0}
 	}; // 9 input parameters
-
-    //PDO_DBG_ENTER("pdo_snowflake_handle_factory");
-    //PDO_DBG_INF_FMT("dbh=%p", dbh);
 
     // Parse the input data parameters
     php_pdo_parse_data_source(dbh->data_source, dbh->data_source_len, vars, 9);
@@ -317,6 +423,7 @@ cleanup:
 	PDO_DBG_RETURN(ret);
 }
 /* }}} */
+
 
 pdo_driver_t pdo_snowflake_driver = {
 	PDO_DRIVER_HEADER(snowflake),
