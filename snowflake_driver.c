@@ -90,9 +90,6 @@ snowflake_handle_preparer(pdo_dbh_t *dbh, const char *sql, size_t sql_len,
   PDO_DBG_INF("sql=%.*s", (int) sql_len, sql);
   pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
   pdo_snowflake_stmt *S = ecalloc(1, sizeof(pdo_snowflake_stmt));
-  char *nsql = NULL;
-  size_t nsql_len = 0;
-  int ret;
 
   // TODO Add debugging info stuff
 
@@ -101,54 +98,19 @@ snowflake_handle_preparer(pdo_dbh_t *dbh, const char *sql, size_t sql_len,
   stmt->methods = &snowflake_stmt_methods;
 
   stmt->supports_placeholders = PDO_PLACEHOLDER_POSITIONAL;
-  ret = pdo_parse_params(stmt, (char *) sql, sql_len, &nsql, &nsql_len);
-
-  if (ret == 1)
-  {
-    /* query was rewritten */
-    sql = nsql;
-    sql_len = nsql_len;
-  }
-  else if (ret == -1)
-  {
-    /* failed to parse */
-    strcpy(dbh->error_code, stmt->error_code);
-    PDO_DBG_RETURN(0);
-  }
 
   if (!(S->stmt = snowflake_stmt(H->server)))
   {
     pdo_snowflake_error(dbh);
-    if (nsql)
-    {
-      efree(nsql);
-    }
     PDO_DBG_RETURN(0);
   }
 
   if (snowflake_prepare(S->stmt, sql) != SF_STATUS_SUCCESS)
   {
     pdo_snowflake_error(dbh);
-    if (nsql)
-    {
-      efree(nsql);
-    }
     PDO_DBG_RETURN(0);
   }
-
-  if (nsql)
-  {
-    efree(nsql);
-  }
   dbh->alloc_own_columns = 1;
-
-  PDO_DBG_RETURN(1);
-
-  // TODO remove unnecessary goto statements
-
-  fallback:
-  end:
-  stmt->supports_placeholders = PDO_PLACEHOLDER_NONE;
 
   PDO_DBG_RETURN(1);
 }
