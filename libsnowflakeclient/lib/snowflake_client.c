@@ -279,8 +279,11 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
     // Create body
     body = create_auth_json_body(sf, "C API", "C API", "0.1");
     log_debug("Created body");
-    s_body = cJSON_Print(body);
-    log_trace("Here is constructed body:\n%s", s_body);
+    // TODO delete password before printing
+    if (DEBUG) {
+        s_body = cJSON_Print(body);
+        log_trace("Here is constructed body:\n%s", s_body);
+    }
 
     // Send request and get data
     if (request(sf, &resp, SESSION_URL, url_params, 5, s_body, NULL, POST_REQUEST_TYPE, &sf->error)) {
