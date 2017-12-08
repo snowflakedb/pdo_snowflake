@@ -207,6 +207,7 @@ typedef struct sf_snowflake_statement {
     ARRAY_LIST *params;
     ARRAY_LIST *results;
     SNOWFLAKE_COLUMN_DESC **desc;
+    ARRAY_LIST *stmt_params;
 } SNOWFLAKE_STMT;
 
 /**
@@ -420,26 +421,26 @@ SNOWFLAKE_STATUS STDCALL snowflake_prepare(
         SNOWFLAKE_STMT *sfstmt, const char *command);
 
 /**
- * Sets the statement attribute to the session.
+ * Sets a statement attribute.
  *
- * @param sf SNOWFLAKE context.
+ * @param sf SNOWFLAKE_STMT context.
  * @param type the attribute name type
  * @param value pointer to the attribute value
  * @return 0 if success, otherwise an errno is returned.
  */
 SNOWFLAKE_STATUS STDCALL snowflake_stmt_set_attr(
-        SNOWFLAKE_STMT *sf, SNOWFLAKE_STMT_ATTRIBUTE type, const void *value);
+        SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_STMT_ATTRIBUTE type, const void *value);
 
 /**
- * Gets the statement attribute value from the session.
+ * Gets a statement attribute value.
  *
- * @param sf SNOWFLAKE context.
+ * @param sf SNOWFLAKE_STMT context.
  * @param type the attribute name type
  * @param value pointer to the attribute value buffer
  * @return 0 if success, otherwise an errno is returned.
  */
 SNOWFLAKE_STATUS STDCALL snowflake_stmt_get_attr(
-        SNOWFLAKE_STMT *sf, SNOWFLAKE_STMT_ATTRIBUTE type, void *value);
+        SNOWFLAKE_STMT *sfstmt, SNOWFLAKE_STMT_ATTRIBUTE type, void *value);
 
 /**
  * Executes a statement.
