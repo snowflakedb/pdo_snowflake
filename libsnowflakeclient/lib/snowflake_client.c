@@ -730,6 +730,9 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
             JSON_ERROR_MSG(json_error, error_msg, "Success code");
             SET_SNOWFLAKE_ERROR(&sfstmt->error, SF_ERROR_BAD_JSON, error_msg, sfstmt->sfqid);
             goto cleanup;
+        } else if (!success) {
+            SET_SNOWFLAKE_ERROR(&sfstmt->error, SF_ERROR_APPLICATION_ERROR, "Query was not successful", "");
+            goto cleanup;
         }
     } else {
         log_trace("Connection failed");
