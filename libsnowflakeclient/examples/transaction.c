@@ -8,7 +8,7 @@
 #include <snowflake_client.h>
 
 
-void main()
+int main()
 {
   SNOWFLAKE_ERROR *err;
   /* init */
