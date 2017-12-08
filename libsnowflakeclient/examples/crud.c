@@ -5,6 +5,66 @@
 #include <stdio.h>
 #include <snowflake_client.h>
 #include <example_setup.h>
+#include <memory.h>
+
+int fetch_data(SNOWFLAKE_STMT *stmt, int64 expected_sum) {
+    int ret = -1;
+    SNOWFLAKE_STATUS status;
+
+    status = snowflake_query(
+      stmt,
+      "select * from t"
+    );
+    if (status != SF_STATUS_SUCCESS) {
+        fprintf(stderr, "failed to select a table\n");
+        goto exit;
+    }
+
+    int64 c1v = 0;
+    SNOWFLAKE_BIND_OUTPUT c1;
+    c1.idx = 1;
+    c1.max_length = sizeof(c1v);
+    c1.type = SF_C_TYPE_INT64;
+    c1.value = &c1v;
+    status = snowflake_bind_result(stmt, &c1);
+    if (status != SF_STATUS_SUCCESS) {
+        fprintf(stderr, "failed to bind c1\n");
+        goto exit;
+    }
+
+    char c2v[1000];
+    SNOWFLAKE_BIND_OUTPUT c2;
+    c2.idx = 2;
+    c2.max_length = sizeof(c2v);
+    c2.type = SF_C_TYPE_STRING;
+    c2.value = &c2v;
+    status = snowflake_bind_result(stmt, &c2);
+    if (status != SF_STATUS_SUCCESS) {
+        fprintf(stderr, "failed to bind c2\n");
+        goto exit;
+    }
+
+    int64 total = 0;
+    while ((status = snowflake_fetch(stmt)) == SF_STATUS_SUCCESS) {
+        printf("c1: %d, c2: %s\n", c1v, c2v);
+        total += c1v;
+    }
+    if (total != expected_sum) {
+        fprintf(
+          stderr,
+          "failed to get the all values. expected: %lld, got :%lld\n",
+          expected_sum, total);
+        goto exit;
+    }
+
+    if (status != SF_STATUS_EOL) {
+        fprintf(stderr, "failed to fetch data\n");
+        goto exit;
+    }
+    ret = 0;
+    exit:
+    return ret;
+}
 
 /**
  * Example of simple CRUD
@@ -43,56 +103,59 @@ int main() {
         goto error_stmt;
     }
 
-    status = snowflake_query(
-      stmt,
-      "select * from t"
-    );
+    ret = fetch_data(stmt, 3);
+    if (ret != 0) {
+        goto error_stmt;
+    }
+
+    status = snowflake_prepare(stmt, "update t set c1=? where c2=?");
     if (status != SF_STATUS_SUCCESS) {
-        fprintf(stderr, "failed to select a table\n");
+        fprintf(stderr, "failed to prepare updating\n");
         goto error_stmt;
     }
-    printf("len = %lld\n", stmt->total_fieldcount);
 
-    int64 c1v = 0;
-    SNOWFLAKE_BIND_OUTPUT c1;
-    c1.idx = 1;
-    c1.max_length = sizeof(c1v);
-    c1.type = SF_C_TYPE_INT64;
-    c1.value = &c1v;
-    status = snowflake_bind_result(stmt, &c1);
+    int64 p1v = 102;
+    SNOWFLAKE_BIND_INPUT p1;
+    p1.idx = 1;
+    p1.c_type = SF_C_TYPE_INT64;
+    p1.value = &p1v;
+    status = snowflake_bind_param(stmt, &p1);
     if (status != SF_STATUS_SUCCESS) {
-        fprintf(stderr, "failed to bind c1\n");
+        fprintf(stderr, "failed to bind p1\n");
         goto error_stmt;
     }
 
-    char c2v[1000];
-    SNOWFLAKE_BIND_OUTPUT c2;
-    c2.idx = 2;
-    c2.max_length = sizeof(c2v);
-    c2.type = SF_C_TYPE_STRING;
-    c2.value = &c2v;
-    status = snowflake_bind_result(stmt, &c2);
+    char p2v[1000];
+    strcpy(p2v, "test2");
+    SNOWFLAKE_BIND_INPUT p2;
+    p2.idx = 2;
+    p2.c_type = SF_C_TYPE_STRING;
+    p2.value = &p2v;
+
+    status = snowflake_bind_param(stmt, &p2);
     if (status != SF_STATUS_SUCCESS) {
-        fprintf(stderr, "failed to bind c2\n");
+        fprintf(stderr, "failed to bind p1\n");
         goto error_stmt;
     }
 
-    int64 total = 0;
-    while ((status = snowflake_fetch(stmt)) == SF_STATUS_SUCCESS) {
-        printf("c1: %d, c2: %s\n", c1v, c2v);
-        total += c1v;
-    }
-    if (total != 3) {
-        fprintf(
-          stderr,
-          "failed to get the all values. expected: 3, got :%lld", total);
+    status = snowflake_execute(stmt);
+    if (status != SF_STATUS_SUCCESS) {
+        fprintf(stderr, "failed to exec\n");
         goto error_stmt;
     }
 
-    if (status != SF_STATUS_EOL) {
-        fprintf(stderr, "failed to fetch data\n");
+    ret = fetch_data(stmt, 103);
+    if (ret != 0) {
         goto error_stmt;
     }
+
+    status = snowflake_query(stmt, "drop table if exists t");
+    if (status != SF_STATUS_SUCCESS) {
+        fprintf(stderr, "failed to drop table t\n");
+        goto error_stmt;
+    }
+    printf("OK\n");
+    /* success */
     ret = 0;
 
     error_stmt: /* error stmt */
