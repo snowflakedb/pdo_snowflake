@@ -25,7 +25,7 @@ static int pdo_snowflake_stmt_dtor(pdo_stmt_t *stmt) /* {{{ */
     if (S->bound_params) {
         efree(S->bound_params);
     }
-    PDO_DBG_INF("COUNT: %d", stmt->column_count);
+    PDO_DBG_INF("count: %d", stmt->column_count);
     if (S->bound_result) {
         int i;
         for (i = 0; i < stmt->column_count; ++i) {
