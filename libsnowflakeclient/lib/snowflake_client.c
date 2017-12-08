@@ -290,16 +290,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
         s_resp = cJSON_Print(resp);
         log_trace("Here is JSON response:\n%s", s_resp);
         data = cJSON_GetObjectItem(resp, "data");
-        // Get token
-        if (json_copy_string(&sf->token, data, "token")) {
-            log_error("No valid token found in response");
-            SET_SNOWFLAKE_ERROR(&sf->error, SF_ERROR_BAD_JSON, "Cannot find valid session token in response", "");
-            goto cleanup;
-        }
-        // Get master token
-        if (json_copy_string(&sf->master_token, data, "masterToken")) {
-            log_error("No valid master token found in response");
-            SET_SNOWFLAKE_ERROR(&sf->error, SF_ERROR_BAD_JSON, "Cannot find valid master token in response", "");
+        if (!set_tokens(sf, data, &sf->error)) {
             goto cleanup;
         }
     } else {

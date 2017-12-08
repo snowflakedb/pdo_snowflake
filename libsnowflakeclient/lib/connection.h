@@ -96,7 +96,8 @@ cJSON *STDCALL create_auth_json_body(SNOWFLAKE *sf,
                                      const char *application,
                                      const char *int_app_name,
                                      const char *int_app_version);
-cJSON *STDCALL create_query_json_body(char *sql_text, int64 sequence_id);
+cJSON *STDCALL create_query_json_body(const char *sql_text, int64 sequence_id);
+cJSON *STDCALL create_renew_session_json_body(const char *old_token);
 struct curl_slist * STDCALL create_header_no_token();
 struct curl_slist * STDCALL create_header_token(const char *header_token);
 sf_bool STDCALL curl_post_call(SNOWFLAKE *sf,
@@ -125,7 +126,6 @@ char * STDCALL encode_url(CURL *curl,
 sf_bool is_string_empty(const char * str);
 SNOWFLAKE_JSON_ERROR STDCALL json_copy_bool(sf_bool *dest, cJSON *data, const char *item);
 SNOWFLAKE_JSON_ERROR STDCALL json_copy_int(int64 *dest, cJSON *data, const char *item);
-
 SNOWFLAKE_JSON_ERROR STDCALL json_copy_string(char **dest, cJSON *data, const char *item);
 SNOWFLAKE_JSON_ERROR STDCALL json_copy_string_no_alloc(char *dest, cJSON *data, const char *item, size_t dest_size);
 SNOWFLAKE_JSON_ERROR STDCALL json_detach_array_from_object(cJSON **dest, cJSON *data, const char *item);
@@ -139,6 +139,7 @@ sf_bool STDCALL http_perform(SNOWFLAKE *sf,
                              char *body, cJSON **json,
                              SNOWFLAKE_ERROR *error);
 sf_bool STDCALL is_retryable_http_code(int32 code);
+sf_bool STDCALL renew_session(CURL * curl, SNOWFLAKE *sf, SNOWFLAKE_ERROR *error);
 sf_bool STDCALL request(SNOWFLAKE *sf,
                         cJSON **json,
                         const char *url,
@@ -150,6 +151,7 @@ sf_bool STDCALL request(SNOWFLAKE *sf,
                         SNOWFLAKE_ERROR *error);
 void STDCALL reset_curl(CURL *curl);
 uint32 STDCALL retry_ctx_next_sleep(RETRY_CONTEXT *retry_ctx);
+sf_bool STDCALL set_tokens(SNOWFLAKE *sf, cJSON *data, SNOWFLAKE_ERROR *error);
 
 #ifdef __cplusplus
 }
