@@ -207,7 +207,6 @@ typedef struct sf_snowflake_statement {
     ARRAY_LIST *params;
     ARRAY_LIST *results;
     SNOWFLAKE_COLUMN_DESC **desc;
-    ARRAY_LIST *stmt_params;
 } SNOWFLAKE_STMT;
 
 /**

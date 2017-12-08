@@ -462,11 +462,6 @@ static void STDCALL _snowflake_stmt_reset(SNOWFLAKE_STMT *sfstmt) {
     }
     sfstmt->desc = NULL;
 
-    if (sfstmt->stmt_params) {
-        array_list_deallocate(sfstmt->stmt_params);
-    }
-    sfstmt->stmt_params = NULL;
-
     sfstmt->total_rowcount = -1;
     sfstmt->total_fieldcount = -1;
     sfstmt->total_row_index = -1;
@@ -846,7 +841,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_stmt_get_attr(
     if (!sfstmt) {
         return SF_STATUS_ERROR;
     }
-    // TODO: get value from the hash.
+    // TODO: get the value from SNOWFLAKE_STMT.
     return SF_STATUS_SUCCESS;
 }
 
@@ -856,10 +851,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_stmt_set_attr(
         return SF_STATUS_ERROR;
     }
     clear_snowflake_error(&sfstmt->error);
-    if (sfstmt->stmt_params == NULL) {
-        sfstmt->stmt_params = array_list_init(); // temporarily array
-    }
-    /* TODO: need a hash to store key value pairs */
+    /* TODO: need extra member in SNOWFLAKE_STMT */
     return SF_STATUS_SUCCESS;
 }
 
