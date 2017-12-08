@@ -8,11 +8,11 @@
 #if 1
 #define PDO_DBG_ENABLED 1
 
-#define PDO_DBG_INF(...) pdo_snowflake_log(__LINE__, __FILE__, "info", __VA_ARGS__)
-#define PDO_DBG_ERR(...) pdo_snowflake_log(__LINE__, __FILE__, "error", __VA_ARGS__)
-#define PDO_DBG_ENTER(func_name) pdo_snowflake_log(__LINE__, __FILE__, "enter", func_name)
-#define PDO_DBG_RETURN(value)  do { pdo_snowflake_log(__LINE__, __FILE__, "return", ""); return (value); } while (0)
-#define PDO_DBG_VOID_RETURN(value)  do { pdo_snowflake_log(__LINE__, __FILE__, "return", ""); return; } while (0)
+#define PDO_DBG_INF(...) pdo_snowflake_log(__LINE__, __FILE__, "INFO", __VA_ARGS__)
+#define PDO_DBG_ERR(...) pdo_snowflake_log(__LINE__, __FILE__, "ERROR", __VA_ARGS__)
+#define PDO_DBG_ENTER(func_name) pdo_snowflake_log(__LINE__, __FILE__, "E", func_name)
+#define PDO_DBG_RETURN(value)  do { pdo_snowflake_log(__LINE__, __FILE__, "R", ""); return (value); } while (0)
+#define PDO_DBG_VOID_RETURN(value)  do { pdo_snowflake_log(__LINE__, __FILE__, "R", ""); return; } while (0)
 #else
 #define PDO_DBG_ENABLED 0
 static inline void PDO_DBG_INF(char *format, ...) {}
