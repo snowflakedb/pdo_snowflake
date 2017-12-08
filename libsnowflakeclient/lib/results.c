@@ -44,33 +44,33 @@ SNOWFLAKE_TYPE string_to_snowflake_type(const char *string) {
 const char *snowflake_type_to_string(SNOWFLAKE_TYPE type) {
     switch (type) {
         case SF_TYPE_FIXED:
-            return "fixed";
+            return "FIXED";
         case SF_TYPE_REAL:
-            return "real";
+            return "REAL";
         case SF_TYPE_TEXT:
-            return "text";
+            return "TEXT";
         case SF_TYPE_DATE:
-            return "date";
+            return "DATE";
         case SF_TYPE_TIMESTAMP_LTZ:
-            return "timestamp_ltz";
+            return "TIMESTAMP_LTZ";
         case SF_TYPE_TIMESTAMP_NTZ:
-            return "timestamp_ntz";
+            return "TIMESTAMP_NTZ";
         case SF_TYPE_TIMESTAMP_TZ:
-            return "timestamp_tz";
+            return "TIMESTAMP_TZ";
         case SF_TYPE_VARIANT:
-            return "variant";
+            return "VARIANT";
         case SF_TYPE_OBJECT:
-            return "object";
+            return "OBJECT";
         case SF_TYPE_ARRAY:
-            return "array";
+            return "ARRAY";
         case SF_TYPE_BINARY:
-            return "binary";
+            return "BINARY";
         case SF_TYPE_TIME:
-            return "time";
+            return "TIME";
         case SF_TYPE_BOOLEAN:
-            return "boolean";
+            return "BOOLEAN";
         default:
-            return "text";
+            return "TEXT";
     }
 }
 
