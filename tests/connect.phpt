@@ -1,5 +1,5 @@
 --TEST--
-PDO_SNOWFLAKE:
+pdo_snowflake - connect
 --FILE--
 <?php
     $p = parse_ini_file(getenv('PWD') . "/testenv.ini");

@@ -151,7 +151,11 @@ sf_bool STDCALL request(SNOWFLAKE *sf,
                         SNOWFLAKE_ERROR *error);
 void STDCALL reset_curl(CURL *curl);
 uint32 STDCALL retry_ctx_next_sleep(RETRY_CONTEXT *retry_ctx);
-sf_bool STDCALL set_tokens(SNOWFLAKE *sf, cJSON *data, SNOWFLAKE_ERROR *error);
+sf_bool STDCALL set_tokens(SNOWFLAKE *sf,
+                           cJSON *data,
+                           const char *session_token_str,
+                           const char *master_token_str,
+                           SNOWFLAKE_ERROR *error);
 
 #ifdef __cplusplus
 }

@@ -62,7 +62,6 @@ int mkpath(char* file_path, mode_t mode) {
  */
 sf_bool STDCALL log_init() {
     sf_bool ret = SF_BOOLEAN_FALSE;
-    struct stat st = {0};
     time_t current_time;
     struct tm * time_info;
     char time_str[15];
@@ -290,7 +289,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
         s_resp = cJSON_Print(resp);
         log_trace("Here is JSON response:\n%s", s_resp);
         data = cJSON_GetObjectItem(resp, "data");
-        if (!set_tokens(sf, data, &sf->error)) {
+        if (!set_tokens(sf, data, "token", "masterToken", &sf->error)) {
             goto cleanup;
         }
     } else {
@@ -410,36 +409,13 @@ SNOWFLAKE_STATUS STDCALL snowflake_get_attr(
     //TODO Implement this
 }
 
-SNOWFLAKE_STMT *STDCALL snowflake_stmt(SNOWFLAKE *sf) {
-    if (!sf) {
-        return NULL;
-    }
-
-    SNOWFLAKE_STMT *sfstmt = (SNOWFLAKE_STMT *) SF_CALLOC(1, sizeof(SNOWFLAKE_STMT));
-    if (sfstmt) {
-        sfstmt->connection = sf;
-        strncpy(sfstmt->sfqid, "", UUID4_LEN);
-        strncpy(sfstmt->sqlstate, "", SQLSTATE_LEN);
-        sfstmt->sequence_counter = ++sf->sequence_counter;
-        uuid4_generate(sfstmt->request_id);
-        sfstmt->sql_text = NULL;
-        sfstmt->raw_results = NULL;
-        sfstmt->total_rowcount = -1;
-        sfstmt->total_fieldcount = -1;
-        sfstmt->total_row_index = -1;
-        sfstmt->params = NULL;
-        sfstmt->results = NULL;
-        sfstmt->desc = NULL;
-        clear_snowflake_error(&sfstmt->error);
-    }
-    return sfstmt;
-}
-
-void STDCALL snowflake_stmt_close(SNOWFLAKE_STMT *sfstmt) {
+static void STDCALL _snowflake_stmt_reset(SNOWFLAKE_STMT *sfstmt, sf_bool free) {
     int64 i;
-    if (sfstmt) {
+    if (!sfstmt) {
+        return;
+    }
+    if (free && sfstmt) {
         cJSON_Delete(sfstmt->raw_results);
-        cJSON_Delete(sfstmt->prepared_inputs);
         SF_FREE(sfstmt->sql_text);
         array_list_deallocate(sfstmt->params);
         array_list_deallocate(sfstmt->results);
@@ -451,6 +427,36 @@ void STDCALL snowflake_stmt_close(SNOWFLAKE_STMT *sfstmt) {
         }
         SF_FREE(sfstmt->desc);
     }
+    strncpy(sfstmt->sfqid, "", UUID4_LEN);
+    strncpy(sfstmt->sqlstate, "", SQLSTATE_LEN);
+    uuid4_generate(sfstmt->request_id);
+    sfstmt->sql_text = NULL;
+    sfstmt->raw_results = NULL;
+    sfstmt->total_rowcount = -1;
+    sfstmt->total_fieldcount = -1;
+    sfstmt->total_row_index = -1;
+    sfstmt->params = NULL;
+    sfstmt->results = NULL;
+    sfstmt->desc = NULL;
+    clear_snowflake_error(&sfstmt->error);
+}
+
+SNOWFLAKE_STMT *STDCALL snowflake_stmt(SNOWFLAKE *sf) {
+    if (!sf) {
+        return NULL;
+    }
+
+    SNOWFLAKE_STMT *sfstmt = (SNOWFLAKE_STMT *) SF_CALLOC(1, sizeof(SNOWFLAKE_STMT));
+    if (sfstmt) {
+        _snowflake_stmt_reset(sfstmt, SF_BOOLEAN_FALSE);
+        sfstmt->sequence_counter = ++sf->sequence_counter;
+        sfstmt->connection = sf;
+    }
+    return sfstmt;
+}
+
+void STDCALL snowflake_stmt_close(SNOWFLAKE_STMT *sfstmt) {
+    _snowflake_stmt_reset(sfstmt, SF_BOOLEAN_TRUE);
     SF_FREE(sfstmt);
 }
 
@@ -608,37 +614,14 @@ SNOWFLAKE_STATUS STDCALL snowflake_prepare(SNOWFLAKE_STMT *sfstmt, const char *c
     clear_snowflake_error(&sfstmt->error);
     SNOWFLAKE_STATUS ret = SF_STATUS_ERROR;
     size_t sql_text_size = 1; // Don't forget about null terminator
-    size_t i;
-    cJSON *bindings;
-    cJSON *binding;
-    SNOWFLAKE_BIND_INPUT *input;
-    const char *type;
-    char *value;
     if (!command) {
         goto cleanup;
     }
+    _snowflake_stmt_reset(sfstmt, SF_BOOLEAN_TRUE);
     // Set sql_text to command
     sql_text_size += strlen(command);
     sfstmt->sql_text = (char *) SF_CALLOC(1, sql_text_size);
     strncpy(sfstmt->sql_text, command, sql_text_size);
-
-    // TODO Do error handing and checking and stuff
-    // TODO move this to execute function
-    if (sfstmt->params && sfstmt->params->used > 0) {
-        sfstmt->prepared_inputs = cJSON_CreateObject();
-        bindings = cJSON_CreateArray();
-        for (i = 0; i < sfstmt->params->size; i++) {
-            input = (SNOWFLAKE_BIND_INPUT *) array_list_get(sfstmt->params, i + 1);
-            // TODO check if input is null and either set error or write msg to log
-            type = snowflake_type_to_string(c_type_to_snowflake(input->c_type, SF_TYPE_TIMESTAMP_NTZ));
-            value = value_to_string(input->value, input->c_type);
-            binding = cJSON_CreateObject();
-            cJSON_AddStringToObject(binding, "type", type);
-            cJSON_AddStringToObject(binding, "value", value);
-            cJSON_AddItemToArray(bindings, binding);
-        }
-        cJSON_AddItemToObject(sfstmt->prepared_inputs, "bindings", bindings);
-    }
 
     ret = SF_STATUS_SUCCESS;
 
@@ -664,6 +647,31 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
     URL_KEY_VALUE url_params[] = {
             {"requestId=", sfstmt->request_id, NULL, NULL, 0, 0}
     };
+    size_t i;
+    cJSON *bindings = NULL;
+    SNOWFLAKE_BIND_INPUT *input;
+    const char *type;
+    char *value;
+
+    // TODO Do error handing and checking and stuff
+    if (sfstmt->params && sfstmt->params->used > 0) {
+        bindings = cJSON_CreateObject();
+        for (i = 0; i < sfstmt->params->used; i++) {
+            cJSON *binding;
+            input = (SNOWFLAKE_BIND_INPUT *) array_list_get(sfstmt->params, i + 1);
+            // TODO check if input is null and either set error or write msg to log
+            type = snowflake_type_to_string(c_type_to_snowflake(input->c_type, SF_TYPE_TIMESTAMP_NTZ));
+            value = value_to_string(input->value, input->c_type);
+            binding = cJSON_CreateObject();
+            char idxbuf[20];
+            sprintf(idxbuf, "%ld", i + 1);
+            cJSON_AddStringToObject(binding, "type", type);
+            cJSON_AddStringToObject(binding, "value", value);
+            cJSON_AddItemToObject(bindings, idxbuf, binding);
+            SF_FREE(value);
+        }
+    }
+
     if (is_string_empty(sfstmt->connection->master_token) || is_string_empty(sfstmt->connection->token)) {
         log_error("Missing session token or Master token. Are you sure that snowflake_connect was successful?");
         SET_SNOWFLAKE_ERROR(&sfstmt->error, SF_ERROR_BAD_CONNECTION_PARAMS,
@@ -673,6 +681,9 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
 
     // Create Body
     body = create_query_json_body(sfstmt->sql_text, sfstmt->sequence_counter);
+    if (bindings != NULL) {
+        cJSON_AddItemToObject(body, "bindings", bindings);
+    }
     s_body = cJSON_Print(body);
     log_debug("Created body");
     log_trace("Here is constructed body:\n%s", s_body);
@@ -720,6 +731,9 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
         } else if (json_error != SF_JSON_NO_ERROR) {
             JSON_ERROR_MSG(json_error, error_msg, "Success code");
             SET_SNOWFLAKE_ERROR(&sfstmt->error, SF_ERROR_BAD_JSON, error_msg, sfstmt->sfqid);
+            goto cleanup;
+        } else if (!success) {
+            SET_SNOWFLAKE_ERROR(&sfstmt->error, SF_ERROR_APPLICATION_ERROR, "Query was not successful", "");
             goto cleanup;
         }
     } else {

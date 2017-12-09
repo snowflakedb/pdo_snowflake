@@ -10,15 +10,83 @@
 int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
                          int line) /* {{{ */
 {
-  PDO_DBG_RETURN(1);
+    pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
+    pdo_error_type *pdo_err;
+    SNOWFLAKE_ERROR *einfo;
+    pdo_snowflake_stmt *S = NULL;
+
+    PDO_DBG_ENTER("_pdo_snowflake_error");
+    PDO_DBG_INF("file=%s line=%d", file, line);
+    if (stmt) {
+        S = (pdo_snowflake_stmt *) stmt->driver_data;
+        pdo_err = &stmt->error_code;
+        einfo = &S->stmt->error;
+    }
+    else {
+        pdo_err = &dbh->error_code;
+        einfo = &H->server->error;
+    }
+
+    /* Adjust the file and line to reference to PDO source code instead of
+     * Snowflake Client code. */
+    einfo->file = file;
+    einfo->line = line;
+
+    if (!einfo->error_code) {
+        /* No error if the error code is 0 */
+        strcpy(*pdo_err, PDO_ERR_NONE);
+        PDO_DBG_RETURN(0);
+    }
+
+    /* Set SQLSTATE */
+    if (stmt) {
+        S = (pdo_snowflake_stmt *) stmt->driver_data;
+        strcpy(*pdo_err, S->stmt->sqlstate);
+    }
+    else {
+        /* TODO: connection related errors */
+        strcpy(*pdo_err, "00000");
+    }
+
+    PDO_DBG_RETURN(einfo->error_code);
 }
 
 /* }}} */
 
-static int pdo_snowflake_fetch_error_func(pdo_dbh_t *dbh, pdo_stmt_t *stmt,
-                                          zval *info) /* {{{ */
+/**
+ * Get fetch error information.  if stmt is not null, fetch information
+ * pertaining to the statement, otherwise fetch global error information.
+ * The driver should add the following information to the array "info" in
+ * this order:
+ * - native error code
+ * - string representation of the error code ... any other optional driver
+ *   specific data ...
+ *
+ * @param dbh Pointer to the database handle initialized by the handle factory
+ * @param stmt
+ * @param info
+ * @return 1 if success or 0 if error occurs
+ */
+static int pdo_snowflake_fetch_error_func(
+  pdo_dbh_t *dbh, pdo_stmt_t *stmt, zval *info) /* {{{ */
 {
-  PDO_DBG_RETURN(1);
+    pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
+    SNOWFLAKE_ERROR *einfo = NULL;
+
+    PDO_DBG_ENTER("pdo_snowflake_fetch_error_func");
+    PDO_DBG_INF("dbh=%p stmt=%p", dbh, stmt);
+    if (stmt) {
+        pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
+        einfo = &S->stmt->error;
+    }
+    else {
+        einfo = &H->server->error;
+    }
+    if (einfo->error_code) {
+        add_next_index_long(info, einfo->error_code);
+        add_next_index_string(info, einfo->msg);
+    }
+    PDO_DBG_RETURN(1);
 }
 /* }}} */
 
@@ -30,21 +98,19 @@ static int pdo_snowflake_fetch_error_func(pdo_dbh_t *dbh, pdo_stmt_t *stmt,
  */
 static int snowflake_handle_closer(pdo_dbh_t *dbh) /* {{{ */
 {
-  PDO_DBG_ENTER("snowflake_handle_closer");
-  pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
+    PDO_DBG_ENTER("snowflake_handle_closer");
+    pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
 
-  if (H)
-  {
-    if (H->server)
-    {
-      snowflake_term(H->server);
-      H->server = NULL;
+    if (H) {
+        if (H->server) {
+            snowflake_term(H->server);
+            H->server = NULL;
+        }
+        pefree(H, dbh->is_persistent);
+        dbh->driver_data = NULL;
     }
-    pefree(H, dbh->is_persistent);
-    dbh->driver_data = NULL;
-  }
-  snowflake_global_term(); // TODO: should be one time per process
-  PDO_DBG_RETURN(1);
+    snowflake_global_term(); // TODO: should be one time per process
+    PDO_DBG_RETURN(1);
 }
 /* }}} */
 
@@ -85,34 +151,36 @@ static int
 snowflake_handle_preparer(pdo_dbh_t *dbh, const char *sql, size_t sql_len,
                           pdo_stmt_t *stmt, zval *driver_options) /* {{{ */
 {
-  PDO_DBG_ENTER("snowflake_handle_preparer");
-  PDO_DBG_INF("dbh=%p", dbh);
-  PDO_DBG_INF("sql=%.*s", (int) sql_len, sql);
-  pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
-  pdo_snowflake_stmt *S = ecalloc(1, sizeof(pdo_snowflake_stmt));
+    PDO_DBG_ENTER("snowflake_handle_preparer");
+    PDO_DBG_INF("dbh=%p", dbh);
+    PDO_DBG_INF("sql=%.*s", (int) sql_len, sql);
+    pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
 
-  // TODO Add debugging info stuff
+    /* allocate PDO stmt */
+    pdo_snowflake_stmt *S = ecalloc(1, sizeof(pdo_snowflake_stmt));
 
-  S->H = H;
-  stmt->driver_data = S;
-  stmt->methods = &snowflake_stmt_methods;
+    // TODO Add debugging info stuff
 
-  stmt->supports_placeholders = PDO_PLACEHOLDER_POSITIONAL;
+    S->H = H;
+    stmt->driver_data = S;
+    stmt->methods = &snowflake_stmt_methods;
 
-  if (!(S->stmt = snowflake_stmt(H->server)))
-  {
-    pdo_snowflake_error(dbh);
-    PDO_DBG_RETURN(0);
-  }
+    stmt->supports_placeholders = PDO_PLACEHOLDER_POSITIONAL;
 
-  if (snowflake_prepare(S->stmt, sql) != SF_STATUS_SUCCESS)
-  {
-    pdo_snowflake_error(dbh);
-    PDO_DBG_RETURN(0);
-  }
-  dbh->alloc_own_columns = 1;
+    /* allocate Snowflake stmt. Must be freed in dtor */
+    if (!(S->stmt = snowflake_stmt(H->server))) {
+        pdo_snowflake_error(dbh);
+        PDO_DBG_RETURN(0);
+    }
 
-  PDO_DBG_RETURN(1);
+    /* prepare SQL */
+    if (snowflake_prepare(S->stmt, sql) != SF_STATUS_SUCCESS) {
+        pdo_snowflake_error_stmt(stmt);
+        PDO_DBG_RETURN(0);
+    }
+    dbh->alloc_own_columns = 1;
+
+    PDO_DBG_RETURN(1);
 }
 /* }}} */
 
@@ -127,38 +195,42 @@ snowflake_handle_preparer(pdo_dbh_t *dbh, const char *sql, size_t sql_len,
 static zend_long
 snowflake_handle_doer(pdo_dbh_t *dbh, const char *sql, size_t sql_len) /* {{{ */
 {
-  PDO_DBG_ENTER("snowflake_handle_doer");
-  int ret = 0;
-  pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
+    PDO_DBG_ENTER("snowflake_handle_doer");
+    int ret = 0;
+    pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
 
-  // TODO add debugging statements
+    // TODO add debugging statements
 
-  SNOWFLAKE_STMT *sfstmt = snowflake_stmt(H->server);
-  if (snowflake_query(sfstmt, sql) == SF_STATUS_SUCCESS)
-  {
-    int64 rows = snowflake_affected_rows(sfstmt);
-    if (rows == -1)
-    {
-      // TODO copy error from sfstmt to snowflake db handle
-      pdo_snowflake_error(dbh);
-      ret = -1; // TODO add ternary expression like: H->einfo.errcode ? -1 : 0
-      goto cleanup;
+    PDO_DBG_INF("sql: %s, len: %d", sql, sql_len);
+    SNOWFLAKE_STMT *sfstmt = snowflake_stmt(H->server);
+    if (snowflake_query(sfstmt, sql) == SF_STATUS_SUCCESS) {
+        PDO_DBG_INF("success");
+        int64 rows = snowflake_affected_rows(sfstmt);
+        if (rows == -1) {
+            pdo_stmt_t *pdostmt = ecalloc(1, sizeof(pdo_stmt_t));
+            pdostmt->driver_data = sfstmt;
+            pdostmt->dbh = dbh;
+            // TODO copy error from sfstmt to snowflake db handle
+            pdo_snowflake_error_stmt(pdostmt);
+            efree(pdostmt);
+            ret = -1; // TODO add ternary expression like: H->einfo.errcode ? -1 : 0
+            goto cleanup;
+        }
+        PDO_DBG_INF("success1");
+        // return number of rows affected
+        ret = (int) rows;
     }
-    // return number of rows affected
-    ret = (int) rows;
-  }
-  else
-  {
-    // TODO copy error from sfstmt to snowflake db handle
-    pdo_snowflake_error(dbh);
-    ret = -1;
-    goto cleanup;
-  }
+    else {
+        /* Failed to run a query */
+        pdo_snowflake_error(dbh);
+        ret = -1;
+        goto cleanup;
+    }
 
-  cleanup:
-  snowflake_stmt_close(sfstmt);
+    cleanup:
+    snowflake_stmt_close(sfstmt);
 
-  PDO_DBG_RETURN(ret);
+    PDO_DBG_RETURN(ret);
 }
 /* }}} */
 
@@ -174,9 +246,9 @@ snowflake_handle_doer(pdo_dbh_t *dbh, const char *sql, size_t sql_len) /* {{{ */
 static char *pdo_snowflake_last_insert_id(pdo_dbh_t *dbh, const char *name,
                                           size_t *len) /* {{{ */
 {
-  PDO_DBG_ENTER("pdo_snowflake_last_insert_id");
-  /* NOT SUPPORTED */
-  PDO_DBG_RETURN(0);
+    PDO_DBG_ENTER("pdo_snowflake_last_insert_id");
+    /* NOT SUPPORTED */
+    PDO_DBG_RETURN(0);
 }
 /* }}} */
 
@@ -200,9 +272,9 @@ static int snowflake_handle_quoter(pdo_dbh_t *dbh, const char *unquoted,
                                    size_t *quotedlen,
                                    enum pdo_param_type paramtype) /* {{{ */
 {
-  PDO_DBG_ENTER("snowflake_handle_quoter");
-  /* NOT SUPPORTED */
-  PDO_DBG_RETURN(0);
+    PDO_DBG_ENTER("snowflake_handle_quoter");
+    /* NOT SUPPORTED */
+    PDO_DBG_RETURN(0);
 }
 /* }}} */
 
@@ -213,8 +285,8 @@ static int snowflake_handle_quoter(pdo_dbh_t *dbh, const char *unquoted,
  */
 static int snowflake_handle_begin(pdo_dbh_t *dbh) /* {{{ */
 {
-  PDO_DBG_ENTER("snowflake_handle_begin");
-  PDO_DBG_RETURN(1);
+    PDO_DBG_ENTER("snowflake_handle_begin");
+    PDO_DBG_RETURN(1);
 }
 /* }}} */
 
@@ -225,8 +297,8 @@ static int snowflake_handle_begin(pdo_dbh_t *dbh) /* {{{ */
  */
 static int snowflake_handle_commit(pdo_dbh_t *dbh) /* {{{ */
 {
-  PDO_DBG_ENTER("snowflake_handle_commit");
-  PDO_DBG_RETURN(1);
+    PDO_DBG_ENTER("snowflake_handle_commit");
+    PDO_DBG_RETURN(1);
 }
 /* }}} */
 
@@ -237,16 +309,16 @@ static int snowflake_handle_commit(pdo_dbh_t *dbh) /* {{{ */
  */
 static int snowflake_handle_rollback(pdo_dbh_t *dbh) /* {{{ */
 {
-  PDO_DBG_ENTER("snowflake_handle_rollback");
-  PDO_DBG_RETURN(1);
+    PDO_DBG_ENTER("snowflake_handle_rollback");
+    PDO_DBG_RETURN(1);
 }
 
 /* }}} */
 
 static inline int snowflake_handle_autocommit(pdo_dbh_t *dbh) /* {{{ */
 {
-  PDO_DBG_ENTER("snowflake_handle_autocommit");
-  PDO_DBG_RETURN(1);
+    PDO_DBG_ENTER("snowflake_handle_autocommit");
+    PDO_DBG_RETURN(1);
 }
 
 /* }}} */
@@ -254,17 +326,17 @@ static inline int snowflake_handle_autocommit(pdo_dbh_t *dbh) /* {{{ */
 static int
 pdo_snowflake_set_attribute(pdo_dbh_t *dbh, zend_long attr, zval *val) /* {{{ */
 {
-  PDO_DBG_ENTER("pdo_snowflake_set_attribute");
-  PDO_DBG_RETURN(1);
+    PDO_DBG_ENTER("pdo_snowflake_set_attribute");
+    PDO_DBG_RETURN(1);
 }
 
 /* }}} */
 
 static int
-pdo_snowflake_get_attribute(pdo_dbh_t *dbh, zend_long attr, zval *return_value)
-{
-  PDO_DBG_ENTER("pdo_snowflake_get_attribute");
-  PDO_DBG_RETURN(1);
+pdo_snowflake_get_attribute(pdo_dbh_t *dbh, zend_long attr,
+                            zval *return_value) {
+    PDO_DBG_ENTER("pdo_snowflake_get_attribute");
+    PDO_DBG_RETURN(1);
 }
 /* }}} */
 
@@ -280,9 +352,9 @@ pdo_snowflake_get_attribute(pdo_dbh_t *dbh, zend_long attr, zval *return_value)
  */
 static int pdo_snowflake_check_liveness(pdo_dbh_t *dbh) /* {{{ */
 {
-  PDO_DBG_ENTER("pdo_snowflake_check_liveness");
-  /* TODO: this can run just run select 1 and check the response */
-  PDO_DBG_RETURN(0);
+    PDO_DBG_ENTER("pdo_snowflake_check_liveness");
+    /* TODO: this can run just run select 1 and check the response */
+    PDO_DBG_RETURN(0);
 }
 /* }}} */
 
@@ -321,106 +393,98 @@ static struct pdo_dbh_methods snowflake_methods = {
 static int
 pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
 {
-  PDO_DBG_ENTER("pdo_snowflake_handle_factory");
-  PDO_DBG_INF("dbh=%p", dbh);
-  pdo_snowflake_db_handle *H;
-  size_t i;
-  int ret = 0;
-  struct pdo_data_src_parser vars[] = {
-    {"host",          "",      0},
-    {"port",          "",      0},
-    {"account",       "",      0},
-    {"database",      "",      0},
-    {"schema",        "",      0},
-    {"warehouse",     "",      0},
-    {"role",          "",      0},
-    {"protocol",      "https", 0},
-    {"insecure_mode", "",      0}
-  }; // 9 input parameters
+    PDO_DBG_ENTER("pdo_snowflake_handle_factory");
+    PDO_DBG_INF("dbh=%p", dbh);
+    pdo_snowflake_db_handle *H;
+    size_t i;
+    int ret = 0;
+    struct pdo_data_src_parser vars[] = {
+      {"host",          "",      0},
+      {"port",          "",      0},
+      {"account",       "",      0},
+      {"database",      "",      0},
+      {"schema",        "",      0},
+      {"warehouse",     "",      0},
+      {"role",          "",      0},
+      {"protocol",      "https", 0},
+      {"insecure_mode", "",      0}
+    }; // 9 input parameters
 
-  // Parse the input data parameters
-  php_pdo_parse_data_source(dbh->data_source, dbh->data_source_len, vars, 9);
+    // Parse the input data parameters
+    php_pdo_parse_data_source(dbh->data_source, dbh->data_source_len, vars, 9);
 
-  // Run global init and allocate snowflake handle memory
-  //TODO Come up with way to ensure global init is only called once
-  snowflake_global_init();
-  H = pecalloc(1, sizeof(pdo_snowflake_db_handle), dbh->is_persistent);
+    // Run global init and allocate snowflake handle memory
+    //TODO Come up with way to ensure global init is only called once
+    snowflake_global_init();
+    H = pecalloc(1, sizeof(pdo_snowflake_db_handle), dbh->is_persistent);
 
-  //TODO set error stuff
+    //TODO set error stuff
 
-  /* allocate an environment */
+    /* allocate an environment */
 
-  /* handle for the server */
-  if (!(H->server = snowflake_init()))
-  {
-    pdo_snowflake_error(dbh);
-    goto cleanup;
-  }
-
-  dbh->driver_data = H;
-
-  if (driver_options)
-  {
-    //TODO Set other non-essential parameters, i.e. timeout, emulate, etc.
-    zend_string *ca_bundle_file = pdo_attr_strval(driver_options,
-                                                  PDO_SNOWFLAKE_ATTR_SSL_CAPATH,
-                                                  NULL);
-    // TODO create function to set SSL Version
-    zend_long ssl_version = pdo_attr_lval(driver_options,
-                                          PDO_SNOWFLAKE_ATTR_SSL_VERSION, -1);
-    zend_long disable_verify_peer = pdo_attr_lval(driver_options,
-                                                  PDO_SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS,
-                                                  1) ? 0 : 1;
-    snowflake_global_set_attribute(SF_GLOBAL_DISABLE_VERIFY_PEER,
-                                   &disable_verify_peer);
-    snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE,
-                                   ca_bundle_file ? ZSTR_VAL(ca_bundle_file)
-                                                  : NULL);
-    if (ssl_version != -1)
-    {
-      snowflake_global_set_attribute(SF_GLOBAL_SSL_VERSION, &ssl_version);
+    /* handle for the server */
+    if (!(H->server = snowflake_init())) {
+        pdo_snowflake_error(dbh);
+        goto cleanup;
     }
-    if (ca_bundle_file)
-    {
-      zend_string_release(ca_bundle_file);
+
+    dbh->driver_data = H;
+
+    if (driver_options) {
+        //TODO Set other non-essential parameters, i.e. timeout, emulate, etc.
+        zend_string *ca_bundle_file = pdo_attr_strval(
+          driver_options, PDO_SNOWFLAKE_ATTR_SSL_CAPATH, NULL);
+        // TODO create function to set SSL Version
+        zend_long ssl_version = pdo_attr_lval(
+          driver_options, PDO_SNOWFLAKE_ATTR_SSL_VERSION, -1);
+        zend_long disable_verify_peer = pdo_attr_lval(
+          driver_options,
+          PDO_SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS, 1) ? 0
+                                                                          : 1;
+        snowflake_global_set_attribute(
+          SF_GLOBAL_DISABLE_VERIFY_PEER, &disable_verify_peer);
+        snowflake_global_set_attribute(
+          SF_GLOBAL_CA_BUNDLE_FILE, ca_bundle_file ? ZSTR_VAL(ca_bundle_file)
+                                                   : NULL);
+        if (ssl_version != -1) {
+            /* TODO: not allowed older than TLS 1.2 */
+            snowflake_global_set_attribute(SF_GLOBAL_SSL_VERSION, &ssl_version);
+        }
+        if (ca_bundle_file) {
+            zend_string_release(ca_bundle_file);
+        }
     }
-  }
 
-  // Set context attributes
-  snowflake_set_attr(H->server, SF_CON_USER, dbh->username);
-  snowflake_set_attr(H->server, SF_CON_PASSWORD, dbh->password);
-  snowflake_set_attr(H->server, SF_CON_HOST, vars[0].optval);
-  snowflake_set_attr(H->server, SF_CON_PORT, vars[1].optval);
-  snowflake_set_attr(H->server, SF_CON_ACCOUNT, vars[2].optval);
-  snowflake_set_attr(H->server, SF_CON_DATABASE, vars[3].optval);
-  snowflake_set_attr(H->server, SF_CON_SCHEMA, vars[4].optval);
-  snowflake_set_attr(H->server, SF_CON_WAREHOUSE, vars[5].optval);
-  snowflake_set_attr(H->server, SF_CON_ROLE, vars[6].optval);
-  snowflake_set_attr(H->server, SF_CON_PROTOCOL, vars[7].optval);
-  snowflake_set_attr(H->server, SF_CON_INSECURE_MODE, vars[8].optval);
+    // Set context attributes
+    snowflake_set_attr(H->server, SF_CON_USER, dbh->username);
+    snowflake_set_attr(H->server, SF_CON_PASSWORD, dbh->password);
+    snowflake_set_attr(H->server, SF_CON_HOST, vars[0].optval);
+    snowflake_set_attr(H->server, SF_CON_PORT, vars[1].optval);
+    snowflake_set_attr(H->server, SF_CON_ACCOUNT, vars[2].optval);
+    snowflake_set_attr(H->server, SF_CON_DATABASE, vars[3].optval);
+    snowflake_set_attr(H->server, SF_CON_SCHEMA, vars[4].optval);
+    snowflake_set_attr(H->server, SF_CON_WAREHOUSE, vars[5].optval);
+    snowflake_set_attr(H->server, SF_CON_ROLE, vars[6].optval);
+    snowflake_set_attr(H->server, SF_CON_PROTOCOL, vars[7].optval);
+    snowflake_set_attr(H->server, SF_CON_INSECURE_MODE, vars[8].optval);
 
-  if (snowflake_connect(H->server) == SF_STATUS_ERROR)
-  {
-    pdo_snowflake_error(dbh);
-    goto cleanup;
-  }
-
-  dbh->methods = &snowflake_methods;
-
-  ret = 1;
-
-  cleanup:
-  for (i = 0; i < sizeof(vars) / sizeof(vars[0]); i++)
-  {
-    if (vars[i].freeme)
-    {
-      efree(vars[i].optval);
+    if (snowflake_connect(H->server) == SF_STATUS_ERROR) {
+        pdo_snowflake_error(dbh);
+        goto cleanup;
     }
-  }
 
-  dbh->methods = &snowflake_methods;
+    ret = 1;
 
-  PDO_DBG_RETURN(ret);
+    cleanup:
+    for (i = 0; i < sizeof(vars) / sizeof(vars[0]); i++) {
+        if (vars[i].freeme) {
+            efree(vars[i].optval);
+        }
+    }
+
+    dbh->methods = &snowflake_methods;
+
+    PDO_DBG_RETURN(ret);
 }
 
 /* }}} */

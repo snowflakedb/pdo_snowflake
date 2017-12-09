@@ -17,13 +17,13 @@ int main() {
 
     /* query, try running a query with a connection struct that has not connected */
     SNOWFLAKE_STMT *sfstmt = snowflake_stmt(sf);
+    snowflake_prepare(sfstmt, "select 1;");
     SNOWFLAKE_BIND_OUTPUT c1;
     int out = 0;
     c1.idx = 1;
     c1.type = SF_C_TYPE_INT64;
     c1.value = (void *) &out;
     snowflake_bind_result(sfstmt, &c1);
-    snowflake_prepare(sfstmt, "select 1;");
     status = snowflake_execute(sfstmt);
     if (status != SF_STATUS_SUCCESS) {
         SNOWFLAKE_ERROR *error = snowflake_stmt_error(sfstmt);
@@ -37,6 +37,19 @@ int main() {
     snowflake_set_attr(sf, SF_CON_ACCOUNT, getenv("SNOWFLAKE_TEST_ACCOUNT"));
     snowflake_set_attr(sf, SF_CON_USER, getenv("SNOWFLAKE_TEST_USER"));
     snowflake_set_attr(sf, SF_CON_PASSWORD, getenv("SNOWFLAKE_TEST_PASSWORD"));
+    char *host, *port, *protocol;
+    host = getenv("SNOWFLAKE_TEST_HOST");
+    if (host) {
+        snowflake_set_attr(sf, SF_CON_HOST, host);
+    }
+    port = getenv("SNOWFLAKE_TEST_PORT");
+    if (port) {
+        snowflake_set_attr(sf, SF_CON_PORT, port);
+    }
+    protocol = getenv("SNOWFLAKE_TEST_PROTOCOL");
+    if (protocol) {
+        snowflake_set_attr(sf, SF_CON_PROTOCOL, protocol);
+    }
     status = snowflake_connect(sf);
     if (status != SF_STATUS_SUCCESS) {
         SNOWFLAKE_ERROR *error = snowflake_error(sf);

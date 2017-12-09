@@ -197,6 +197,9 @@ sf_bool STDCALL curl_post_call(SNOWFLAKE *sf,
     char query_code[QUERYCODE_LEN];
     char *result_url = NULL;
     cJSON *data = NULL;
+    struct curl_slist *new_header = NULL;
+    size_t header_token_size;
+    char *header_token = NULL;
     sf_bool ret = SF_BOOLEAN_FALSE;
     sf_bool stop = SF_BOOLEAN_FALSE;
 
@@ -221,9 +224,27 @@ sf_bool STDCALL curl_post_call(SNOWFLAKE *sf,
             break;
         }
 
-        if (strcmp(query_code, SESSION_EXPIRE_CODE) == 0 && !renew_session(curl, sf, error)) {
-            // Error is set in renew session function
-            break;
+        if (strcmp(query_code, SESSION_EXPIRE_CODE) == 0) {
+            if (!renew_session(curl, sf, error)) {
+                // Error is set in renew session function
+                break;
+            } else {
+                // TODO refactor creating the header token string
+                // Create new header since we have a new token
+                header_token_size = strlen(HEADER_SNOWFLAKE_TOKEN_FORMAT) - 2 + strlen(sf->token) + 1;
+                header_token = (char *) SF_CALLOC(1, header_token_size);
+                if (!header_token) {
+                    SET_SNOWFLAKE_ERROR(error, SF_ERROR_OUT_OF_MEMORY,
+                                        "Ran out of memory trying to create header token", "");
+                    break;
+                }
+                snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->token);
+                new_header = create_header_token(header_token);
+                if (!curl_post_call(sf, curl, url, new_header, body, json, error)) {
+                    // Error is set in curl call
+                    break;
+                }
+            }
         }
 
         while (query_code && (strcmp(query_code, QUERY_IN_PROGRESS_CODE) == 0 || strcmp(query_code, QUERY_IN_PROGRESS_ASYNC_CODE) == 0)) {
@@ -262,6 +283,8 @@ sf_bool STDCALL curl_post_call(SNOWFLAKE *sf,
     } while (0); // Dummy loop to break out of
 
     SF_FREE(result_url);
+    SF_FREE(header_token);
+    curl_slist_free_all(new_header);
 
     return ret;
 }
@@ -276,6 +299,9 @@ sf_bool STDCALL curl_get_call(SNOWFLAKE *sf,
     const char *error_msg;
     char query_code[QUERYCODE_LEN];
     char *result_url = NULL;
+    struct curl_slist *new_header = NULL;
+    size_t header_token_size;
+    char *header_token = NULL;
     sf_bool ret = SF_BOOLEAN_FALSE;
 
     // Set to 0
@@ -299,15 +325,35 @@ sf_bool STDCALL curl_get_call(SNOWFLAKE *sf,
             break;
         }
 
-        if (strcmp(query_code, SESSION_EXPIRE_CODE) == 0 && !renew_session(curl, sf, error)) {
-            // Error is set in renew session function
-            break;
+        if (strcmp(query_code, SESSION_EXPIRE_CODE) == 0) {
+            if (!renew_session(curl, sf, error)) {
+                // Error is set in renew session function
+                break;
+            } else {
+                // TODO refactor creating the header token string
+                // Create new header since we have a new token
+                header_token_size = strlen(HEADER_SNOWFLAKE_TOKEN_FORMAT) - 2 + strlen(sf->token) + 1;
+                header_token = (char *) SF_CALLOC(1, header_token_size);
+                if (!header_token) {
+                    SET_SNOWFLAKE_ERROR(error, SF_ERROR_OUT_OF_MEMORY,
+                                        "Ran out of memory trying to create header token", "");
+                    break;
+                }
+                snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->token);
+                new_header = create_header_token(header_token);
+                if (!curl_get_call(sf, curl, url, new_header, json, error)) {
+                    // Error is set in curl call
+                    break;
+                }
+            }
         }
 
         ret = SF_BOOLEAN_TRUE;
     } while (0); // Dummy loop to break out of
 
     SF_FREE(result_url);
+    SF_FREE(header_token);
+    curl_slist_free_all(new_header);
 
     return ret;
 }
@@ -799,14 +845,14 @@ sf_bool STDCALL renew_session(CURL *curl, SNOWFLAKE *sf, SNOWFLAKE_ERROR *error)
     }
     log_debug("Updating session. Master token: %s", sf->master_token);
     // Create header
-    header_token_size = strlen(HEADER_SNOWFLAKE_TOKEN_FORMAT) - 2 + strlen(sf->token) + 1;
+    header_token_size = strlen(HEADER_SNOWFLAKE_TOKEN_FORMAT) - 2 + strlen(sf->master_token) + 1;
     header_token = (char *) SF_CALLOC(1, header_token_size);
     if (!header_token) {
         SET_SNOWFLAKE_ERROR(error, SF_ERROR_OUT_OF_MEMORY,
                             "Ran out of memory trying to create header token", "");
         goto cleanup;
     }
-    snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->token);
+    snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->master_token);
     header = create_header_token(header_token);
 
     // Create body and convert to string
@@ -823,37 +869,39 @@ sf_bool STDCALL renew_session(CURL *curl, SNOWFLAKE *sf, SNOWFLAKE_ERROR *error)
 
     // Successful call, non-null json, successful success code, data object and session token must all be present
     // otherwise set an error
-    if ((ret = curl_post_call(sf, curl, encoded_url, header, s_body, &json, error)) && json &&
-            (json_error = json_copy_bool(&success, json, "success")) == SF_JSON_NO_ERROR && success &&
-            (data = cJSON_GetObjectItem(json, "data")) && (has_token = cJSON_HasObjectItem(data, "sessionToken"))) {
+    if (!curl_post_call(sf, curl, encoded_url, header, s_body, &json, error) || !json) {
+        // Do nothing, let error propogate up from post call
+        log_error("Curl call failed during renew session");
+        goto cleanup;
+    } else if ((json_error = json_copy_bool(&success, json, "success"))) {
+        log_error("Error finding success in JSON response for renew session");
+        JSON_ERROR_MSG(json_error, error_msg, "Success");
+        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, error_msg, "");
+        goto cleanup;
+    } else if (!success) {
+        log_error("Renew session was unsuccessful");
+        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_RESPONSE, "Request returned as being unsuccessful", "");
+        goto cleanup;
+    } else if (!(data = cJSON_GetObjectItem(json, "data"))) {
+        log_error("Missing data field in response");
+        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "No data object in JSON response", "");
+        goto cleanup;
+    } else if (!(has_token = cJSON_HasObjectItem(data, "sessionToken"))) {
+        log_error("No session token in JSON response");
+        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "No session token in JSON response", "");
+        goto cleanup;
+    } else {
         log_debug("Successful renew session");
-        if (!set_tokens(sf, data, error)) {
+        if (!set_tokens(sf, data, "sessionToken", "masterToken", error)) {
             goto cleanup;
         }
         log_debug("Finished updating session");
-    } else {
-        log_debug("Updating session failed. Success code: %s. Post Call return status: %s", success, ret);
-        if (!ret) {
-            // Do nothing, let error propogate up from post call
-        } else if (json_error) {
-            JSON_ERROR_MSG(json_error, error_msg, "Success");
-            SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, error_msg, "");
-        } else if (!data) {
-            SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "No data object in JSON response", "");
-        } else if (!has_token) {
-            SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "No session token in JSON response", "");
-        } else {
-            SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_RESPONSE, "Renew session failed for unknown reasons. "
-                    "An error case was possibly missed", "");
-        }
-        goto cleanup;
     }
 
     ret = SF_BOOLEAN_TRUE;
 
 cleanup:
     curl_slist_free_all(header);
-    curl_easy_cleanup(curl);
     cJSON_Delete(body);
     cJSON_Delete(json);
     SF_FREE(s_body);
@@ -885,15 +933,19 @@ uint32 STDCALL retry_ctx_next_sleep(RETRY_CONTEXT *retry_ctx) {
     return retry_ctx->sleep_time;
 }
 
-sf_bool STDCALL set_tokens(SNOWFLAKE *sf, cJSON *data, SNOWFLAKE_ERROR *error) {
+sf_bool STDCALL set_tokens(SNOWFLAKE *sf,
+                           cJSON *data,
+                           const char *session_token_str,
+                           const char *master_token_str,
+                           SNOWFLAKE_ERROR *error) {
     // Get token
-    if (json_copy_string(&sf->token, data, "token")) {
+    if (json_copy_string(&sf->token, data, session_token_str)) {
         log_error("No valid token found in response");
         SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "Cannot find valid session token in response", "");
         return SF_BOOLEAN_FALSE;
     }
     // Get master token
-    if (json_copy_string(&sf->master_token, data, "masterToken")) {
+    if (json_copy_string(&sf->master_token, data, master_token_str)) {
         log_error("No valid master token found in response");
         SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "Cannot find valid master token in response", "");
         return SF_BOOLEAN_FALSE;

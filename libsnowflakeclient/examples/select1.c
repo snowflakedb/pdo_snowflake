@@ -24,13 +24,13 @@ int main() {
 
     /* query */
     SNOWFLAKE_STMT *sfstmt = snowflake_stmt(sf);
+    snowflake_query(sfstmt, "select 1;");
     SNOWFLAKE_BIND_OUTPUT c1;
     int64 out = 0;
     c1.idx = 1;
     c1.type = SF_C_TYPE_INT64;
     c1.value = (void *) &out;
     snowflake_bind_result(sfstmt, &c1);
-    snowflake_query(sfstmt, "select 1;");
     printf("Number of rows: %d\n", (int) snowflake_num_rows(sfstmt));
 
     while ((status = snowflake_fetch(sfstmt)) != SF_STATUS_EOL) {

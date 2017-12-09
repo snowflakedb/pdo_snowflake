@@ -200,7 +200,6 @@ typedef struct sf_snowflake_statement {
     SNOWFLAKE_ERROR error;
     SNOWFLAKE *connection;
     char *sql_text;
-    cJSON *prepared_inputs;
     cJSON *raw_results;
     int64 total_rowcount;
     int64 total_fieldcount;
