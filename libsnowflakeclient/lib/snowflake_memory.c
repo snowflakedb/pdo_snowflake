@@ -3,7 +3,7 @@
  */
 
 #include "snowflake_memory.h"
-#include "log.h"
+#include <log.h>
 
 // Basic hashing function. Works well for memory addresses
 #define sf_ptr_hash(p, t) (((unsigned long) (p) >> 3) & (sizeof (t)/sizeof ((t)[0]) - 1))

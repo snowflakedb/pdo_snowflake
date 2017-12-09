@@ -4,7 +4,7 @@
 
 #include <string.h>
 #include "connection.h"
-#include "log.h"
+#include <log.h>
 #include "snowflake_memory.h"
 #include "snowflake_client_int.h"
 #include "constants.h"

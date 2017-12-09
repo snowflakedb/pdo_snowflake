@@ -14,7 +14,7 @@
 #include "snowflake_client_int.h"
 #include "connection.h"
 #include "snowflake_memory.h"
-#include "log.h"
+#include <log.h>
 #include "results.h"
 #include "error.h"
 
@@ -60,7 +60,7 @@ int mkpath(char* file_path, mode_t mode) {
 /*
  * Initializes logging file
  */
-sf_bool STDCALL log_init() {
+sf_bool STDCALL log_init(const char *log_path) {
     sf_bool ret = SF_BOOLEAN_FALSE;
     time_t current_time;
     struct tm * time_info;
@@ -68,10 +68,14 @@ sf_bool STDCALL log_init() {
     time(&current_time);
     time_info = localtime(&current_time);
     strftime(time_str, sizeof(time_str), "%Y%m%d%H%M%S", time_info);
-
+    const char *sf_log_path;
     size_t log_path_size = 1; //Start with 1 to include null terminator
     log_path_size += strlen(time_str);
-    char *sf_log_path = getenv("SNOWFLAKE_LOG_PATH");
+    if (log_path) {
+        sf_log_path = log_path;
+    } else {
+        sf_log_path = getenv("SNOWFLAKE_LOG_PATH");
+    }
     // Set logging level
     if (DEBUG) {
         log_set_quiet(SF_BOOLEAN_FALSE);
@@ -128,7 +132,7 @@ void STDCALL log_term() {
     }
 }
 
-SNOWFLAKE_STATUS STDCALL snowflake_global_init() {
+SNOWFLAKE_STATUS STDCALL snowflake_global_init(const char *log_path) {
     SNOWFLAKE_STATUS ret = SF_STATUS_ERROR;
     CURLcode curl_ret;
 
@@ -139,7 +143,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_global_init() {
     DEBUG = SF_BOOLEAN_FALSE;
 
     // TODO Add log init error handling
-    if (!log_init()) {
+    if (!log_init(log_path)) {
         log_fatal("Error during log initialization");
         goto cleanup;
     }
