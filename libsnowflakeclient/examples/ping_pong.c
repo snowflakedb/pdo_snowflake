@@ -11,8 +11,10 @@
 int main() {
     /* init */
     SNOWFLAKE_STATUS status;
+    SNOWFLAKE *sf = NULL;
+    SNOWFLAKE_STMT *sfstmt = NULL;
     initialize_snowflake_example(SF_BOOLEAN_FALSE);
-    SNOWFLAKE *sf = setup_snowflake_connection();
+    sf = setup_snowflake_connection();
     status = snowflake_connect(sf);
     if (status != SF_STATUS_SUCCESS) {
         fprintf(stderr, "Connecting to snowflake failed, exiting...\n");
@@ -24,7 +26,7 @@ int main() {
     }
 
     /* query */
-    SNOWFLAKE_STMT *sfstmt = snowflake_stmt(sf);
+    sfstmt = snowflake_stmt(sf);
     status = snowflake_query(sfstmt, "select seq4() from table(generator(timelimit=>60));");
     if (status != SF_STATUS_SUCCESS) {
         SNOWFLAKE_ERROR *error = snowflake_stmt_error(sfstmt);

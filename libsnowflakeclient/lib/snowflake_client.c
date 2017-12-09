@@ -289,16 +289,7 @@ SNOWFLAKE_STATUS STDCALL snowflake_connect(SNOWFLAKE *sf) {
         s_resp = cJSON_Print(resp);
         log_trace("Here is JSON response:\n%s", s_resp);
         data = cJSON_GetObjectItem(resp, "data");
-        // Get token
-        if (json_copy_string(&sf->token, data, "token")) {
-            log_error("No valid token found in response");
-            SET_SNOWFLAKE_ERROR(&sf->error, SF_ERROR_BAD_JSON, "Cannot find valid session token in response", "");
-            goto cleanup;
-        }
-        // Get master token
-        if (json_copy_string(&sf->master_token, data, "masterToken")) {
-            log_error("No valid master token found in response");
-            SET_SNOWFLAKE_ERROR(&sf->error, SF_ERROR_BAD_JSON, "Cannot find valid master token in response", "");
+        if (!set_tokens(sf, data, "token", "masterToken", &sf->error)) {
             goto cleanup;
         }
     } else {
@@ -420,6 +411,9 @@ SNOWFLAKE_STATUS STDCALL snowflake_get_attr(
 
 static void STDCALL _snowflake_stmt_reset(SNOWFLAKE_STMT *sfstmt, sf_bool free) {
     int64 i;
+    if (!sfstmt) {
+        return;
+    }
     if (free && sfstmt) {
         cJSON_Delete(sfstmt->raw_results);
         SF_FREE(sfstmt->sql_text);
@@ -660,7 +654,6 @@ SNOWFLAKE_STATUS STDCALL snowflake_execute(SNOWFLAKE_STMT *sfstmt) {
     char *value;
 
     // TODO Do error handing and checking and stuff
-    // TODO move this to execute function
     if (sfstmt->params && sfstmt->params->used > 0) {
         bindings = cJSON_CreateObject();
         for (i = 0; i < sfstmt->params->used; i++) {

@@ -14,9 +14,14 @@
 
 #define SESSION_URL "/session/v1/login-request?"
 #define QUERY_URL "/queries/v1/query-request?"
+#define RENEW_SESSION_URL "/session/token-request?"
 
 #define SESSION_EXPIRE_CODE "390112"
 #define QUERY_IN_PROGRESS_CODE "333333"
 #define QUERY_IN_PROGRESS_ASYNC_CODE "333334"
+
+#define REQUEST_TYPE_RENEW "RENEW"
+#define REQUEST_TYPE_CLONE "CLONE"
+#define REQUEST_TYPE_ISSUE "ISSUE"
 
 #endif //PDO_SNOWFLAKE_SNOWFLAKE_CLIENT_INT_H
