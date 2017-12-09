@@ -5,7 +5,7 @@
 #include <example_setup.h>
 
 void initialize_snowflake_example(sf_bool debug) {
-    snowflake_global_init();
+    snowflake_global_init(NULL);
 
     snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, getenv("SNOWFLAKE_TEST_CA_BUNDLE_FILE"));
     snowflake_global_set_attribute(SF_GLOBAL_DEBUG, &debug);

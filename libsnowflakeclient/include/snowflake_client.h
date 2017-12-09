@@ -241,7 +241,7 @@ typedef struct sf_snowflake_output
  *
  * @return 0 if successful, errno otherwise
  */
-SNOWFLAKE_STATUS STDCALL snowflake_global_init();
+SNOWFLAKE_STATUS STDCALL snowflake_global_init(const char *log_path);
 
 /**
  * Global Snowflake cleanup.

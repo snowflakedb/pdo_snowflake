@@ -415,7 +415,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
 
     // Run global init and allocate snowflake handle memory
     //TODO Come up with way to ensure global init is only called once
-    snowflake_global_init();
+    snowflake_global_init(NULL);
     H = pecalloc(1, sizeof(pdo_snowflake_db_handle), dbh->is_persistent);
 
     //TODO set error stuff
