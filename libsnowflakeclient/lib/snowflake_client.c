@@ -457,10 +457,10 @@ static void STDCALL _snowflake_stmt_reset(SF_STMT *sfstmt) {
     }
     sfstmt->desc = NULL;
 
-    if (sfstmt->stmt_params) {
-        array_list_deallocate(sfstmt->stmt_params);
+    if (sfstmt->stmt_attrs) {
+        array_list_deallocate(sfstmt->stmt_attrs);
     }
-    sfstmt->stmt_params = NULL;
+    sfstmt->stmt_attrs = NULL;
 
     sfstmt->total_rowcount = -1;
     sfstmt->total_fieldcount = -1;
@@ -589,6 +589,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
             } else if (result->type == SF_C_TYPE_STRING) {
                 /* copy original data as is except Date/Time/Timestamp/Binary type */
                 strncpy(result->value, raw_result->valuestring, result->max_length);
+                result->len = strlen(raw_result->valuestring); /* TODO: what if null is included? */
             } else if (result->type == SF_C_TYPE_TIMESTAMP) {
                 // TODO Do some timestamp stuff here
             } else {
@@ -689,7 +690,7 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
             input = (SF_BIND_INPUT *) array_list_get(sfstmt->params, i + 1);
             // TODO check if input is null and either set error or write msg to log
             type = snowflake_type_to_string(c_type_to_snowflake(input->c_type, SF_TYPE_TIMESTAMP_NTZ));
-            value = value_to_string(input->value, input->c_type);
+            value = value_to_string(input->value, input->len, input->c_type);
             binding = cJSON_CreateObject();
             char idxbuf[20];
             sprintf(idxbuf, "%ld", i + 1);

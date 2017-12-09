@@ -50,8 +50,7 @@ typedef struct {
     pdo_snowflake_db_handle *H;
     SF_STMT *stmt;
 
-    int64 num_params;
-    SF_BIND_INPUT *bound_params;
+    ARRAY_LIST *bound_params;
     SF_BIND_OUTPUT *bound_result;
     sf_bool *out_null; /* TODO: need this? */
     zend_ulong *out_length; /* TODO: need this? */

@@ -119,7 +119,7 @@ SF_TYPE c_type_to_snowflake(SF_C_TYPE c_type, SF_TYPE tsmode) {
     }
 }
 
-char *value_to_string(void *value, SF_C_TYPE c_type) {
+char *value_to_string(void *value, size_t len, SF_C_TYPE c_type) {
     size_t size;
     char *ret;
     // TODO turn cases into macro and check to see if ret if null
@@ -150,7 +150,7 @@ char *value_to_string(void *value, SF_C_TYPE c_type) {
             snprintf(ret, size, "%f", *(float64 *) value);
             return ret;
         case SF_C_TYPE_STRING:
-            size = strlen((char *) value) + 1;
+            size = (size_t)len + 1;
             ret = (char *) SF_CALLOC(1, size);
             strncpy(ret, (char *) value, size);
             return ret;

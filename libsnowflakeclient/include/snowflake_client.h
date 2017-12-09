@@ -209,16 +209,16 @@ typedef struct sf_snowflake_statement {
     ARRAY_LIST *results;
     SF_COLUMN_DESC **desc;
     ARRAY_LIST *stmt_params;
-} SF_STMT;
 
 /**
  * Bind input parameter context
  */
 typedef struct sf_snowflake_input
 {
-  size_t idx;
-  SF_C_TYPE c_type;
-  void *value;
+  size_t idx; /* One based index of the columns */
+  SF_C_TYPE c_type; /* input data type in C */
+  void *value; /* input value */
+  size_t len; /* input value length. valid only for SF_C_TYPE_STRING */
 } SF_BIND_INPUT;
 
 /**
@@ -226,10 +226,11 @@ typedef struct sf_snowflake_input
  */
 typedef struct sf_snowflake_output
 {
-    size_t idx;
-    SF_C_TYPE type;
-    void *value;
-    size_t max_length;
+    size_t idx; /* One based index of the columns */
+    SF_C_TYPE type; /* expected data type in C */
+    void *value; /* output value */
+    size_t max_length; /* maximum buffer size provided by application */
+    size_t len; /* actual value length */
 } SF_BIND_OUTPUT;
 
 /**
