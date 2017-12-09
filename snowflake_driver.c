@@ -153,7 +153,7 @@ snowflake_handle_preparer(pdo_dbh_t *dbh, const char *sql, size_t sql_len,
 {
     PDO_DBG_ENTER("snowflake_handle_preparer");
     PDO_DBG_INF("dbh=%p", dbh);
-    PDO_DBG_INF("sql=%.*s", (int) sql_len, sql);
+    PDO_DBG_INF("sql=%.*s, len=%ld", (int) sql_len, sql, sql_len);
     pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
 
     /* allocate PDO stmt */
@@ -201,7 +201,7 @@ snowflake_handle_doer(pdo_dbh_t *dbh, const char *sql, size_t sql_len) /* {{{ */
 
     // TODO add debugging statements
 
-    PDO_DBG_INF("sql: %s, len: %d", sql, sql_len);
+    PDO_DBG_INF("sql: %.*s, len: %d", sql_len, sql, sql_len);
     SF_STMT *sfstmt = snowflake_stmt(H->server);
     if (snowflake_query(sfstmt, sql) == SF_STATUS_SUCCESS) {
         PDO_DBG_INF("success");
