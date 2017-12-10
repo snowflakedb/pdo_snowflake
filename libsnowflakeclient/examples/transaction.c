@@ -10,9 +10,9 @@
 
 int main()
 {
-  SNOWFLAKE_ERROR *err;
+  SF_ERROR *err;
   /* init */
-  SNOWFLAKE *sf = snowflake_init();
+  SF_CONNECT *sf = snowflake_init();
 
   /* connect*/
   snowflake_set_attr(sf, SF_CON_HOST, getenv("SNOWFLAKE_TEST_HOST"));
@@ -31,9 +31,9 @@ int main()
   snowflake_trans_begin(sf);
 
   /* execute a DML */
-  SNOWFLAKE_STMT *sfstmt = snowflake_stmt(sf);
+  SF_STMT *sfstmt = snowflake_stmt(sf);
   snowflake_prepare(sfstmt, "INSERT INTO testtable(1,?,?)");
-  SNOWFLAKE_BIND_INPUT p1, p2;
+  SF_BIND_INPUT p1, p2;
   p1.idx = 1;
   p1.c_type = SF_C_TYPE_STRING;
   p1.value = (void *) "test1";
@@ -54,7 +54,7 @@ int main()
 
   err: /* error */
   snowflake_trans_rollback(sf);
-  /* SNOWFLAKE_ERROR structure is included in a SNOWFLAKE_STMT, so you don't
+  /* SF_ERROR structure is included in a SF_STMT, so you don't
    * need to free the memory. */
   err = snowflake_error(sfstmt);
   printf("Error. Query ID: %s, Message: %s\n", err->sfqid, err->msg);

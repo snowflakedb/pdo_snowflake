@@ -6,8 +6,8 @@
 #include "error.h"
 #include "snowflake_memory.h"
 
-void STDCALL set_snowflake_error(SNOWFLAKE_ERROR *error,
-                                  SNOWFLAKE_ERROR_CODE error_code,
+void STDCALL set_snowflake_error(SF_ERROR *error,
+                                  SF_ERROR_CODE error_code,
                                   const char *msg,
                                   const char *sfqid,
                                   const char *file,
@@ -28,8 +28,8 @@ void STDCALL set_snowflake_error(SNOWFLAKE_ERROR *error,
     error->line = line;
 }
 
-void STDCALL clear_snowflake_error(SNOWFLAKE_ERROR *error) {
-    error->error_code = SF_NO_ERROR;
+void STDCALL clear_snowflake_error(SF_ERROR *error) {
+    error->error_code = SF_ERROR_NONE;
     error->msg = NULL;
     error->file = NULL;
     error->line = 0;

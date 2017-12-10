@@ -18,7 +18,7 @@ extern "C" {
 #include <snowflake_client.h>
 
 void initialize_snowflake_example(sf_bool debug);
-SNOWFLAKE *setup_snowflake_connection();
+SF_CONNECT *setup_snowflake_connection();
 
 #ifdef __cplusplus
 }

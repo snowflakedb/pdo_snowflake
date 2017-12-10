@@ -12,7 +12,7 @@ int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
 {
     pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
     pdo_error_type *pdo_err;
-    SNOWFLAKE_ERROR *einfo;
+    SF_ERROR *einfo;
     pdo_snowflake_stmt *S = NULL;
 
     PDO_DBG_ENTER("_pdo_snowflake_error");
@@ -71,7 +71,7 @@ static int pdo_snowflake_fetch_error_func(
   pdo_dbh_t *dbh, pdo_stmt_t *stmt, zval *info) /* {{{ */
 {
     pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
-    SNOWFLAKE_ERROR *einfo = NULL;
+    SF_ERROR *einfo = NULL;
 
     PDO_DBG_ENTER("pdo_snowflake_fetch_error_func");
     PDO_DBG_INF("dbh=%p stmt=%p", dbh, stmt);
@@ -202,7 +202,7 @@ snowflake_handle_doer(pdo_dbh_t *dbh, const char *sql, size_t sql_len) /* {{{ */
     // TODO add debugging statements
 
     PDO_DBG_INF("sql: %s, len: %d", sql, sql_len);
-    SNOWFLAKE_STMT *sfstmt = snowflake_stmt(H->server);
+    SF_STMT *sfstmt = snowflake_stmt(H->server);
     if (snowflake_query(sfstmt, sql) == SF_STATUS_SUCCESS) {
         PDO_DBG_INF("success");
         int64 rows = snowflake_affected_rows(sfstmt);

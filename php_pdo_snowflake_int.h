@@ -43,16 +43,16 @@ typedef long zend_long;
 #endif /* PHP_VERSION_ID */
 
 typedef struct {
-    SNOWFLAKE *server;
+    SF_CONNECT *server;
 } pdo_snowflake_db_handle;
 
 typedef struct {
     pdo_snowflake_db_handle *H;
-    SNOWFLAKE_STMT *stmt;
+    SF_STMT *stmt;
 
     int64 num_params;
-    SNOWFLAKE_BIND_INPUT *bound_params;
-    SNOWFLAKE_BIND_OUTPUT *bound_result;
+    SF_BIND_INPUT *bound_params;
+    SF_BIND_OUTPUT *bound_result;
     sf_bool *out_null; /* TODO: need this? */
     zend_ulong *out_length; /* TODO: need this? */
 } pdo_snowflake_stmt;

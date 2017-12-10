@@ -11,8 +11,8 @@ void initialize_snowflake_example(sf_bool debug) {
     snowflake_global_set_attribute(SF_GLOBAL_DEBUG, &debug);
 }
 
-SNOWFLAKE *setup_snowflake_connection() {
-    SNOWFLAKE *sf = snowflake_init();
+SF_CONNECT *setup_snowflake_connection() {
+    SF_CONNECT *sf = snowflake_init();
 
     snowflake_set_attr(sf, SF_CON_ACCOUNT, getenv("SNOWFLAKE_TEST_ACCOUNT"));
     snowflake_set_attr(sf, SF_CON_USER, getenv("SNOWFLAKE_TEST_USER"));

@@ -7,9 +7,9 @@
 #include <example_setup.h>
 #include <memory.h>
 
-int fetch_data(SNOWFLAKE_STMT *stmt, int64 expected_sum) {
+int fetch_data(SF_STMT *stmt, int64 expected_sum) {
     int ret = -1;
-    SNOWFLAKE_STATUS status;
+    SF_STATUS status;
 
     status = snowflake_query(
       stmt,
@@ -21,7 +21,7 @@ int fetch_data(SNOWFLAKE_STMT *stmt, int64 expected_sum) {
     }
 
     int64 c1v = 0;
-    SNOWFLAKE_BIND_OUTPUT c1;
+    SF_BIND_OUTPUT c1;
     c1.idx = 1;
     c1.max_length = sizeof(c1v);
     c1.type = SF_C_TYPE_INT64;
@@ -33,7 +33,7 @@ int fetch_data(SNOWFLAKE_STMT *stmt, int64 expected_sum) {
     }
 
     char c2v[1000];
-    SNOWFLAKE_BIND_OUTPUT c2;
+    SF_BIND_OUTPUT c2;
     c2.idx = 2;
     c2.max_length = sizeof(c2v);
     c2.type = SF_C_TYPE_STRING;
@@ -71,11 +71,11 @@ int fetch_data(SNOWFLAKE_STMT *stmt, int64 expected_sum) {
  */
 int main() {
     int ret = -1;
-    SNOWFLAKE_STATUS status;
+    SF_STATUS status;
     initialize_snowflake_example(SF_BOOLEAN_FALSE);
 
     /* Connect with all parameters set */
-    SNOWFLAKE *sf = setup_snowflake_connection();
+    SF_CONNECT *sf = setup_snowflake_connection();
     status = snowflake_connect(sf);
     if (status != SF_STATUS_SUCCESS) {
         fprintf(stderr, "connecting to snowflake failed\n");
@@ -83,7 +83,7 @@ int main() {
     }
 
     /* Create a statement once and reused */
-    SNOWFLAKE_STMT *stmt = snowflake_stmt(sf);
+    SF_STMT *stmt = snowflake_stmt(sf);
     /* NOTE: the numeric type here should fit into int64 otherwise
      * it is taken as a float */
     status = snowflake_query(
@@ -115,7 +115,7 @@ int main() {
     }
 
     int64 p1v = 102;
-    SNOWFLAKE_BIND_INPUT p1;
+    SF_BIND_INPUT p1;
     p1.idx = 1;
     p1.c_type = SF_C_TYPE_INT64;
     p1.value = &p1v;
@@ -127,7 +127,7 @@ int main() {
 
     char p2v[1000];
     strcpy(p2v, "test2");
-    SNOWFLAKE_BIND_INPUT p2;
+    SF_BIND_INPUT p2;
     p2.idx = 2;
     p2.c_type = SF_C_TYPE_STRING;
     p2.value = &p2v;

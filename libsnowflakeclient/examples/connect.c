@@ -11,10 +11,10 @@
 int main()
 {
     /* init */
-    SNOWFLAKE_STATUS status;
+    SF_STATUS status;
     initialize_snowflake_example(SF_BOOLEAN_FALSE);
 
-    SNOWFLAKE *sf = NULL;
+    SF_CONNECT *sf = NULL;
 
     // Try connecting with a NULL connection struct, should fail
     status = snowflake_connect(sf);
@@ -28,7 +28,7 @@ int main()
     sf = snowflake_init();
     status = snowflake_connect(sf);
     if (status != SF_STATUS_SUCCESS) {
-        SNOWFLAKE_ERROR *error = snowflake_error(sf);
+        SF_ERROR *error = snowflake_error(sf);
         printf("OK, connecting to snowflake failed. Error message: %s. In File, %s, Line, %d\n", error->msg, error->file, error->line);
     } else {
         fprintf(stderr, "Connecting to snowflake succeeded...exiting");
@@ -54,7 +54,7 @@ int main()
 
     status = snowflake_connect(sf);
     if (status != SF_STATUS_SUCCESS) {
-        SNOWFLAKE_ERROR *error = snowflake_error(sf);
+        SF_ERROR *error = snowflake_error(sf);
         fprintf(stderr, "Failed connecting with minimum parameters set.\n");
         fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
     } else {
@@ -67,7 +67,7 @@ int main()
 
     status = snowflake_connect(sf);
     if (status != SF_STATUS_SUCCESS) {
-        SNOWFLAKE_ERROR *error = snowflake_error(sf);
+        SF_ERROR *error = snowflake_error(sf);
         fprintf(stderr, "Failed connecting with full parameters set\n");
         fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
     } else {

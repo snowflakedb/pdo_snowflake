@@ -60,7 +60,7 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
 
     // TODO: bind parameters
     S->bound_params = NULL;
-    // ecalloc((size_t)S->num_params, sizeof(SNOWFLAKE_BIND_INPUT));
+    // ecalloc((size_t)S->num_params, sizeof(SF_BIND_INPUT));
 
     /* execute */
     if (snowflake_execute(S->stmt) != SF_STATUS_SUCCESS) {
@@ -72,10 +72,10 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
     stmt->column_count = (int) snowflake_num_fields(S->stmt);
     PDO_DBG_INF("number of columns: %d", stmt->column_count);
     S->bound_result = ecalloc((size_t) stmt->column_count,
-                              sizeof(SNOWFLAKE_BIND_OUTPUT));
+                              sizeof(SF_BIND_OUTPUT));
     for (i = 0; i < stmt->column_count; ++i) {
         size_t len = 0;
-        SNOWFLAKE_COLUMN_DESC *desc = S->stmt->desc[i];
+        SF_COLUMN_DESC *desc = S->stmt->desc[i];
         S->bound_result[i].idx = (size_t) i + 1;  /* 1 based index */
         S->bound_result[i].type = SF_C_TYPE_STRING; /* string type */
         PDO_DBG_INF("prec: %d, scale: %d, name: %s, type: %d",
@@ -155,7 +155,7 @@ static int pdo_snowflake_stmt_fetch(
     if (ori != PDO_FETCH_ORI_NEXT) {
 
     }
-    SNOWFLAKE_STATUS ret = snowflake_fetch(S->stmt);
+    SF_STATUS ret = snowflake_fetch(S->stmt);
     if (ret == SF_STATUS_EOL) {
         PDO_DBG_INF("EOL");
         PDO_DBG_RETURN(0);

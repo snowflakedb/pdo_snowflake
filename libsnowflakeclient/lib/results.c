@@ -8,7 +8,7 @@
 #include "snowflake_memory.h"
 #include <log.h>
 
-SNOWFLAKE_TYPE string_to_snowflake_type(const char *string) {
+SF_TYPE string_to_snowflake_type(const char *string) {
     if (strcmp(string, "fixed") == 0) {
         return SF_TYPE_FIXED;
     } else if (strcmp(string, "real") == 0) {
@@ -41,7 +41,7 @@ SNOWFLAKE_TYPE string_to_snowflake_type(const char *string) {
     }
 }
 
-const char *snowflake_type_to_string(SNOWFLAKE_TYPE type) {
+const char *snowflake_type_to_string(SF_TYPE type) {
     switch (type) {
         case SF_TYPE_FIXED:
             return "FIXED";
@@ -74,7 +74,7 @@ const char *snowflake_type_to_string(SNOWFLAKE_TYPE type) {
     }
 }
 
-SNOWFLAKE_C_TYPE snowflake_to_c_type(SNOWFLAKE_TYPE type, int64 precision, int64 scale) {
+SF_C_TYPE snowflake_to_c_type(SF_TYPE type, int64 precision, int64 scale) {
     if (type == SF_TYPE_FIXED) {
         if (scale > 0 || precision >= 19) {
             return SF_C_TYPE_FLOAT64;
@@ -98,7 +98,7 @@ SNOWFLAKE_C_TYPE snowflake_to_c_type(SNOWFLAKE_TYPE type, int64 precision, int64
     }
 }
 
-SNOWFLAKE_TYPE c_type_to_snowflake(SNOWFLAKE_C_TYPE c_type, SNOWFLAKE_TYPE tsmode) {
+SF_TYPE c_type_to_snowflake(SF_C_TYPE c_type, SF_TYPE tsmode) {
     switch (c_type) {
         case SF_C_TYPE_INT8:
             return SF_TYPE_FIXED;
@@ -119,7 +119,7 @@ SNOWFLAKE_TYPE c_type_to_snowflake(SNOWFLAKE_C_TYPE c_type, SNOWFLAKE_TYPE tsmod
     }
 }
 
-char *value_to_string(void *value, SNOWFLAKE_C_TYPE c_type) {
+char *value_to_string(void *value, SF_C_TYPE c_type) {
     size_t size;
     char *ret;
     // TODO turn cases into macro and check to see if ret if null
@@ -166,19 +166,19 @@ char *value_to_string(void *value, SNOWFLAKE_C_TYPE c_type) {
     }
 }
 
-SNOWFLAKE_COLUMN_DESC ** set_description(const cJSON *rowtype) {
+SF_COLUMN_DESC ** set_description(const cJSON *rowtype) {
     int i;
     cJSON *blob;
     cJSON *column;
-    SNOWFLAKE_COLUMN_DESC **desc = NULL;
+    SF_COLUMN_DESC **desc = NULL;
     size_t array_size = (size_t) cJSON_GetArraySize(rowtype);
     if (rowtype == NULL || array_size == 0) {
         return desc;
     }
-    desc = (SNOWFLAKE_COLUMN_DESC **) SF_CALLOC(array_size, sizeof(SNOWFLAKE_COLUMN_DESC *));
+    desc = (SF_COLUMN_DESC **) SF_CALLOC(array_size, sizeof(SF_COLUMN_DESC *));
     for (i = 0; i < array_size; i++) {
         column = cJSON_GetArrayItem(rowtype, i);
-        desc[i] = (SNOWFLAKE_COLUMN_DESC *) SF_CALLOC(1, sizeof(SNOWFLAKE_COLUMN_DESC));
+        desc[i] = (SF_COLUMN_DESC *) SF_CALLOC(1, sizeof(SF_COLUMN_DESC));
         if(json_copy_string(&desc[i]->name, column, "name")) {
             desc[i]->name = NULL;
         }
