@@ -10,15 +10,15 @@
 
 int main() {
     /* init */
-    SNOWFLAKE_STATUS status;
-    SNOWFLAKE *sf = NULL;
-    SNOWFLAKE_STMT *sfstmt = NULL;
+    SF_STATUS status;
+    SF_CONNECT *sf = NULL;
+    SF_STMT *sfstmt = NULL;
     initialize_snowflake_example(SF_BOOLEAN_FALSE);
     sf = setup_snowflake_connection();
     status = snowflake_connect(sf);
     if (status != SF_STATUS_SUCCESS) {
         fprintf(stderr, "Connecting to snowflake failed, exiting...\n");
-        SNOWFLAKE_ERROR *error = snowflake_error(sf);
+        SF_ERROR *error = snowflake_error(sf);
         fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
         goto cleanup;
     } else {
@@ -29,7 +29,7 @@ int main() {
     sfstmt = snowflake_stmt(sf);
     status = snowflake_query(sfstmt, "select seq4() from table(generator(timelimit=>60));");
     if (status != SF_STATUS_SUCCESS) {
-        SNOWFLAKE_ERROR *error = snowflake_stmt_error(sfstmt);
+        SF_ERROR *error = snowflake_stmt_error(sfstmt);
         fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
     }
     printf("Number of rows: %d\n", (int) snowflake_num_rows(sfstmt));
