@@ -55,7 +55,7 @@ static void _pdo_snowflake_stmt_set_row_count(pdo_stmt_t *stmt) /* {{{ */
 
     row_count = (zend_long) snowflake_affected_rows(S->stmt);
     PDO_DBG_INF("row count: %lld", row_count);
-    if (row_count != (zend_long)-1) {
+    if (row_count != (zend_long) -1) {
         stmt->row_count = row_count;
     }
 }
@@ -139,13 +139,11 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
             if (desc->scale == 0) {
                 /* No decimal point but integer */
                 len = (size_t) desc->precision;
-            }
-            else {
+            } else {
                 /* The total number of digits plus decimal point */
                 len = (size_t) desc->precision + 1;
             }
-        }
-        else if (desc->type == SF_TYPE_TEXT) {
+        } else if (desc->type == SF_TYPE_TEXT) {
             len = (size_t) desc->byte_size;
         }
         // TODO: S->bound_result[i].type =
@@ -177,7 +175,8 @@ static int pdo_snowflake_stmt_execute(pdo_stmt_t *stmt) /* {{{ */
     }
 
     // TODO: stmt->active_query_stringlen should be specified.
-    if (snowflake_query(S->stmt, stmt->active_query_string, stmt->active_query_stringlen) !=
+    if (snowflake_query(S->stmt, stmt->active_query_string,
+                        stmt->active_query_stringlen) !=
         SF_STATUS_SUCCESS) {
         PDO_DBG_RETURN(0);
     }
@@ -216,8 +215,7 @@ static int pdo_snowflake_stmt_fetch(
     if (ret == SF_STATUS_EOL) {
         PDO_DBG_INF("EOL");
         PDO_DBG_RETURN(0);
-    }
-    else if (ret != SF_STATUS_SUCCESS) {
+    } else if (ret != SF_STATUS_SUCCESS) {
         PDO_DBG_INF("ERROR 1");
         PDO_DBG_RETURN(0);
     }
@@ -361,8 +359,7 @@ static int pdo_snowflake_stmt_param_hook(
     }
     if (Z_ISREF(param->parameter)) {
         parameter = Z_REFVAL(param->parameter);
-    }
-    else {
+    } else {
         parameter = &param->parameter;
     }
     SF_BIND_INPUT *v;
