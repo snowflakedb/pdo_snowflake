@@ -214,7 +214,7 @@ sf_bool STDCALL curl_post_call(SF_CONNECT *sf,
         if ((json_error = json_copy_string_no_alloc(query_code, *json, "code", QUERYCODE_LEN)) != SF_JSON_ERROR_NONE &&
                 json_error != SF_JSON_ERROR_ITEM_NULL) {
             JSON_ERROR_MSG(json_error, error_msg, "Query code");
-            SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, error_msg, "");
+            SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, error_msg, SF_SQLSTATE_UNABLE_TO_CONNECT);
             break;
         }
 
@@ -235,7 +235,7 @@ sf_bool STDCALL curl_post_call(SF_CONNECT *sf,
                 header_token = (char *) SF_CALLOC(1, header_token_size);
                 if (!header_token) {
                     SET_SNOWFLAKE_ERROR(error, SF_ERROR_OUT_OF_MEMORY,
-                                        "Ran out of memory trying to create header token", "");
+                                        "Ran out of memory trying to create header token", SF_SQLSTATE_UNABLE_TO_CONNECT);
                     break;
                 }
                 snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->token);
@@ -255,7 +255,7 @@ sf_bool STDCALL curl_post_call(SF_CONNECT *sf,
             if (json_copy_string(&result_url, data, "getResultUrl") != SF_JSON_ERROR_NONE) {
                 stop = SF_BOOLEAN_TRUE;
                 JSON_ERROR_MSG(json_error, error_msg, "Result URL");
-                SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, error_msg, "");
+                SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, error_msg, SF_SQLSTATE_UNABLE_TO_CONNECT);
                 break;
             }
 
@@ -270,7 +270,7 @@ sf_bool STDCALL curl_post_call(SF_CONNECT *sf,
                 json_error != SF_JSON_ERROR_ITEM_NULL) {
                 stop = SF_BOOLEAN_TRUE;
                 JSON_ERROR_MSG(json_error, error_msg, "Query code");
-                SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, error_msg, "");
+                SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, error_msg, SF_SQLSTATE_UNABLE_TO_CONNECT);
                 break;
             }
         }
@@ -315,7 +315,7 @@ sf_bool STDCALL curl_get_call(SF_CONNECT *sf,
         if ((json_error = json_copy_string_no_alloc(query_code, *json, "code", QUERYCODE_LEN)) != SF_JSON_ERROR_NONE &&
             json_error != SF_JSON_ERROR_ITEM_NULL) {
             JSON_ERROR_MSG(json_error, error_msg, "Query code");
-            SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, error_msg, "");
+            SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, error_msg, SF_SQLSTATE_UNABLE_TO_CONNECT);
             break;
         }
 
@@ -336,7 +336,7 @@ sf_bool STDCALL curl_get_call(SF_CONNECT *sf,
                 header_token = (char *) SF_CALLOC(1, header_token_size);
                 if (!header_token) {
                     SET_SNOWFLAKE_ERROR(error, SF_ERROR_OUT_OF_MEMORY,
-                                        "Ran out of memory trying to create header token", "");
+                                        "Ran out of memory trying to create header token", SF_SQLSTATE_UNABLE_TO_CONNECT);
                     break;
                 }
                 snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->token);
@@ -436,7 +436,7 @@ char * encode_url(CURL *curl,
 
     encoded_url = (char *) SF_CALLOC(1, encoded_url_size);
     if (!encoded_url) {
-        SET_SNOWFLAKE_ERROR(error, SF_ERROR_OUT_OF_MEMORY, "Ran out of memory trying to create encoded url", "");
+        SET_SNOWFLAKE_ERROR(error, SF_ERROR_OUT_OF_MEMORY, "Ran out of memory trying to create encoded url", SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     }
     snprintf(encoded_url, base_url_size, format, protocol, account, host, port, url);
@@ -706,15 +706,15 @@ sf_bool STDCALL http_perform(SF_CONNECT *sf,
         /* Check for errors */
         if (res != CURLE_OK) {
             log_error("curl_easy_perform() failed: %s", curl_easy_strerror(res));
-            SET_SNOWFLAKE_ERROR(error, SF_ERROR_CURL, "Failed during easy perform", "");
+            SET_SNOWFLAKE_ERROR(error, SF_ERROR_CURL, "Failed during easy perform", SF_SQLSTATE_UNABLE_TO_CONNECT);
         } else {
             if (curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code) != CURLE_OK) {
                 log_error("Unable to get http response code [%s]", curl_easy_strerror(res));
-                SET_SNOWFLAKE_ERROR(error, SF_ERROR_CURL, "Unable to get http response code", "");
+                SET_SNOWFLAKE_ERROR(error, SF_ERROR_CURL, "Unable to get http response code", SF_SQLSTATE_UNABLE_TO_CONNECT);
             } else if (http_code != 200) {
                 retry = is_retryable_http_code(http_code);
                 if (!retry) {
-                    SET_SNOWFLAKE_ERROR(error, SF_ERROR_RETRY, "Received unretryable http code", "");
+                    SET_SNOWFLAKE_ERROR(error, SF_ERROR_RETRY, "Received unretryable http code", SF_SQLSTATE_UNABLE_TO_CONNECT);
                 }
             } else {
                 ret = SF_BOOLEAN_TRUE;
@@ -735,7 +735,7 @@ sf_bool STDCALL http_perform(SF_CONNECT *sf,
         if (*json) {
             ret = SF_BOOLEAN_TRUE;
         } else {
-            SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "Unable to parse JSON text response.", "");
+            SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "Unable to parse JSON text response.", SF_SQLSTATE_UNABLE_TO_CONNECT);
             ret = SF_BOOLEAN_FALSE;
         }
     }
@@ -777,7 +777,7 @@ sf_bool STDCALL request(SF_CONNECT *sf,
                 header_token = (char *) SF_CALLOC(1, header_token_size);
                 if (!header_token) {
                     SET_SNOWFLAKE_ERROR(error, SF_ERROR_OUT_OF_MEMORY,
-                                        "Ran out of memory trying to create header token", "");
+                                        "Ran out of memory trying to create header token", SF_SQLSTATE_UNABLE_TO_CONNECT);
                     goto cleanup;
                 }
                 snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->token);
@@ -800,7 +800,7 @@ sf_bool STDCALL request(SF_CONNECT *sf,
             ret = curl_get_call(sf, curl, encoded_url, my_header, json, error);
         } else {
             SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_REQUEST,
-                                "An unknown request type was passed to the request function", "");
+                                "An unknown request type was passed to the request function", SF_SQLSTATE_UNABLE_TO_CONNECT);
             goto cleanup;
         }
     }
@@ -840,7 +840,7 @@ sf_bool STDCALL renew_session(CURL *curl, SF_CONNECT *sf, SF_ERROR *error) {
     }
     if (is_string_empty(sf->master_token)) {
         SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_REQUEST, "Missing master token when trying to renew session. "
-                "Are you sure your connection was properly setup?", "");
+                "Are you sure your connection was properly setup?", SF_SQLSTATE_UNABLE_TO_CONNECT);
         return ret;
     }
     log_debug("Updating session. Master token: %s", sf->master_token);
@@ -849,7 +849,7 @@ sf_bool STDCALL renew_session(CURL *curl, SF_CONNECT *sf, SF_ERROR *error) {
     header_token = (char *) SF_CALLOC(1, header_token_size);
     if (!header_token) {
         SET_SNOWFLAKE_ERROR(error, SF_ERROR_OUT_OF_MEMORY,
-                            "Ran out of memory trying to create header token", "");
+                            "Ran out of memory trying to create header token", SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     }
     snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->master_token);
@@ -876,19 +876,19 @@ sf_bool STDCALL renew_session(CURL *curl, SF_CONNECT *sf, SF_ERROR *error) {
     } else if ((json_error = json_copy_bool(&success, json, "success"))) {
         log_error("Error finding success in JSON response for renew session");
         JSON_ERROR_MSG(json_error, error_msg, "Success");
-        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, error_msg, "");
+        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, error_msg, SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     } else if (!success) {
         log_error("Renew session was unsuccessful");
-        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_RESPONSE, "Request returned as being unsuccessful", "");
+        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_RESPONSE, "Request returned as being unsuccessful", SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     } else if (!(data = cJSON_GetObjectItem(json, "data"))) {
         log_error("Missing data field in response");
-        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "No data object in JSON response", "");
+        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "No data object in JSON response", SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     } else if (!(has_token = cJSON_HasObjectItem(data, "sessionToken"))) {
         log_error("No session token in JSON response");
-        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "No session token in JSON response", "");
+        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "No session token in JSON response", SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     } else {
         log_debug("Successful renew session");
@@ -941,13 +941,13 @@ sf_bool STDCALL set_tokens(SF_CONNECT *sf,
     // Get token
     if (json_copy_string(&sf->token, data, session_token_str)) {
         log_error("No valid token found in response");
-        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "Cannot find valid session token in response", "");
+        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "Cannot find valid session token in response", SF_SQLSTATE_UNABLE_TO_CONNECT);
         return SF_BOOLEAN_FALSE;
     }
     // Get master token
     if (json_copy_string(&sf->master_token, data, master_token_str)) {
         log_error("No valid master token found in response");
-        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "Cannot find valid master token in response", "");
+        SET_SNOWFLAKE_ERROR(error, SF_ERROR_BAD_JSON, "Cannot find valid master token in response", SF_SQLSTATE_UNABLE_TO_CONNECT);
         return SF_BOOLEAN_FALSE;
     }
 
