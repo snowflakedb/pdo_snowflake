@@ -65,8 +65,8 @@ int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
  *   specific data ...
  *
  * @param dbh Pointer to the database handle initialized by the handle factory
- * @param stmt
- * @param info
+ * @param stmt Pointer to the returned statement or NULL if an error occurs.
+ * @param info an array of error info buffer
  * @return 1 if success or 0 if error occurs
  */
 static int pdo_snowflake_fetch_error_func(
