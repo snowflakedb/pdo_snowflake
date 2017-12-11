@@ -21,8 +21,7 @@ int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
         S = (pdo_snowflake_stmt *) stmt->driver_data;
         pdo_err = &stmt->error_code;
         einfo = &S->stmt->error;
-    }
-    else {
+    } else {
         pdo_err = &dbh->error_code;
         einfo = &H->server->error;
     }
@@ -42,8 +41,7 @@ int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
     if (stmt) {
         S = (pdo_snowflake_stmt *) stmt->driver_data;
         strcpy(*pdo_err, S->stmt->sqlstate);
-    }
-    else {
+    } else {
         /* TODO: connection related errors */
         strcpy(*pdo_err, "00000");
     }
@@ -78,8 +76,7 @@ static int pdo_snowflake_fetch_error_func(
     if (stmt) {
         pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
         einfo = &S->stmt->error;
-    }
-    else {
+    } else {
         einfo = &H->server->error;
     }
     if (einfo->error_code) {
@@ -219,15 +216,14 @@ snowflake_handle_doer(pdo_dbh_t *dbh, const char *sql, size_t sql_len) /* {{{ */
         PDO_DBG_INF("success1");
         // return number of rows affected
         ret = (int) rows;
-    }
-    else {
+    } else {
         /* Failed to run a query */
         pdo_snowflake_error(dbh);
         ret = -1;
         goto cleanup;
     }
 
-    cleanup:
+cleanup:
     snowflake_stmt_close(sfstmt);
 
     PDO_DBG_RETURN(ret);
@@ -475,7 +471,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
 
     ret = 1;
 
-    cleanup:
+cleanup:
     for (i = 0; i < sizeof(vars) / sizeof(vars[0]); i++) {
         if (vars[i].freeme) {
             efree(vars[i].optval);
