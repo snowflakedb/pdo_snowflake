@@ -208,7 +208,8 @@ typedef struct sf_snowflake_statement {
     ARRAY_LIST *params;
     ARRAY_LIST *results;
     SF_COLUMN_DESC **desc;
-    ARRAY_LIST *stmt_params;
+    ARRAY_LIST *stmt_attrs;
+} SF_STMT;
 
 /**
  * Bind input parameter context

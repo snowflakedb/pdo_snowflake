@@ -350,7 +350,7 @@ static int pdo_snowflake_stmt_param_hook(
     else {
         parameter = &param->parameter;
     }
-    SNOWFLAKE_BIND_INPUT *v;
+    SF_BIND_INPUT *v;
     switch (event_type) {
         case PDO_PARAM_EVT_ALLOC:
             PDO_DBG_INF(
@@ -368,7 +368,7 @@ static int pdo_snowflake_stmt_param_hook(
             if (S->bound_params == NULL) {
                 S->bound_params = array_list_init();
             }
-            v = ecalloc(1, sizeof(SNOWFLAKE_BIND_INPUT));
+            v = ecalloc(1, sizeof(SF_BIND_INPUT));
             /* TODO: check if already set in the array */
             array_list_set(S->bound_params, v, (size_t) param->paramno + 1);
             break;
