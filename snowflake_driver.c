@@ -18,17 +18,20 @@ int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
     PDO_DBG_ENTER("_pdo_snowflake_error");
     PDO_DBG_INF("file=%s line=%d", file, line);
     if (stmt) {
+        PDO_DBG_INF("stmt error");
         S = (pdo_snowflake_stmt *) stmt->driver_data;
         pdo_err = &stmt->error_code;
         einfo = &S->stmt->error;
     } else {
+        PDO_DBG_INF("connection error");
         pdo_err = &dbh->error_code;
         einfo = &H->server->error;
     }
+    PDO_DBG_INF("error code: %ld", einfo->error_code);
 
     /* Adjust the file and line to reference to PDO source code instead of
      * Snowflake Client code. */
-    einfo->file = file;
+    einfo->file = (char*)file;
     einfo->line = line;
 
     if (!einfo->error_code) {
@@ -40,10 +43,11 @@ int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
     /* Set SQLSTATE */
     if (stmt) {
         S = (pdo_snowflake_stmt *) stmt->driver_data;
-        strcpy(*pdo_err, S->stmt->sqlstate);
+        strcpy(*pdo_err, S->stmt->error.sqlstate);
+        PDO_DBG_INF("sqlstate: %s", pdo_err);
     } else {
         /* TODO: connection related errors */
-        strcpy(*pdo_err, "00000");
+        strcpy(*pdo_err, SF_SQLSTATE_NO_ERROR);
     }
 
     PDO_DBG_RETURN(einfo->error_code);

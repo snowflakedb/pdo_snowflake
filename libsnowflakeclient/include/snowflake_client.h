@@ -21,7 +21,7 @@ extern "C" {
 #include "uuid4.h"
 #include "snowflake_client_version.h"
 
-#define SQLSTATE_LEN 7
+#define SQLSTATE_LEN 6
 
 /**
  * Snowflake Data types
@@ -87,6 +87,15 @@ typedef enum sf_error_code {
 } SF_ERROR_CODE;
 
 /**
+ * SQLState for client errors
+ */
+#define SF_SQLSTATE_NO_ERROR "00000"
+#define SF_SQLSTATE_UNABLE_TO_CONNECT "08001"
+#define SF_SQLSTATE_CONNECTION_ALREADY_EXIST "08002"
+#define SF_SQLSTATE_CONNECTION_NOT_EXIST "08003"
+#define SF_SQLSTATE_APP_REJECT_CONNECTION "08004"
+
+/**
  * Attributes for Snowflake database session context.
  */
 typedef enum sf_attribute {
@@ -133,9 +142,10 @@ typedef enum sf_stmt_attribute {
  */
 typedef struct sf_error {
     SF_ERROR_CODE error_code;
-    const char *msg;
+    char sqlstate[SQLSTATE_LEN];
+    char *msg;
     char sfqid[UUID4_LEN];
-    const char *file;
+    char *file;
     int line;
 } SF_ERROR;
 
@@ -194,7 +204,6 @@ typedef struct sf_snowflake_column_desc {
 typedef struct sf_snowflake_statement {
     /* TODO */
     char sfqid[UUID4_LEN];
-    char sqlstate[SQLSTATE_LEN];
     int64 sequence_counter;
     char request_id[UUID4_LEN];
     SF_ERROR error;

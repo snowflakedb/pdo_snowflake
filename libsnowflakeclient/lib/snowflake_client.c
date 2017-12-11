@@ -300,7 +300,7 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
         SET_SNOWFLAKE_ERROR(&sf->error,
                             SF_ERROR_BAD_CONNECTION_PARAMS,
                             "Missing essential connection parameters. Either user or account (or both) are missing",
-                            "");
+                            SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     }
 
@@ -323,7 +323,7 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
         }
     } else {
         log_error("No response");
-        SET_SNOWFLAKE_ERROR(&sf->error, SF_ERROR_BAD_JSON, "No valid JSON response", "");
+        SET_SNOWFLAKE_ERROR(&sf->error, SF_ERROR_BAD_JSON, "No valid JSON response", SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     }
 
@@ -423,7 +423,7 @@ SF_STATUS STDCALL snowflake_set_attr(
             sf->autocommit = *((sf_bool *) value);
             break;
         default:
-            SET_SNOWFLAKE_ERROR(&sf->error, SF_ERROR_BAD_ATTRIBUTE_TYPE, "Invalid attribute type", "");
+            SET_SNOWFLAKE_ERROR(&sf->error, SF_ERROR_BAD_ATTRIBUTE_TYPE, "Invalid attribute type", SF_SQLSTATE_UNABLE_TO_CONNECT);
             return SF_STATUS_ERROR;
     }
     return SF_STATUS_SUCCESS;
@@ -449,8 +449,7 @@ static void STDCALL _snowflake_stmt_reset(SF_STMT *sfstmt) {
     clear_snowflake_error(&sfstmt->error);
 
     strncpy(sfstmt->sfqid, "", UUID4_LEN);
-    strncpy(sfstmt->sqlstate, "", SQLSTATE_LEN);
-    uuid4_generate(sfstmt->request_id);
+    uuid4_generate(sfstmt->request_id); /* TODO: move this to exec */
 
     if (sfstmt->sql_text) {
         SF_FREE(sfstmt->sql_text); /* SQL */
@@ -486,6 +485,9 @@ static void STDCALL _snowflake_stmt_reset(SF_STMT *sfstmt) {
         array_list_deallocate(sfstmt->stmt_attrs);
     }
     sfstmt->stmt_attrs = NULL;
+
+    /* clear error handle */
+    clear_snowflake_error(&sfstmt->error);
 
     sfstmt->total_rowcount = -1;
     sfstmt->total_fieldcount = -1;
@@ -758,7 +760,7 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
     if (is_string_empty(sfstmt->connection->master_token) || is_string_empty(sfstmt->connection->token)) {
         log_error("Missing session token or Master token. Are you sure that snowflake_connect was successful?");
         SET_SNOWFLAKE_ERROR(&sfstmt->error, SF_ERROR_BAD_CONNECTION_PARAMS,
-                            "Missing session or master token. Try running snowflake_connect.", "");
+                            "Missing session or master token. Try running snowflake_connect.", SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     }
 
@@ -778,9 +780,6 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
         data = cJSON_GetObjectItem(resp, "data");
         if (json_copy_string_no_alloc(sfstmt->sfqid, data, "queryId", UUID4_LEN)) {
             log_debug("No valid sfqid found in response");
-        }
-        if (json_copy_string_no_alloc(sfstmt->sqlstate, data, "sqlState", SQLSTATE_LEN)) {
-            log_debug("No valid sqlstate found in response");
         }
         if ((json_error = json_copy_bool(&success, resp, "success")) == SF_JSON_ERROR_NONE && success) {
             // Set Database info
@@ -811,8 +810,9 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
             // Set results array
             if (json_detach_array_from_object(&sfstmt->raw_results, data, "rowset")) {
                 log_error("No valid rowset found in response");
-                SET_SNOWFLAKE_ERROR(&sfstmt->error, SF_ERROR_BAD_JSON,
-                                    "Missing rowset from response. No results found.", sfstmt->sfqid);
+                SET_SNOWFLAKE_STMT_ERROR(&sfstmt->error, SF_ERROR_BAD_JSON,
+                                    "Missing rowset from response. No results found.",
+                                    SF_SQLSTATE_APP_REJECT_CONNECTION, sfstmt->sfqid);
                 goto cleanup;
             }
             if (json_copy_int(&sfstmt->total_rowcount, data, "total")) {
@@ -821,10 +821,31 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
             }
         } else if (json_error != SF_JSON_ERROR_NONE) {
             JSON_ERROR_MSG(json_error, error_msg, "Success code");
-            SET_SNOWFLAKE_ERROR(&sfstmt->error, SF_ERROR_BAD_JSON, error_msg, sfstmt->sfqid);
+            SET_SNOWFLAKE_STMT_ERROR(
+              &sfstmt->error, SF_ERROR_BAD_JSON,
+              error_msg, SF_SQLSTATE_APP_REJECT_CONNECTION, sfstmt->sfqid);
             goto cleanup;
         } else if (!success) {
-            SET_SNOWFLAKE_ERROR(&sfstmt->error, SF_ERROR_APPLICATION_ERROR, "Query was not successful", "");
+            cJSON *messageJson = NULL;
+            char *message = NULL;
+            cJSON *codeJson = NULL;
+            int64 code = -1;
+            if (json_copy_string_no_alloc(sfstmt->error.sqlstate, data, "sqlState", SQLSTATE_LEN)) {
+                log_debug("No valid sqlstate found in response");
+            }
+            messageJson = cJSON_GetObjectItem(resp, "message");
+            if (messageJson) {
+                message = messageJson->valuestring;
+            }
+            codeJson = cJSON_GetObjectItem(resp, "code");
+            if (codeJson) {
+                code = (int64)atoi(codeJson->valuestring);
+            } else {
+                log_debug("no code element.");
+            }
+            SET_SNOWFLAKE_STMT_ERROR(&sfstmt->error, code,
+                                     message ? message : "Query was not successful",
+                                     NULL, sfstmt->sfqid);
             goto cleanup;
         }
     } else {
@@ -894,7 +915,7 @@ const char *STDCALL snowflake_sqlstate(SF_STMT *sfstmt) {
     if (!sfstmt) {
         return NULL;
     }
-    return sfstmt->sqlstate;
+    return sfstmt->error.sqlstate;
 }
 
 SF_STATUS STDCALL snowflake_stmt_get_attr(
