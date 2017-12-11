@@ -177,7 +177,7 @@ static int pdo_snowflake_stmt_execute(pdo_stmt_t *stmt) /* {{{ */
     }
 
     // TODO: stmt->active_query_stringlen should be specified.
-    if (snowflake_query(S->stmt, stmt->active_query_string) !=
+    if (snowflake_query(S->stmt, stmt->active_query_string, stmt->active_query_stringlen) !=
         SF_STATUS_SUCCESS) {
         PDO_DBG_RETURN(0);
     }

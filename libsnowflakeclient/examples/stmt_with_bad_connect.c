@@ -17,7 +17,7 @@ int main() {
 
     /* query, try running a query with a connection struct that has not connected */
     SF_STMT *sfstmt = snowflake_stmt(sf);
-    snowflake_prepare(sfstmt, "select 1;");
+    snowflake_prepare(sfstmt, "select 1;", 0);
     SF_BIND_OUTPUT c1;
     int out = 0;
     c1.idx = 1;

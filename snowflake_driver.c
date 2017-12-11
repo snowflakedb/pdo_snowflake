@@ -174,7 +174,7 @@ snowflake_handle_preparer(pdo_dbh_t *dbh, const char *sql, size_t sql_len,
     }
 
     /* prepare SQL */
-    if (snowflake_prepare(S->stmt, sql) != SF_STATUS_SUCCESS) {
+    if (snowflake_prepare(S->stmt, sql, sql_len) != SF_STATUS_SUCCESS) {
         pdo_snowflake_error_stmt(stmt);
         PDO_DBG_RETURN(0);
     }
@@ -203,7 +203,7 @@ snowflake_handle_doer(pdo_dbh_t *dbh, const char *sql, size_t sql_len) /* {{{ */
 
     PDO_DBG_INF("sql: %.*s, len: %d", sql_len, sql, sql_len);
     SF_STMT *sfstmt = snowflake_stmt(H->server);
-    if (snowflake_query(sfstmt, sql) == SF_STATUS_SUCCESS) {
+    if (snowflake_query(sfstmt, sql, sql_len) == SF_STATUS_SUCCESS) {
         PDO_DBG_INF("success");
         int64 rows = snowflake_affected_rows(sfstmt);
         if (rows == -1) {

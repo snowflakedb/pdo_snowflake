@@ -540,12 +540,12 @@ SF_STATUS STDCALL snowflake_bind_result(
 }
 
 SF_STATUS STDCALL snowflake_query(
-        SF_STMT *sfstmt, const char *command) {
+        SF_STMT *sfstmt, const char *command, size_t command_size) {
     if (!sfstmt) {
         return SF_STATUS_ERROR;
     }
     clear_snowflake_error(&sfstmt->error);
-    if (snowflake_prepare(sfstmt, command) != SF_STATUS_SUCCESS) {
+    if (snowflake_prepare(sfstmt, command, command_size) != SF_STATUS_SUCCESS) {
         return SF_STATUS_ERROR;
     }
     if (snowflake_execute(sfstmt) != SF_STATUS_SUCCESS) {
@@ -682,7 +682,7 @@ int64 STDCALL snowflake_affected_rows(SF_STMT *sfstmt) {
     return ret;
 }
 
-SF_STATUS STDCALL snowflake_prepare(SF_STMT *sfstmt, const char *command) {
+SF_STATUS STDCALL snowflake_prepare(SF_STMT *sfstmt, const char *command, size_t command_size) {
     if (!sfstmt) {
         return SF_STATUS_ERROR;
     }
@@ -694,9 +694,15 @@ SF_STATUS STDCALL snowflake_prepare(SF_STMT *sfstmt, const char *command) {
     }
     _snowflake_stmt_reset(sfstmt);
     // Set sql_text to command
-    sql_text_size += strlen(command);
+    if (command_size == 0) {
+        sql_text_size += strlen(command);
+    } else {
+        sql_text_size += command_size;
+    }
     sfstmt->sql_text = (char *) SF_CALLOC(1, sql_text_size);
-    strncpy(sfstmt->sql_text, command, sql_text_size);
+    memcpy(sfstmt->sql_text, command, sql_text_size - 1);
+    // Null terminate
+    sfstmt->sql_text[sql_text_size - 1] = '\0';
 
     ret = SF_STATUS_SUCCESS;
 
