@@ -375,7 +375,7 @@ SF_ERROR *STDCALL snowflake_error(SF_CONNECT *sf);
  * @param command a query or command that returns results.
  * @return 0 if success, otherwise an errno is returned.
  */
-SF_STATUS STDCALL snowflake_query(SF_STMT *sfstmt, const char *command);
+SF_STATUS STDCALL snowflake_query(SF_STMT *sfstmt, const char *command, size_t command_size);
 
 /**
  * Returns the number of affected rows in the last execution.  This function
@@ -418,8 +418,7 @@ const char *STDCALL snowflake_sqlstate(SF_STMT *sfstmt);
  * @param command a query or command that returns results.
  * @return 0 if success, otherwise an errno is returned.
  */
-SF_STATUS STDCALL snowflake_prepare(
-        SF_STMT *sfstmt, const char *command);
+SF_STATUS STDCALL snowflake_prepare(SF_STMT *sfstmt, const char *command,  size_t command_size);
 
 /**
  * Sets a statement attribute.
@@ -429,8 +428,7 @@ SF_STATUS STDCALL snowflake_prepare(
  * @param value pointer to the attribute value
  * @return 0 if success, otherwise an errno is returned.
  */
-SF_STATUS STDCALL snowflake_stmt_set_attr(
-        SF_STMT *sfstmt, SF_STMT_ATTRIBUTE type, const void *value);
+SF_STATUS STDCALL snowflake_stmt_set_attr(SF_STMT *sfstmt, SF_STMT_ATTRIBUTE type, const void *value);
 
 /**
  * Gets a statement attribute value.
@@ -440,8 +438,7 @@ SF_STATUS STDCALL snowflake_stmt_set_attr(
  * @param value pointer to the attribute value buffer
  * @return 0 if success, otherwise an errno is returned.
  */
-SF_STATUS STDCALL snowflake_stmt_get_attr(
-        SF_STMT *sfstmt, SF_STMT_ATTRIBUTE type, void *value);
+SF_STATUS STDCALL snowflake_stmt_get_attr(SF_STMT *sfstmt, SF_STMT_ATTRIBUTE type, void *value);
 
 /**
  * Executes a statement.

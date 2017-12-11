@@ -13,7 +13,8 @@ int fetch_data(SF_STMT *stmt, int64 expected_sum) {
 
     status = snowflake_query(
       stmt,
-      "select * from t"
+      "select * from t",
+      0
     );
     if (status != SF_STATUS_SUCCESS) {
         fprintf(stderr, "failed to select a table\n");
@@ -88,7 +89,9 @@ int main() {
      * it is taken as a float */
     status = snowflake_query(
       stmt,
-      "create or replace table t (c1 number(10,0), c2 string)");
+      "create or replace table t (c1 number(10,0), c2 string)",
+      0
+    );
     if (status != SF_STATUS_SUCCESS) {
         fprintf(stderr, "failed to create a table\n");
         goto error_stmt;
@@ -96,7 +99,8 @@ int main() {
 
     status = snowflake_query(
       stmt,
-      "insert into t values(1, 'test1'),(2, 'test2')"
+      "insert into t values(1, 'test1'),(2, 'test2')",
+      0
     );
     if (status != SF_STATUS_SUCCESS) {
         fprintf(stderr, "failed to insert a table\n");
@@ -108,7 +112,7 @@ int main() {
         goto error_stmt;
     }
 
-    status = snowflake_prepare(stmt, "update t set c1=? where c2=?");
+    status = snowflake_prepare(stmt, "update t set c1=? where c2=?", 0);
     if (status != SF_STATUS_SUCCESS) {
         fprintf(stderr, "failed to prepare updating\n");
         goto error_stmt;
@@ -149,7 +153,7 @@ int main() {
         goto error_stmt;
     }
 
-    status = snowflake_query(stmt, "drop table if exists t");
+    status = snowflake_query(stmt, "drop table if exists t", 0);
     if (status != SF_STATUS_SUCCESS) {
         fprintf(stderr, "failed to drop table t\n");
         goto error_stmt;
