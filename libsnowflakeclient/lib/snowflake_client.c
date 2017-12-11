@@ -30,6 +30,31 @@ sf_bool DEBUG;
 static char *LOG_PATH = NULL;
 static FILE *LOG_FP = NULL;
 
+#define _SF_STMT_TYPE_DML 0x3000
+#define _SF_STMT_TYPE_INSERT (_SF_STMT_TYPE_DML + 0x100)
+#define _SF_STMT_TYPE_UPDATE (_SF_STMT_TYPE_DML + 0x200)
+#define _SF_STMT_TYPE_DELETE (_SF_STMT_TYPE_DML + 0x300)
+#define _SF_STMT_TYPE_MERGE (_SF_STMT_TYPE_DML + 0x400)
+#define _SF_STMT_TYPE_MULTI_TABLE_INSERT (_SF_STMT_TYPE_DML + 0x500)
+
+static sf_bool detect_stmt_type(int64 stmt_type_id) {
+    sf_bool ret;
+    switch (stmt_type_id) {
+        case _SF_STMT_TYPE_DML:
+        case _SF_STMT_TYPE_INSERT:
+        case _SF_STMT_TYPE_UPDATE:
+        case _SF_STMT_TYPE_DELETE:
+        case _SF_STMT_TYPE_MERGE:
+        case _SF_STMT_TYPE_MULTI_TABLE_INSERT:
+            ret = SF_BOOLEAN_TRUE;
+            break;
+        default:
+            ret = SF_BOOLEAN_FALSE;
+            break;
+    }
+    return ret;
+}
+
 /*
  * Convenience method to find string size, create buffer, copy over, and return.
  */
@@ -630,10 +655,31 @@ SF_STATUS STDCALL snowflake_trans_rollback(SF_CONNECT *sf) {
 }
 
 int64 STDCALL snowflake_affected_rows(SF_STMT *sfstmt) {
+    size_t i;
+    int64 ret = -1;
+    cJSON *row = NULL;
+    cJSON *raw_row_result;
     if (!sfstmt) {
-        return -1;
+        return ret;
     }
-    return 0;
+    if (cJSON_GetArraySize(sfstmt->raw_results) == 0) {
+        /* no affected rows is determined. The potential cause is
+         * the query is not DML. */
+        return ret;
+    }
+
+    if (sfstmt->is_dml) {
+        row = cJSON_DetachItemFromArray(sfstmt->raw_results, 0);
+        ret = 0;
+        for (i = 0; i < sfstmt->total_fieldcount; ++i) {
+            raw_row_result = cJSON_GetArrayItem(row, i);
+            ret += (int64) strtoll(raw_row_result->valuestring, NULL, 10);
+        }
+        cJSON_Delete(row);
+    } else {
+        ret = sfstmt->total_rowcount;
+    }
+    return ret;
 }
 
 SF_STATUS STDCALL snowflake_prepare(SF_STMT *sfstmt, const char *command) {
@@ -741,6 +787,13 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
             }
             if (json_copy_string(&sfstmt->connection->role, data, "finalRoleName")) {
                 log_warn("No valid role found in response");
+            }
+            int64 stmt_type_id;
+            if (json_copy_int(&stmt_type_id, data, "statementTypeId")) {
+                /* failed to get statement type id */
+                sfstmt->is_dml = SF_BOOLEAN_FALSE;
+            } else {
+                sfstmt->is_dml = detect_stmt_type(stmt_type_id);
             }
             rowtype = cJSON_GetObjectItem(data, "rowtype");
             if (cJSON_IsArray(rowtype)) {

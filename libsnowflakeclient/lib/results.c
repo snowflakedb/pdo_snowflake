@@ -152,7 +152,7 @@ char *value_to_string(void *value, size_t len, SF_C_TYPE c_type) {
         case SF_C_TYPE_STRING:
             size = (size_t)len + 1;
             ret = (char *) SF_CALLOC(1, size);
-            strncpy(ret, (char *) value, size);
+            strncpy(ret, (const char *) value, size);
             return ret;
         case SF_C_TYPE_TIMESTAMP:
             // TODO Add timestamp case

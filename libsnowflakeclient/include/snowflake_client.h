@@ -209,6 +209,7 @@ typedef struct sf_snowflake_statement {
     ARRAY_LIST *results;
     SF_COLUMN_DESC **desc;
     ARRAY_LIST *stmt_attrs;
+    sf_bool is_dml;
 } SF_STMT;
 
 /**
