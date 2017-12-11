@@ -103,6 +103,8 @@ int main() {
         goto error_stmt;
     }
 
+    printf("affected rows: %lld\n", snowflake_affected_rows(stmt));
+
     ret = fetch_data(stmt, 3);
     if (ret != 0) {
         goto error_stmt;
@@ -119,6 +121,7 @@ int main() {
     p1.idx = 1;
     p1.c_type = SF_C_TYPE_INT64;
     p1.value = &p1v;
+    p1.len = sizeof(p1v);
     status = snowflake_bind_param(stmt, &p1);
     if (status != SF_STATUS_SUCCESS) {
         fprintf(stderr, "failed to bind p1\n");
@@ -131,6 +134,7 @@ int main() {
     p2.idx = 2;
     p2.c_type = SF_C_TYPE_STRING;
     p2.value = &p2v;
+    p2.len = sizeof(p2v);
 
     status = snowflake_bind_param(stmt, &p2);
     if (status != SF_STATUS_SUCCESS) {
@@ -143,6 +147,8 @@ int main() {
         fprintf(stderr, "failed to exec\n");
         goto error_stmt;
     }
+
+    printf("affected rows: %lld\n", snowflake_affected_rows(stmt));
 
     ret = fetch_data(stmt, 103);
     if (ret != 0) {

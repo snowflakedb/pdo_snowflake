@@ -46,6 +46,20 @@ static const char *const php_zval_type_names[] = {
   "IS_REFERENCE",
 };
 
+static void _pdo_snowflake_stmt_set_row_count(pdo_stmt_t *stmt) /* {{{ */
+{
+    zend_long row_count;
+    pdo_snowflake_stmt *S = stmt->driver_data;
+
+    PDO_DBG_ENTER("_pdo_snowflake_stmt_set_row_count");
+
+    row_count = (zend_long) snowflake_affected_rows(S->stmt);
+    PDO_DBG_INF("row count: %lld", row_count);
+    if (row_count != (zend_long)-1) {
+        stmt->row_count = row_count;
+    }
+}
+
 /**
  * Destroy a previously constructed statement object.
  *
@@ -141,6 +155,7 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
         snowflake_bind_result(S->stmt, &S->bound_result[i]);
     }
 
+    _pdo_snowflake_stmt_set_row_count(stmt);
     PDO_DBG_RETURN(1);
 }
 /* }}} */

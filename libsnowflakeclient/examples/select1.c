@@ -30,6 +30,7 @@ int main() {
     c1.idx = 1;
     c1.type = SF_C_TYPE_INT64;
     c1.value = (void *) &out;
+    c1.len = sizeof(out);
     snowflake_bind_result(sfstmt, &c1);
     printf("Number of rows: %d\n", (int) snowflake_num_rows(sfstmt));
 
