@@ -274,6 +274,8 @@ void STDCALL snowflake_term(SF_CONNECT *sf) {
 }
 
 SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
+    sf_bool success = SF_BOOLEAN_FALSE;
+    SF_JSON_ERROR json_error;
     if (!sf) {
         return SF_STATUS_ERROR;
     }
@@ -317,6 +319,32 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
     if (request(sf, &resp, SESSION_URL, url_params, 5, s_body, NULL, POST_REQUEST_TYPE, &sf->error)) {
         s_resp = cJSON_Print(resp);
         log_trace("Here is JSON response:\n%s", s_resp);
+        if ((json_error = json_copy_bool(&success, resp, "success")) != SF_JSON_ERROR_NONE ) {
+            log_error("JSON error: %d", json_error);
+            SET_SNOWFLAKE_ERROR(&sf->error, SF_ERROR_BAD_JSON, "No valid JSON response", SF_SQLSTATE_UNABLE_TO_CONNECT);
+            goto cleanup;
+        }
+        if (!success) {
+            cJSON *messageJson = cJSON_GetObjectItem(resp, "message");
+            char *message = NULL;
+            cJSON *codeJson = NULL;
+            int64 code = -1;
+            if (messageJson) {
+                message = messageJson->valuestring;
+            }
+            codeJson = cJSON_GetObjectItem(resp, "code");
+            if (codeJson) {
+                code = (int64)atoi(codeJson->valuestring);
+            } else {
+                log_debug("no code element.");
+            }
+
+            SET_SNOWFLAKE_ERROR(&sf->error, code,
+                                message ? message : "Query was not successful",
+                                SF_SQLSTATE_UNABLE_TO_CONNECT);
+            goto cleanup;
+        }
+
         data = cJSON_GetObjectItem(resp, "data");
         if (!set_tokens(sf, data, "token", "masterToken", &sf->error)) {
             goto cleanup;

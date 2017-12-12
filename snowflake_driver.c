@@ -6,6 +6,7 @@
 #include "php.h"
 #include "pdo/php_pdo_driver.h"
 #include "php_pdo_snowflake_int.h"
+#include "Zend/zend_exceptions.h"
 
 int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
                          int line) /* {{{ */
@@ -31,7 +32,7 @@ int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
 
     /* Adjust the file and line to reference to PDO source code instead of
      * Snowflake Client code. */
-    einfo->file = (char*)file;
+    einfo->file = (char *) file;
     einfo->line = line;
 
     if (!einfo->error_code) {
@@ -41,15 +42,18 @@ int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
     }
 
     /* Set SQLSTATE */
-    if (stmt) {
-        S = (pdo_snowflake_stmt *) stmt->driver_data;
-        strcpy(*pdo_err, S->stmt->error.sqlstate);
-        PDO_DBG_INF("sqlstate: %s", pdo_err);
-    } else {
-        /* TODO: connection related errors */
-        strcpy(*pdo_err, SF_SQLSTATE_NO_ERROR);
-    }
+    strcpy(*pdo_err, einfo->sqlstate);
+    PDO_DBG_INF("sqlstate: %s", pdo_err);
+    PDO_DBG_INF("msg: %s", einfo->msg);
 
+    if (!dbh->methods) {
+        PDO_DBG_INF("Failed to allocate DBH");
+        zend_throw_exception_ex(
+          php_pdo_get_exception(),
+          einfo->error_code,
+          "SQLSTATE[%s] [%d] %s",
+          *pdo_err, einfo->error_code, einfo->msg);
+    }
     PDO_DBG_RETURN(einfo->error_code);
 }
 
@@ -92,7 +96,7 @@ static int pdo_snowflake_fetch_error_func(
 /* }}} */
 
 /**
- * Close an open database.
+ * Close an opened database.
  *
  * @param dbh Pointer to the database handle initialized by the handle factory
  * @return 1 if success or 0 if error occurs
@@ -104,6 +108,7 @@ static int snowflake_handle_closer(pdo_dbh_t *dbh) /* {{{ */
 
     if (H) {
         if (H->server) {
+            snowflake_close(H->server);
             snowflake_term(H->server);
             H->server = NULL;
         }

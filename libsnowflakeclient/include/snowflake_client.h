@@ -144,6 +144,7 @@ typedef struct sf_error {
     SF_ERROR_CODE error_code;
     char sqlstate[SQLSTATE_LEN];
     char *msg;
+    sf_bool is_shared_msg;
     char sfqid[UUID4_LEN];
     char *file;
     int line;
@@ -363,18 +364,18 @@ SF_STATUS STDCALL snowflake_trans_commit(SF_CONNECT *sf);
 SF_STATUS STDCALL snowflake_trans_rollback(SF_CONNECT *sf);
 
 /**
- * Returns an error message for the SNOWFLAKE_STMT context.
+ * Returns an error context for the SNOWFLAKE_STMT context.
  *
  * @param sfstmt SNOWFLAKE_STMT context.
- * @return error message
+ * @return error context
  */
 SF_ERROR *STDCALL snowflake_stmt_error(SF_STMT *sfstmt);
 
 /**
- * Returns an error message for the SNOWFLAKE context.
+ * Returns an error context for the SNOWFLAKE context.
  *
  * @param sf SNOWFLAKE context.
- * @return error message
+ * @return error context
  */
 SF_ERROR *STDCALL snowflake_error(SF_CONNECT *sf);
 
