@@ -45,7 +45,7 @@ pdo_snowflake - error handlings
     $dbh = null; // make sure closing db.
 
    try {
-        $dbh = new PDO($dsn, $user, "HAHAHAH", $options);
+        $dbh = new PDO($dsn, "HIHIHI", "HAHAHAH", $options);
     } catch (PDOException $e) {
         echo 'Connection failed: ' . $e->getMessage() . "\n";
     }
