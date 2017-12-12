@@ -42,9 +42,18 @@ pdo_snowflake - error handlings
         echo "dsn is: $dsn";
     }
 
+    $dbh = null; // make sure closing db.
+
+   try {
+        $dbh = new PDO($dsn, $user, "HAHAHAH", $options);
+    } catch (PDOException $e) {
+        echo 'Connection failed: ' . $e->getMessage() . "\n";
+    }
+
     $dbh = null;
 ?>
 --EXPECT--
 Connected to Snowflake
 sqlstate: 42000
 Snowflake Error: 1003
+Connection failed: SQLSTATE[08001] [390100] Incorrect username or password was specified.
