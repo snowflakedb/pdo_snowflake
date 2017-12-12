@@ -40,7 +40,7 @@ int main() {
     }
 cleanup1:
     if (sfstmt) {
-        snowflake_stmt_close(sfstmt);
+        snowflake_stmt_term(sfstmt);
     }
     sfstmt = NULL;
     snowflake_term(sf);
@@ -65,7 +65,7 @@ cleanup1:
 cleanup2:
     /* delete statement */
     if (sfstmt) {
-        snowflake_stmt_close(sfstmt);
+        snowflake_stmt_term(sfstmt);
     }
 
     /* close and term */
