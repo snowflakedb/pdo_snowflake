@@ -256,6 +256,7 @@ SF_CONNECT *STDCALL snowflake_init() {
 void STDCALL snowflake_term(SF_CONNECT *sf) {
     // Ensure object is not null
     if (sf) {
+        clear_snowflake_error(&sf->error);
         SF_FREE(sf->host);
         SF_FREE(sf->port);
         SF_FREE(sf->user);
@@ -376,14 +377,6 @@ cleanup:
     SF_FREE(s_resp);
 
     return ret;
-}
-
-SF_STATUS STDCALL snowflake_close(SF_CONNECT *sf) {
-    if (!sf) {
-        return SF_STATUS_ERROR;
-    }
-    clear_snowflake_error(&sf->error);
-    return SF_STATUS_SUCCESS;
 }
 
 SF_STATUS STDCALL snowflake_set_attr(

@@ -172,7 +172,6 @@ int main() {
     snowflake_stmt_close(stmt);
 
     error_con: /* error connection */
-    snowflake_close(sf);
     snowflake_term(sf);
     snowflake_global_term();
     return ret;

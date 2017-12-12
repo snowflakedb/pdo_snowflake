@@ -36,10 +36,8 @@ int main() {
 
 cleanup:
     snowflake_stmt_close(sfstmt);
-    /* disconnect */
-    snowflake_close(sf);
 
-    /* term */
+    /* close and term */
     snowflake_term(sf); // purge snowflake context
     snowflake_global_term();
 
