@@ -12,7 +12,8 @@ SET(EXAMPLES
         transaction
         ping_pong
         stmt_with_bad_connect
-        crud)
+        crud
+        error_handling)
 
 set(SOURCE_UTILS
         example_setup.c)
