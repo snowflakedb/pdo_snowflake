@@ -324,11 +324,11 @@ SF_STATUS STDCALL snowflake_get_attr(
 SF_STMT *STDCALL snowflake_stmt(SF_CONNECT *sf);
 
 /**
- * Closes a statement.
+ * Closes and terminates a statement context
  * @param sfstmt SNOWFLAKE_STMT context.
  * @return 0 if success, otherwise an errno is returned.
  */
-void STDCALL snowflake_stmt_close(SF_STMT *sfstmt);
+void STDCALL snowflake_stmt_term(SF_STMT *sfstmt);
 
 /**
  * Begins a new transaction.

@@ -169,7 +169,7 @@ int main() {
     ret = 0;
 
     error_stmt: /* error stmt */
-    snowflake_stmt_close(stmt);
+    snowflake_stmt_term(stmt);
 
     error_con: /* error connection */
     snowflake_term(sf);

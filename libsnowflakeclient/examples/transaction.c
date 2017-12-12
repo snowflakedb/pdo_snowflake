@@ -60,7 +60,7 @@ int main()
   printf("Error. Query ID: %s, Message: %s\n", err->sfqid, err->msg);
 
   end: /* finally */
-  snowflake_stmt_close(sfstmt);
+    snowflake_stmt_term(sfstmt);
 
   /* close and term */
   snowflake_term(sf); // purge snowflake context

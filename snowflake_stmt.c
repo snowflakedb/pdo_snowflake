@@ -89,7 +89,7 @@ static int pdo_snowflake_stmt_dtor(pdo_stmt_t *stmt) /* {{{ */
         efree(S->bound_result);
     }
 
-    snowflake_stmt_close(S->stmt);
+    snowflake_stmt_term(S->stmt);
     efree(S);
     stmt->driver_data = NULL;
     PDO_DBG_RETURN(1);

@@ -232,7 +232,7 @@ snowflake_handle_doer(pdo_dbh_t *dbh, const char *sql, size_t sql_len) /* {{{ */
     }
 
 cleanup:
-    snowflake_stmt_close(sfstmt);
+    snowflake_stmt_term(sfstmt);
 
     PDO_DBG_RETURN(ret);
 }
