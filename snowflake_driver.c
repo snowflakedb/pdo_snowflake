@@ -108,7 +108,6 @@ static int snowflake_handle_closer(pdo_dbh_t *dbh) /* {{{ */
 
     if (H) {
         if (H->server) {
-            snowflake_close(H->server);
             snowflake_term(H->server);
             H->server = NULL;
         }

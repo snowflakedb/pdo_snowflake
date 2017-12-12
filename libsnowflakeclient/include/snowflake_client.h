@@ -295,15 +295,6 @@ void STDCALL snowflake_term(SF_CONNECT *sf);
 SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf);
 
 /**
- * Drops a session and disconnects with Snowflake database.
- *
- * @param sf SNOWFLAKE context. The data will be freed from memory
- * if the context was allocated by the library, otherwise the application is
- * responsible for freeing the data.
- */
-SF_STATUS STDCALL snowflake_close(SF_CONNECT *sf);
-
-/**
  * Sets the attribute to the session.
  *
  * @param sf SNOWFLAKE context.
