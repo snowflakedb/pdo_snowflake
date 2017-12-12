@@ -529,7 +529,7 @@ SF_STMT *STDCALL snowflake_stmt(SF_CONNECT *sf) {
     return sfstmt;
 }
 
-void STDCALL snowflake_stmt_close(SF_STMT *sfstmt) {
+void STDCALL snowflake_stmt_term(SF_STMT *sfstmt) {
     if (sfstmt) {
         _snowflake_stmt_reset(sfstmt);
         SF_FREE(sfstmt);

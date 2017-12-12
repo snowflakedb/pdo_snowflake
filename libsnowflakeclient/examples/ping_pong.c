@@ -35,7 +35,7 @@ int main() {
     printf("Number of rows: %d\n", (int) snowflake_num_rows(sfstmt));
 
 cleanup:
-    snowflake_stmt_close(sfstmt);
+    snowflake_stmt_term(sfstmt);
 
     /* close and term */
     snowflake_term(sf); // purge snowflake context

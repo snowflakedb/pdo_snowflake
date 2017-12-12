@@ -50,7 +50,7 @@ int main() {
 
 cleanup:
     /* delete statement */
-    snowflake_stmt_close(sfstmt);
+    snowflake_stmt_term(sfstmt);
 
     /* close and term */
     snowflake_term(sf); // purge snowflake context
