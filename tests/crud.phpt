@@ -81,6 +81,8 @@ pdo_snowflake - CRUD
         echo "user is: $user\n";
     }
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 Connected to Snowflake
 inserted rows: 3
@@ -94,3 +96,5 @@ updated rows: 1
 deleted rows: 1
 1 test1
 3 test101
+===DONE===
+
