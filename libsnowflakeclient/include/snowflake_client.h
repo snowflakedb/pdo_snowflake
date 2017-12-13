@@ -371,6 +371,16 @@ SF_ERROR *STDCALL snowflake_stmt_error(SF_STMT *sfstmt);
 SF_ERROR *STDCALL snowflake_error(SF_CONNECT *sf);
 
 /**
+ * Propagate SF_STMT error to SF_CONNECT so that the latest statement
+ * error is visible in the connection context.
+ *
+ * @param sf SNOWFLAKE context
+ * @param sfstmt SNOWFLAKE_STMT context.
+ * @return 0 if success, otherwise an errno is returned.
+ */
+SF_STATUS STDCALL snowflake_propagate_error(SF_CONNECT *sf, SF_STMT *sfstmt);
+
+/**
  * Executes a query and returns result set. This function works only for
  * queries and commands that return result set. If no result set is returned,
  * NULL is returned.

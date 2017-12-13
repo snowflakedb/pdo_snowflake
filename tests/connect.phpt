@@ -1,8 +1,10 @@
 --TEST--
 pdo_snowflake - connect
+--INI--
+pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 --FILE--
 <?php
-    $p = parse_ini_file(getenv('PWD') . "/testenv.ini");
+    $p = parse_ini_file(__DIR__ . "/../testenv.ini");
 
     $account = $p['SNOWFLAKE_TEST_ACCOUNT'];
     $user = $p['SNOWFLAKE_TEST_USER'];
@@ -28,10 +30,8 @@ pdo_snowflake - connect
 
     $dsn = "snowflake:host=$host;port=$port;account=$account;database=$database;schema=$schema;warehouse=$warehouse;role=$role;protocol=$protocol";
 
-    $ca_bundle_file = $p['SNOWFLAKE_TEST_CA_BUNDLE_FILE'];
-    $options = array(PDO::SNOWFLAKE_ATTR_SSL_CAPATH => $ca_bundle_file);
     try {
-        $dbh = new PDO($dsn, $user, $password, $options);
+        $dbh = new PDO($dsn, $user, $password);
         echo 'Connected to Snowflake' . "\n";
     } catch (PDOException $e) {
         echo 'Connection failed: ' . $e->getMessage();
