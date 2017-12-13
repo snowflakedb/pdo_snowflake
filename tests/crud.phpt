@@ -1,5 +1,8 @@
 --TEST--
 pdo_snowflake - CRUD
+--INI--
+pdo_snowflake.log=/tmp/sflog
+pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 --FILE--
 <?php
     $p = parse_ini_file(getenv('PWD') . "/testenv.ini");
@@ -28,17 +31,22 @@ pdo_snowflake - CRUD
 
     $dsn = "snowflake:host=$host;port=$port;account=$account;database=$database;schema=$schema;warehouse=$warehouse;role=$role;protocol=$protocol";
 
-    $ca_bundle_file = $p['SNOWFLAKE_TEST_CA_BUNDLE_FILE'];
-    $options = array(PDO::SNOWFLAKE_ATTR_SSL_CAPATH => $ca_bundle_file);
     try {
-        $dbh = new PDO($dsn, $user, $password, $options);
+        $dbh = new PDO($dsn, $user, $password);
         echo "Connected to Snowflake\n";
 
-        $dbh->exec("create or replace table t (c1 int, c2 string)");
+        $count = $dbh->exec("create or replace table t (c1 int, c2 string)");
+        if ($count == 0) {
+            print_r($dbh->errorInfo());
+        }
 
         // insert
         $count = $dbh->exec("insert into t(c1,c2) values(1, 'test1'),(2,'test2'),(3,'test3')");
-        echo "inserted rows: " . $count . "\n";
+        if ($count == 0) {
+            print_r($dbh->errorInfo());
+        } else {
+            echo "inserted rows: " . $count . "\n";
+        }
         $sth = $dbh->query("select * from t order by 1");
         while($row = $sth->fetch()) {
             echo $row["C1"] . " " . $row["C2"] . "\n";

@@ -682,12 +682,15 @@ int64 STDCALL snowflake_affected_rows(SF_STMT *sfstmt) {
     int64 ret = -1;
     cJSON *row = NULL;
     cJSON *raw_row_result;
+    clear_snowflake_error(&sfstmt->error);
     if (!sfstmt) {
+        /* TODO: set error - set_snowflake_error */
         return ret;
     }
     if (cJSON_GetArraySize(sfstmt->raw_results) == 0) {
         /* no affected rows is determined. The potential cause is
          * the query is not DML. */
+        /* TODO: set error - set_snowflake_error */
         return ret;
     }
 
@@ -958,3 +961,20 @@ SF_STATUS STDCALL snowflake_stmt_set_attr(
     return SF_STATUS_SUCCESS;
 }
 
+SF_STATUS STDCALL snowflake_propagate_error(SF_CONNECT *sf, SF_STMT *sfstmt) {
+    if (!sfstmt || !sf) {
+        return SF_STATUS_ERROR;
+    }
+    if (sf->error.error_code) {
+        /* if already error is set */
+        SF_FREE(sf->error.msg);
+    }
+    memcpy(&sf->error, &sfstmt->error, sizeof(SF_ERROR));
+    if (sfstmt->error.error_code) {
+        /* any error */
+        size_t len = strlen(sfstmt->error.msg);
+        sf->error.msg = SF_CALLOC(len + 1, sizeof(char));
+        strncpy(sf->error.msg, sfstmt->error.msg, len);
+    }
+    return SF_STATUS_SUCCESS;
+}

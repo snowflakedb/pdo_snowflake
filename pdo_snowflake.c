@@ -1,5 +1,7 @@
 /* Copyright (c) 2017 Snowflake Computing Inc. All right reserved.  */
 
+#define PDO_SNOWFLAKE_VERSION "0.1"
+
 #ifdef HAVE_CONFIG_H
 
 #include "config.h"
@@ -33,6 +35,13 @@ PHP_INI_BEGIN()
     ("pdo_snowflake.debug", NULL, PHP_INI_SYSTEM, OnUpdateString, debug,
      zend_pdo_snowflake_globals, pdo_snowflake_globals)
 #endif
+    STD_PHP_INI_ENTRY
+    ("pdo_snowflake.cacert", NULL, PHP_INI_SYSTEM, OnUpdateString, cacert,
+     zend_pdo_snowflake_globals, pdo_snowflake_globals)
+    STD_PHP_INI_ENTRY
+    ("pdo_snowflake.log", NULL, PHP_INI_SYSTEM, OnUpdateString, log,
+     zend_pdo_snowflake_globals, pdo_snowflake_globals)
+
 PHP_INI_END()
 /* }}} */
 
@@ -56,6 +65,11 @@ void pdo_snowflake_log(int line, const char *filename, const char *severity,
 static PHP_MINIT_FUNCTION(pdo_snowflake) {
     REGISTER_INI_ENTRIES();
 
+    char* log = PDO_SNOWFLAKE_G(log);
+    char* cacert = PDO_SNOWFLAKE_G(cacert);
+    snowflake_global_init(log);
+    snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, cacert);
+
     REGISTER_PDO_CLASS_CONST_LONG("SNOWFLAKE_ATTR_SSL_CAPATH",
                                   (zend_long) PDO_SNOWFLAKE_ATTR_SSL_CAPATH);
     REGISTER_PDO_CLASS_CONST_LONG(
@@ -69,6 +83,7 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
 /* {{{ PHP_MSHUTDOWN_FUNCTION
  */
 static PHP_MSHUTDOWN_FUNCTION(pdo_snowflake) {
+    snowflake_global_term();
     php_pdo_unregister_driver(&pdo_snowflake_driver);
     UNREGISTER_INI_ENTRIES();
 
@@ -80,16 +95,13 @@ static PHP_MSHUTDOWN_FUNCTION(pdo_snowflake) {
  */
 static PHP_MINFO_FUNCTION(pdo_snowflake) {
     php_info_print_table_start();
-
     php_info_print_table_header(2, "PDO Driver for Snowflake", "enabled");
     /* TODO: get Snowflake Driver version, etc*/
-    php_info_print_table_row(2, "Client API version", "0.1");
+    php_info_print_table_row(2, "Version", PDO_SNOWFLAKE_VERSION);
 
     php_info_print_table_end();
 
-#ifndef PHP_WIN32
     DISPLAY_INI_ENTRIES();
-#endif
 }
 /* }}} */
 
@@ -100,9 +112,11 @@ static PHP_GINIT_FUNCTION(pdo_snowflake) {
     ZEND_TSRMLS_CACHE_UPDATE();
 #endif
 #endif
+
 #if PDO_DBG_ENABLED
-    pdo_snowflake_globals->debug = NULL;  /* The actual string */
+    pdo_snowflake_globals->debug = NULL;
 #endif
+    pdo_snowflake_globals->cacert = NULL;
 }
 /* }}} */
 

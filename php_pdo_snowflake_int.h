@@ -27,8 +27,10 @@ static inline void PDO_DBG_ENTER(char *func_name) {}
  */
 ZEND_BEGIN_MODULE_GLOBALS(pdo_snowflake)
 #if PDO_DBG_ENABLED
-    char *debug; /* The actual string */
+    char *debug;
 #endif
+    char *cacert; /* location of cacert.pem */
+    char *log; /* location of log file */
 ZEND_END_MODULE_GLOBALS(pdo_snowflake)
 
 ZEND_EXTERN_MODULE_GLOBALS(pdo_snowflake)
