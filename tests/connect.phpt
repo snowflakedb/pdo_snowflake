@@ -32,12 +32,16 @@ pdo_snowflake - connect
     $options = array(PDO::SNOWFLAKE_ATTR_SSL_CAPATH => $ca_bundle_file);
     try {
         $dbh = new PDO($dsn, $user, $password, $options);
-        echo 'Connected to Snowflake';
+        echo 'Connected to Snowflake' . "\n";
     } catch (PDOException $e) {
         echo 'Connection failed: ' . $e->getMessage();
         echo "dsn is: $dsn\n";
         echo "user is: $user\n";
     }
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 Connected to Snowflake
+===DONE===
+
