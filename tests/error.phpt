@@ -52,8 +52,12 @@ pdo_snowflake - error handlings
 
     $dbh = null;
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 Connected to Snowflake
 sqlstate: 42000
 Snowflake Error: 1003
 Connection failed: SQLSTATE[08001] [390100] Incorrect username or password was specified.
+===DONE===
+
