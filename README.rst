@@ -90,6 +90,13 @@ Clone the this repository and run ``phpize``, ``configure``, ``make`` and ``make
     ./libtool --mode=install cp ./pdo_snowflake.la $(pwd)/modules
     make test
 
+Test Framework
+--------------------
+
+The PHP PDO Snowflake driver uses phpt test framework. Refer the following documents to write tests.
+
+- https://qa.php.net/write-test.php
+- https://qa.php.net/phpt_details.php
 
 Check if the PDO Snowflake module can be loaded
 --------------------
