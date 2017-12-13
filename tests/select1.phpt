@@ -73,6 +73,8 @@ pdo_snowflake - select1
 
     $dbh = null;
 ?>
+===DONE===
+<?php exit(0); ?>
 --EXPECT--
 Connected to Snowflake
 Result 1
@@ -85,3 +87,5 @@ Count 1
 OK. row[0] is not set.
 Result 4
 Count 2
+===DONE===
+
