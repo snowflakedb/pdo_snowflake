@@ -17,6 +17,7 @@
 #include <log.h>
 #include "results.h"
 #include "error.h"
+#include "chunk_downloader.h"
 
 #define curl_easier_escape(curl, string) curl_easy_escape(curl, string, 0)
 
@@ -29,6 +30,8 @@ sf_bool DEBUG;
 
 static char *LOG_PATH = NULL;
 static FILE *LOG_FP = NULL;
+
+pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
 
 #define _SF_STMT_TYPE_DML 0x3000
 #define _SF_STMT_TYPE_INSERT (_SF_STMT_TYPE_DML + 0x100)
@@ -82,6 +85,14 @@ int mkpath(char* file_path, mode_t mode) {
     return 0;
 }
 
+void log_lock_func(void *udata, int lock) {
+    if (lock) {
+        pthread_mutex_lock(&log_lock);
+    } else {
+        pthread_mutex_unlock(&log_lock);
+    }
+}
+
 /*
  * Initializes logging file
  */
@@ -108,6 +119,7 @@ sf_bool STDCALL log_init(const char *log_path) {
         log_set_quiet(SF_BOOLEAN_TRUE);
     }
     log_set_level(LOG_TRACE);
+    log_set_lock(&log_lock_func);
     // If log path is specified, use absolute path. Otherwise set logging dir to be relative to current directory
     if (sf_log_path) {
         log_path_size += strlen(sf_log_path);
@@ -210,10 +222,8 @@ SF_STATUS STDCALL snowflake_global_set_attribute(SF_GLOBAL_ATTRIBUTE type, const
             DEBUG = *(sf_bool *) value;
             if (DEBUG) {
                 log_set_quiet(SF_BOOLEAN_FALSE);
-                log_set_level(LOG_TRACE);
             } else {
                 log_set_quiet(SF_BOOLEAN_TRUE);
-                log_set_level(LOG_INFO);
             }
             break;
         default:
@@ -513,6 +523,10 @@ static void STDCALL _snowflake_stmt_reset(SF_STMT *sfstmt) {
     sfstmt->total_rowcount = -1;
     sfstmt->total_fieldcount = -1;
     sfstmt->total_row_index = -1;
+
+    // Destroy chunk downloader
+    chunk_downloader_term(sfstmt->chunk_downloader);
+    sfstmt->chunk_downloader = NULL;
 }
 
 SF_STMT *STDCALL snowflake_stmt(SF_CONNECT *sf) {
@@ -584,15 +598,58 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
     clear_snowflake_error(&sfstmt->error);
     SF_STATUS ret = SF_STATUS_ERROR;
     int64 i;
+    uint64 index;
     cJSON *row = NULL;
     cJSON *raw_result;
     SF_BIND_OUTPUT *result;
 
     // If no more results, set return to SF_STATUS_EOL
     if (cJSON_GetArraySize(sfstmt->raw_results) == 0) {
-        ret = SF_STATUS_EOL;
-        goto cleanup;
+        if (sfstmt->chunk_downloader) {
+            log_debug("Fetching next chunk from chunk downloader.");
+            pthread_mutex_lock(&sfstmt->chunk_downloader->queue_lock);
+            // TODO refactor to move goto out of lock
+            do {
+                if (sfstmt->chunk_downloader->consumer_head >= sfstmt->chunk_downloader->queue_size) {
+                    // No more chunks, set EOL and break
+                    log_debug("Out of chunks, setting EOL.");
+                    ret = SF_STATUS_EOL;
+                    break;
+                } else {
+                    // Get index and increment
+                    index = sfstmt->chunk_downloader->consumer_head;
+                    while (sfstmt->chunk_downloader->queue[index].chunk == NULL && !shutdown_or_error(sfstmt->chunk_downloader)) {
+                        pthread_cond_wait(&sfstmt->chunk_downloader->consumer_cond, &sfstmt->chunk_downloader->queue_lock);
+                    }
+
+                    sfstmt->chunk_downloader->consumer_head++;
+
+                    // TODO check for chunk downloader error here
+
+                    // Delete old cJSON results struct
+                    cJSON_Delete(sfstmt->raw_results);
+                    // Set new chunk and remove chunk reference from locked array
+                    sfstmt->raw_results = sfstmt->chunk_downloader->queue[index].chunk;
+                    sfstmt->chunk_downloader->queue[index].chunk = NULL;
+                    log_debug("Acquired chunk %llu from chunk downloader", index);
+                    if (pthread_cond_signal(&sfstmt->chunk_downloader->producer_cond)) {
+                        // TODO set error case
+                    }
+                }
+            } while (0);
+            pthread_mutex_unlock(&sfstmt->chunk_downloader->queue_lock);
+        } else {
+            // If there is no chunk downloader set, then we've truly reached the end of the results and should set EOL
+            log_debug("No chunk downloader set, end of results.");
+            ret = SF_STATUS_EOL;
+        }
+
+        if (ret == SF_STATUS_EOL) {
+            goto cleanup;
+        }
     }
+
+    // TODO set case where error occurs in chunk downloader
 
     // Check that we can write to the provided result bindings
     for (i = 0; i < sfstmt->total_fieldcount; i++) {
@@ -750,6 +807,9 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
     cJSON *data = NULL;
     cJSON *rowtype = NULL;
     cJSON *resp = NULL;
+    cJSON *chunks = NULL;
+    cJSON *chunk_headers = NULL;
+    char *qrmk = NULL;
     char *s_body = NULL;
     char *s_resp = NULL;
     sf_bool success = SF_BOOLEAN_FALSE;
@@ -843,6 +903,18 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
                 log_warn("No total count found in response. Reverting to using array size of results");
                 sfstmt->total_rowcount = cJSON_GetArraySize(sfstmt->raw_results);
             }
+
+            // Set large result set if one exists
+            if ((chunks = cJSON_GetObjectItem(data, "chunks")) != NULL) {
+                // We don't care if there is no qrmk, so ignore return code
+                json_copy_string(&qrmk, data, "qrmk");
+                chunk_headers = cJSON_GetObjectItem(data, "chunkHeaders");
+                sfstmt->chunk_downloader = chunk_downloader_init(qrmk, chunk_headers, chunks, 2, 4, &sfstmt->error);
+                if (!sfstmt->chunk_downloader) {
+                    // Unable to create chunk downloader. Error is set in chunk_downloader_init function.
+                    goto cleanup;
+                }
+            }
         } else if (json_error != SF_JSON_ERROR_NONE) {
             JSON_ERROR_MSG(json_error, error_msg, "Success code");
             SET_SNOWFLAKE_STMT_ERROR(
@@ -884,6 +956,7 @@ cleanup:
     cJSON_Delete(resp);
     SF_FREE(s_body);
     SF_FREE(s_resp);
+    SF_FREE(qrmk);
 
     return ret;
 }

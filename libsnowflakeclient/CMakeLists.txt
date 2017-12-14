@@ -22,9 +22,9 @@ set(SOURCE_FILES
         lib/results.c
         lib/uuid4.c
         lib/basic_types.c
-        lib/error.h
         lib/error.c
-        lib/snowflake_client_int.h)
+        lib/snowflake_client_int.h
+        lib/chunk_downloader.c)
 
 find_library(CURL_LIB libcurl.a PATHS deps-build/linux/curl/lib/ REQUIRED)
 find_library(SSL_LIB libssl.a PATHS deps-build/linux/openssl/lib/ REQUIRED)
@@ -49,7 +49,7 @@ link_directories(
 )
 
 target_link_libraries(snowflakeclient
-        rt dl
+        rt dl z
         ${CURL_LIB}
         ${SSL_LIB}
         ${CRYPTO_LIB}

@@ -21,7 +21,7 @@
 #
 ###########################################################################
 
-prefix=/home/stakeda/git/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/curl
+prefix=/home/kwagner/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/curl
 exec_prefix=${prefix}
 includedir=${prefix}/include
 cppflag_curl_staticlib=-DCURL_STATICLIB
@@ -83,7 +83,7 @@ while test $# -gt 0; do
         ;;
 
     --feature|--features)
-        for feature in SSL IPv6 UnixSockets NTLM NTLM_WB TLS-SRP HTTPS-proxy ""; do
+        for feature in SSL IPv6 UnixSockets libz NTLM NTLM_WB TLS-SRP HTTPS-proxy ""; do
             test -n "$feature" && echo "$feature"
         done
         ;;
@@ -148,7 +148,7 @@ while test $# -gt 0; do
            CURLLIBDIR=""
         fi
         if test "Xyes" = "Xyes"; then
-          echo ${CURLLIBDIR}-lcurl -lssl -lcrypto -lssl -lcrypto -lrt -ldl
+          echo ${CURLLIBDIR}-lcurl -lssl -lpthread -ldl -lssl -lcrypto -lz -ldl
         else
           echo ${CURLLIBDIR}-lcurl
         fi
@@ -156,7 +156,7 @@ while test $# -gt 0; do
 
     --static-libs)
         if test "Xyes" != "Xno" ; then
-          echo ${exec_prefix}/lib/libcurl.a -L/home/stakeda/git/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/openssl/lib -lssl -lcrypto -lssl -lcrypto -lrt -ldl
+          echo ${exec_prefix}/lib/libcurl.a -L/home/kwagner/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/openssl/lib -lssl -lpthread -ldl -lssl -lcrypto -lz -ldl
         else
           echo "curl was built with static libraries disabled" >&2
           exit 1
@@ -164,7 +164,7 @@ while test $# -gt 0; do
         ;;
 
     --configure)
-        echo " '--with-ssl=/home/stakeda/git/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/openssl' '--without-nss' '--enable-static' '--disable-shared' '--prefix=/home/stakeda/git/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/curl' '--without-libssh2' '--without-zlib' '--disable-rtsp' '--disable-ldap' '--disable-ldaps' '--disable-telnet' '--disable-tftp' '--disable-imap' '--disable-smb' '--disable-smtp' '--disable-gopher' '--disable-pop3' '--disable-ftp' '--disable-dict' '--disable-file' '--disable-manual' 'LIBS=-ldl'"
+        echo " '--with-ssl=/home/kwagner/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/openssl' '--without-nss' '--enable-static' '--disable-shared' '--prefix=/home/kwagner/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/curl' '--without-libssh2' '--disable-rtsp' '--disable-ldap' '--disable-ldaps' '--disable-telnet' '--disable-tftp' '--disable-imap' '--disable-smb' '--disable-smtp' '--disable-gopher' '--disable-pop3' '--disable-ftp' '--disable-dict' '--disable-file' '--disable-manual' 'LIBS=-ldl'"
         ;;
 
     *)
