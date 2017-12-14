@@ -57,14 +57,14 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 ?>
 ===DONE===
 <?php exit(0); ?>
---EXPECT--
+--EXPECTF--
 Connected to Snowflake
 sqlstate: 42000
 Snowflake Error: 1003
 Connected to Snowflake
 
 Warning: PDO::query(): SQLSTATE[42000]: Syntax error or access violation: 1003 SQL compilation error:
-syntax error line 1 at position 16 unexpected 'dual'. in /home/stakeda/git/pdo_snowflake/tests/error.php on line 23
+syntax error line 1 at position 16 unexpected 'dual'. in %s on line 23
 Connected to Snowflake
 sqlstate: 42000
 Snowflake Error: 1003
