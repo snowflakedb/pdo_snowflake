@@ -60,9 +60,6 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 
         // insert with binding
         $sth = $dbh->prepare("insert into t(c1,c2) values(?,?)");
-        if ($count == 0) {
-            print_r($dbh->errorInfo());
-        }
         $c1 = 11;
         $c2 = "test111";
         $sth->bindParam(1, $c1, PDO::PARAM_INT);
