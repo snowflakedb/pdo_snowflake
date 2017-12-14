@@ -63,7 +63,7 @@ int fetch_data(SF_STMT *stmt, int64 expected_sum) {
         goto exit;
     }
     ret = 0;
-    exit:
+exit:
     return ret;
 }
 
@@ -154,11 +154,41 @@ int main() {
 
     printf("affected rows: %lld\n", snowflake_affected_rows(stmt));
 
+    /* update the second row */
+    p1v = 101;
+    p1.idx = 1;
+    p1.c_type = SF_C_TYPE_INT64;
+    p1.value = &p1v;
+    p1.len = sizeof(p1v);
+    status = snowflake_bind_param(stmt, &p1);
+    if (status != SF_STATUS_SUCCESS) {
+        fprintf(stderr, "failed to bind p1\n");
+        goto error_stmt;
+    }
+
+    strcpy(p2v, "test1");
+    p2.idx = 2;
+    p2.c_type = SF_C_TYPE_STRING;
+    p2.value = &p2v;
+    p2.len = sizeof(p2v);
+
+    status = snowflake_bind_param(stmt, &p2);
+    if (status != SF_STATUS_SUCCESS) {
+        fprintf(stderr, "failed to bind p1\n");
+        goto error_stmt;
+    }
+
+    status = snowflake_execute(stmt);
+    if (status != SF_STATUS_SUCCESS) {
+        fprintf(stderr, "failed to exec\n");
+        goto error_stmt;
+    }
+    printf("affected rows: %lld\n", snowflake_affected_rows(stmt));
+
     ret = fetch_data(stmt, 103);
     if (ret != 0) {
         goto error_stmt;
     }
-
     status = snowflake_query(stmt, "drop table if exists t", 0);
     if (status != SF_STATUS_SUCCESS) {
         fprintf(stderr, "failed to drop table t\n");
@@ -168,10 +198,10 @@ int main() {
     /* success */
     ret = 0;
 
-    error_stmt: /* error stmt */
+error_stmt: /* error stmt */
     snowflake_stmt_term(stmt);
 
-    error_con: /* error connection */
+error_con: /* error connection */
     snowflake_term(sf);
     snowflake_global_term();
     return ret;
