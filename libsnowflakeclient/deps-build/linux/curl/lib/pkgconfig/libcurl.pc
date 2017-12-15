@@ -28,12 +28,12 @@ exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 supported_protocols="HTTP HTTPS"
-supported_features="SSL IPv6 UnixSockets NTLM NTLM_WB TLS-SRP HTTPS-proxy"
+supported_features="SSL IPv6 UnixSockets libz NTLM NTLM_WB TLS-SRP HTTPS-proxy"
 
 Name: libcurl
 URL: https://curl.haxx.se/
 Description: Library to transfer files with ftp, http, etc.
 Version: 7.54.1
 Libs: -L${libdir} -lcurl
-Libs.private: -lssl -lcrypto -lssl -lcrypto -lrt -ldl
+Libs.private: -lssl -lcrypto -lssl -lcrypto -lz -lrt -ldl
 Cflags: -I${includedir} -DCURL_STATICLIB
