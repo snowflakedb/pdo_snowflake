@@ -1,4 +1,4 @@
-prefix=/home/kwagner/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/openssl
+prefix=/home/stakeda/git/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/openssl
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
