@@ -6,6 +6,7 @@
 #include "snowflake_memory.h"
 #include "connection.h"
 #include "error.h"
+#include "snowflake_client_int.h"
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
@@ -30,12 +31,49 @@ switch(e) \
     default: (em) = "Unknown non-zero pthread init error" ; break; \
 }
 
-sf_bool shutdown_or_error(SF_CHUNK_DOWNLOADER *chunk_downloader) {
+#define PTHREAD_JOIN_ERROR_MSG(e, em) \
+switch(e) \
+{ \
+    case EDEADLK: (em) = "A deadlock was detected (i.e. two threads tried to join with each other)"; break; \
+    case EPERM: (em) = "Not a joinable thread"; break; \
+    case ESRCH: (em) = "No thread with specified ID could be found"; break; \
+    default: (em) = "Unknown non-zero pthread join error" ; break; \
+}
+
+sf_bool get_shutdown_or_error(SF_CHUNK_DOWNLOADER *chunk_downloader) {
     sf_bool ret;
     pthread_rwlock_rdlock(&chunk_downloader->attr_lock);
-    ret = chunk_downloader->is_shutdown || chunk_downloader->error;
+    ret = chunk_downloader->is_shutdown || chunk_downloader->has_error;
     pthread_rwlock_unlock(&chunk_downloader->attr_lock);
     return ret;
+}
+
+sf_bool get_shutdown(SF_CHUNK_DOWNLOADER *chunk_downloader) {
+    sf_bool ret;
+    pthread_rwlock_rdlock(&chunk_downloader->attr_lock);
+    ret = chunk_downloader->is_shutdown;
+    pthread_rwlock_unlock(&chunk_downloader->attr_lock);
+    return ret;
+}
+
+void set_shutdown(SF_CHUNK_DOWNLOADER *chunk_downloader, sf_bool value) {
+    pthread_rwlock_wrlock(&chunk_downloader->attr_lock);
+    chunk_downloader->is_shutdown = value;
+    pthread_rwlock_unlock(&chunk_downloader->attr_lock);
+}
+
+sf_bool get_error(SF_CHUNK_DOWNLOADER *chunk_downloader) {
+    sf_bool ret;
+    pthread_rwlock_rdlock(&chunk_downloader->attr_lock);
+    ret = chunk_downloader->has_error;
+    pthread_rwlock_unlock(&chunk_downloader->attr_lock);
+    return ret;
+}
+
+void set_error(SF_CHUNK_DOWNLOADER *chunk_downloader, sf_bool value) {
+    pthread_rwlock_wrlock(&chunk_downloader->attr_lock);
+    chunk_downloader->has_error = value;
+    pthread_rwlock_unlock(&chunk_downloader->attr_lock);
 }
 
 sf_bool init_locks(SF_CHUNK_DOWNLOADER *chunk_downloader) {
@@ -82,6 +120,7 @@ sf_bool fill_queue(SF_CHUNK_DOWNLOADER *chunk_downloader, cJSON *chunks, int chu
     // We want to detach each chunk object so that after we create the queue item,
     // we free the memory associated with the JSON blob
     for (i = 0; i < chunk_count; i++) {
+        // Detach instead of getting so that we can free the chunk memory after we create our queue item
         if (json_detach_object_from_array(&chunk, chunks, 0)) {
             goto cleanup;
         }
@@ -102,6 +141,10 @@ sf_bool fill_queue(SF_CHUNK_DOWNLOADER *chunk_downloader, cJSON *chunks, int chu
         if (json_copy_int(&chunk_downloader->queue[i].row_count, chunk, "rowCount")) {
             goto cleanup;
         }
+
+        // Free detached chunk
+        cJSON_Delete(chunk);
+        chunk = NULL;
     }
 
     return SF_BOOLEAN_TRUE;
@@ -117,41 +160,34 @@ cleanup:
 sf_bool create_chunk_headers(SF_CHUNK_DOWNLOADER *chunk_downloader, cJSON *json_headers) {
     sf_bool ret = SF_BOOLEAN_FALSE;
     int header_field_size;
+    size_t i;
     cJSON *item = NULL;
-    char *customer_key = NULL;
-    char *customer_key_md5 = NULL;
+    char *header_item = NULL;
+    ARRAY_LIST *keys = json_get_object_keys(json_headers);
+    char *key;
 
-    // Set customer key header
-    item = cJSON_GetObjectItem(json_headers, "x-amz-server-side-encryption-customer-key");
-    if (!item || (header_field_size = snprintf(NULL, 0, "x-amz-server-side-encryption-customer-key: %s", item->valuestring)) < 0) {
-        SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_ERROR_BAD_JSON,
-                            "Could not find a valid customer key in chunk headers", "");
-        goto cleanup;
-    } else {
+    for (i = 0; i < keys->used; i++) {
+        key = (char *) array_list_get(keys, i);
+        // Since I know that these keys are correct from a case sensitive view,
+        // I can use the faster case sensitive version
+        item = cJSON_GetObjectItemCaseSensitive(json_headers, key);
+        if (!item || (header_field_size = snprintf(NULL, 0, "%s: %s", key, item->valuestring)) < 0) {
+            SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_ERROR_BAD_JSON,
+                                "Could not find critical chunk header item", "");
+            goto cleanup;
+        }
         // Type conversion is safe since we know that header_field_size must be positive
-        customer_key = (char *) SF_CALLOC(1, header_field_size + 1);
-        snprintf(customer_key, header_field_size + 1, "x-amz-server-side-encryption-customer-key: %s", item->valuestring);
-        chunk_downloader->chunk_headers = curl_slist_append(chunk_downloader->chunk_headers, customer_key);
-    }
-
-    // Set customer key md5 header
-    item = cJSON_GetObjectItem(json_headers, "x-amz-server-side-encryption-customer-key-md5");
-    if (!item || (header_field_size = snprintf(NULL, 0, "x-amz-server-side-encryption-customer-key-md5: %s", item->valuestring)) < 0) {
-        SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_ERROR_BAD_JSON,
-                            "Could not find a valid customer key md5sum in chunk headers", "");
-        goto cleanup;
-    } else {
-        // Type conversion is safe since we know that header_field_size must be positive
-        customer_key_md5 = (char *) SF_CALLOC(1, header_field_size + 1);
-        snprintf(customer_key_md5, header_field_size + 1, "x-amz-server-side-encryption-customer-key-md5: %s", item->valuestring);
-        chunk_downloader->chunk_headers = curl_slist_append(chunk_downloader->chunk_headers, customer_key_md5);
+        header_item = (char *) SF_CALLOC(1, header_field_size + 1);
+        snprintf(header_item, header_field_size + 1, "%s: %s", key, item->valuestring);
+        chunk_downloader->chunk_headers = curl_slist_append(chunk_downloader->chunk_headers, header_item);
+        SF_FREE(header_item);
     }
 
     ret = SF_BOOLEAN_TRUE;
 
 cleanup:
-    SF_FREE(customer_key);
-    SF_FREE(customer_key_md5);
+    array_list_deallocate(keys);
+    SF_FREE(header_item);
 
     return ret;
 }
@@ -161,8 +197,8 @@ sf_bool download_chunk(char *url, struct curl_slist *headers, cJSON **chunk, SF_
     CURL *curl = NULL;
     curl = curl_easy_init();
 
-    // TODO set default network timeout global variable
-    if (!curl || !http_perform(curl, GET_REQUEST_TYPE, url, headers, NULL, chunk, 60, SF_BOOLEAN_TRUE, error)) {
+    if (!curl || !http_perform(curl, GET_REQUEST_TYPE, url, headers, NULL, chunk, DEFAULT_SNOWFLAKE_REQUEST_TIMEOUT, SF_BOOLEAN_TRUE, error)) {
+        // Error set in perform function
         goto cleanup;
     }
 
@@ -210,7 +246,7 @@ SF_CHUNK_DOWNLOADER *STDCALL chunk_downloader_init(const char *qrmk,
     chunk_downloader->producer_head = 0;
     chunk_downloader->consumer_head = 0;
     chunk_downloader->is_shutdown = SF_BOOLEAN_FALSE;
-    chunk_downloader->error = SF_BOOLEAN_FALSE;
+    chunk_downloader->has_error = SF_BOOLEAN_FALSE;
     chunk_downloader->sf_error = sf_error;
 
     // Initialize chunk_headers or qrmk
@@ -270,38 +306,66 @@ cleanup:
     return NULL;
 }
 
-void STDCALL chunk_downloader_term(SF_CHUNK_DOWNLOADER *chunk_downloader) {
+sf_bool STDCALL chunk_downloader_term(SF_CHUNK_DOWNLOADER *chunk_downloader) {
+    sf_bool ret = SF_BOOLEAN_FALSE;
+    int pthread_ret;
+    const char *error_msg;
     uint64 i;
     if (!chunk_downloader) {
-        return;
+        return ret;
     }
 
-    // TODO check for lock acquire error
-    pthread_mutex_lock(&chunk_downloader->queue_lock);
+    if ((pthread_ret = pthread_mutex_lock(&chunk_downloader->queue_lock))) {
+        pthread_rwlock_wrlock(&chunk_downloader->attr_lock);
+        if (!chunk_downloader->has_error) {
+            PTHREAD_LOCK_INIT_ERROR_MSG(pthread_ret, error_msg);
+            SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_ERROR_PTHREAD, error_msg, "");
+            chunk_downloader->has_error = SF_BOOLEAN_TRUE;
+        }
+        pthread_rwlock_unlock(&chunk_downloader->attr_lock);
+        return ret;
+    }
 
-    // TODO set error values
     do {
-        // Already shutting down
-        if (chunk_downloader->is_shutdown) {
-            break;
+        // Already shutting down, just return false
+        if (get_shutdown(chunk_downloader)) {
+            return ret;
         }
 
-        chunk_downloader->is_shutdown = SF_BOOLEAN_TRUE;
+        set_shutdown(chunk_downloader, SF_BOOLEAN_TRUE);
 
         if (pthread_cond_broadcast(&chunk_downloader->consumer_cond) ||
                 pthread_cond_broadcast(&chunk_downloader->producer_cond) ||
-                pthread_mutex_unlock(&chunk_downloader->queue_lock)) {
-            break;
+                (pthread_mutex_unlock(&chunk_downloader->queue_lock))) {
+            // Something went wrong with either notifying the producer/consumer or releasing the queue lock
+            // Set and error and then try to continue with cleanup
+            pthread_rwlock_wrlock(&chunk_downloader->attr_lock);
+            if (!chunk_downloader->has_error) {
+                SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_ERROR_PTHREAD, "Error during condition broadcast", "");
+                chunk_downloader->has_error = SF_BOOLEAN_TRUE;
+            }
+            pthread_rwlock_unlock(&chunk_downloader->attr_lock);
         }
 
         // Join all the threads
         for (i = 0; i < chunk_downloader->thread_count; i++) {
-            // TODO add error check
-            pthread_join(chunk_downloader->threads[i], NULL);
+            if ((pthread_ret = pthread_join(chunk_downloader->threads[i], NULL)) != 0) {
+                if (!get_error(chunk_downloader)) {
+                    PTHREAD_JOIN_ERROR_MSG(pthread_ret, error_msg);
+                    SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_ERROR_PTHREAD, error_msg, "");
+                }
+                pthread_rwlock_wrlock(&chunk_downloader->attr_lock);
+                if (!chunk_downloader->has_error) {
+                    PTHREAD_JOIN_ERROR_MSG(pthread_ret, error_msg);
+                    SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_ERROR_PTHREAD, error_msg, "");
+                    chunk_downloader->has_error = SF_BOOLEAN_TRUE;
+                }
+                pthread_rwlock_unlock(&chunk_downloader->attr_lock);
+            }
         }
     } while (0);
 
-    // TODO only free if no error occurs
+    // Free chunk downloader memory
     SF_FREE(chunk_downloader->threads);
     // Free all the memory of the items in the queue before freeing queue memory
     for (i = 0; i < chunk_downloader->queue_size; i++) {
@@ -337,12 +401,12 @@ static void *chunk_downloader_thread(void *downloader) {
         // If we're shutting down or an error has occurred, skip
         while ((chunk_downloader->producer_head - chunk_downloader->consumer_head) >= chunk_downloader->thread_count &&
                 chunk_downloader->producer_head < chunk_downloader->queue_size &&
-                !shutdown_or_error(chunk_downloader)) {
+                !get_shutdown_or_error(chunk_downloader)) {
             pthread_cond_wait(&chunk_downloader->producer_cond, &chunk_downloader->queue_lock);
         }
 
         // If we're shutting down, or we have reached the end of the results, then break
-        if (shutdown_or_error(chunk_downloader) || chunk_downloader->producer_head >= chunk_downloader->queue_size) {
+        if (get_shutdown_or_error(chunk_downloader) || chunk_downloader->producer_head >= chunk_downloader->queue_size) {
             break;
         }
 
@@ -354,20 +418,35 @@ static void *chunk_downloader_thread(void *downloader) {
 
         // Download chunk
         if (!download_chunk(chunk_downloader->queue[index].url, chunk_downloader->chunk_headers, &chunk, &error)) {
-            // TODO error handling
+            pthread_rwlock_wrlock(&chunk_downloader->attr_lock);
+            if (!chunk_downloader->has_error) {
+                copy_snowflake_error(chunk_downloader->sf_error, &error);
+                chunk_downloader->has_error = SF_BOOLEAN_TRUE;
+            }
+            pthread_rwlock_unlock(&chunk_downloader->attr_lock);
+            break;
         }
 
         // Gain back lock to set cJSON blob
-        // TODO lock error checking
         pthread_mutex_lock(&chunk_downloader->queue_lock);
 
-        // TODO check for error or shutdown
+        if (get_error(chunk_downloader)) {
+            break;
+        }
+
         // Set the chunk
         chunk_downloader->queue[index].chunk = chunk;
 
         // Notify the consumer that we have a chunk ready
         if (pthread_cond_signal(&chunk_downloader->consumer_cond)) {
-            // TODO do error stuff
+            pthread_rwlock_wrlock(&chunk_downloader->attr_lock);
+            if (!chunk_downloader->has_error) {
+                SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_ERROR_PTHREAD,
+                                    "Error sending consumer signal to notify of chunk downloaded", "");
+                chunk_downloader->has_error = SF_BOOLEAN_TRUE;
+            }
+            pthread_rwlock_unlock(&chunk_downloader->attr_lock);
+            break;
         }
 
         // Drop the lock

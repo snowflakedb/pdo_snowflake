@@ -47,11 +47,21 @@ int main() {
             fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
             break;
         }
-        printf("result: %d\n", *((int *) c1.value));
         counter++;
+
+        if ((counter % 10000) == 0) {
+            printf("Number of results fetched: %llu\n", counter);
+        }
     }
-    printf("Number of rows in result: %d\n", (int) snowflake_num_rows(sfstmt));
+    printf("Number of rows in result: %llu\n", snowflake_num_rows(sfstmt));
     printf("Number of rows fetched: %llu\n", counter);
+    if (counter == snowflake_num_rows(sfstmt)) {
+        printf("Number of rows fetched equals number of rows expected in result\n");
+    } else {
+        status = SF_STATUS_ERROR;
+        fprintf(stderr, "Number of rows fetched is different from number of rows expected\n");
+        goto cleanup;
+    }
 
     // If we reached end of line, then we were successful
     if (status == SF_STATUS_EOL) {

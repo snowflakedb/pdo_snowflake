@@ -507,6 +507,7 @@ static void STDCALL _snowflake_stmt_reset(SF_STMT *sfstmt) {
 
     if (sfstmt->raw_results) {
         cJSON_Delete(sfstmt->raw_results);
+        sfstmt->raw_results = NULL;
     }
     sfstmt->raw_results = NULL;
 
@@ -606,34 +607,48 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
     }
     clear_snowflake_error(&sfstmt->error);
     SF_STATUS ret = SF_STATUS_ERROR;
+    sf_bool get_chunk_success = SF_BOOLEAN_TRUE;
     int64 i;
     uint64 index;
     cJSON *row = NULL;
     cJSON *raw_result;
     SF_BIND_OUTPUT *result;
 
+    // Check for chunk_downloader error
+    if (sfstmt->chunk_downloader && get_error(sfstmt->chunk_downloader)) {
+        goto cleanup;
+    }
+
     // If no more results, set return to SF_STATUS_EOL
     if (cJSON_GetArraySize(sfstmt->raw_results) == 0) {
         if (sfstmt->chunk_downloader) {
             log_debug("Fetching next chunk from chunk downloader.");
             pthread_mutex_lock(&sfstmt->chunk_downloader->queue_lock);
-            // TODO refactor to move goto out of lock
             do {
                 if (sfstmt->chunk_downloader->consumer_head >= sfstmt->chunk_downloader->queue_size) {
                     // No more chunks, set EOL and break
                     log_debug("Out of chunks, setting EOL.");
+                    cJSON_Delete(sfstmt->raw_results);
+                    sfstmt->raw_results = NULL;
                     ret = SF_STATUS_EOL;
                     break;
                 } else {
                     // Get index and increment
                     index = sfstmt->chunk_downloader->consumer_head;
-                    while (sfstmt->chunk_downloader->queue[index].chunk == NULL && !shutdown_or_error(sfstmt->chunk_downloader)) {
+                    while (sfstmt->chunk_downloader->queue[index].chunk == NULL && !get_shutdown_or_error(
+                            sfstmt->chunk_downloader)) {
                         pthread_cond_wait(&sfstmt->chunk_downloader->consumer_cond, &sfstmt->chunk_downloader->queue_lock);
                     }
 
-                    sfstmt->chunk_downloader->consumer_head++;
+                    if (get_error(sfstmt->chunk_downloader)) {
+                        get_chunk_success = SF_BOOLEAN_FALSE;
+                        break;
+                    } else if (get_shutdown(sfstmt->chunk_downloader)) {
+                        get_chunk_success = SF_BOOLEAN_FALSE;
+                        break;
+                    }
 
-                    // TODO check for chunk downloader error here
+                    sfstmt->chunk_downloader->consumer_head++;
 
                     // Delete old cJSON results struct
                     cJSON_Delete(sfstmt->raw_results);
@@ -642,7 +657,10 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                     sfstmt->chunk_downloader->queue[index].chunk = NULL;
                     log_debug("Acquired chunk %llu from chunk downloader", index);
                     if (pthread_cond_signal(&sfstmt->chunk_downloader->producer_cond)) {
-                        // TODO set error case
+                        SET_SNOWFLAKE_ERROR(&sfstmt->error, SF_ERROR_PTHREAD,
+                                            "Unable to send signal using produce_cond", "");
+                        get_chunk_success = SF_BOOLEAN_FALSE;
+                        break;
                     }
                 }
             } while (0);
@@ -653,12 +671,11 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
             ret = SF_STATUS_EOL;
         }
 
-        if (ret == SF_STATUS_EOL) {
+        // If we've reached the end, or we have an error getting the next chunk, goto cleanup and return status
+        if (ret == SF_STATUS_EOL || !get_chunk_success) {
             goto cleanup;
         }
     }
-
-    // TODO set case where error occurs in chunk downloader
 
     // Check that we can write to the provided result bindings
     for (i = 0; i < sfstmt->total_fieldcount; i++) {

@@ -49,7 +49,7 @@ struct sf_chunk_downloader {
 
     // Error/shutdown flags
     sf_bool is_shutdown;
-    sf_bool error;
+    sf_bool has_error;
 
     // Chunk downloader attribute read-write lock. If you need to acquire both the queue_lock and attr_lock,
     // ALWAYS acquire the queue_lock first, otherwise we can deadlock
@@ -65,9 +65,13 @@ SF_CHUNK_DOWNLOADER *STDCALL chunk_downloader_init(const char *qrmk,
                                                    uint64 thread_count,
                                                    uint64 fetch_slots,
                                                    SF_ERROR *sf_error);
-void STDCALL chunk_downloader_term(SF_CHUNK_DOWNLOADER *chunk_downloader);
+sf_bool STDCALL chunk_downloader_term(SF_CHUNK_DOWNLOADER *chunk_downloader);
 static void *chunk_downloader_thread(void *downloader);
-sf_bool shutdown_or_error(SF_CHUNK_DOWNLOADER *chunk_downloader);
+sf_bool get_shutdown_or_error(SF_CHUNK_DOWNLOADER *chunk_downloader);
+sf_bool get_shutdown(SF_CHUNK_DOWNLOADER *chunk_downloader);
+void set_shutdown(SF_CHUNK_DOWNLOADER *chunk_downloader, sf_bool value);
+sf_bool get_error(SF_CHUNK_DOWNLOADER *chunk_downloader);
+void set_error(SF_CHUNK_DOWNLOADER *chunk_downloader, sf_bool value);
 
 
 #ifdef __cplusplus

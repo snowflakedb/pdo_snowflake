@@ -131,6 +131,7 @@ SF_JSON_ERROR STDCALL json_copy_string_no_alloc(char *dest, cJSON *data, const c
 SF_JSON_ERROR STDCALL json_detach_array_from_object(cJSON **dest, cJSON *data, const char *item);
 SF_JSON_ERROR STDCALL json_detach_array_from_array(cJSON **dest, cJSON *data, int index);
 SF_JSON_ERROR STDCALL json_detach_object_from_array(cJSON **dest, cJSON *data, int index);
+ARRAY_LIST *json_get_object_keys(const cJSON const *item);
 size_t json_resp_cb(char *data, size_t size, size_t nmemb, RAW_JSON_BUFFER *raw_json);
 sf_bool STDCALL http_perform(CURL *curl,
                              SF_REQUEST_TYPE request_type,
