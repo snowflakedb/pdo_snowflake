@@ -15,6 +15,7 @@ extern "C" {
 #define STDCALL __stdcall
 #endif
 
+#include <pthread.h>
 #include "cJSON.h"
 #include "arraylist.h"
 #include "basic_types.h"
@@ -180,6 +181,7 @@ typedef struct sf_snowflake_connection {
 
     // Session specific fields
     int64 sequence_counter;
+    pthread_mutex_t mutex_sequence_counter;
     char request_id[UUID4_LEN];
 
     // Error

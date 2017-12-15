@@ -8,6 +8,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <pthread.h>
 #include <snowflake_client.h>
 #include <openssl/crypto.h>
 #include "constants.h"
@@ -256,7 +257,8 @@ SF_CONNECT *STDCALL snowflake_init() {
         sf->login_timeout = 120;
         sf->network_timeout = 0;
         sf->sequence_counter = 0;
-        uuid4_generate(sf->request_id);
+        pthread_mutex_init ( &sf->mutex_sequence_counter, NULL);
+        sf->request_id[0] = '\0';
         clear_snowflake_error(&sf->error);
     }
 
@@ -267,6 +269,7 @@ void STDCALL snowflake_term(SF_CONNECT *sf) {
     // Ensure object is not null
     if (sf) {
         clear_snowflake_error(&sf->error);
+        pthread_mutex_destroy(&sf->mutex_sequence_counter);
         SF_FREE(sf->host);
         SF_FREE(sf->port);
         SF_FREE(sf->user);
@@ -298,6 +301,7 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
     char *s_body = NULL;
     char *s_resp = NULL;
     // Encoded URL to use with libcurl
+    uuid4_generate(sf->request_id);
     URL_KEY_VALUE url_params[] = {
             {"request_id=", sf->request_id, NULL, NULL, 0, 0},
             {"&databaseName=", sf->database, NULL, NULL, 0, 0},
@@ -470,17 +474,31 @@ SF_STATUS STDCALL snowflake_get_attr(
 }
 
 /**
+ * Resets SF_COLUMN_DESC in SF_STMT
+ * @param sfstmt
+ */
+static void STDCALL _snowflake_stmt_desc_reset(SF_STMT *sfstmt) {
+    int64 i = 0;
+    if (sfstmt->desc) {
+        /* column metadata */
+        for (i = 0; i < sfstmt->total_fieldcount; i++) {
+            SF_FREE(sfstmt->desc[i]->name);
+            SF_FREE(sfstmt->desc[i]);
+        }
+        SF_FREE(sfstmt->desc);
+    }
+    sfstmt->desc = NULL;
+}
+/**
  * Resets SNOWFLAKE_STMT parameters.
  *
  * @param sfstmt
- * @param free free allocated memory if true
  */
 static void STDCALL _snowflake_stmt_reset(SF_STMT *sfstmt) {
-    int64 i;
     clear_snowflake_error(&sfstmt->error);
 
     strncpy(sfstmt->sfqid, "", UUID4_LEN);
-    uuid4_generate(sfstmt->request_id); /* TODO: move this to exec */
+    sfstmt->request_id[0] = '\0';
 
     if (sfstmt->sql_text) {
         SF_FREE(sfstmt->sql_text); /* SQL */
@@ -502,15 +520,7 @@ static void STDCALL _snowflake_stmt_reset(SF_STMT *sfstmt) {
     }
     sfstmt->results = NULL;
 
-    if (sfstmt->desc) {
-        /* column metadata */
-        for (i = 0; i < sfstmt->total_fieldcount; i++) {
-            SF_FREE(sfstmt->desc[i]->name);
-            SF_FREE(sfstmt->desc[i]);
-        }
-        SF_FREE(sfstmt->desc);
-    }
-    sfstmt->desc = NULL;
+    _snowflake_stmt_desc_reset(sfstmt);
 
     if (sfstmt->stmt_attrs) {
         array_list_deallocate(sfstmt->stmt_attrs);
@@ -537,7 +547,6 @@ SF_STMT *STDCALL snowflake_stmt(SF_CONNECT *sf) {
     SF_STMT *sfstmt = (SF_STMT *) SF_CALLOC(1, sizeof(SF_STMT));
     if (sfstmt) {
         _snowflake_stmt_reset(sfstmt);
-        sfstmt->sequence_counter = ++sf->sequence_counter;
         sfstmt->connection = sf;
     }
     return sfstmt;
@@ -813,6 +822,7 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
     char *s_body = NULL;
     char *s_resp = NULL;
     sf_bool success = SF_BOOLEAN_FALSE;
+    uuid4_generate(sfstmt->request_id);
     URL_KEY_VALUE url_params[] = {
             {"requestId=", sfstmt->request_id, NULL, NULL, 0, 0}
     };
@@ -821,6 +831,10 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
     SF_BIND_INPUT *input;
     const char *type;
     char *value;
+
+    pthread_mutex_lock(&sfstmt->connection->mutex_sequence_counter);
+    sfstmt->sequence_counter = ++sfstmt->connection->sequence_counter;
+    pthread_mutex_unlock(&sfstmt->connection->mutex_sequence_counter);
 
     // TODO Do error handing and checking and stuff
     if (sfstmt->params && sfstmt->params->used > 0) {
@@ -889,6 +903,7 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
             rowtype = cJSON_GetObjectItem(data, "rowtype");
             if (cJSON_IsArray(rowtype)) {
                 sfstmt->total_fieldcount = cJSON_GetArraySize(rowtype);
+                _snowflake_stmt_desc_reset(sfstmt);
                 sfstmt->desc = set_description(rowtype);
             }
             // Set results array
