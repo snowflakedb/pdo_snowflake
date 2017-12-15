@@ -1,5 +1,5 @@
 --TEST--
-pdo_snowflake - CRUD
+pdo_snowflake - binding
 --INI--
 pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 --FILE--
@@ -29,6 +29,20 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
             echo "Execution failed.\n";
         }
         echo "inserted rows: " . $sth->rowCount() . "\n";
+
+        $sth = $dbh->prepare("insert into t(c1,c2) values(?,?)");
+
+        // looks like every data are taken as STRING data type if type
+        // is not specified.
+        $c1 = 13;
+        $c2 = "test113";
+        $sth->bindParam(1, $c1);
+        $sth->bindParam(2, $c2);
+        $ret = $sth->execute();
+        if (!$ret) {
+            echo "Execution failed.\n";
+        }
+
         $sth = $dbh->query("select * from t order by 1");
         while($row = $sth->fetch()) {
             echo $row["C1"] . " " . $row["C2"] . "\n";
@@ -53,4 +67,5 @@ inserted rows: 1
 inserted rows: 1
 11 test111
 12 test112
+13 test113
 ===DONE===
