@@ -49,7 +49,7 @@ link_directories(
 )
 
 target_link_libraries(snowflakeclient
-        rt dl
+        rt dl z
         ${CURL_LIB}
         ${SSL_LIB}
         ${CRYPTO_LIB}
