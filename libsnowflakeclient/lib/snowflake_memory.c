@@ -4,10 +4,13 @@
 
 #include "snowflake_memory.h"
 #include <log.h>
+#include <pthread.h>
 
 // Basic hashing function. Works well for memory addresses
 #define sf_ptr_hash(p, t) (((unsigned long) (p) >> 3) & (sizeof (t)/sizeof ((t)[0]) - 1))
 #define SF_ALLOC_MAP_SIZE 2048
+
+pthread_mutex_t allocation_lock = PTHREAD_MUTEX_INITIALIZER;
 
 static struct allocation {
     struct allocation *link;
@@ -76,7 +79,9 @@ void *sf_malloc(size_t size, const char *file, int line) {
         exit(EXIT_FAILURE);
     }
 
+    pthread_mutex_lock(&allocation_lock);
     alloc_insert(data, size, file, line);
+    pthread_mutex_unlock(&allocation_lock);
 
     return data;
 }
@@ -93,7 +98,9 @@ void *sf_calloc(size_t num, size_t size, const char *file, int line) {
         exit(EXIT_FAILURE);
     }
 
+    pthread_mutex_lock(&allocation_lock);
     alloc_insert(data, num * size, file, line);
+    pthread_mutex_unlock(&allocation_lock);
 
     return data;
 }
@@ -108,6 +115,7 @@ void *sf_realloc(void *ptr, size_t size, const char *file, int line) {
         exit(EXIT_FAILURE);
     }
 
+    pthread_mutex_lock(&allocation_lock);
     alloc = alloc_find(ptr);
     // If we don't find old entry then create new one
     if (alloc) {
@@ -124,14 +132,17 @@ void *sf_realloc(void *ptr, size_t size, const char *file, int line) {
     } else {
         alloc_insert(data, size, file, line);
     }
+    pthread_mutex_unlock(&allocation_lock);
 
     return data;
 }
 
 void sf_free(void *ptr, const char *file, int line) {
     if (ptr) {
+        pthread_mutex_lock(&allocation_lock);
         free(ptr);
         alloc_remove(ptr);
+        pthread_mutex_unlock(&allocation_lock);
     }
 }
 
@@ -140,6 +151,7 @@ void sf_alloc_map_to_log(sf_bool cleanup) {
     int size = 0;
     struct allocation *alloc;
     struct allocation *link;
+    pthread_mutex_lock(&allocation_lock);
     for (i = 0; i < SF_ALLOC_MAP_SIZE; i++) {
         if (alloc_map[i]) {
             alloc = alloc_map[i];
@@ -155,4 +167,5 @@ void sf_alloc_map_to_log(sf_bool cleanup) {
             }
         }
     }
+    pthread_mutex_unlock(&allocation_lock);
 }

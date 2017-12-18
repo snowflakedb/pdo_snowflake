@@ -86,3 +86,11 @@ void STDCALL clear_snowflake_error(SF_ERROR *error) {
     error->is_shared_msg = SF_BOOLEAN_FALSE;
     memset(error->sfqid, 0, UUID4_LEN);
 }
+
+void STDCALL copy_snowflake_error(SF_ERROR *dst, SF_ERROR *src) {
+    if (!dst || !src) {
+        return;
+    }
+    
+    set_snowflake_error(dst, src->error_code, src->msg, src->sqlstate, src->sfqid, src->file, src->line);
+}

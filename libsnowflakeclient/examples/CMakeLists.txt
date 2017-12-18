@@ -13,7 +13,8 @@ SET(EXAMPLES
         ping_pong
         stmt_with_bad_connect
         crud
-        error_handling)
+        error_handling
+        large_result_set)
 
 set(SOURCE_UTILS
         example_setup.c)

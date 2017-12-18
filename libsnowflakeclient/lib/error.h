@@ -28,6 +28,7 @@ void STDCALL set_snowflake_error(SF_ERROR *error,
                                   const char *file,
                                   int line);
 void STDCALL clear_snowflake_error(SF_ERROR *error);
+void STDCALL copy_snowflake_error(SF_ERROR *dst, SF_ERROR *src);
 
 #ifdef __cplusplus
 }

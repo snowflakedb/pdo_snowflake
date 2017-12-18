@@ -207,7 +207,7 @@ sf_bool STDCALL curl_post_call(SF_CONNECT *sf,
     memset(query_code, 0, QUERYCODE_LEN);
 
     do {
-        if(!http_perform(sf, curl, POST_REQUEST_TYPE, url, header, body, json, error) || !*json) {
+        if(!http_perform(curl, POST_REQUEST_TYPE, url, header, body, json, sf->network_timeout, SF_BOOLEAN_FALSE, error) || !*json) {
             // Error is set in the perform function
             break;
         }
@@ -308,7 +308,7 @@ sf_bool STDCALL curl_get_call(SF_CONNECT *sf,
     memset(query_code, 0, QUERYCODE_LEN);
 
     do {
-        if(!http_perform(sf, curl, GET_REQUEST_TYPE, url, header, NULL, json, error) || !*json) {
+        if(!http_perform(curl, GET_REQUEST_TYPE, url, header, NULL, json, sf->network_timeout, SF_BOOLEAN_FALSE, error) || !*json) {
             // Error is set in the perform function
             break;
         }
@@ -575,6 +575,55 @@ SF_JSON_ERROR STDCALL json_detach_array_from_array(cJSON **dest, cJSON *data, in
     return SF_JSON_ERROR_NONE;
 }
 
+SF_JSON_ERROR STDCALL json_detach_object_from_array(cJSON **dest, cJSON *data, int index) {
+    cJSON *blob = cJSON_DetachItemFromArray(data, index);
+    if (!blob) {
+        return SF_JSON_ERROR_ITEM_MISSING;
+    } else if(cJSON_IsNull(blob)) {
+        return SF_JSON_ERROR_ITEM_NULL;
+    } else if (!cJSON_IsObject(blob)) {
+        return SF_JSON_ERROR_ITEM_WRONG_TYPE;
+    } else {
+        if (*dest) {
+            cJSON_Delete(*dest);
+        }
+        *dest = blob;
+        log_debug("Found object item at index: %s", index);
+    }
+
+    return SF_JSON_ERROR_NONE;
+}
+
+/**
+ * Returns all the keys in a JSON object. To save memory, the keys in the array list are references
+ * to the keys in the cJSON structs. DO NOT free these keys in the arraylist. Once you delete the cJSON
+ * object, you must also destroy the arraylist containing the object keys.
+ *
+ * @param item A cJSON object that will not be altered in the function
+ * @return An arraylist containing all the keys in the object. This arraylist must be freed by the caller at some point.
+ */
+ARRAY_LIST *json_get_object_keys(const cJSON const *item) {
+    if (!item || !cJSON_IsObject(item)) {
+        return NULL;
+    }
+    // Get the first key-value pair in the object
+    const cJSON *next = item->child;
+    ARRAY_LIST *al = array_list_init();
+    size_t counter = 0;
+    char *key = NULL;
+
+    while (next) {
+        // Get key and add the arraylist
+        key = next->string;
+        array_list_set(al, key, counter);
+        // Increment counter and get the next element
+        counter++;
+        next = next->next;
+    }
+
+    return al;
+}
+
 /**
  * libcurl write function callback to write response to a buffer
  */
@@ -590,13 +639,14 @@ size_t json_resp_cb(char *data, size_t size, size_t nmemb, RAW_JSON_BUFFER *raw_
     return data_size;
 }
 
-sf_bool STDCALL http_perform(SF_CONNECT *sf,
-                             CURL *curl,
+sf_bool STDCALL http_perform(CURL *curl,
                              SF_REQUEST_TYPE request_type,
                              char *url,
                              struct curl_slist *header,
                              char *body,
                              cJSON **json,
+                             int64 network_timeout,
+                             sf_bool chunk_downloader,
                              SF_ERROR *error) {
     CURLcode res;
     sf_bool ret = SF_BOOLEAN_FALSE;
@@ -608,7 +658,7 @@ sf_bool STDCALL http_perform(SF_CONNECT *sf,
     };
     RETRY_CONTEXT retry_ctx = {
             0,      //retry_count
-            sf->network_timeout,
+            network_timeout,
             1,      // time to sleep
             &djb    // Decorrelate jitter
     };
@@ -623,6 +673,10 @@ sf_bool STDCALL http_perform(SF_CONNECT *sf,
     //TODO set error buffer
 
     do {
+        // Reset buffer since this may not be our first rodeo
+        SF_FREE(buffer.buffer);
+        buffer.size = 0;
+
         // Set parameters
         res = curl_easy_setopt(curl, CURLOPT_URL, url);
         if (res != CURLE_OK) {
@@ -698,6 +752,20 @@ sf_bool STDCALL http_perform(SF_CONNECT *sf,
             break;
         }
 
+        // Set chunk downloader specific stuff here
+        if (chunk_downloader) {
+            res = curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "");
+            if (res != CURLE_OK) {
+                log_error("Unable to set accepted content encoding", curl_easy_strerror(res));
+                break;
+            }
+
+            // Set the first character in the buffer as a bracket
+            buffer.buffer = (char *) SF_CALLOC(1, 2); // Don't forget null terminator
+            buffer.size = 1;
+            strncpy(buffer.buffer, "[", 2);
+        }
+
         // Be optimistic
         retry = SF_BOOLEAN_FALSE;
 
@@ -724,11 +792,17 @@ sf_bool STDCALL http_perform(SF_CONNECT *sf,
         // Reset everything
         reset_curl(curl);
         http_code = 0;
-
     } while(retry);
 
     // We were successful so parse JSON from text
     if (ret) {
+        if (chunk_downloader) {
+            buffer.buffer = (char *) SF_REALLOC(buffer.buffer, buffer.size + 2); // 1 byte for closing bracket, 1 for null terminator
+            memcpy(&buffer.buffer[buffer.size], "]", 1);
+            buffer.size += 1;
+            // Set null terminator
+            buffer.buffer[buffer.size] = '\0';
+        }
         cJSON_Delete(*json);
         *json = NULL;
         *json = cJSON_Parse(buffer.buffer);

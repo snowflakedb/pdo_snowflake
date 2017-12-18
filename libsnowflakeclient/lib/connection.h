@@ -130,13 +130,17 @@ SF_JSON_ERROR STDCALL json_copy_string(char **dest, cJSON *data, const char *ite
 SF_JSON_ERROR STDCALL json_copy_string_no_alloc(char *dest, cJSON *data, const char *item, size_t dest_size);
 SF_JSON_ERROR STDCALL json_detach_array_from_object(cJSON **dest, cJSON *data, const char *item);
 SF_JSON_ERROR STDCALL json_detach_array_from_array(cJSON **dest, cJSON *data, int index);
+SF_JSON_ERROR STDCALL json_detach_object_from_array(cJSON **dest, cJSON *data, int index);
+ARRAY_LIST *json_get_object_keys(const cJSON const *item);
 size_t json_resp_cb(char *data, size_t size, size_t nmemb, RAW_JSON_BUFFER *raw_json);
-sf_bool STDCALL http_perform(SF_CONNECT *sf,
-                             CURL *curl,
+sf_bool STDCALL http_perform(CURL *curl,
                              SF_REQUEST_TYPE request_type,
                              char *url,
                              struct curl_slist *header,
-                             char *body, cJSON **json,
+                             char *body,
+                             cJSON **json,
+                             int64 network_timeout,
+                             sf_bool chunk_downloader,
                              SF_ERROR *error);
 sf_bool STDCALL is_retryable_http_code(int32 code);
 sf_bool STDCALL renew_session(CURL * curl, SF_CONNECT *sf, SF_ERROR *error);

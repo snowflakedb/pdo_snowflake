@@ -27,7 +27,7 @@ int main() {
 
     /* query */
     sfstmt = snowflake_stmt(sf);
-    status = snowflake_query(sfstmt, "select seq4() from table(generator(timelimit=>60));", 0);
+    status = snowflake_query(sfstmt, "select count(*) from table(generator(timelimit=>60));", 0);
     if (status != SF_STATUS_SUCCESS) {
         SF_ERROR *error = snowflake_stmt_error(sfstmt);
         fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);

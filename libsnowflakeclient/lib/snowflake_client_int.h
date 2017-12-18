@@ -11,6 +11,7 @@
 #define HEADER_C_API_USER_AGENT "User-Agent: c_api/0.1"
 
 #define DEFAULT_SNOWFLAKE_BASE_URL "snowflakecomputing.com"
+#define DEFAULT_SNOWFLAKE_REQUEST_TIMEOUT 60
 
 #define SESSION_URL "/session/v1/login-request?"
 #define QUERY_URL "/queries/v1/query-request?"

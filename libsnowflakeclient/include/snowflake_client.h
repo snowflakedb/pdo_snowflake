@@ -84,7 +84,8 @@ typedef enum sf_error_code {
     SF_ERROR_RETRY,
     SF_ERROR_CURL,
     SF_ERROR_BAD_ATTRIBUTE_TYPE,
-    SF_ERROR_APPLICATION_ERROR
+    SF_ERROR_APPLICATION_ERROR,
+    SF_ERROR_PTHREAD
 } SF_ERROR_CODE;
 
 /**
@@ -202,6 +203,11 @@ typedef struct sf_snowflake_column_desc {
 } SF_COLUMN_DESC;
 
 /**
+ * Chunk downloader context
+ */
+typedef struct sf_chunk_downloader SF_CHUNK_DOWNLOADER;
+
+/**
  * Statement context
  */
 typedef struct sf_snowflake_statement {
@@ -222,6 +228,7 @@ typedef struct sf_snowflake_statement {
     SF_COLUMN_DESC **desc;
     ARRAY_LIST *stmt_attrs;
     sf_bool is_dml;
+    SF_CHUNK_DOWNLOADER *chunk_downloader;
 } SF_STMT;
 
 /**
