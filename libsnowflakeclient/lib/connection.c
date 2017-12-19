@@ -116,21 +116,28 @@ static uint32 uimax(uint32 a, uint32 b) {
 cJSON *STDCALL create_auth_json_body(SF_CONNECT *sf,
                                      const char *application,
                                      const char *int_app_name,
-                                     const char *int_app_version) {
+                                     const char *int_app_version,
+                                     sf_bool autocommit) {
     cJSON *body;
     cJSON *data;
     cJSON *client_env;
+    cJSON *session_parameters;
 
     //Create Client Environment JSON blob
     client_env = cJSON_CreateObject();
     cJSON_AddStringToObject(client_env, "APPLICATION", application);
     cJSON_AddStringToObject(client_env, "OS_VERSION", "Linux");
 
+    session_parameters = cJSON_CreateObject();
+    cJSON_AddStringToObject(
+      session_parameters,
+      "AUTOCOMMIT",
+      autocommit == SF_BOOLEAN_TRUE ? "TRUE" : "FALSE");
+
     //Create Request Data JSON blob
     data = cJSON_CreateObject();
     cJSON_AddStringToObject(data, "CLIENT_APP_ID", int_app_name);
     cJSON_AddStringToObject(data, "CLIENT_APP_VERSION", int_app_version);
-    cJSON_AddStringToObject(data, "SVN_REVISION", "12345"); //TODO Add SVN Revision Here
     cJSON_AddStringToObject(data, "ACCOUNT_NAME", sf->account);
     cJSON_AddStringToObject(data, "LOGIN_NAME", sf->user);
     // Add password if one exists
@@ -138,6 +145,7 @@ cJSON *STDCALL create_auth_json_body(SF_CONNECT *sf,
         cJSON_AddStringToObject(data, "PASSWORD", sf->password);
     }
     cJSON_AddItemToObject(data, "CLIENT_ENVIRONMENT", client_env);
+    cJSON_AddItemToObject(data, "SESSION_PARAMETERS", session_parameters);
 
     //Create body
     body = cJSON_CreateObject();

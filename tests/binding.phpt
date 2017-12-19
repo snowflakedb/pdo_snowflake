@@ -48,7 +48,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
             echo $row["C1"] . " " . $row["C2"] . "\n";
         }
 
-        // $count = $dbh->exec("drop table if exists t");
+        $count = $dbh->exec("drop table if exists t");
         if ($count == 0) {
             print_r($dbh->errorInfo());
         }

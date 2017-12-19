@@ -34,6 +34,8 @@ static FILE *LOG_FP = NULL;
 
 pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
 
+SF_STATUS _snowflake_internal_query(SF_CONNECT *sf, const char *sql);
+
 #define _SF_STMT_TYPE_DML 0x3000
 #define _SF_STMT_TYPE_INSERT (_SF_STMT_TYPE_DML + 0x100)
 #define _SF_STMT_TYPE_UPDATE (_SF_STMT_TYPE_DML + 0x200)
@@ -58,6 +60,10 @@ static sf_bool detect_stmt_type(int64 stmt_type_id) {
     }
     return ret;
 }
+
+#define _SF_STMT_SQL_BEGIN "begin"
+#define _SF_STMT_SQL_COMMIT "commit"
+#define _SF_STMT_SQL_ROLLBACK "rollback"
 
 /*
  * Convenience method to find string size, create buffer, copy over, and return.
@@ -322,7 +328,7 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
     }
 
     // Create body
-    body = create_auth_json_body(sf, "C API", "C API", "0.1");
+    body = create_auth_json_body(sf, "C API", "C API", "0.1", sf->autocommit);
     log_debug("Created body");
     s_body = cJSON_Print(body);
     // TODO delete password before printing
@@ -736,28 +742,42 @@ cleanup:
     return ret;
 }
 
-SF_STATUS STDCALL snowflake_trans_begin(SF_CONNECT *sf) {
+SF_STATUS _snowflake_internal_query(SF_CONNECT *sf, const char* sql) {
     if (!sf) {
         return SF_STATUS_ERROR;
     }
-    clear_snowflake_error(&sf->error);
-    return SF_STATUS_SUCCESS;
+    SF_STATUS ret = SF_STATUS_ERROR;
+    SF_STMT *sfstmt = snowflake_stmt(sf);
+    if (sfstmt == NULL) {
+        SET_SNOWFLAKE_ERROR(
+          &sf->error,
+          SF_ERROR_OUT_OF_MEMORY,
+          "Out of memory in creating SF_STMT. ",
+          SF_SQLSTATE_UNABLE_TO_CONNECT);
+        goto error;
+    }
+    ret = snowflake_query(sfstmt, sql, 0);
+    if (ret != SF_STATUS_SUCCESS) {
+        snowflake_propagate_error(sf, sfstmt);
+        goto error;
+    }
+    ret = SF_STATUS_SUCCESS;
+
+error:
+    snowflake_stmt_term(sfstmt);
+    return ret;
+}
+
+SF_STATUS STDCALL snowflake_trans_begin(SF_CONNECT *sf) {
+    return _snowflake_internal_query(sf, _SF_STMT_SQL_BEGIN);
 }
 
 SF_STATUS STDCALL snowflake_trans_commit(SF_CONNECT *sf) {
-    if (!sf) {
-        return SF_STATUS_ERROR;
-    }
-    clear_snowflake_error(&sf->error);
-    return SF_STATUS_SUCCESS;
+    return _snowflake_internal_query(sf, _SF_STMT_SQL_COMMIT);
 }
 
 SF_STATUS STDCALL snowflake_trans_rollback(SF_CONNECT *sf) {
-    if (!sf) {
-        return SF_STATUS_ERROR;
-    }
-    clear_snowflake_error(&sf->error);
-    return SF_STATUS_SUCCESS;
+    return _snowflake_internal_query(sf, _SF_STMT_SQL_ROLLBACK);
 }
 
 int64 STDCALL snowflake_affected_rows(SF_STMT *sfstmt) {
@@ -1079,6 +1099,13 @@ SF_STATUS STDCALL snowflake_propagate_error(SF_CONNECT *sf, SF_STMT *sfstmt) {
         /* any error */
         size_t len = strlen(sfstmt->error.msg);
         sf->error.msg = SF_CALLOC(len + 1, sizeof(char));
+        if (sf->error.msg == NULL) {
+            SET_SNOWFLAKE_ERROR(
+              &sf->error,
+              SF_ERROR_OUT_OF_MEMORY,
+              "Out of memory in creating a buffer for the error message.",
+              SF_SQLSTATE_APP_REJECT_CONNECTION);
+        }
         strncpy(sf->error.msg, sfstmt->error.msg, len);
     }
     return SF_STATUS_SUCCESS;

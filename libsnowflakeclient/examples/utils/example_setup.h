@@ -19,7 +19,7 @@ extern "C" {
 
 void initialize_snowflake_example(sf_bool debug);
 SF_CONNECT *setup_snowflake_connection();
-
+SF_CONNECT *setup_snowflake_connection_with_autocommit(sf_bool autocommit);
 #ifdef __cplusplus
 }
 #endif

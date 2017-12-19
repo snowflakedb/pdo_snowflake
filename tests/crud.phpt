@@ -84,8 +84,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         while($row = $sth->fetch()) {
             echo $row["C1"] . " " . $row["C2"] . "\n";
         }
-
-        // $count = $dbh->exec("drop table if exists t");
+        $count = $dbh->exec("drop table if exists t");
     } catch (PDOException $e) {
         echo 'Connection failed: ' . $e->getMessage() . "\n";
         echo "dsn is: $dsn\n";
