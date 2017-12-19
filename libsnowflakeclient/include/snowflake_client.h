@@ -435,6 +435,14 @@ uint64 STDCALL snowflake_num_fields(SF_STMT *sfstmt);
 const char *STDCALL snowflake_sqlstate(SF_STMT *sfstmt);
 
 /**
+ * Gets an array of column metadata.
+ *
+ * @param sf SNOWFLAKE_STMT context.
+ * @return SF_COLUMN_DESC if success or NULL
+ */
+SF_COLUMN_DESC** STDCALL snowflake_desc(SF_STMT *sfstmt);
+
+/**
  * Prepares a statement.
  *
  * @param sfstmt SNOWFLAKE_STMT context.
@@ -486,7 +494,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt);
  * @param sfstmt SNOWFLAKE_STMT context.
  * @return the number of binding parameters in the statement.
  */
-uint64 STDCALL snowflake_param_count(SF_STMT *sfstmt);
+uint64 STDCALL snowflake_num_params(SF_STMT *sfstmt);
 
 /**
  * Binds parameters with the statement for execution.
@@ -517,6 +525,12 @@ SF_STATUS STDCALL snowflake_bind_result(
  */
 const char *STDCALL snowflake_sfqid(SF_STMT *sfstmt);
 
+/**
+ * Converts Snowflake Type enum value to a string representation
+ * @param type SF_TYPE enum
+ * @return a String representation of Snowflake Type
+ */
+const char *snowflake_type_to_string(SF_TYPE type);
 
 #ifdef  __cplusplus
 }

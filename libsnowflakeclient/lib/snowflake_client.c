@@ -1045,7 +1045,7 @@ uint64 STDCALL snowflake_num_fields(SF_STMT *sfstmt) {
     return (uint64)sfstmt->total_fieldcount;
 }
 
-uint64 STDCALL snowflake_param_count(SF_STMT *sfstmt) {
+uint64 STDCALL snowflake_num_params(SF_STMT *sfstmt) {
     if (!sfstmt) {
         // TODO change to -1?
         return 0;
@@ -1065,6 +1065,13 @@ const char *STDCALL snowflake_sqlstate(SF_STMT *sfstmt) {
         return NULL;
     }
     return sfstmt->error.sqlstate;
+}
+
+SF_COLUMN_DESC** STDCALL snowflake_desc(SF_STMT *sfstmt) {
+    if (!sfstmt) {
+        return NULL;
+    }
+    return sfstmt->desc;
 }
 
 SF_STATUS STDCALL snowflake_stmt_get_attr(

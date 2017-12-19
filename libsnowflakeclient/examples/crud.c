@@ -45,6 +45,30 @@ int fetch_data(SF_STMT *stmt, int64 expected_sum) {
         goto exit;
     }
 
+    uint64 num_fields = snowflake_num_fields(stmt);
+    SF_COLUMN_DESC **descs = snowflake_desc(stmt);
+
+    if (num_fields != 2) {
+        fprintf(stderr,
+                "failed to get the number of fields. expected: 2, got: %llu",
+                num_fields);
+        goto exit;
+    }
+
+    int i;
+    for (i = 0; i < num_fields; ++i) {
+        printf(
+          "name: %s, type: %d, C type: %d, byte_size: %lld, "
+            "internal_size: %lld, precision: %lld, scale: %lld, null ok: %d\n",
+          descs[i]->name,
+          descs[i]->type,
+          descs[i]->c_type,
+          descs[i]->byte_size,
+          descs[i]->internal_size,
+          descs[i]->precision,
+          descs[i]->scale,
+          descs[i]->null_ok);
+    }
     int64 total = 0;
     while ((status = snowflake_fetch(stmt)) == SF_STATUS_SUCCESS) {
         printf("c1: %d, c2: %s\n", c1v, c2v);
@@ -89,7 +113,7 @@ int main() {
      * it is taken as a float */
     status = snowflake_query(
       stmt,
-      "create or replace table t (c1 number(10,0), c2 string)",
+      "create or replace table t (c1 number(10,0) not null, c2 string)",
       0
     );
     if (status != SF_STATUS_SUCCESS) {

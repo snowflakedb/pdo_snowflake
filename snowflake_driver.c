@@ -484,7 +484,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         }
 
         /* autocommit */
-        dbh->auto_commit = (unsigned)auto_commit;
+        dbh->auto_commit = (unsigned) auto_commit;
     }
 
     // Set context attributes
