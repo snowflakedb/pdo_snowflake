@@ -44,3 +44,4 @@ cmake-build/
 .idea/
 logs/
 testenv.ini
+gmon.out

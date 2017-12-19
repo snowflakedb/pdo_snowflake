@@ -12,6 +12,10 @@ void initialize_snowflake_example(sf_bool debug) {
 }
 
 SF_CONNECT *setup_snowflake_connection() {
+    return setup_snowflake_connection_with_autocommit(SF_BOOLEAN_TRUE);
+}
+
+SF_CONNECT *setup_snowflake_connection_with_autocommit(sf_bool autocommit) {
     SF_CONNECT *sf = snowflake_init();
 
     snowflake_set_attr(sf, SF_CON_ACCOUNT, getenv("SNOWFLAKE_TEST_ACCOUNT"));
@@ -21,7 +25,7 @@ SF_CONNECT *setup_snowflake_connection() {
     snowflake_set_attr(sf, SF_CON_SCHEMA, getenv("SNOWFLAKE_TEST_SCHEMA"));
     snowflake_set_attr(sf, SF_CON_ROLE, getenv("SNOWFLAKE_TEST_ROLE"));
     snowflake_set_attr(sf, SF_CON_WAREHOUSE, getenv("SNOWFLAKE_TEST_WAREHOUSE"));
-    snowflake_set_attr(sf, SF_CON_AUTOCOMMIT, &SF_BOOLEAN_TRUE);
+    snowflake_set_attr(sf, SF_CON_AUTOCOMMIT, &autocommit);
     char *host, *port, *protocol;
     host = getenv("SNOWFLAKE_TEST_HOST");
     if (host) {

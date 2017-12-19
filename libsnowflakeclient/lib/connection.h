@@ -95,7 +95,8 @@ static int my_trace(CURL *handle, curl_infotype type, char *data, size_t size, v
 cJSON *STDCALL create_auth_json_body(SF_CONNECT *sf,
                                      const char *application,
                                      const char *int_app_name,
-                                     const char *int_app_version);
+                                     const char *int_app_version,
+                                     sf_bool autocommit);
 cJSON *STDCALL create_query_json_body(const char *sql_text, int64 sequence_id);
 cJSON *STDCALL create_renew_session_json_body(const char *old_token);
 struct curl_slist * STDCALL create_header_no_token();

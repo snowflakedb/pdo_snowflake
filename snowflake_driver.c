@@ -280,7 +280,9 @@ static int snowflake_handle_quoter(pdo_dbh_t *dbh, const char *unquoted,
 static int snowflake_handle_begin(pdo_dbh_t *dbh) /* {{{ */
 {
     PDO_DBG_ENTER("snowflake_handle_begin");
-    PDO_DBG_RETURN(1);
+    pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
+    SF_STATUS status = snowflake_trans_begin(H->server);
+    PDO_DBG_RETURN(status == SF_STATUS_SUCCESS ? 1 : 0);
 }
 /* }}} */
 
@@ -292,7 +294,9 @@ static int snowflake_handle_begin(pdo_dbh_t *dbh) /* {{{ */
 static int snowflake_handle_commit(pdo_dbh_t *dbh) /* {{{ */
 {
     PDO_DBG_ENTER("snowflake_handle_commit");
-    PDO_DBG_RETURN(1);
+    pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
+    SF_STATUS status = snowflake_trans_commit(H->server);
+    PDO_DBG_RETURN(status == SF_STATUS_SUCCESS ? 1 : 0);
 }
 /* }}} */
 
@@ -304,11 +308,14 @@ static int snowflake_handle_commit(pdo_dbh_t *dbh) /* {{{ */
 static int snowflake_handle_rollback(pdo_dbh_t *dbh) /* {{{ */
 {
     PDO_DBG_ENTER("snowflake_handle_rollback");
-    PDO_DBG_RETURN(1);
+    pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
+    SF_STATUS status = snowflake_trans_rollback(H->server);
+    PDO_DBG_RETURN(status == SF_STATUS_SUCCESS ? 1 : 0);
 }
 
 /* }}} */
 
+/* TODO: is this really used? */
 static inline int snowflake_handle_autocommit(pdo_dbh_t *dbh) /* {{{ */
 {
     PDO_DBG_ENTER("snowflake_handle_autocommit");
@@ -320,8 +327,25 @@ static inline int snowflake_handle_autocommit(pdo_dbh_t *dbh) /* {{{ */
 static int
 pdo_snowflake_set_attribute(pdo_dbh_t *dbh, zend_long attr, zval *val) /* {{{ */
 {
+    zend_long lval = zval_get_long(val);
+    zend_bool bval = lval ? (zend_bool) 1 : (zend_bool) 0;
     PDO_DBG_ENTER("pdo_snowflake_set_attribute");
-    PDO_DBG_RETURN(1);
+    PDO_DBG_INF("dbh=%p, attr=%l", dbh, attr);
+    switch (attr) {
+        case PDO_ATTR_AUTOCOMMIT:
+            /* ignore if the new value equals the old one */
+            if (dbh->auto_commit ^ bval) {
+                dbh->auto_commit = bval;
+                PDO_DBG_INF("value=%s", bval ? "TRUE" : "FALSE");
+            }
+            PDO_DBG_RETURN(1);
+            break;
+        default:
+            PDO_DBG_INF("unsupported attribute: %ld", attr);
+            /* invalid attribute */
+            PDO_DBG_RETURN(0);
+            break;
+    }
 }
 
 /* }}} */
@@ -329,8 +353,20 @@ pdo_snowflake_set_attribute(pdo_dbh_t *dbh, zend_long attr, zval *val) /* {{{ */
 static int
 pdo_snowflake_get_attribute(pdo_dbh_t *dbh, zend_long attr,
                             zval *return_value) {
+    pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
+
     PDO_DBG_ENTER("pdo_snowflake_get_attribute");
-    PDO_DBG_RETURN(1);
+    PDO_DBG_INF("dbh=%p", dbh);
+    PDO_DBG_INF("attr=%l", attr);
+    switch (attr) {
+        /* TODO: add more attributes */
+        case PDO_ATTR_AUTOCOMMIT: ZVAL_LONG(return_value, dbh->auto_commit);
+            break;
+        default:
+            /**/
+            PDO_DBG_RETURN(0);
+    }
+    PDO_DBG_RETURN(0);
 }
 /* }}} */
 
@@ -366,9 +402,9 @@ static struct pdo_dbh_methods snowflake_methods = {
   pdo_snowflake_fetch_error_func,
   pdo_snowflake_get_attribute,
   pdo_snowflake_check_liveness,
-  NULL,
-  NULL,
-  NULL
+  NULL, /* get_driver_methods */
+  NULL, /* persistent_shutdown */
+  NULL /* in_transaction*/
 };
 /* }}} */
 
@@ -432,8 +468,13 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
           driver_options,
           PDO_SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS, 1) ? 0
                                                                           : 1;
+        zend_long auto_commit = pdo_attr_lval(
+          driver_options,
+          PDO_ATTR_AUTOCOMMIT, 1) ? 0 : 1;
+
         snowflake_global_set_attribute(
           SF_GLOBAL_DISABLE_VERIFY_PEER, &disable_verify_peer);
+
         if (ssl_version != -1) {
             /* TODO: not allowed older than TLS 1.2 */
             snowflake_global_set_attribute(SF_GLOBAL_SSL_VERSION, &ssl_version);
@@ -441,6 +482,9 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         if (ca_bundle_file) {
             zend_string_release(ca_bundle_file);
         }
+
+        /* autocommit */
+        dbh->auto_commit = (unsigned)auto_commit;
     }
 
     // Set context attributes
@@ -455,6 +499,10 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     snowflake_set_attr(H->server, SF_CON_ROLE, vars[6].optval);
     snowflake_set_attr(H->server, SF_CON_PROTOCOL, vars[7].optval);
     snowflake_set_attr(H->server, SF_CON_INSECURE_MODE, vars[8].optval);
+    PDO_DBG_INF("autocomit: %u", dbh->auto_commit);
+    snowflake_set_attr(
+      H->server, SF_CON_AUTOCOMMIT,
+      dbh->auto_commit ? &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
 
     if (snowflake_connect(H->server) == SF_STATUS_ERROR) {
         pdo_snowflake_error(dbh);
