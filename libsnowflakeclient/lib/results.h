@@ -19,7 +19,6 @@ extern "C" {
 
 SF_TYPE string_to_snowflake_type(const char *string);
 SF_C_TYPE snowflake_to_c_type(SF_TYPE type, int64 precision, int64 scale);
-const char *snowflake_type_to_string(SF_TYPE type);
 SF_TYPE c_type_to_snowflake(SF_C_TYPE c_type, SF_TYPE tsmode);
 char *value_to_string(void *value, size_t len, SF_C_TYPE c_type);
 SF_COLUMN_DESC ** set_description(const cJSON *rowtype);

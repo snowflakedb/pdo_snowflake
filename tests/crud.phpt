@@ -81,6 +81,16 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         echo "inserted rows: " . $sth->rowCount() . "\n";
 
         $sth = $dbh->query("select * from t order by 1");
+        $meta = $sth->getColumnMeta(0);
+        echo sprintf(
+            "name: %s, native_type: %s, len: %d, precision: %d, scale: %d\n",
+             $meta["name"], $meta["native_type"], $meta["len"],
+              $meta["precision"], $meta["scale"]);
+        $meta = $sth->getColumnMeta(1);
+        echo sprintf(
+            "name: %s, native_type: %s, len: %d, precision: %d, scale: %d\n",
+             $meta["name"], $meta["native_type"], $meta["len"],
+              $meta["precision"], $meta["scale"]);
         while($row = $sth->fetch()) {
             echo $row["C1"] . " " . $row["C2"] . "\n";
         }
@@ -108,6 +118,8 @@ deleted rows: 1
 3 test101
 inserted rows: 1
 inserted rows: 1
+name: C1, native_type: FIXED, len: 0, precision: 38, scale: 0
+name: C2, native_type: TEXT, len: 16777216, precision: 0, scale: 0
 1 test1
 3 test101
 11 test111
