@@ -16,6 +16,7 @@
 #define SESSION_URL "/session/v1/login-request?"
 #define QUERY_URL "/queries/v1/query-request?"
 #define RENEW_SESSION_URL "/session/token-request?"
+#define DELETE_SESSION_URL "/session?"
 
 #define SESSION_EXPIRE_CODE "390112"
 #define QUERY_IN_PROGRESS_CODE "333333"

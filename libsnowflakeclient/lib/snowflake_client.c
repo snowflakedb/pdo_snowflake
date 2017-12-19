@@ -274,7 +274,24 @@ SF_CONNECT *STDCALL snowflake_init() {
 void STDCALL snowflake_term(SF_CONNECT *sf) {
     // Ensure object is not null
     if (sf) {
+        cJSON *resp = NULL;
+        char *s_resp = NULL;
         clear_snowflake_error(&sf->error);
+
+        /* delete the session */
+        URL_KEY_VALUE url_params[] = {
+          {"delete=", "true", NULL, NULL, 0, 0}
+        };
+        if (request(sf, &resp, DELETE_SESSION_URL, url_params, 1, NULL, NULL,
+                    POST_REQUEST_TYPE, &sf->error)) {
+            s_resp = cJSON_Print(resp);
+            log_trace("JSON response:\n%s", s_resp);
+            /* The error doesn't matter here. Everything will be cleaned up
+             * anyway. */
+        }
+        cJSON_Delete(resp);
+        SF_FREE(s_resp);
+
         pthread_mutex_destroy(&sf->mutex_sequence_counter);
         SF_FREE(sf->host);
         SF_FREE(sf->port);
