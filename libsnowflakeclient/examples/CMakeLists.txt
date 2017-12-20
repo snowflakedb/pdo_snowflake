@@ -15,7 +15,8 @@ SET(EXAMPLES
         crud
         error_handling
         large_result_set
-        selectvar)
+        selectvar
+        selectnum)
 
 set(SOURCE_UTILS
         example_setup.c)

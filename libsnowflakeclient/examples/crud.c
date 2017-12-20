@@ -209,7 +209,7 @@ int main() {
     }
     printf("affected rows: %lld\n", snowflake_affected_rows(stmt));
 
-    ret = fetch_data(stmt, 103);
+    ret = fetch_data(stmt, 203);
     if (ret != 0) {
         goto error_stmt;
     }

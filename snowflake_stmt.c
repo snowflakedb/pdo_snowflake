@@ -147,15 +147,17 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
             case SF_TYPE_ARRAY:
             case SF_TYPE_VARIANT:
             case SF_TYPE_OBJECT:
+                /* No length is given from the server */
                 len = SF_MAX_OBJECT_SIZE;
+                break;
+            case SF_TYPE_REAL:
+                len = (size_t)256; /* TODO */
                 break;
             case SF_TYPE_BINARY:
                 break;
             case SF_TYPE_BOOLEAN:
                 break;
             case SF_TYPE_DATE:
-                break;
-            case SF_TYPE_REAL:
                 break;
             case SF_TYPE_TIME:
                 break;
