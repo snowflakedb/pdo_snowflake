@@ -2,6 +2,10 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
+/*
+ * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
+ */
+
 
 #include <stdio.h>
 #include <snowflake_client.h>
@@ -30,7 +34,7 @@ int main() {
      * it is taken as a float */
     status = snowflake_query(
       sfstmt,
-      "create or replace table t (c1 object, c2 array, c3 variant)",
+      "create or replace table t (c1 number(38,6), c2 number(18,0), c3 float)",
       0
     );
     if (status != SF_STATUS_SUCCESS) {
@@ -43,7 +47,7 @@ int main() {
     /* insert data */
     status = snowflake_prepare(
       sfstmt,
-      "insert into t select parse_json(?),parse_json(?),parse_json(?)",
+      "insert into t(c1,c2,c3) values(?,?,?)",
       0);
     if (status != SF_STATUS_SUCCESS) {
         SF_ERROR *error = snowflake_error(sf);
@@ -53,30 +57,27 @@ int main() {
     }
 
     SF_BIND_INPUT ic1;
-    char ic1buf[1024];
-    strcpy(ic1buf, "{\"test1\":1}");
+    double ic1buf = 123.456;
     ic1.idx = 1;
-    ic1.c_type = SF_C_TYPE_STRING;
-    ic1.value = (void *) ic1buf;
-    ic1.len = strlen(ic1buf);
+    ic1.c_type = SF_C_TYPE_FLOAT64;
+    ic1.value = (void *) &ic1buf;
+    ic1.len = sizeof(ic1buf);
     snowflake_bind_param(sfstmt, &ic1);
 
     SF_BIND_INPUT ic2;
-    char ic2buf[1024];
-    strcpy(ic2buf, "'[1,2,3]'");
+    int64 ic2buf = 98765;
     ic2.idx = 2;
-    ic2.c_type = SF_C_TYPE_STRING;
-    ic2.value = (void *) ic2buf;
-    ic2.len = strlen(ic2buf);
+    ic2.c_type = SF_C_TYPE_INT64;
+    ic2.value = (void *) &ic2buf;
+    ic2.len = sizeof(ic2buf);
     snowflake_bind_param(sfstmt, &ic2);
 
     SF_BIND_INPUT ic3;
-    char ic3buf[1024];
-    strcpy(ic3buf, "'[456,789]'");
+    double ic3buf = 123.456;
     ic3.idx = 3;
-    ic3.c_type = SF_C_TYPE_STRING;
-    ic3.value = (void *) ic3buf;
-    ic3.len = strlen(ic3buf);
+    ic3.c_type = SF_C_TYPE_FLOAT64;
+    ic3.value = (void *) &ic3buf;
+    ic3.len = sizeof(ic3buf);
     snowflake_bind_param(sfstmt, &ic3);
 
     status = snowflake_execute(sfstmt);

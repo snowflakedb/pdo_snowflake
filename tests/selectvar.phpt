@@ -42,6 +42,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         echo "dsn is: $dsn\n";
         echo "user is: $user\n";
     }
+    $dbh = null;
 ?>
 ===DONE===
 <?php exit(0); ?>
