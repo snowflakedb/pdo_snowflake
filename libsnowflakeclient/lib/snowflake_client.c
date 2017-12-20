@@ -706,7 +706,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
         if (result == NULL) {
             continue;
         } else {
-            if (result->type != sfstmt->desc[i]->c_type && result->type != SF_C_TYPE_STRING) {
+            if (result->c_type != sfstmt->desc[i]->c_type && result->c_type != SF_C_TYPE_STRING) {
                 // TODO add error msg
                 goto cleanup;
             }
@@ -725,26 +725,26 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
         } else {
             raw_result = cJSON_GetArrayItem(row, i);
             // TODO turn into switch statement
-            if (result->type == SF_C_TYPE_INT8) {
+            if (result->c_type == SF_C_TYPE_INT8) {
                 if (sfstmt->desc[i]->type == SF_TYPE_BOOLEAN) {
                     *(int8 *) result->value = cJSON_IsTrue(raw_result) ? SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
                 } else {
                     // field is a char?
                     *(int8 *) result->value = (int8) raw_result->valuestring[0];
                 }
-            } else if (result->type == SF_C_TYPE_UINT8) {
+            } else if (result->c_type == SF_C_TYPE_UINT8) {
                 *(uint8 *) result->value = (uint8) raw_result->valuestring[0];
-            } else if (result->type == SF_C_TYPE_INT64) {
+            } else if (result->c_type == SF_C_TYPE_INT64) {
                 *(int64 *) result->value = (int64) strtoll(raw_result->valuestring, NULL, 10);
-            } else if (result->type == SF_C_TYPE_UINT64) {
+            } else if (result->c_type == SF_C_TYPE_UINT64) {
                 *(uint64 *) result->value = (uint64) strtoull(raw_result->valuestring, NULL, 10);
-            } else if (result->type == SF_C_TYPE_FLOAT64) {
+            } else if (result->c_type == SF_C_TYPE_FLOAT64) {
                 *(float64 *) result->value = (float64) strtod(raw_result->valuestring, NULL);
-            } else if (result->type == SF_C_TYPE_STRING) {
+            } else if (result->c_type == SF_C_TYPE_STRING) {
                 /* copy original data as is except Date/Time/Timestamp/Binary type */
                 strncpy(result->value, raw_result->valuestring, result->max_length);
                 result->len = strlen(raw_result->valuestring); /* TODO: what if null is included? */
-            } else if (result->type == SF_C_TYPE_TIMESTAMP) {
+            } else if (result->c_type == SF_C_TYPE_TIMESTAMP) {
                 // TODO Do some timestamp stuff here
             } else {
                 // TODO Create default case

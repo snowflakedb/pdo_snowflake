@@ -1,5 +1,5 @@
 --TEST--
-pdo_snowflake - select1
+pdo_snowflake - select 1
 --INI--
 pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 --FILE--

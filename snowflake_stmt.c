@@ -109,10 +109,6 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
     PDO_DBG_ENTER("pdo_snowflake_stmt_execute_prepared");
     int i;
     pdo_snowflake_stmt *S = stmt->driver_data;
-    pdo_snowflake_db_handle *H = S->H;
-
-    // TODO: bind parameters. Do we need this?
-    /* S->bound_params = NULL;*/
 
     /* execute */
     if (snowflake_execute(S->stmt) != SF_STATUS_SUCCESS) {
@@ -129,24 +125,49 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
         size_t len = 0;
         SF_COLUMN_DESC *desc = S->stmt->desc[i];
         S->bound_result[i].idx = (size_t) i + 1;  /* 1 based index */
-        S->bound_result[i].type = SF_C_TYPE_STRING; /* string type */
+        S->bound_result[i].c_type = SF_C_TYPE_STRING; /* string type */
         PDO_DBG_INF("name: %s, prec: %d, scale: %d, type: %d, c_type: %d, "
                       "byte_size: %ld, internal_bytes: %ld, null_ok: %d",
                     desc->name, desc->precision, desc->scale,
                     desc->type, desc->c_type,
                     desc->byte_size, desc->internal_size, desc->null_ok);
-        if (desc->type == SF_TYPE_FIXED) {
-            if (desc->scale == 0) {
-                /* No decimal point but integer */
-                len = (size_t) desc->precision;
-            } else {
-                /* The total number of digits plus decimal point */
-                len = (size_t) desc->precision + 1;
-            }
-        } else if (desc->type == SF_TYPE_TEXT) {
-            len = (size_t) desc->byte_size;
+        switch (desc->type) {
+            case SF_TYPE_FIXED:
+                if (desc->scale == 0) {
+                    /* No decimal point but integer */
+                    len = (size_t) desc->precision;
+                } else {
+                    /* The total number of digits plus decimal point */
+                    len = (size_t) desc->precision + 1;
+                }
+                break;
+            case SF_TYPE_TEXT:
+                len = (size_t) desc->byte_size;
+                break;
+            case SF_TYPE_ARRAY:
+            case SF_TYPE_VARIANT:
+            case SF_TYPE_OBJECT:
+                len = SF_MAX_OBJECT_SIZE;
+                break;
+            case SF_TYPE_BINARY:
+                break;
+            case SF_TYPE_BOOLEAN:
+                break;
+            case SF_TYPE_DATE:
+                break;
+            case SF_TYPE_REAL:
+                break;
+            case SF_TYPE_TIME:
+                break;
+            case SF_TYPE_TIMESTAMP_LTZ:
+                break;
+            case SF_TYPE_TIMESTAMP_TZ:
+                break;
+            case SF_TYPE_TIMESTAMP_NTZ:
+                break;
+            default:
+                break;
         }
-        // TODO: S->bound_result[i].type =
         S->bound_result[i].max_length = len; // change this
         S->bound_result[i].value = ecalloc(len, sizeof(char));
         S->bound_result[i].len = 0; // reset the actual value length
@@ -250,7 +271,17 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
     SF_COLUMN_DESC **F = snowflake_desc(S->stmt);
     for (i = 0; i < stmt->column_count; i++) {
         cols[i].precision = (zend_ulong) F[i]->precision;
-        cols[i].maxlen = (size_t) F[i]->byte_size; /* TODO: str size? */
+        switch(F[i]->type) {
+            case SF_TYPE_OBJECT:
+            case SF_TYPE_ARRAY:
+            case SF_TYPE_VARIANT:
+                /* No size is given from the server */
+                cols[i].maxlen = SF_MAX_OBJECT_SIZE;
+                break;
+            default:
+                cols[i].maxlen = (size_t) F[i]->byte_size;
+                break;
+        }
         cols[i].name = zend_string_init(
           F[i]->name, strlen(F[i]->name), 0);
         cols[i].param_type = PDO_PARAM_STR; /* Always string */

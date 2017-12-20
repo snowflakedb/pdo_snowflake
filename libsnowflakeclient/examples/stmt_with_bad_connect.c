@@ -21,7 +21,7 @@ int main() {
     SF_BIND_OUTPUT c1;
     int out = 0;
     c1.idx = 1;
-    c1.type = SF_C_TYPE_INT64;
+    c1.c_type = SF_C_TYPE_INT64;
     c1.value = (void *) &out;
     snowflake_bind_result(sfstmt, &c1);
     status = snowflake_execute(sfstmt);

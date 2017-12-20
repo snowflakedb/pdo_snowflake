@@ -25,6 +25,11 @@ extern "C" {
 #define SQLSTATE_LEN 6
 
 /**
+ * The maximum object size
+ */
+#define SF_MAX_OBJECT_SIZE 16777216
+
+/**
  * Snowflake Data types
  */
 typedef enum sf_type {
@@ -248,7 +253,7 @@ typedef struct sf_snowflake_input
 typedef struct sf_snowflake_output
 {
     size_t idx; /* One based index of the columns */
-    SF_C_TYPE type; /* expected data type in C */
+    SF_C_TYPE c_type; /* expected data type in C */
     void *value; /* output value */
     size_t max_length; /* maximum buffer size provided by application */
     size_t len; /* actual value length */

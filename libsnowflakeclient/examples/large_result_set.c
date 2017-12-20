@@ -36,7 +36,7 @@ int main() {
     int64 out = 0;
     uint64 counter = 0;
     c1.idx = 1;
-    c1.type = SF_C_TYPE_INT64;
+    c1.c_type = SF_C_TYPE_INT64;
     c1.value = (void *) &out;
     c1.len = sizeof(out);
     snowflake_bind_result(sfstmt, &c1);

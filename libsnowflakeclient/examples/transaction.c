@@ -106,7 +106,7 @@ int main() {
     SF_BIND_OUTPUT v1;
 
     v1.idx = 1;
-    v1.type = SF_C_TYPE_INT64;
+    v1.c_type = SF_C_TYPE_INT64;
     v1.value = &v;
     v1.max_length = sizeof(v1);
     status = snowflake_bind_result(sfstmt, &v1);
