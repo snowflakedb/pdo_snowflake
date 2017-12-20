@@ -58,7 +58,8 @@ typedef enum sf_c_type {
     SF_C_TYPE_UINT64,
     SF_C_TYPE_FLOAT64,
     SF_C_TYPE_STRING,
-    SF_C_TYPE_TIMESTAMP
+    SF_C_TYPE_TIMESTAMP,
+    SF_C_TYPE_BOOLEAN
 } SF_C_TYPE;
 
 /**
@@ -245,6 +246,7 @@ typedef struct sf_snowflake_input
   SF_C_TYPE c_type; /* input data type in C */
   void *value; /* input value */
   size_t len; /* input value length. valid only for SF_C_TYPE_STRING */
+  SF_TYPE type; /* (optional) target Snowflake data type */
 } SF_BIND_INPUT;
 
 /**

@@ -16,7 +16,8 @@ SET(EXAMPLES
         error_handling
         large_result_set
         selectvar
-        selectnum)
+        selectnum
+        selectbool)
 
 set(SOURCE_UTILS
         example_setup.c)

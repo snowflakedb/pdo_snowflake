@@ -151,11 +151,12 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
                 len = SF_MAX_OBJECT_SIZE;
                 break;
             case SF_TYPE_REAL:
-                len = (size_t)256; /* TODO */
+                len = (size_t) 256; /* TODO */
                 break;
             case SF_TYPE_BINARY:
                 break;
             case SF_TYPE_BOOLEAN:
+                len = sizeof(SF_BOOLEAN_FALSE_STR);
                 break;
             case SF_TYPE_DATE:
                 break;
@@ -170,6 +171,7 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
             default:
                 break;
         }
+        PDO_DBG_INF("len: %ld", len);
         S->bound_result[i].max_length = len; // change this
         S->bound_result[i].value = ecalloc(len, sizeof(char));
         S->bound_result[i].len = 0; // reset the actual value length
@@ -273,12 +275,22 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
     SF_COLUMN_DESC **F = snowflake_desc(S->stmt);
     for (i = 0; i < stmt->column_count; i++) {
         cols[i].precision = (zend_ulong) F[i]->precision;
-        switch(F[i]->type) {
+        switch (F[i]->type) {
             case SF_TYPE_OBJECT:
             case SF_TYPE_ARRAY:
             case SF_TYPE_VARIANT:
                 /* No size is given from the server */
                 cols[i].maxlen = SF_MAX_OBJECT_SIZE;
+                break;
+            case SF_TYPE_BOOLEAN:
+                cols[i].maxlen = sizeof(SF_BOOLEAN_FALSE_STR);
+            case SF_TYPE_TIMESTAMP_TZ:
+            case SF_TYPE_TIMESTAMP_NTZ:
+            case SF_TYPE_TIMESTAMP_LTZ:
+            case SF_TYPE_DATE:
+            case SF_TYPE_TIME:
+            case SF_TYPE_BINARY:
+                /* TODO */
                 break;
             default:
                 cols[i].maxlen = (size_t) F[i]->byte_size;
@@ -443,6 +455,18 @@ static int pdo_snowflake_stmt_param_hook(
                     v->len = Z_STRLEN_P(parameter);
                     v->value = Z_STRVAL_P(parameter);
                     break;
+                case PDO_PARAM_BOOL:
+                    PDO_DBG_INF(
+                      "value: %s",
+                      php_zval_type_names[Z_TYPE_P(parameter)]);
+                    if (Z_TYPE_P(parameter) == IS_FALSE) {
+                        v->value = &SF_BOOLEAN_FALSE;
+                    } else {
+                        v->value = &SF_BOOLEAN_TRUE;
+                    }
+                    v->len = sizeof(sf_bool);
+                    v->c_type = SF_C_TYPE_BOOLEAN;
+                    break;
                 default:
                     /* TODO: error not supported */
                     PDO_DBG_RETURN(0);
@@ -455,6 +479,7 @@ static int pdo_snowflake_stmt_param_hook(
                     efree(v->value);
                     break;
                 case PDO_PARAM_STR:
+                case PDO_PARAM_BOOL:
                     /* nop */
                     break;
                 default:

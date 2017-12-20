@@ -336,7 +336,9 @@ pdo_snowflake_set_attribute(pdo_dbh_t *dbh, zend_long attr, zval *val) /* {{{ */
             /* ignore if the new value equals the old one */
             if (dbh->auto_commit ^ bval) {
                 dbh->auto_commit = bval;
-                PDO_DBG_INF("value=%s", bval ? "TRUE" : "FALSE");
+                PDO_DBG_INF(
+                  "value=%s",
+                  bval ? SF_BOOLEAN_TRUE_STR : SF_BOOLEAN_FALSE_STR);
             }
             PDO_DBG_RETURN(1);
             break;

@@ -86,7 +86,7 @@ SF_C_TYPE snowflake_to_c_type(SF_TYPE type, int64 precision, int64 scale) {
             type == SF_TYPE_TIMESTAMP_TZ) {
         return SF_C_TYPE_TIMESTAMP;
     } else if (type == SF_TYPE_BOOLEAN) {
-        return SF_C_TYPE_INT8;
+        return SF_C_TYPE_BOOLEAN;
     } else if (type == SF_TYPE_TEXT ||
             type == SF_TYPE_VARIANT ||
             type == SF_TYPE_OBJECT ||
@@ -114,6 +114,8 @@ SF_TYPE c_type_to_snowflake(SF_C_TYPE c_type, SF_TYPE tsmode) {
             return SF_TYPE_TEXT;
         case SF_C_TYPE_TIMESTAMP:
             return tsmode;
+        case SF_C_TYPE_BOOLEAN:
+            return SF_TYPE_BOOLEAN;
         default:
             return SF_TYPE_TEXT;
     }
@@ -148,6 +150,11 @@ char *value_to_string(void *value, size_t len, SF_C_TYPE c_type) {
             size = (size_t) snprintf( NULL, 0, "%f", *(float64 *) value) + 1;
             ret = (char *) SF_CALLOC(1, size);
             snprintf(ret, size, "%f", *(float64 *) value);
+            return ret;
+        case SF_C_TYPE_BOOLEAN:
+            size = *(sf_bool*)value == SF_BOOLEAN_TRUE ? sizeof(SF_BOOLEAN_TRUE_STR) : sizeof(SF_BOOLEAN_FALSE_STR) + 1;
+            ret = (char*) SF_CALLOC(1, size);
+            strncpy(ret, *(sf_bool*)value == SF_BOOLEAN_TRUE ? SF_BOOLEAN_TRUE_STR : SF_BOOLEAN_FALSE_STR, size);
             return ret;
         case SF_C_TYPE_STRING:
             size = (size_t)len + 1;

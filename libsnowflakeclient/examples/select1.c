@@ -17,7 +17,8 @@ int main() {
     if (status != SF_STATUS_SUCCESS) {
         fprintf(stderr, "Connecting to snowflake failed, exiting...\n");
         SF_ERROR *error = snowflake_error(sf);
-        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
+        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
+                error->msg, error->file, error->line);
         goto cleanup;
     }
 
@@ -33,18 +34,17 @@ int main() {
     snowflake_bind_result(sfstmt, &c1);
     printf("Number of rows: %d\n", (int) snowflake_num_rows(sfstmt));
 
-    while ((status = snowflake_fetch(sfstmt)) != SF_STATUS_EOL) {
-        if (status == SF_STATUS_ERROR || status == SF_STATUS_WARNING) {
-            SF_ERROR *error = snowflake_stmt_error(sfstmt);
-            fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
-            break;
-        }
+    while ((status = snowflake_fetch(sfstmt)) != SF_STATUS_SUCCESS) {
         printf("result: %d\n", *((int *) c1.value));
     }
 
     // If we reached end of line, then we were successful
     if (status == SF_STATUS_EOL) {
         status = SF_STATUS_SUCCESS;
+    } else if (status == SF_STATUS_ERROR || status == SF_STATUS_WARNING) {
+        SF_ERROR *error = snowflake_stmt_error(sfstmt);
+        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
+                error->msg, error->file, error->line);
     }
 
 cleanup:
