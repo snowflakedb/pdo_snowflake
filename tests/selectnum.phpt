@@ -1,5 +1,5 @@
 --TEST--
-pdo_snowflake - select very large number
+pdo_snowflake - insert and select numeric data types
 --INI--
 pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 --FILE--

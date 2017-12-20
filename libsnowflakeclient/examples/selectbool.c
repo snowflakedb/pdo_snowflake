@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <snowflake_client.h>
 #include <example_setup.h>
-#include <memory.h>
 
 
 int main() {
@@ -17,7 +16,6 @@ int main() {
 
     status = snowflake_connect(sf);
     if (status != SF_STATUS_SUCCESS) {
-        fprintf(stderr, "Connecting to snowflake failed, exiting...\n");
         SF_ERROR *error = snowflake_error(sf);
         fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
                 error->msg, error->file, error->line);
@@ -30,7 +28,7 @@ int main() {
      * it is taken as a float */
     status = snowflake_query(
       sfstmt,
-      "create or replace table t (c1 object, c2 array, c3 variant)",
+      "create or replace table t (c1 int, c2 boolean)",
       0
     );
     if (status != SF_STATUS_SUCCESS) {
@@ -43,7 +41,7 @@ int main() {
     /* insert data */
     status = snowflake_prepare(
       sfstmt,
-      "insert into t select parse_json(?),parse_json(?),parse_json(?)",
+      "insert into t(c1,c2) values(?,?)",
       0);
     if (status != SF_STATUS_SUCCESS) {
         SF_ERROR *error = snowflake_stmt_error(sfstmt);
@@ -53,31 +51,43 @@ int main() {
     }
 
     SF_BIND_INPUT ic1;
-    char ic1buf[1024];
-    strcpy(ic1buf, "{\"test1\":1}");
+    int64 ic1buf = 201;
     ic1.idx = 1;
-    ic1.c_type = SF_C_TYPE_STRING;
-    ic1.value = (void *) ic1buf;
-    ic1.len = strlen(ic1buf);
+    ic1.c_type = SF_C_TYPE_INT64;
+    ic1.value = (void *) &ic1buf;
+    ic1.len = sizeof(ic1buf);
     snowflake_bind_param(sfstmt, &ic1);
 
     SF_BIND_INPUT ic2;
-    char ic2buf[1024];
-    strcpy(ic2buf, "'[1,2,3]'");
+    sf_bool ic2buf = SF_BOOLEAN_TRUE;
     ic2.idx = 2;
-    ic2.c_type = SF_C_TYPE_STRING;
-    ic2.value = (void *) ic2buf;
-    ic2.len = strlen(ic2buf);
+    ic2.c_type = SF_C_TYPE_BOOLEAN;
+    ic2.value = (void *) &ic2buf;
+    ic2.len = sizeof(ic2buf);
     snowflake_bind_param(sfstmt, &ic2);
 
-    SF_BIND_INPUT ic3;
-    char ic3buf[1024];
-    strcpy(ic3buf, "'[456,789]'");
-    ic3.idx = 3;
-    ic3.c_type = SF_C_TYPE_STRING;
-    ic3.value = (void *) ic3buf;
-    ic3.len = strlen(ic3buf);
-    snowflake_bind_param(sfstmt, &ic3);
+    status = snowflake_execute(sfstmt);
+    if (status != SF_STATUS_SUCCESS) {
+        SF_ERROR *error = snowflake_stmt_error(sfstmt);
+        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
+                error->msg, error->file, error->line);
+        goto cleanup;
+    }
+    printf("Inserted one row\n");
+
+    ic1buf = 211;
+    ic1.idx = 1;
+    ic1.c_type = SF_C_TYPE_INT64;
+    ic1.value = (void *) &ic1buf;
+    ic1.len = sizeof(ic1buf);
+    snowflake_bind_param(sfstmt, &ic1);
+
+    ic2buf = SF_BOOLEAN_FALSE;
+    ic2.idx = 2;
+    ic2.c_type = SF_C_TYPE_BOOLEAN;
+    ic2.value = (void *) &ic2buf;
+    ic2.len = sizeof(ic2buf);
+    snowflake_bind_param(sfstmt, &ic2);
 
     status = snowflake_execute(sfstmt);
     if (status != SF_STATUS_SUCCESS) {
@@ -115,19 +125,10 @@ int main() {
     c2.max_length = sizeof(c2buf);
     snowflake_bind_result(sfstmt, &c2);
 
-    SF_BIND_OUTPUT c3;
-    char c3buf[1024];
-    c3.idx = 3;
-    c3.c_type = SF_C_TYPE_STRING;
-    c3.value = (void *) c3buf;
-    c3.max_length = sizeof(c3buf);
-    snowflake_bind_result(sfstmt, &c3);
-
     printf("Number of rows: %d\n", (int) snowflake_num_rows(sfstmt));
 
     while ((status = snowflake_fetch(sfstmt)) == SF_STATUS_SUCCESS) {
-        printf("result: %s, %s, %s\n", (char *) c1.value, (char *) c2.value,
-               (char *) c3.value);
+        printf("result: %s, %s\n", (char *) c1.value, (char *) c2.value);
     }
 
     // If we reached end of line, then we were successful

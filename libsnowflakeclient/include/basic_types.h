@@ -28,6 +28,9 @@ typedef int8 sf_bool;
 extern int8 SF_BOOLEAN_TRUE;
 extern int8 SF_BOOLEAN_FALSE;
 
+#define SF_BOOLEAN_TRUE_STR "TRUE"
+#define SF_BOOLEAN_FALSE_STR "FALSE"
+
 #ifdef __cplusplus
 }
 #endif

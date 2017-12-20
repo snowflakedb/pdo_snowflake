@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <snowflake_client.h>
 #include <example_setup.h>
-#include <memory.h>
 
 
 int main() {
@@ -38,7 +37,7 @@ int main() {
       0
     );
     if (status != SF_STATUS_SUCCESS) {
-        SF_ERROR *error = snowflake_error(sf);
+        SF_ERROR *error = snowflake_stmt_error(sfstmt);
         fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
                 error->msg, error->file, error->line);
         goto cleanup;
@@ -50,7 +49,7 @@ int main() {
       "insert into t(c1,c2,c3) values(?,?,?)",
       0);
     if (status != SF_STATUS_SUCCESS) {
-        SF_ERROR *error = snowflake_error(sf);
+        SF_ERROR *error = snowflake_stmt_error(sfstmt);
         fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
                 error->msg, error->file, error->line);
         goto cleanup;
@@ -82,7 +81,7 @@ int main() {
 
     status = snowflake_execute(sfstmt);
     if (status != SF_STATUS_SUCCESS) {
-        SF_ERROR *error = snowflake_error(sf);
+        SF_ERROR *error = snowflake_stmt_error(sfstmt);
         fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
                 error->msg, error->file, error->line);
         goto cleanup;
@@ -92,7 +91,7 @@ int main() {
     /* query */
     status = snowflake_query(sfstmt, "select * from t", 0);
     if (status != SF_STATUS_SUCCESS) {
-        SF_ERROR *error = snowflake_error(sf);
+        SF_ERROR *error = snowflake_stmt_error(sfstmt);
         fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
                 error->msg, error->file, error->line);
         goto cleanup;
