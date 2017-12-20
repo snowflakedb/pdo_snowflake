@@ -25,7 +25,7 @@ int fetch_data(SF_STMT *stmt, int64 expected_sum) {
     SF_BIND_OUTPUT c1;
     c1.idx = 1;
     c1.max_length = sizeof(c1v);
-    c1.type = SF_C_TYPE_INT64;
+    c1.c_type = SF_C_TYPE_INT64;
     c1.value = &c1v;
     status = snowflake_bind_result(stmt, &c1);
     if (status != SF_STATUS_SUCCESS) {
@@ -37,7 +37,7 @@ int fetch_data(SF_STMT *stmt, int64 expected_sum) {
     SF_BIND_OUTPUT c2;
     c2.idx = 2;
     c2.max_length = sizeof(c2v);
-    c2.type = SF_C_TYPE_STRING;
+    c2.c_type = SF_C_TYPE_STRING;
     c2.value = &c2v;
     status = snowflake_bind_result(stmt, &c2);
     if (status != SF_STATUS_SUCCESS) {

@@ -14,7 +14,8 @@ SET(EXAMPLES
         stmt_with_bad_connect
         crud
         error_handling
-        large_result_set)
+        large_result_set
+        selectvar)
 
 set(SOURCE_UTILS
         example_setup.c)

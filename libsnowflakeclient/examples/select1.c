@@ -4,7 +4,6 @@
 
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <snowflake_client.h>
 #include <example_setup.h>
 
@@ -28,7 +27,7 @@ int main() {
     SF_BIND_OUTPUT c1;
     int64 out = 0;
     c1.idx = 1;
-    c1.type = SF_C_TYPE_INT64;
+    c1.c_type = SF_C_TYPE_INT64;
     c1.value = (void *) &out;
     c1.len = sizeof(out);
     snowflake_bind_result(sfstmt, &c1);
