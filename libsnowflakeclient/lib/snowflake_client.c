@@ -756,11 +756,11 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                         if (strcmp(raw_result->valuestring, "0") == 0) {
                             /* False */
                             strncpy(result->value, SF_BOOLEAN_FALSE_STR, result->max_length);
-                            result->len = sizeof(SF_BOOLEAN_FALSE_STR);
+                            result->len = sizeof(SF_BOOLEAN_FALSE_STR)-1;
                         } else {
                             /* True */
                             strncpy(result->value, SF_BOOLEAN_TRUE_STR, result->max_length);
-                            result->len = sizeof(SF_BOOLEAN_TRUE_STR);
+                            result->len = sizeof(SF_BOOLEAN_TRUE_STR)-1;
                         }
                     } else {
                         /* copy original data as is except Date/Time/Timestamp/Binary type */

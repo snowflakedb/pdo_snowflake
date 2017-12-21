@@ -45,28 +45,13 @@ PHP_INI_BEGIN()
 PHP_INI_END()
 /* }}} */
 
-/* TODO: adhoc logger until Snowflake client provides it. */
-void pdo_snowflake_log(int line, const char *filename, const char *severity,
-                       char *fmt, ...) {
-    va_list args;
-    va_start (args, fmt);
-
-    FILE *fp = fopen("/tmp/php.log", "a");
-    fprintf(fp, "[%-6s] %-70s:%5d - ", severity, filename, line);
-    vfprintf(fp, fmt, args);
-    fprintf(fp, "\n");
-    fclose(fp);
-
-    va_end (args);
-}
-
 /* {{{ PHP_MINIT_FUNCTION
  */
 static PHP_MINIT_FUNCTION(pdo_snowflake) {
     REGISTER_INI_ENTRIES();
 
-    char* log = PDO_SNOWFLAKE_G(log);
-    char* cacert = PDO_SNOWFLAKE_G(cacert);
+    char *log = PDO_SNOWFLAKE_G(log);
+    char *cacert = PDO_SNOWFLAKE_G(cacert);
     snowflake_global_init(log);
     snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, cacert);
 

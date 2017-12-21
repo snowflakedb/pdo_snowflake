@@ -197,7 +197,8 @@ static int pdo_snowflake_stmt_execute(pdo_stmt_t *stmt) /* {{{ */
     PDO_DBG_INF("stmt=%p", S->stmt);
 
     if (S->stmt) {
-        PDO_DBG_RETURN(pdo_snowflake_stmt_execute_prepared(stmt));
+        int ret = pdo_snowflake_stmt_execute_prepared(stmt);
+        PDO_DBG_RETURN(ret);
     }
 
     // TODO: stmt->active_query_stringlen should be specified.
@@ -235,7 +236,7 @@ static int pdo_snowflake_stmt_fetch(
     PDO_DBG_INF("ori: %d, offset: %d", ori, offset);
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     if (ori != PDO_FETCH_ORI_NEXT) {
-
+        /* TODO: raise error */
     }
     SF_STATUS ret = snowflake_fetch(S->stmt);
     if (ret == SF_STATUS_EOL) {
