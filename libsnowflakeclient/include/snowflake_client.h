@@ -2,8 +2,8 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
-#ifndef SNOWFLAKE_SNOWFLAKE_CLIENT_H
-#define SNOWFLAKE_SNOWFLAKE_CLIENT_H
+#ifndef SNOWFLAKE_CLIENT_H
+#define SNOWFLAKE_CLIENT_H
 
 #ifdef  __cplusplus
 extern "C" {
@@ -548,4 +548,4 @@ const char *snowflake_type_to_string(SF_TYPE type);
 }
 #endif
 
-#endif //SNOWFLAKE_SNOWFLAKE_CLIENT_H
+#endif //SNOWFLAKE_CLIENT_H
