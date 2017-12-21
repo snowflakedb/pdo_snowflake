@@ -388,13 +388,7 @@ static void *chunk_downloader_thread(void *downloader) {
     uint64 index;
     // Create err per thread so we don't have to lock the chunk downloader err
     SF_ERROR err;
-    err.error_code = SF_ERROR_NONE;
-    err.sqlstate[0] = '\0';
-    err.msg = NULL;
-    err.is_shared_msg = SF_BOOLEAN_FALSE;
-    err.sfqid[0] = '\0';
-    err.file = NULL;
-    err.line = 0;
+    memset(&err, 0, sizeof(err));
     clear_snowflake_error(&err);
 
     // Loop forever until shutdown
