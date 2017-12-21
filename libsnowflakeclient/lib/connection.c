@@ -13,6 +13,12 @@
 #define curl_easier_escape(curl, string) curl_easy_escape(curl, string, 0)
 #define QUERYCODE_LEN 7
 
+/*
+ * Debug functions from curl example. Should update at somepoint, and possibly remove from header since these are private functions
+ */
+static void dump(const char *text, FILE *stream, unsigned char *ptr, size_t size, char nohex);
+static int my_trace(CURL *handle, curl_infotype type, char *data, size_t size, void *userp);
+
 static
 void dump(const char *text,
           FILE *stream, unsigned char *ptr, size_t size,
@@ -653,12 +659,14 @@ sf_bool STDCALL http_perform(CURL *curl,
             1,      //base
             16      //cap
     };
+    /* TODO: let's remove this if not used.
     RETRY_CONTEXT retry_ctx = {
             0,      //retry_count
             network_timeout,
             1,      // time to sleep
             &djb    // Decorrelate jitter
     };
+    */
     RAW_JSON_BUFFER buffer = {NULL, 0};
     struct data config;
     config.trace_ascii = 1;

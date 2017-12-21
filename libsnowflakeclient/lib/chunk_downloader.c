@@ -11,6 +11,8 @@
 #include <string.h>
 #include <unistd.h>
 
+static void *chunk_downloader_thread(void *downloader);
+
 #define PTHREAD_LOCK_INIT_ERROR_MSG(e, em) \
 switch(e) \
 { \

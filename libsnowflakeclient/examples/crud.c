@@ -71,7 +71,7 @@ int fetch_data(SF_STMT *stmt, int64 expected_sum) {
     }
     int64 total = 0;
     while ((status = snowflake_fetch(stmt)) == SF_STATUS_SUCCESS) {
-        printf("c1: %d, c2: %s\n", c1v, c2v);
+        printf("c1: %lld, c2: %s\n", c1v, c2v);
         total += c1v;
     }
     if (total != expected_sum) {

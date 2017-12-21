@@ -553,7 +553,7 @@ static int pdo_snowflake_stmt_col_meta(
     }
     add_assoc_long(return_value, "scale", (zend_long) F[colno]->scale);
     add_assoc_string(return_value, "native_type",
-                     snowflake_type_to_string(F[colno]->type));
+                     (char*)snowflake_type_to_string(F[colno]->type));
     add_assoc_zval(return_value, "flags", &flags);
 
     PDO_DBG_RETURN(0);

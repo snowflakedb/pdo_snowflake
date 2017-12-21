@@ -134,13 +134,6 @@ switch(e) \
     default: (em) = "Received unknown JSON error code trying to find " #t ; break; \
 }
 
-/*
- * Debug functions from curl example. Should update at somepoint, and possibly remove from header since these are private functions
- */
-static void dump(const char *text, FILE *stream, unsigned char *ptr, size_t size, char nohex);
-static int my_trace(CURL *handle, curl_infotype type, char *data, size_t size, void *userp);
-
-
 /**
  * Creates connection authorization body as a cJSON blob. cJSON blob must be freed by the caller using cJSON_Delete.
  *
