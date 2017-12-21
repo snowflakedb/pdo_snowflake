@@ -76,8 +76,9 @@ static int pdo_snowflake_stmt_dtor(pdo_stmt_t *stmt) /* {{{ */
     pdo_snowflake_stmt *S = stmt->driver_data;
 
     if (S->bound_params) {
-        array_list_deallocate(S->bound_params);
+        sf_array_list_deallocate(S->bound_params);
     }
+
     PDO_DBG_INF("number of columns: %d", stmt->column_count);
     if (S->bound_result) {
         int i;
@@ -390,6 +391,7 @@ static int pdo_snowflake_stmt_param_hook(
   struct pdo_bound_param_data *param,
   enum pdo_param_event event_type) /* {{{ */
 {
+    int ret = 1;
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     zval *parameter = NULL;
     PDO_DBG_ENTER("pdo_snowflake_stmt_param_hook");
@@ -409,6 +411,7 @@ static int pdo_snowflake_stmt_param_hook(
         parameter = &param->parameter;
     }
     SF_BIND_INPUT *v;
+
     switch (event_type) {
         case PDO_PARAM_EVT_ALLOC:
             PDO_DBG_INF(
@@ -421,17 +424,18 @@ static int pdo_snowflake_stmt_param_hook(
             /* sanity check parameter number range */
             if (param->paramno < 0) {
                 strcpy(stmt->error_code, "HY093");
-                PDO_DBG_RETURN(0);
+                ret = 0;
+                goto clean;
             }
             if (S->bound_params == NULL) {
-                S->bound_params = array_list_init();
+                S->bound_params = sf_array_list_init();
             }
             v = ecalloc(1, sizeof(SF_BIND_INPUT));
             /* TODO: check if already set in the array */
-            array_list_set(S->bound_params, v, (size_t) param->paramno + 1);
+            sf_array_list_set(S->bound_params, v, (size_t) param->paramno + 1);
             break;
         case PDO_PARAM_EVT_EXEC_PRE:
-            v = array_list_get(S->bound_params, (size_t) param->paramno + 1);
+            v = sf_array_list_get(S->bound_params, (size_t) param->paramno + 1);
             v->idx = (size_t) param->paramno + 1;
             snowflake_bind_param(S->stmt, v);
 
@@ -469,11 +473,12 @@ static int pdo_snowflake_stmt_param_hook(
                     break;
                 default:
                     /* TODO: error not supported */
-                    PDO_DBG_RETURN(0);
+                    ret = 0;
+                    goto clean;
             }
             break;
         case PDO_PARAM_EVT_FREE:
-            v = array_list_get(S->bound_params, (size_t) param->paramno + 1);
+            v = sf_array_list_get(S->bound_params, (size_t) param->paramno + 1);
             switch (param->param_type) {
                 case PDO_PARAM_INT:
                     efree(v->value);
@@ -487,7 +492,8 @@ static int pdo_snowflake_stmt_param_hook(
                     break;
             }
             efree(v);
-            array_list_set(S->bound_params, NULL, (size_t) param->paramno + 1);
+            sf_array_list_set(S->bound_params, NULL,
+                              (size_t) param->paramno + 1);
         case PDO_PARAM_EVT_EXEC_POST:
         case PDO_PARAM_EVT_FETCH_PRE:
         case PDO_PARAM_EVT_FETCH_POST:
@@ -497,8 +503,9 @@ static int pdo_snowflake_stmt_param_hook(
         default:
             break;
     }
+clean:
 
-    PDO_DBG_RETURN(1);
+    PDO_DBG_RETURN(ret);
 }
 /* }}} */
 

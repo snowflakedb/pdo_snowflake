@@ -9,13 +9,13 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <pthread.h>
-#include <snowflake_client.h>
 #include <openssl/crypto.h>
+#include <snowflake_client.h>
+#include <snowflake_logger.h>
 #include "constants.h"
 #include "snowflake_client_int.h"
 #include "connection.h"
 #include "snowflake_memory.h"
-#include <log.h>
 #include "results.h"
 #include "error.h"
 #include "chunk_downloader.h"
@@ -520,7 +520,7 @@ static void STDCALL _snowflake_stmt_desc_reset(SF_STMT *sfstmt) {
 static void STDCALL _snowflake_stmt_reset(SF_STMT *sfstmt) {
     clear_snowflake_error(&sfstmt->error);
 
-    strncpy(sfstmt->sfqid, "", UUID4_LEN);
+    strncpy(sfstmt->sfqid, "", SF_UUID4_LEN);
     sfstmt->request_id[0] = '\0';
 
     if (sfstmt->sql_text) {
@@ -535,19 +535,19 @@ static void STDCALL _snowflake_stmt_reset(SF_STMT *sfstmt) {
     sfstmt->raw_results = NULL;
 
     if (sfstmt->params) {
-        array_list_deallocate(sfstmt->params); /* binding parameters */
+        sf_array_list_deallocate(sfstmt->params); /* binding parameters */
     }
     sfstmt->params = NULL;
 
     if (sfstmt->results) {
-        array_list_deallocate(sfstmt->results); /* binding columns */
+        sf_array_list_deallocate(sfstmt->results); /* binding columns */
     }
     sfstmt->results = NULL;
 
     _snowflake_stmt_desc_reset(sfstmt);
 
     if (sfstmt->stmt_attrs) {
-        array_list_deallocate(sfstmt->stmt_attrs);
+        sf_array_list_deallocate(sfstmt->stmt_attrs);
     }
     sfstmt->stmt_attrs = NULL;
 
@@ -590,9 +590,9 @@ SF_STATUS STDCALL snowflake_bind_param(
     }
     clear_snowflake_error(&sfstmt->error);
     if (sfstmt->params == NULL) {
-        sfstmt->params = array_list_init();
+        sfstmt->params = sf_array_list_init();
     }
-    array_list_set(sfstmt->params, sfbind, sfbind->idx);
+    sf_array_list_set(sfstmt->params, sfbind, sfbind->idx);
     return SF_STATUS_SUCCESS;
 }
 
@@ -603,9 +603,9 @@ SF_STATUS STDCALL snowflake_bind_result(
     }
     clear_snowflake_error(&sfstmt->error);
     if (sfstmt->results == NULL) {
-        sfstmt->results = array_list_init();
+        sfstmt->results = sf_array_list_init();
     }
-    array_list_set(sfstmt->results, sfbind, sfbind->idx);
+    sf_array_list_set(sfstmt->results, sfbind, sfbind->idx);
     return SF_STATUS_SUCCESS;
 }
 
@@ -674,7 +674,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                     sfstmt->chunk_downloader->consumer_head++;
 
                     // Delete old cJSON results struct
-                    cJSON_Delete(sfstmt->raw_results);
+                    cJSON_Delete((cJSON*)sfstmt->raw_results);
                     // Set new chunk and remove chunk reference from locked array
                     sfstmt->raw_results = sfstmt->chunk_downloader->queue[index].chunk;
                     sfstmt->chunk_downloader->queue[index].chunk = NULL;
@@ -702,7 +702,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
 
     // Check that we can write to the provided result bindings
     for (i = 0; i < sfstmt->total_fieldcount; i++) {
-        result = array_list_get(sfstmt->results, i + 1);
+        result = sf_array_list_get(sfstmt->results, i + 1);
         if (result == NULL) {
             continue;
         } else {
@@ -719,7 +719,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
     // Write to results
     // TODO error checking for conversions during fetch
     for (i = 0; i < sfstmt->total_fieldcount; i++) {
-        result = array_list_get(sfstmt->results, i + 1);
+        result = sf_array_list_get(sfstmt->results, i + 1);
         if (result == NULL) {
             continue;
         } else {
@@ -920,11 +920,12 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
     pthread_mutex_unlock(&sfstmt->connection->mutex_sequence_counter);
 
     // TODO Do error handing and checking and stuff
-    if (sfstmt->params && sfstmt->params->used > 0) {
+    ARRAY_LIST *p = (ARRAY_LIST*)sfstmt->params;
+    if (p && p->used > 0) {
         bindings = cJSON_CreateObject();
-        for (i = 0; i < sfstmt->params->used; i++) {
+        for (i = 0; i < p->used; i++) {
             cJSON *binding;
-            input = (SF_BIND_INPUT *) array_list_get(sfstmt->params, i + 1);
+            input = (SF_BIND_INPUT *) sf_array_list_get(p, i + 1);
             // TODO check if input is null and either set error or write msg to log
             type = snowflake_type_to_string(c_type_to_snowflake(input->c_type, SF_TYPE_TIMESTAMP_NTZ));
             value = value_to_string(input->value, input->len, input->c_type);
@@ -959,7 +960,7 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
         s_resp = cJSON_Print(resp);
         log_trace("Here is JSON response:\n%s", s_resp);
         data = cJSON_GetObjectItem(resp, "data");
-        if (json_copy_string_no_alloc(sfstmt->sfqid, data, "queryId", UUID4_LEN)) {
+        if (json_copy_string_no_alloc(sfstmt->sfqid, data, "queryId", SF_UUID4_LEN)) {
             log_debug("No valid sfqid found in response");
         }
         if ((json_error = json_copy_bool(&success, resp, "success")) == SF_JSON_ERROR_NONE && success) {
@@ -990,7 +991,7 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
                 sfstmt->desc = set_description(rowtype);
             }
             // Set results array
-            if (json_detach_array_from_object(&sfstmt->raw_results, data, "rowset")) {
+            if (json_detach_array_from_object((cJSON**)(&sfstmt->raw_results), data, "rowset")) {
                 log_error("No valid rowset found in response");
                 SET_SNOWFLAKE_STMT_ERROR(&sfstmt->error, SF_ERROR_BAD_JSON,
                                     "Missing rowset from response. No results found.",
@@ -1024,7 +1025,7 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
             char *message = NULL;
             cJSON *codeJson = NULL;
             int64 code = -1;
-            if (json_copy_string_no_alloc(sfstmt->error.sqlstate, data, "sqlState", SQLSTATE_LEN)) {
+            if (json_copy_string_no_alloc(sfstmt->error.sqlstate, data, "sqlState", SF_SQLSTATE_LEN)) {
                 log_debug("No valid sqlstate found in response");
             }
             messageJson = cJSON_GetObjectItem(resp, "message");
@@ -1096,7 +1097,8 @@ uint64 STDCALL snowflake_num_params(SF_STMT *sfstmt) {
         // TODO change to -1?
         return 0;
     }
-    return sfstmt->params->used;
+    ARRAY_LIST *p = (ARRAY_LIST*)sfstmt->params;
+    return p->used;
 }
 
 const char *STDCALL snowflake_sfqid(SF_STMT *sfstmt) {

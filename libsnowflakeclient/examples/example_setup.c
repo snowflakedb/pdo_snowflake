@@ -3,6 +3,7 @@
  */
 
 #include <example_setup.h>
+#include <stdlib.h>
 
 void initialize_snowflake_example(sf_bool debug) {
     snowflake_global_init(NULL);

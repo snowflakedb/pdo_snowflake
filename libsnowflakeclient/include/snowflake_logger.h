@@ -11,8 +11,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#define LOG_VERSION "0.1.0"
-
 typedef void (*log_LockFn)(void *udata, int lock);
 
 enum { LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR, LOG_FATAL };

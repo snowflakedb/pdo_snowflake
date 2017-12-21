@@ -3,7 +3,7 @@
  */
 
 #include <string.h>
-#include <log.h>
+#include <snowflake_logger.h>
 #include "error.h"
 #include "snowflake_memory.h"
 
@@ -29,10 +29,10 @@ void STDCALL set_snowflake_error(SF_ERROR *error,
     }
 
     error->error_code = error_code;
-    strncpy(error->sfqid, sfqid, UUID4_LEN);
+    strncpy(error->sfqid, sfqid, SF_UUID4_LEN);
     // Null terminate
-    if (error->sfqid[UUID4_LEN - 1] != '\0') {
-        error->sfqid[UUID4_LEN - 1] = '\0';
+    if (error->sfqid[SF_UUID4_LEN - 1] != '\0') {
+        error->sfqid[SF_UUID4_LEN - 1] = '\0';
     }
 
     if (sqlstate != NULL) {
@@ -84,7 +84,7 @@ void STDCALL clear_snowflake_error(SF_ERROR *error) {
     error->file = NULL;
     error->line = 0;
     error->is_shared_msg = SF_BOOLEAN_FALSE;
-    memset(error->sfqid, 0, UUID4_LEN);
+    memset(error->sfqid, 0, SF_UUID4_LEN);
 }
 
 void STDCALL copy_snowflake_error(SF_ERROR *dst, SF_ERROR *src) {

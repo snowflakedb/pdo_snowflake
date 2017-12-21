@@ -4,7 +4,7 @@
 
 #include <string.h>
 #include "connection.h"
-#include <log.h>
+#include <snowflake_logger.h>
 #include "snowflake_memory.h"
 #include "snowflake_client_int.h"
 #include "constants.h"
@@ -227,7 +227,7 @@ sf_bool STDCALL curl_post_call(SF_CONNECT *sf,
         }
 
         // No query code means things went well, just break and return
-        if (!query_code) {
+        if (query_code[0] == '\0') {
             ret = SF_BOOLEAN_TRUE;
             break;
         }
@@ -255,7 +255,7 @@ sf_bool STDCALL curl_post_call(SF_CONNECT *sf,
             }
         }
 
-        while (query_code && (strcmp(query_code, QUERY_IN_PROGRESS_CODE) == 0 || strcmp(query_code, QUERY_IN_PROGRESS_ASYNC_CODE) == 0)) {
+        while (strcmp(query_code, QUERY_IN_PROGRESS_CODE) == 0 || strcmp(query_code, QUERY_IN_PROGRESS_ASYNC_CODE) == 0) {
             // Remove old result URL and query code if this isn't our first rodeo
             SF_FREE(result_url);
             memset(query_code, 0, QUERYCODE_LEN);
@@ -328,7 +328,7 @@ sf_bool STDCALL curl_get_call(SF_CONNECT *sf,
         }
 
         // No query code means things went well, just break and return
-        if (!query_code) {
+        if (query_code[0] == '\0') {
             ret = SF_BOOLEAN_TRUE;
             break;
         }
@@ -608,14 +608,14 @@ ARRAY_LIST *json_get_object_keys(const cJSON const *item) {
     }
     // Get the first key-value pair in the object
     const cJSON *next = item->child;
-    ARRAY_LIST *al = array_list_init();
+    ARRAY_LIST *al = sf_array_list_init();
     size_t counter = 0;
     char *key = NULL;
 
     while (next) {
         // Get key and add the arraylist
         key = next->string;
-        array_list_set(al, key, counter);
+        sf_array_list_set(al, key, counter);
         // Increment counter and get the next element
         counter++;
         next = next->next;
@@ -892,7 +892,7 @@ sf_bool STDCALL renew_session(CURL *curl, SF_CONNECT *sf, SF_ERROR *error) {
     sf_bool ret = SF_BOOLEAN_FALSE;
     SF_JSON_ERROR json_error;
     const char *error_msg = NULL;
-    char request_id[UUID4_LEN];
+    char request_id[SF_UUID4_LEN];
     struct curl_slist *header = NULL;
     cJSON *body = NULL;
     cJSON *json = NULL;

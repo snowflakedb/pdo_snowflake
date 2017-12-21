@@ -6,7 +6,7 @@
 #include "results.h"
 #include "connection.h"
 #include "snowflake_memory.h"
-#include <log.h>
+#include <snowflake_logger.h>
 
 SF_TYPE string_to_snowflake_type(const char *string) {
     if (strcmp(string, "fixed") == 0) {

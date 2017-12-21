@@ -15,13 +15,13 @@ set(SOURCE_FILES
         lib/snowflake_client.c
         lib/constants.h
         lib/cJSON.c
-        lib/log.c
+        lib/snowflake_logger.c
         lib/arraylist.c
         lib/snowflake_memory.c
         lib/connection.c
         lib/results.c
         lib/uuid4.c
-        lib/basic_types.c
+        lib/snowflake_basic_types.c
         lib/error.c
         lib/snowflake_client_int.h
         lib/chunk_downloader.c)

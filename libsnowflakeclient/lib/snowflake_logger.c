@@ -25,7 +25,7 @@
 #include <stdarg.h>
 #include <time.h>
 
-#include <log.h>
+#include <snowflake_logger.h>
 
 static struct {
   void *udata;

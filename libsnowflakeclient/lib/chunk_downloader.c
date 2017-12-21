@@ -167,7 +167,7 @@ sf_bool create_chunk_headers(SF_CHUNK_DOWNLOADER *chunk_downloader, cJSON *json_
     char *key;
 
     for (i = 0; i < keys->used; i++) {
-        key = (char *) array_list_get(keys, i);
+        key = (char *) sf_array_list_get(keys, i);
         // Since I know that these keys are correct from a case sensitive view,
         // I can use the faster case sensitive version
         item = cJSON_GetObjectItemCaseSensitive(json_headers, key);
@@ -186,7 +186,7 @@ sf_bool create_chunk_headers(SF_CHUNK_DOWNLOADER *chunk_downloader, cJSON *json_
     ret = SF_BOOLEAN_TRUE;
 
 cleanup:
-    array_list_deallocate(keys);
+    sf_array_list_deallocate(keys);
     SF_FREE(header_item);
 
     return ret;

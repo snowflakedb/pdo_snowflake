@@ -3,7 +3,7 @@
  */
 
 #include "snowflake_memory.h"
-#include <log.h>
+#include <snowflake_logger.h>
 #include <pthread.h>
 
 // Basic hashing function. Works well for memory addresses
