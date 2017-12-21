@@ -386,9 +386,16 @@ static void *chunk_downloader_thread(void *downloader) {
     SF_CHUNK_DOWNLOADER *chunk_downloader = (SF_CHUNK_DOWNLOADER *) downloader;
     cJSON *chunk = NULL;
     uint64 index;
-    // Create error per thread so we don't have to lock the chunk downloader error
-    SF_ERROR error = {SF_ERROR_NONE, NULL, NULL, SF_BOOLEAN_FALSE, NULL, NULL, 0};
-    clear_snowflake_error(&error);
+    // Create err per thread so we don't have to lock the chunk downloader err
+    SF_ERROR err;
+    err.error_code = SF_ERROR_NONE;
+    err.sqlstate[0] = '\0';
+    err.msg = NULL;
+    err.is_shared_msg = SF_BOOLEAN_FALSE;
+    err.sfqid[0] = '\0';
+    err.file = NULL;
+    err.line = 0;
+    clear_snowflake_error(&err);
 
     // Loop forever until shutdown
     while (1) {
@@ -398,7 +405,7 @@ static void *chunk_downloader_thread(void *downloader) {
 
         // If we've downloaded chunks == # of threads, wait until the consumer consumes a chunk.
         // Ensure that the producer_head is less than the queue_size to ensure that we still have items to process
-        // If we're shutting down or an error has occurred, skip
+        // If we're shutting down or an err has occurred, skip
         while ((chunk_downloader->producer_head - chunk_downloader->consumer_head) >= chunk_downloader->thread_count &&
                 chunk_downloader->producer_head < chunk_downloader->queue_size &&
                 !get_shutdown_or_error(chunk_downloader)) {
@@ -417,10 +424,10 @@ static void *chunk_downloader_thread(void *downloader) {
         pthread_mutex_unlock(&chunk_downloader->queue_lock);
 
         // Download chunk
-        if (!download_chunk(chunk_downloader->queue[index].url, chunk_downloader->chunk_headers, &chunk, &error)) {
+        if (!download_chunk(chunk_downloader->queue[index].url, chunk_downloader->chunk_headers, &chunk, &err)) {
             pthread_rwlock_wrlock(&chunk_downloader->attr_lock);
             if (!chunk_downloader->has_error) {
-                copy_snowflake_error(chunk_downloader->sf_error, &error);
+                copy_snowflake_error(chunk_downloader->sf_error, &err);
                 chunk_downloader->has_error = SF_BOOLEAN_TRUE;
             }
             pthread_rwlock_unlock(&chunk_downloader->attr_lock);
