@@ -3,6 +3,7 @@
  */
 
 #include <assert.h>
+#include <time.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -236,6 +237,7 @@ SF_STATUS STDCALL snowflake_global_set_attribute(SF_GLOBAL_ATTRIBUTE type, const
         default:
             break;
     }
+    return SF_STATUS_SUCCESS;
 }
 
 SF_CONNECT *STDCALL snowflake_init() {
@@ -494,6 +496,7 @@ SF_STATUS STDCALL snowflake_get_attr(
     }
     clear_snowflake_error(&sf->error);
     //TODO Implement this
+    return SF_STATUS_SUCCESS;
 }
 
 /**

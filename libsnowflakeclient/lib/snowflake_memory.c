@@ -148,7 +148,6 @@ void sf_free(void *ptr, const char *file, int line) {
 
 void sf_alloc_map_to_log(sf_bool cleanup) {
     int i;
-    int size = 0;
     struct allocation *alloc;
     struct allocation *link;
     pthread_mutex_lock(&allocation_lock);
