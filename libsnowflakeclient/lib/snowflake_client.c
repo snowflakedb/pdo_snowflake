@@ -125,7 +125,7 @@ sf_bool STDCALL log_init(const char *log_path) {
     } else {
         log_set_quiet(SF_BOOLEAN_TRUE);
     }
-    log_set_level(LOG_TRACE);
+    log_set_level(SF_LOG_TRACE);
     log_set_lock(&log_lock_func);
     // If log path is specified, use absolute path. Otherwise set logging dir to be relative to current directory
     if (sf_log_path) {
