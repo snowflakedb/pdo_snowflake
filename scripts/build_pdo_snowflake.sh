@@ -51,6 +51,7 @@ if [[ -n "$REPORT_COVERAGE" ]]; then
 fi
 cc -shared \
     -g \
+    .libs/snowflake_arraylist.o \
     .libs/pdo_snowflake.o \
     .libs/snowflake_driver.o \
     .libs/snowflake_stmt.o \
