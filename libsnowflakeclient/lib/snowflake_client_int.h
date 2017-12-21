@@ -5,6 +5,9 @@
 #ifndef PDO_SNOWFLAKE_SNOWFLAKE_CLIENT_INT_H
 #define PDO_SNOWFLAKE_SNOWFLAKE_CLIENT_INT_H
 
+#include "cJSON.h"
+#include "arraylist.h"
+
 #define HEADER_SNOWFLAKE_TOKEN_FORMAT "Authorization: Snowflake Token=\"%s\""
 #define HEADER_CONTENT_TYPE_APPLICATION_JSON "Content-Type: application/json"
 #define HEADER_ACCEPT_TYPE_APPLICATION_SNOWFLAKE "accept: application/snowflake"
@@ -25,5 +28,7 @@
 #define REQUEST_TYPE_RENEW "RENEW"
 #define REQUEST_TYPE_CLONE "CLONE"
 #define REQUEST_TYPE_ISSUE "ISSUE"
+
+int uuid4_generate(char *dst);
 
 #endif //PDO_SNOWFLAKE_SNOWFLAKE_CLIENT_INT_H

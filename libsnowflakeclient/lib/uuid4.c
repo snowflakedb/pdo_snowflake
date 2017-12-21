@@ -13,8 +13,11 @@
 #include <wincrypt.h>
 #endif
 
-#include <uuid4.h>
-
+#include "snowflake_client_int.h"
+enum {
+    UUID4_ESUCCESS =  0,
+    UUID4_EFAILURE = -1
+};
 
 static int seeded = 0;
 static uint64_t seed[2];
@@ -33,7 +36,7 @@ static uint64_t xorshift128plus(uint64_t *s) {
 
 static int init_seed(void) {
 #if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)
-    int res;
+    size_t res;
     FILE *fp = fopen("/dev/urandom", "rb");
     if (!fp) {
         return UUID4_EFAILURE;

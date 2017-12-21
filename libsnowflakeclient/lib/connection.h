@@ -19,6 +19,8 @@ extern "C" {
 #include <stdlib.h>
 #include <curl/curl.h>
 #include <snowflake_client.h>
+#include "cJSON.h"
+#include "arraylist.h"
 
 /**
  * Request type

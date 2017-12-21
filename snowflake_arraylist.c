@@ -2,8 +2,8 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
-#include "arraylist.h"
-#include "snowflake_memory.h"
+#include "php.h"
+#include "snowflake_arraylist.h"
 
 ARRAY_LIST *sf_array_list_init() {
     ARRAY_LIST *al = (ARRAY_LIST *) calloc(1, sizeof(ARRAY_LIST));
@@ -12,15 +12,15 @@ ARRAY_LIST *sf_array_list_init() {
     // Always initialize to 8
     al->size = 8;
     // Initialize array to NULL
-    al->data = (void **) SF_CALLOC(al->size, sizeof(void *));
+    al->data = (void **) ecalloc(al->size, sizeof(void *));
     return al;
 }
 
 void sf_array_list_deallocate(ARRAY_LIST *al) {
     if (al != NULL) {
-        SF_FREE(al->data);
+        efree(al->data);
     }
-    SF_FREE(al);
+    efree(al);
 }
 
 void sf_array_list_grow(ARRAY_LIST *al, size_t min_size) {
@@ -29,7 +29,7 @@ void sf_array_list_grow(ARRAY_LIST *al, size_t min_size) {
     while (new_size < min_size) {
         new_size *= 2;
     }
-    al->data = (void **) SF_REALLOC(al->data, sizeof(void *) * new_size);
+    al->data = (void **) erealloc(al->data, sizeof(void *) * new_size);
     // Initialize new memory to NULL
     for (i = al->size; i < new_size; i++) {
         al->data[i] = NULL;

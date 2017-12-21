@@ -16,6 +16,7 @@ extern "C" {
 #endif
 
 #include <snowflake_client.h>
+#include "cJSON.h"
 
 SF_TYPE string_to_snowflake_type(const char *string);
 SF_C_TYPE snowflake_to_c_type(SF_TYPE type, int64 precision, int64 scale);

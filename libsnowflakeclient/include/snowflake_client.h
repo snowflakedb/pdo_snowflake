@@ -16,13 +16,18 @@ extern "C" {
 #endif
 
 #include <pthread.h>
-#include "cJSON.h"
-#include "arraylist.h"
-#include "basic_types.h"
-#include "uuid4.h"
+#include "snowflake_basic_types.h"
 #include "snowflake_client_version.h"
 
-#define SQLSTATE_LEN 6
+/**
+ * SQLState code length
+ */
+#define SF_SQLSTATE_LEN 6
+
+/**
+ * UUID4 length
+ */
+#define SF_UUID4_LEN 37
 
 /**
  * The maximum object size
@@ -150,10 +155,10 @@ typedef enum sf_stmt_attribute {
  */
 typedef struct sf_error {
     SF_ERROR_CODE error_code;
-    char sqlstate[SQLSTATE_LEN];
+    char sqlstate[SF_SQLSTATE_LEN];
     char *msg;
     sf_bool is_shared_msg;
-    char sfqid[UUID4_LEN];
+    char sfqid[SF_UUID4_LEN];
     char *file;
     int line;
 } SF_ERROR;
@@ -188,7 +193,7 @@ typedef struct sf_snowflake_connection {
     // Session specific fields
     int64 sequence_counter;
     pthread_mutex_t mutex_sequence_counter;
-    char request_id[UUID4_LEN];
+    char request_id[SF_UUID4_LEN];
 
     // Error
     SF_ERROR error;
@@ -218,21 +223,21 @@ typedef struct sf_chunk_downloader SF_CHUNK_DOWNLOADER;
  */
 typedef struct sf_snowflake_statement {
     /* TODO */
-    char sfqid[UUID4_LEN];
+    char sfqid[SF_UUID4_LEN];
     int64 sequence_counter;
-    char request_id[UUID4_LEN];
+    char request_id[SF_UUID4_LEN];
     SF_ERROR error;
     SF_CONNECT *connection;
     char *sql_text;
-    cJSON *raw_results;
+    void *raw_results;
     int64 total_rowcount;
     int64 total_fieldcount;
     int64 total_row_index;
     // TODO Create Bind list
-    ARRAY_LIST *params;
-    ARRAY_LIST *results;
+    void* params;
+    void *results;
     SF_COLUMN_DESC **desc;
-    ARRAY_LIST *stmt_attrs;
+    void *stmt_attrs;
     sf_bool is_dml;
     SF_CHUNK_DOWNLOADER *chunk_downloader;
 } SF_STMT;

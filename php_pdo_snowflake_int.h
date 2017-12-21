@@ -4,6 +4,7 @@
 #define PHP_PDO_SNOWFLAKE_INT_H
 
 #include <snowflake_client.h>
+#include "snowflake_arraylist.h"
 
 #if 1
 #define PDO_DBG_ENABLED 1
