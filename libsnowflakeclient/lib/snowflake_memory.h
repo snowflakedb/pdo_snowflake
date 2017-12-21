@@ -2,8 +2,8 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
-#ifndef PDO_SNOWFLAKE_SNOWFLAKE_MEMORY_H
-#define PDO_SNOWFLAKE_SNOWFLAKE_MEMORY_H
+#ifndef SNOWFLAKE_SNOWFLAKE_MEMORY_H
+#define SNOWFLAKE_SNOWFLAKE_MEMORY_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,4 +33,4 @@ void sf_alloc_map_to_log(sf_bool cleanup);
 }
 #endif
 
-#endif //PDO_SNOWFLAKE_SNOWFLAKE_MEMORY_H
+#endif //SNOWFLAKE_SNOWFLAKE_MEMORY_H

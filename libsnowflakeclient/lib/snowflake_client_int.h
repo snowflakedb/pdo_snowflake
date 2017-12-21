@@ -2,8 +2,8 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
-#ifndef PDO_SNOWFLAKE_SNOWFLAKE_CLIENT_INT_H
-#define PDO_SNOWFLAKE_SNOWFLAKE_CLIENT_INT_H
+#ifndef SNOWFLAKE_SNOWFLAKE_CLIENT_INT_H
+#define SNOWFLAKE_SNOWFLAKE_CLIENT_INT_H
 
 #include "cJSON.h"
 #include "arraylist.h"
@@ -31,4 +31,4 @@
 
 int uuid4_generate(char *dst);
 
-#endif //PDO_SNOWFLAKE_SNOWFLAKE_CLIENT_INT_H
+#endif //SNOWFLAKE_SNOWFLAKE_CLIENT_INT_H

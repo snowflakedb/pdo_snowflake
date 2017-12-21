@@ -2,8 +2,8 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
-#ifndef PDO_SNOWFLAKE_CONNECTION_H
-#define PDO_SNOWFLAKE_CONNECTION_H
+#ifndef SNOWFLAKE_CONNECTION_H
+#define SNOWFLAKE_CONNECTION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -442,4 +442,4 @@ sf_bool STDCALL set_tokens(SF_CONNECT *sf, cJSON *data, const char *session_toke
 }
 #endif
 
-#endif //PDO_SNOWFLAKE_CONNECTION_H
+#endif //SNOWFLAKE_CONNECTION_H

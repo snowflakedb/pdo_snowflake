@@ -2,8 +2,8 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
-#ifndef PDO_SNOWFLAKE_CONSTANTS_H
-#define PDO_SNOWFLAKE_CONSTANTS_H
+#ifndef SNOWFLAKE_CONSTANTS_H
+#define SNOWFLAKE_CONSTANTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,4 +26,4 @@ extern sf_bool DEBUG;
 }
 #endif
 
-#endif //PDO_SNOWFLAKE_CONSTANTS_H
+#endif //SNOWFLAKE_CONSTANTS_H

@@ -4,9 +4,12 @@
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the MIT license. See `log.c` for details.
  */
+/*
+ * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
+ */
 
-#ifndef LOG_H
-#define LOG_H
+#ifndef SNOWFLAKE_LOGGER_H
+#define SNOWFLAKE_LOGGER_H
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -30,4 +33,4 @@ void log_set_quiet(int enable);
 
 void log_log(int level, const char *file, int line, const char *fmt, ...);
 
-#endif
+#endif /* SNOWFLAKE_LOGGER_H */
