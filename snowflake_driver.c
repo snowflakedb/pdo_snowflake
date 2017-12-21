@@ -282,7 +282,8 @@ static int snowflake_handle_begin(pdo_dbh_t *dbh) /* {{{ */
     PDO_DBG_ENTER("snowflake_handle_begin");
     pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
     SF_STATUS status = snowflake_trans_begin(H->server);
-    PDO_DBG_RETURN(status == SF_STATUS_SUCCESS ? 1 : 0);
+    int ret = status == SF_STATUS_SUCCESS ? 1 : 0;
+    PDO_DBG_RETURN(ret);
 }
 /* }}} */
 
@@ -296,7 +297,8 @@ static int snowflake_handle_commit(pdo_dbh_t *dbh) /* {{{ */
     PDO_DBG_ENTER("snowflake_handle_commit");
     pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
     SF_STATUS status = snowflake_trans_commit(H->server);
-    PDO_DBG_RETURN(status == SF_STATUS_SUCCESS ? 1 : 0);
+    int ret = status == SF_STATUS_SUCCESS ? 1 : 0;
+    PDO_DBG_RETURN(ret);
 }
 /* }}} */
 
@@ -310,7 +312,8 @@ static int snowflake_handle_rollback(pdo_dbh_t *dbh) /* {{{ */
     PDO_DBG_ENTER("snowflake_handle_rollback");
     pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
     SF_STATUS status = snowflake_trans_rollback(H->server);
-    PDO_DBG_RETURN(status == SF_STATUS_SUCCESS ? 1 : 0);
+    int ret = status == SF_STATUS_SUCCESS ? 1 : 0;
+    PDO_DBG_RETURN(ret);
 }
 
 /* }}} */

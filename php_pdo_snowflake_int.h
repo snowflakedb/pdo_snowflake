@@ -4,16 +4,17 @@
 #define PHP_PDO_SNOWFLAKE_INT_H
 
 #include <snowflake_client.h>
+#include <snowflake_logger.h>
 #include "snowflake_arraylist.h"
 
 #if 1
 #define PDO_DBG_ENABLED 1
 
-#define PDO_DBG_INF(...) pdo_snowflake_log(__LINE__, __FILE__, "INFO", __VA_ARGS__)
-#define PDO_DBG_ERR(...) pdo_snowflake_log(__LINE__, __FILE__, "ERROR", __VA_ARGS__)
-#define PDO_DBG_ENTER(func_name) pdo_snowflake_log(__LINE__, __FILE__, "E", func_name)
-#define PDO_DBG_RETURN(value)  do { pdo_snowflake_log(__LINE__, __FILE__, "R", ""); return (value); } while (0)
-#define PDO_DBG_VOID_RETURN(value)  do { pdo_snowflake_log(__LINE__, __FILE__, "R", ""); return; } while (0)
+#define PDO_DBG_INF(...) log_debug(__VA_ARGS__)
+#define PDO_DBG_ERR(...) log_error(__VA_ARGS__)
+#define PDO_DBG_ENTER(func_name) log_debug("Entering: %s", func_name)
+#define PDO_DBG_RETURN(value)  do { log_debug("Leaving: %d", value); return (value); } while (0)
+#define PDO_DBG_VOID_RETURN(value)  do { log_debug("Leaving"); return; } while (0)
 #else
 #define PDO_DBG_ENABLED 0
 static inline void PDO_DBG_INF(char *format, ...) {}
@@ -74,10 +75,5 @@ enum {
     PDO_SNOWFLAKE_ATTR_SSL_VERSION,
     PDO_SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS
 };
-
-/* TODO: adhoc logger until Snowflake Client provides it. */
-extern void
-pdo_snowflake_log(int line, const char *filename, const char *severity,
-                  char *fmt, ...);
 
 #endif /* PHP_PDO_SNOWFLAKE_INT_H */
