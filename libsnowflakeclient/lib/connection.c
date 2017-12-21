@@ -602,14 +602,6 @@ SF_JSON_ERROR STDCALL json_detach_object_from_array(cJSON **dest, cJSON *data, i
     return SF_JSON_ERROR_NONE;
 }
 
-/**
- * Returns all the keys in a JSON object. To save memory, the keys in the array list are references
- * to the keys in the cJSON structs. DO NOT free these keys in the arraylist. Once you delete the cJSON
- * object, you must also destroy the arraylist containing the object keys.
- *
- * @param item A cJSON object that will not be altered in the function
- * @return An arraylist containing all the keys in the object. This arraylist must be freed by the caller at some point.
- */
 ARRAY_LIST *json_get_object_keys(const cJSON const *item) {
     if (!item || !cJSON_IsObject(item)) {
         return NULL;
@@ -632,9 +624,6 @@ ARRAY_LIST *json_get_object_keys(const cJSON const *item) {
     return al;
 }
 
-/**
- * libcurl write function callback to write response to a buffer
- */
 size_t json_resp_cb(char *data, size_t size, size_t nmemb, RAW_JSON_BUFFER *raw_json) {
     size_t data_size = size * nmemb;
     log_debug("Curl response size: %zu\n", data_size);
