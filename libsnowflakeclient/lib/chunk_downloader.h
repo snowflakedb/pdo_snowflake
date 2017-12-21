@@ -2,8 +2,8 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
-#ifndef PDO_SNOWFLAKE_CHUNK_DOWNLOADER_H
-#define PDO_SNOWFLAKE_CHUNK_DOWNLOADER_H
+#ifndef SNOWFLAKE_CHUNK_DOWNLOADER_H
+#define SNOWFLAKE_CHUNK_DOWNLOADER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,4 +79,4 @@ void set_error(SF_CHUNK_DOWNLOADER *chunk_downloader, sf_bool value);
 }
 #endif
 
-#endif //PDO_SNOWFLAKE_CHUNK_DOWNLOADER_H
+#endif //SNOWFLAKE_CHUNK_DOWNLOADER_H

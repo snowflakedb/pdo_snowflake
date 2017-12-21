@@ -2,8 +2,8 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
-#ifndef PDO_SNOWFLAKE_BASIC_TYPES_H
-#define PDO_SNOWFLAKE_BASIC_TYPES_H
+#ifndef SNOWFLAKE_BASIC_TYPES_H
+#define SNOWFLAKE_BASIC_TYPES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,4 +35,4 @@ extern int8 SF_BOOLEAN_FALSE;
 }
 #endif
 
-#endif //PDO_SNOWFLAKE_BASIC_TYPES_H
+#endif //SNOWFLAKE_BASIC_TYPES_H

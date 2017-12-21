@@ -2,8 +2,8 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
-#ifndef PDO_SNOWFLAKE_ERROR_H
-#define PDO_SNOWFLAKE_ERROR_H
+#ifndef SNOWFLAKE_ERROR_H
+#define SNOWFLAKE_ERROR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,4 +34,4 @@ void STDCALL copy_snowflake_error(SF_ERROR *dst, SF_ERROR *src);
 }
 #endif
 
-#endif //PDO_SNOWFLAKE_ERROR_H
+#endif //SNOWFLAKE_ERROR_H

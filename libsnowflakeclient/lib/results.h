@@ -2,8 +2,8 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
-#ifndef PDO_SNOWFLAKE_RESULTS_H
-#define PDO_SNOWFLAKE_RESULTS_H
+#ifndef SNOWFLAKE_RESULTS_H
+#define SNOWFLAKE_RESULTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,4 +28,4 @@ SF_COLUMN_DESC ** set_description(const cJSON *rowtype);
 }
 #endif
 
-#endif //PDO_SNOWFLAKE_RESULTS_H
+#endif //SNOWFLAKE_RESULTS_H

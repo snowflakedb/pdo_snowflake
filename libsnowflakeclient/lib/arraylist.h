@@ -2,8 +2,8 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
-#ifndef PDO_SNOWFLAKE_ARRAYLIST_H
-#define PDO_SNOWFLAKE_ARRAYLIST_H
+#ifndef SNOWFLAKE_ARRAYLIST_H
+#define SNOWFLAKE_ARRAYLIST_H
 
 #ifdef  __cplusplus
 extern "C" {
@@ -33,4 +33,4 @@ void *STDCALL sf_array_list_get(ARRAY_LIST *al, size_t index);
 }
 #endif
 
-#endif //PDO_SNOWFLAKE_ARRAYLIST_H
+#endif //SNOWFLAKE_ARRAYLIST_H
