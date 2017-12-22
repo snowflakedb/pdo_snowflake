@@ -230,6 +230,7 @@ typedef struct sf_snowflake_statement {
     SF_CONNECT *connection;
     char *sql_text;
     void *raw_results;
+    int64 chunk_rowcount;
     int64 total_rowcount;
     int64 total_fieldcount;
     int64 total_row_index;
