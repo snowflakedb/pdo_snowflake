@@ -608,7 +608,7 @@ SF_JSON_ERROR STDCALL json_detach_object_from_array(cJSON **dest, cJSON *data, i
     return SF_JSON_ERROR_NONE;
 }
 
-ARRAY_LIST *json_get_object_keys(const cJSON const *item) {
+ARRAY_LIST *json_get_object_keys(const cJSON * const item) {
     if (!item || !cJSON_IsObject(item)) {
         return NULL;
     }

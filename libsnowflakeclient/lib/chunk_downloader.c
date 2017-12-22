@@ -309,12 +309,11 @@ cleanup:
 }
 
 sf_bool STDCALL chunk_downloader_term(SF_CHUNK_DOWNLOADER *chunk_downloader) {
-    sf_bool ret = SF_BOOLEAN_FALSE;
     int pthread_ret;
     const char *error_msg;
     uint64 i;
     if (!chunk_downloader) {
-        return ret;
+        return SF_BOOLEAN_FALSE;
     }
 
     if ((pthread_ret = pthread_mutex_lock(&chunk_downloader->queue_lock))) {
@@ -325,13 +324,13 @@ sf_bool STDCALL chunk_downloader_term(SF_CHUNK_DOWNLOADER *chunk_downloader) {
             chunk_downloader->has_error = SF_BOOLEAN_TRUE;
         }
         pthread_rwlock_unlock(&chunk_downloader->attr_lock);
-        return ret;
+        return SF_BOOLEAN_FALSE;
     }
 
     do {
         // Already shutting down, just return false
         if (get_shutdown(chunk_downloader)) {
-            return ret;
+            return SF_BOOLEAN_FALSE;
         }
 
         set_shutdown(chunk_downloader, SF_BOOLEAN_TRUE);
@@ -382,6 +381,8 @@ sf_bool STDCALL chunk_downloader_term(SF_CHUNK_DOWNLOADER *chunk_downloader) {
     pthread_cond_destroy(&chunk_downloader->consumer_cond);
     pthread_rwlock_destroy(&chunk_downloader->attr_lock);
     SF_FREE(chunk_downloader);
+
+    return SF_BOOLEAN_TRUE;
 }
 
 static void *chunk_downloader_thread(void *downloader) {
