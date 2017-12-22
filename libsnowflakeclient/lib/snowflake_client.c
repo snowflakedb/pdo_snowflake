@@ -557,6 +557,7 @@ static void STDCALL _snowflake_stmt_reset(SF_STMT *sfstmt) {
     /* clear error handle */
     clear_snowflake_error(&sfstmt->error);
 
+    sfstmt->chunk_rowcount = -1;
     sfstmt->total_rowcount = -1;
     sfstmt->total_fieldcount = -1;
     sfstmt->total_row_index = -1;
@@ -646,7 +647,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
     }
 
     // If no more results, set return to SF_STATUS_EOL
-    if (cJSON_GetArraySize(sfstmt->raw_results) == 0) {
+    if (sfstmt->chunk_rowcount == 0) {
         if (sfstmt->chunk_downloader) {
             log_debug("Fetching next chunk from chunk downloader.");
             pthread_mutex_lock(&sfstmt->chunk_downloader->queue_lock);
@@ -681,6 +682,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                     // Set new chunk and remove chunk reference from locked array
                     sfstmt->raw_results = sfstmt->chunk_downloader->queue[index].chunk;
                     sfstmt->chunk_downloader->queue[index].chunk = NULL;
+                    sfstmt->chunk_rowcount = sfstmt->chunk_downloader->queue[index].row_count;
                     log_debug("Acquired chunk %llu from chunk downloader", index);
                     if (pthread_cond_signal(&sfstmt->chunk_downloader->producer_cond)) {
                         SET_SNOWFLAKE_ERROR(&sfstmt->error, SF_ERROR_PTHREAD,
@@ -718,6 +720,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
 
     // Get next result row
     row = cJSON_DetachItemFromArray(sfstmt->raw_results, 0);
+    sfstmt->chunk_rowcount--;
 
     // Write to results
     // TODO error checking for conversions during fetch
@@ -727,7 +730,6 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
             continue;
         } else {
             raw_result = cJSON_GetArrayItem(row, i);
-            // TODO turn into switch statement
             switch(result->c_type) {
                 case SF_C_TYPE_INT8:
                     if (sfstmt->desc[i]->type == SF_TYPE_BOOLEAN) {
@@ -1005,6 +1007,8 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
                 log_warn("No total count found in response. Reverting to using array size of results");
                 sfstmt->total_rowcount = cJSON_GetArraySize(sfstmt->raw_results);
             }
+            // Get number of rows in this chunk
+            sfstmt->chunk_rowcount = cJSON_GetArraySize(sfstmt->raw_results);
 
             // Set large result set if one exists
             if ((chunks = cJSON_GetObjectItem(data, "chunks")) != NULL) {
