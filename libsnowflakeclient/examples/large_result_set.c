@@ -27,20 +27,28 @@ int main() {
 
     /* query */
     sfstmt = snowflake_stmt(sf);
-    status = snowflake_query(sfstmt, "select seq4() from table(generator(rowcount=>200000));", 0);
+    status = snowflake_query(sfstmt, "select seq4(),randstr(1000,random()) from table(generator(rowcount=>100000));", 0);
     if (status != SF_STATUS_SUCCESS) {
         SF_ERROR *error = snowflake_stmt_error(sfstmt);
         fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
     }
     SF_BIND_OUTPUT c1;
     int64 out = 0;
-    uint64 counter = 0;
     c1.idx = 1;
     c1.c_type = SF_C_TYPE_INT64;
     c1.value = (void *) &out;
-    c1.len = sizeof(out);
+    c1.max_length = sizeof(out);
     snowflake_bind_result(sfstmt, &c1);
 
+    SF_BIND_OUTPUT c2;
+    char c2buf[1001];
+    c2.idx = 2;
+    c2.c_type = SF_C_TYPE_STRING;
+    c2.value = (void *) c2buf;
+    c2.max_length = sizeof(c2buf);
+    snowflake_bind_result(sfstmt, &c2);
+
+    uint64 counter = 0;
     while ((status = snowflake_fetch(sfstmt)) != SF_STATUS_EOL) {
         if (status == SF_STATUS_ERROR || status == SF_STATUS_WARNING) {
             SF_ERROR *error = snowflake_stmt_error(sfstmt);
@@ -49,8 +57,8 @@ int main() {
         }
         counter++;
 
-        if ((counter % 10000) == 0) {
-            printf("Number of results fetched: %llu\n", counter);
+        if ((out % 10000) == 0) {
+            printf("%lld\t%s\n", out, c2buf);
         }
     }
     printf("Number of rows in result: %llu\n", snowflake_num_rows(sfstmt));
