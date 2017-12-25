@@ -34,6 +34,7 @@ static char *LOG_PATH = NULL;
 static FILE *LOG_FP = NULL;
 
 pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t gmtime_lock = PTHREAD_MUTEX_INITIALIZER;
 
 SF_STATUS _snowflake_internal_query(SF_CONNECT *sf, const char *sql);
 
@@ -728,14 +729,19 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
         if (result == NULL) {
             continue;
         } else {
+            time_t epoch_time = 0L;
+            struct tm *tm_ptr = NULL;
             raw_result = cJSON_GetArrayItem(row, i);
             switch(result->c_type) {
                 case SF_C_TYPE_INT8:
-                    if (sfstmt->desc[i].type == SF_TYPE_BOOLEAN) {
-                        *(int8 *) result->value = cJSON_IsTrue(raw_result) ? SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
-                    } else {
-                        // field is a char?
-                        *(int8 *) result->value = (int8) raw_result->valuestring[0];
+                    switch(sfstmt->desc[i]->type) {
+                        case SF_TYPE_BOOLEAN:
+                            *(int8 *) result->value = cJSON_IsTrue(raw_result) ? SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
+                            break;
+                        default:
+                            // field is a char?
+                            *(int8 *) result->value = (int8) raw_result->valuestring[0];
+                            break;
                     }
                     result->len = sizeof(int8);
                     break;
@@ -756,20 +762,31 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                     result->len = sizeof(float64);
                     break;
                 case SF_C_TYPE_STRING:
-                    if (sfstmt->desc[i].type == SF_TYPE_BOOLEAN) {
-                        if (strcmp(raw_result->valuestring, "0") == 0) {
-                            /* False */
-                            strncpy(result->value, SF_BOOLEAN_FALSE_STR, result->max_length);
-                            result->len = sizeof(SF_BOOLEAN_FALSE_STR)-1;
-                        } else {
-                            /* True */
-                            strncpy(result->value, SF_BOOLEAN_TRUE_STR, result->max_length);
-                            result->len = sizeof(SF_BOOLEAN_TRUE_STR)-1;
-                        }
-                    } else {
-                        /* copy original data as is except Date/Time/Timestamp/Binary type */
-                        strncpy(result->value, raw_result->valuestring, result->max_length);
-                        result->len = strlen(raw_result->valuestring); /* TODO: what if null is included? */
+                    switch(sfstmt->desc[i]->type) {
+                        case SF_TYPE_BOOLEAN:
+                            if (strcmp(raw_result->valuestring, "0") == 0) {
+                                /* False */
+                                strncpy(result->value, SF_BOOLEAN_FALSE_STR, result->max_length);
+                                result->len = sizeof(SF_BOOLEAN_FALSE_STR)-1;
+                            } else {
+                                /* True */
+                                strncpy(result->value, SF_BOOLEAN_TRUE_STR, result->max_length);
+                                result->len = sizeof(SF_BOOLEAN_TRUE_STR)-1;
+                            }
+                            break;
+                        case SF_TYPE_DATE:
+                            epoch_time = (time_t)(atol(raw_result->valuestring) * 86400L);
+                            pthread_mutex_lock(&gmtime_lock);
+                            tm_ptr = gmtime(&epoch_time);
+                            /* TODO: error check */
+                            result->len = strftime(result->value, result->max_length, "%Y-%m-%d", tm_ptr);
+                            pthread_mutex_unlock(&gmtime_lock);
+                            break;
+                        default:
+                            /* copy original data as is except Date/Time/Timestamp/Binary type */
+                            strncpy(result->value, raw_result->valuestring, result->max_length);
+                            result->len = strlen(raw_result->valuestring); /* TODO: what if null is included? */
+                            break;
                     }
                     break;
                 case SF_C_TYPE_BOOLEAN:
