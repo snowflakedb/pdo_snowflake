@@ -235,7 +235,6 @@ typedef struct sf_snowflake_statement {
     int64 total_rowcount;
     int64 total_fieldcount;
     int64 total_row_index;
-    // TODO Create Bind list
     void* params;
     void *results;
     SF_COLUMN_DESC *desc;
