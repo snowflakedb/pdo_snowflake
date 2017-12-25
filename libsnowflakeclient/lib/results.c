@@ -8,6 +8,29 @@
 #include "snowflake_memory.h"
 #include <snowflake_logger.h>
 
+static size_t _hextostr(char *dst, const char *src, size_t dst_max_len, size_t src_len) {
+    size_t i = 0;
+    size_t dlen = 0;
+    if (dst_max_len < src_len * 2) {
+        return 0;
+    }
+    for (i=0; i < src_len && dlen < dst_max_len; ++i) {
+        unsigned char hb = (unsigned char)src[i] >> 4;
+        unsigned char lb = (unsigned char)src[i] & (unsigned char)0xf;
+        if (hb > 9) {
+            dst[i*2] = (unsigned char)'A' + (hb - (unsigned char) 10);
+        } else {
+            dst[i*2] = (unsigned char)'0' + hb;
+        }
+        if (lb > 9) {
+            dst[i*2+1] = (unsigned char)'A' + (lb - (unsigned char) 10);
+        } else {
+            dst[i*2+1] = (unsigned char)'0' + lb;
+        }
+    }
+    return (size_t)i * 2;
+}
+
 SF_TYPE string_to_snowflake_type(const char *string) {
     if (strcmp(string, "fixed") == 0) {
         return SF_TYPE_FIXED;
@@ -92,6 +115,8 @@ SF_C_TYPE snowflake_to_c_type(SF_TYPE type, int64 precision, int64 scale) {
             type == SF_TYPE_OBJECT ||
             type == SF_TYPE_ARRAY) {
         return SF_C_TYPE_STRING;
+    } else if (type == SF_TYPE_BINARY) {
+        return SF_C_TYPE_BINARY;
     } else {
         // by default return string, since we can do everything with a string
         return SF_C_TYPE_STRING;
@@ -116,6 +141,8 @@ SF_TYPE c_type_to_snowflake(SF_C_TYPE c_type, SF_TYPE tsmode) {
             return tsmode;
         case SF_C_TYPE_BOOLEAN:
             return SF_TYPE_BOOLEAN;
+        case SF_C_TYPE_BINARY:
+            return SF_TYPE_BINARY;
         default:
             return SF_TYPE_TEXT;
     }
@@ -155,6 +182,12 @@ char *value_to_string(void *value, size_t len, SF_C_TYPE c_type) {
             size = *(sf_bool*)value == SF_BOOLEAN_TRUE ? sizeof(SF_BOOLEAN_INT_TRUE_STR) : sizeof(SF_BOOLEAN_INT_FALSE_STR);
             ret = (char*) SF_CALLOC(1, size + 1);
             strncpy(ret, *(sf_bool*)value == SF_BOOLEAN_TRUE ? SF_BOOLEAN_INT_TRUE_STR : SF_BOOLEAN_INT_FALSE_STR, size + 1);
+            return ret;
+        case SF_C_TYPE_BINARY:
+            size = (size_t)len * 2 + 1;
+            ret = (char*) SF_CALLOC(1, size);
+            _hextostr(ret, (const char*) value, size - 1, (size_t)len);
+            ret[size-1] = '\0';
             return ret;
         case SF_C_TYPE_STRING:
             size = (size_t)len + 1;

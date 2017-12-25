@@ -28,7 +28,7 @@ int main() {
      * it is taken as a float */
     status = snowflake_query(
       sfstmt,
-      "create or replace table t (c1 int, c2 boolean)",
+      "create or replace table t (c1 int, c2 binary)",
       0
     );
     if (status != SF_STATUS_SUCCESS) {
@@ -51,7 +51,7 @@ int main() {
     }
 
     SF_BIND_INPUT ic1;
-    int64 ic1buf = 201;
+    int64 ic1buf = 101;
     ic1.idx = 1;
     ic1.c_type = SF_C_TYPE_INT64;
     ic1.value = (void *) &ic1buf;
@@ -59,10 +59,15 @@ int main() {
     snowflake_bind_param(sfstmt, &ic1);
 
     SF_BIND_INPUT ic2;
-    sf_bool ic2buf = SF_BOOLEAN_TRUE;
+    char ic2buf[5];
+    ic2buf[0] = (char)0xab;
+    ic2buf[1] = (char)0xcd;
+    ic2buf[2] = (char)0xef;
+    ic2buf[3] = (char)0x12;
+    ic2buf[4] = (char)0x34;
     ic2.idx = 2;
-    ic2.c_type = SF_C_TYPE_BOOLEAN;
-    ic2.value = (void *) &ic2buf;
+    ic2.c_type = SF_C_TYPE_BINARY;
+    ic2.value = (void *) ic2buf;
     ic2.len = sizeof(ic2buf);
     snowflake_bind_param(sfstmt, &ic2);
 
@@ -75,17 +80,21 @@ int main() {
     }
     printf("Inserted one row\n");
 
-    ic1buf = 211;
+    ic1buf = 102;
     ic1.idx = 1;
     ic1.c_type = SF_C_TYPE_INT64;
     ic1.value = (void *) &ic1buf;
     ic1.len = sizeof(ic1buf);
     snowflake_bind_param(sfstmt, &ic1);
 
-    ic2buf = SF_BOOLEAN_FALSE;
+    ic2buf[0] = (char)0x56;
+    ic2buf[1] = (char)0x78;
+    ic2buf[2] = (char)0x9a;
+    ic2buf[3] = (char)0xbc;
+    ic2buf[4] = (char)0xde;
     ic2.idx = 2;
-    ic2.c_type = SF_C_TYPE_BOOLEAN;
-    ic2.value = (void *) &ic2buf;
+    ic2.c_type = SF_C_TYPE_BINARY;
+    ic2.value = (void *) ic2buf;
     ic2.len = sizeof(ic2buf);
     snowflake_bind_param(sfstmt, &ic2);
 
@@ -128,7 +137,7 @@ int main() {
     printf("Number of rows: %d\n", (int) snowflake_num_rows(sfstmt));
 
     while ((status = snowflake_fetch(sfstmt)) == SF_STATUS_SUCCESS) {
-        printf("result: %s, '%s'\n", (char *) c1.value, (char *) c2.value);
+        printf("result: %s, %s\n", (char *) c1.value, (char *) c2.value);
     }
 
     // If we reached end of line, then we were successful

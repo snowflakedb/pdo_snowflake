@@ -155,6 +155,7 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
                 len = (size_t) 256; /* TODO */
                 break;
             case SF_TYPE_BINARY:
+                len = SF_MAX_OBJECT_SIZE;
                 break;
             case SF_TYPE_BOOLEAN:
                 len =
@@ -288,13 +289,19 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
                 cols[i].maxlen = SF_MAX_OBJECT_SIZE;
                 break;
             case SF_TYPE_BOOLEAN:
-                cols[i].maxlen = sizeof(SF_BOOLEAN_INT_FALSE_STR);
+                cols[i].maxlen =
+                  (sizeof(SF_BOOLEAN_TRUE_STR) > sizeof(SF_BOOLEAN_FALSE_STR)
+                   ? sizeof(SF_BOOLEAN_TRUE_STR)
+                   : sizeof(SF_BOOLEAN_FALSE_STR)) - 1;
+                break;
+            case SF_TYPE_BINARY:
+                cols[i].maxlen = (size_t) F[i]->byte_size;
+                break;
             case SF_TYPE_TIMESTAMP_TZ:
             case SF_TYPE_TIMESTAMP_NTZ:
             case SF_TYPE_TIMESTAMP_LTZ:
             case SF_TYPE_DATE:
             case SF_TYPE_TIME:
-            case SF_TYPE_BINARY:
                 /* TODO */
                 break;
             default:
@@ -458,10 +465,21 @@ static int pdo_snowflake_stmt_param_hook(
                     break;
                 case PDO_PARAM_STR:
                     PDO_DBG_INF(
-                      "value: %.*s",
+                      "value: %.*s, len: %lld",
                       Z_STRLEN_P(parameter),
-                      Z_STRVAL_P(parameter));
+                      Z_STRVAL_P(parameter),
+                      Z_STRLEN_P(parameter));
                     v->c_type = SF_C_TYPE_STRING;
+                    v->len = Z_STRLEN_P(parameter);
+                    v->value = Z_STRVAL_P(parameter);
+                    break;
+                case PDO_PARAM_LOB:
+                    PDO_DBG_INF(
+                      "value: %.*s, len: %lld",
+                      Z_STRLEN_P(parameter),
+                      Z_STRVAL_P(parameter),
+                      Z_STRLEN_P(parameter));
+                    v->c_type = SF_C_TYPE_BINARY;
                     v->len = Z_STRLEN_P(parameter);
                     v->value = Z_STRVAL_P(parameter);
                     break;
