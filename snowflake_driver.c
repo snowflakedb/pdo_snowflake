@@ -473,10 +473,17 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
           driver_options,
           PDO_SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS, 1) ? 0
                                                                           : 1;
+        /* auto commit */
         zend_long auto_commit = pdo_attr_lval(
           driver_options,
           PDO_ATTR_AUTOCOMMIT, 1) ? 0 : 1;
 
+        /* timezone */
+        zend_string *timezone = pdo_attr_strval(
+          driver_options, PDO_SNOWFLAKE_ATTR_TIMEZONE, NULL);
+        snowflake_set_attr(H->server, SF_CON_TIMEZONE, ZSTR_VAL(timezone));
+
+        /*TODO: disable verify peer? do we need this option? */
         snowflake_global_set_attribute(
           SF_GLOBAL_DISABLE_VERIFY_PEER, &disable_verify_peer);
 

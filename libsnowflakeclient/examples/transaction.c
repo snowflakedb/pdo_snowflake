@@ -14,13 +14,13 @@ int main() {
     SF_STATUS status;
     initialize_snowflake_example(SF_BOOLEAN_FALSE);
     SF_CONNECT *sf = setup_snowflake_connection_with_autocommit(
+      "UTC",
       SF_BOOLEAN_FALSE);
     status = snowflake_connect(sf);
     if (status != SF_STATUS_SUCCESS) {
         goto err_con;
     }
 
-    error = NULL;
     SF_STMT *sfstmt = NULL;
 
     /* execute a DML */

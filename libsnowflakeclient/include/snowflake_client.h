@@ -128,9 +128,9 @@ typedef enum sf_attribute {
     SF_CON_APPLICATION,
     SF_CON_AUTHENTICATOR,
     SF_CON_INSECURE_MODE,
-    SF_SESSION_PARAMETER,
     SF_CON_LOGIN_TIMEOUT,
     SF_CON_NETWORK_TIMEOUT,
+    SF_CON_TIMEZONE,
     SF_CON_AUTOCOMMIT
 } SF_ATTRIBUTE;
 
@@ -183,6 +183,7 @@ typedef struct sf_snowflake_connection {
     sf_bool passcode_in_password;
     sf_bool insecure_mode;
     sf_bool autocommit;
+    char *timezone;
 
     // Session info
     char *token;
