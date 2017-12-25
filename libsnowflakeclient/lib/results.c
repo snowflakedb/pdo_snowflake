@@ -8,7 +8,8 @@
 #include "snowflake_memory.h"
 #include <snowflake_logger.h>
 
-static size_t _hextostr(char *dst, const char *src, size_t dst_max_len, size_t src_len) {
+static size_t _bin2hex(
+  char *dst, const char *src, size_t dst_max_len, size_t src_len) {
     size_t i = 0;
     size_t dlen = 0;
     if (dst_max_len < src_len * 2) {
@@ -27,6 +28,7 @@ static size_t _hextostr(char *dst, const char *src, size_t dst_max_len, size_t s
         } else {
             dst[i*2+1] = (unsigned char)'0' + lb;
         }
+        dlen += 2;
     }
     return (size_t)i * 2;
 }
@@ -186,7 +188,7 @@ char *value_to_string(void *value, size_t len, SF_C_TYPE c_type) {
         case SF_C_TYPE_BINARY:
             size = (size_t)len * 2 + 1;
             ret = (char*) SF_CALLOC(1, size);
-            _hextostr(ret, (const char*) value, size - 1, (size_t)len);
+            _bin2hex(ret, (const char *) value, size - 1, (size_t) len);
             ret[size-1] = '\0';
             return ret;
         case SF_C_TYPE_STRING:
