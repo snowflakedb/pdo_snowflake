@@ -81,6 +81,8 @@ SF_C_TYPE snowflake_to_c_type(SF_TYPE type, int64 precision, int64 scale) {
         } else {
             return SF_C_TYPE_INT64;
         }
+    } else if (type == SF_TYPE_REAL) {
+        return SF_C_TYPE_FLOAT64;
     } else if (type == SF_TYPE_TIMESTAMP_LTZ ||
             type == SF_TYPE_TIMESTAMP_NTZ ||
             type == SF_TYPE_TIMESTAMP_TZ) {
@@ -173,47 +175,46 @@ char *value_to_string(void *value, size_t len, SF_C_TYPE c_type) {
     }
 }
 
-SF_COLUMN_DESC ** set_description(const cJSON *rowtype) {
+SF_COLUMN_DESC * set_description(const cJSON *rowtype) {
     int i;
     cJSON *blob;
     cJSON *column;
-    SF_COLUMN_DESC **desc = NULL;
+    SF_COLUMN_DESC *desc = NULL;
     size_t array_size = (size_t) cJSON_GetArraySize(rowtype);
     if (rowtype == NULL || array_size == 0) {
         return desc;
     }
-    desc = (SF_COLUMN_DESC **) SF_CALLOC(array_size, sizeof(SF_COLUMN_DESC *));
+    desc = (SF_COLUMN_DESC *) SF_CALLOC(array_size, sizeof(SF_COLUMN_DESC));
     for (i = 0; i < array_size; i++) {
         column = cJSON_GetArrayItem(rowtype, i);
-        desc[i] = (SF_COLUMN_DESC *) SF_CALLOC(1, sizeof(SF_COLUMN_DESC));
-        if(json_copy_string(&desc[i]->name, column, "name")) {
-            desc[i]->name = NULL;
+        if(json_copy_string(&desc[i].name, column, "name")) {
+            desc[i].name = NULL;
         }
-        if (json_copy_int(&desc[i]->byte_size, column, "byteLength")) {
-            desc[i]->byte_size = 0;
+        if (json_copy_int(&desc[i].byte_size, column, "byteLength")) {
+            desc[i].byte_size = 0;
         }
-        if (json_copy_int(&desc[i]->internal_size, column, "length")) {
-            desc[i]->internal_size = 0;
+        if (json_copy_int(&desc[i].internal_size, column, "length")) {
+            desc[i].internal_size = 0;
         }
-        if (json_copy_int(&desc[i]->precision, column, "precision")) {
-            desc[i]->precision = 0;
+        if (json_copy_int(&desc[i].precision, column, "precision")) {
+            desc[i].precision = 0;
         }
-        if (json_copy_int(&desc[i]->scale, column, "scale")) {
-            desc[i]->scale = 0;
+        if (json_copy_int(&desc[i].scale, column, "scale")) {
+            desc[i].scale = 0;
         }
-        if (json_copy_bool(&desc[i]->null_ok, column, "nullable")) {
-            desc[i]->null_ok = SF_BOOLEAN_FALSE;
+        if (json_copy_bool(&desc[i].null_ok, column, "nullable")) {
+            desc[i].null_ok = SF_BOOLEAN_FALSE;
         }
         // Get type
         blob = cJSON_GetObjectItem(column, "type");
         if (cJSON_IsString(blob)) {
-            desc[i]->type = string_to_snowflake_type(blob->valuestring);
+            desc[i].type = string_to_snowflake_type(blob->valuestring);
         } else {
             // TODO Replace with default type
-            desc[i]->type = SF_TYPE_FIXED;
+            desc[i].type = SF_TYPE_FIXED;
         }
-        desc[i]->c_type = snowflake_to_c_type(desc[i]->type, desc[i]->precision, desc[i]->scale);
-        log_debug("Found type and ctype; %i: %i", desc[i]->type, desc[i]->c_type);
+        desc[i].c_type = snowflake_to_c_type(desc[i].type, desc[i].precision, desc[i].scale);
+        log_debug("Found type and ctype; %i: %i", desc[i].type, desc[i].c_type);
 
     }
 
