@@ -261,6 +261,7 @@ SF_CONNECT *STDCALL snowflake_init() {
         sf->passcode_in_password = SF_BOOLEAN_FALSE;
         sf->insecure_mode = SF_BOOLEAN_FALSE;
         sf->autocommit = SF_BOOLEAN_FALSE;
+        sf->timezone = NULL;
         sf->token = NULL;
         sf->master_token = NULL;
         sf->login_timeout = 120;
@@ -348,7 +349,7 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
     }
 
     // Create body
-    body = create_auth_json_body(sf, "C API", "C API", "0.1", sf->autocommit);
+    body = create_auth_json_body(sf, "C API", "C API", "0.1", sf->timezone, sf->autocommit);
     log_debug("Created body");
     s_body = cJSON_Print(body);
     // TODO delete password before printing
@@ -471,9 +472,6 @@ SF_STATUS STDCALL snowflake_set_attr(
         case SF_CON_INSECURE_MODE:
             sf->insecure_mode = *((sf_bool *) value);
             break;
-        case SF_SESSION_PARAMETER:
-            // TODO Implement this
-            break;
         case SF_CON_LOGIN_TIMEOUT:
             sf->login_timeout = *((int64 *) value);
             break;
@@ -482,6 +480,9 @@ SF_STATUS STDCALL snowflake_set_attr(
             break;
         case SF_CON_AUTOCOMMIT:
             sf->autocommit = *((sf_bool *) value);
+            break;
+        case SF_CON_TIMEZONE:
+            alloc_buffer_and_copy(&sf->timezone, value);
             break;
         default:
             SET_SNOWFLAKE_ERROR(&sf->error, SF_ERROR_BAD_ATTRIBUTE_TYPE, "Invalid attribute type", SF_SQLSTATE_UNABLE_TO_CONNECT);

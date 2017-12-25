@@ -13,10 +13,12 @@ void initialize_snowflake_example(sf_bool debug) {
 }
 
 SF_CONNECT *setup_snowflake_connection() {
-    return setup_snowflake_connection_with_autocommit(SF_BOOLEAN_TRUE);
+    return setup_snowflake_connection_with_autocommit(
+      "UTC", SF_BOOLEAN_TRUE);
 }
 
-SF_CONNECT *setup_snowflake_connection_with_autocommit(sf_bool autocommit) {
+SF_CONNECT *setup_snowflake_connection_with_autocommit(
+  const char* timezone, sf_bool autocommit) {
     SF_CONNECT *sf = snowflake_init();
 
     snowflake_set_attr(sf, SF_CON_ACCOUNT, getenv("SNOWFLAKE_TEST_ACCOUNT"));
@@ -27,6 +29,7 @@ SF_CONNECT *setup_snowflake_connection_with_autocommit(sf_bool autocommit) {
     snowflake_set_attr(sf, SF_CON_ROLE, getenv("SNOWFLAKE_TEST_ROLE"));
     snowflake_set_attr(sf, SF_CON_WAREHOUSE, getenv("SNOWFLAKE_TEST_WAREHOUSE"));
     snowflake_set_attr(sf, SF_CON_AUTOCOMMIT, &autocommit);
+    snowflake_set_attr(sf, SF_CON_TIMEZONE, timezone);
     char *host, *port, *protocol;
     host = getenv("SNOWFLAKE_TEST_HOST");
     if (host) {

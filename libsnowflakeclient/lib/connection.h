@@ -141,11 +141,12 @@ switch(e) \
  * @param application Application type.
  * @param int_app_name Client ID.
  * @param int_app_version Client App Version. Used to ensure we reject unsupported clients.
+ * @param timezone Timezone
  * @param autocommit Wheter autocommit is enabled.
  * @return Authorization cJSON Body.
  */
 cJSON *STDCALL create_auth_json_body(SF_CONNECT *sf, const char *application, const char *int_app_name,
-                                     const char *int_app_version, sf_bool autocommit);
+                                     const char *int_app_version, const char* timezone, sf_bool autocommit);
 
 /**
  * Creates a cJSON blob used to execute queries. cJSON blob must be freed by the caller using cJSON_Delete.

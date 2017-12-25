@@ -123,6 +123,7 @@ cJSON *STDCALL create_auth_json_body(SF_CONNECT *sf,
                                      const char *application,
                                      const char *int_app_name,
                                      const char *int_app_version,
+                                     const char *timezone,
                                      sf_bool autocommit) {
     cJSON *body;
     cJSON *data;
@@ -139,6 +140,8 @@ cJSON *STDCALL create_auth_json_body(SF_CONNECT *sf,
       session_parameters,
       "AUTOCOMMIT",
       autocommit == SF_BOOLEAN_TRUE ? SF_BOOLEAN_INT_TRUE_STR : SF_BOOLEAN_INT_FALSE_STR);
+
+    cJSON_AddStringToObject(session_parameters, "TIMEZONE", timezone);
 
     //Create Request Data JSON blob
     data = cJSON_CreateObject();
