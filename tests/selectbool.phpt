@@ -38,7 +38,11 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
             echo "Results in String\n";
         while($row = $sth->fetch()) {
             echo sprintf("C1: %s\n", $row[0]);
-            echo sprintf("C2: %s\n", $row[1]);
+            if ($row[1]) {
+                echo "C2: TRUE\n";
+            } else {
+                echo "C2: FALSE\n";
+            }
         }
         $count = $dbh->exec("drop table if exists t");
 

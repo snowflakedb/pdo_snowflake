@@ -138,7 +138,7 @@ cJSON *STDCALL create_auth_json_body(SF_CONNECT *sf,
     cJSON_AddStringToObject(
       session_parameters,
       "AUTOCOMMIT",
-      autocommit == SF_BOOLEAN_TRUE ? SF_BOOLEAN_TRUE_STR : SF_BOOLEAN_FALSE_STR);
+      autocommit == SF_BOOLEAN_TRUE ? SF_BOOLEAN_INT_TRUE_STR : SF_BOOLEAN_INT_FALSE_STR);
 
     //Create Request Data JSON blob
     data = cJSON_CreateObject();

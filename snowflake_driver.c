@@ -341,7 +341,7 @@ pdo_snowflake_set_attribute(pdo_dbh_t *dbh, zend_long attr, zval *val) /* {{{ */
                 dbh->auto_commit = bval;
                 PDO_DBG_INF(
                   "value=%s",
-                  bval ? SF_BOOLEAN_TRUE_STR : SF_BOOLEAN_FALSE_STR);
+                  bval ? SF_BOOLEAN_INT_TRUE_STR : SF_BOOLEAN_INT_FALSE_STR);
             }
             PDO_DBG_RETURN(1);
             break;

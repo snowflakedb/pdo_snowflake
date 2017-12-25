@@ -28,8 +28,20 @@ typedef int8 sf_bool;
 extern int8 SF_BOOLEAN_TRUE;
 extern int8 SF_BOOLEAN_FALSE;
 
-#define SF_BOOLEAN_TRUE_STR "TRUE"
-#define SF_BOOLEAN_FALSE_STR "FALSE"
+/**
+ * Boolean data type string representation for Snowflake
+ */
+#define SF_BOOLEAN_INT_TRUE_STR "TRUE"
+#define SF_BOOLEAN_INT_FALSE_STR "FALSE"
+
+/**
+ * Boolean data type string representation for results.
+ *
+ * This is mainly used by PHP PDO Snwoflake but should work fine
+ * for other cases.
+ */
+#define SF_BOOLEAN_TRUE_STR "1"
+#define SF_BOOLEAN_FALSE_STR ""
 
 #ifdef __cplusplus
 }
