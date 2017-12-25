@@ -17,7 +17,8 @@ SET(EXAMPLES
         large_result_set
         selectvar
         selectnum
-        selectbool)
+        selectbool
+        check_ctypes)
 
 set(SOURCE_UTILS
         example_setup.c)
