@@ -1,5 +1,5 @@
 --TEST--
-pdo_snowflake - insert and select variant, object and array
+pdo_snowflake - insert and select VARIANT, OBJECT and ARRAY
 --INI--
 pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 --FILE--

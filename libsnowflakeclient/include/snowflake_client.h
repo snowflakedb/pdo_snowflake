@@ -64,7 +64,8 @@ typedef enum sf_c_type {
     SF_C_TYPE_FLOAT64,
     SF_C_TYPE_STRING,
     SF_C_TYPE_TIMESTAMP,
-    SF_C_TYPE_BOOLEAN
+    SF_C_TYPE_BOOLEAN,
+    SF_C_TYPE_BINARY
 } SF_C_TYPE;
 
 /**
