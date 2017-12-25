@@ -18,7 +18,8 @@ SET(EXAMPLES
         selectvar
         selectnum
         selectbool
-        selectbin)
+        selectbin
+        check_ctypes)
 
 set(SOURCE_UTILS
         example_setup.c)

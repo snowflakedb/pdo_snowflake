@@ -124,7 +124,7 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
                               sizeof(SF_BIND_OUTPUT));
     for (i = 0; i < stmt->column_count; ++i) {
         size_t len = 0;
-        SF_COLUMN_DESC *desc = S->stmt->desc[i];
+        SF_COLUMN_DESC *desc = &S->stmt->desc[i];
         S->bound_result[i].idx = (size_t) i + 1;  /* 1 based index */
         S->bound_result[i].c_type = SF_C_TYPE_STRING; /* string type */
         PDO_DBG_INF("name: %s, prec: %d, scale: %d, type: %d, c_type: %d, "
@@ -278,10 +278,10 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
                     stmt->column_count, colno);
         PDO_DBG_RETURN(0);
     }
-    SF_COLUMN_DESC **F = snowflake_desc(S->stmt);
+    SF_COLUMN_DESC *F = snowflake_desc(S->stmt);
     for (i = 0; i < stmt->column_count; i++) {
-        cols[i].precision = (zend_ulong) F[i]->precision;
-        switch (F[i]->type) {
+        cols[i].precision = (zend_ulong) F[i].precision;
+        switch (F[i].type) {
             case SF_TYPE_OBJECT:
             case SF_TYPE_ARRAY:
             case SF_TYPE_VARIANT:
@@ -295,7 +295,7 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
                    : sizeof(SF_BOOLEAN_FALSE_STR)) - 1;
                 break;
             case SF_TYPE_BINARY:
-                cols[i].maxlen = (size_t) F[i]->byte_size;
+                cols[i].maxlen = (size_t) F[i].byte_size;
                 break;
             case SF_TYPE_TIMESTAMP_TZ:
             case SF_TYPE_TIMESTAMP_NTZ:
@@ -305,11 +305,11 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
                 /* TODO */
                 break;
             default:
-                cols[i].maxlen = (size_t) F[i]->byte_size;
+                cols[i].maxlen = (size_t) F[i].byte_size;
                 break;
         }
         cols[i].name = zend_string_init(
-          F[i]->name, strlen(F[i]->name), 0);
+          F[i].name, strlen(F[i].name), 0);
         cols[i].param_type = PDO_PARAM_STR; /* Always string */
     }
     PDO_DBG_RETURN(1);
@@ -552,7 +552,7 @@ static int pdo_snowflake_stmt_col_meta(
         PDO_DBG_RETURN(1);
     }
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
-    SF_COLUMN_DESC **F;
+    SF_COLUMN_DESC *F;
     zval flags;
 
     if (colno >= stmt->column_count) {
@@ -569,12 +569,12 @@ static int pdo_snowflake_stmt_col_meta(
         PDO_DBG_ERR("failed to get SF_COLUMN_DESC");
         PDO_DBG_RETURN(1);
     }
-    if (!F[colno]->null_ok) {
+    if (!F[colno].null_ok) {
         add_next_index_string(&flags, "not_null");
     }
-    add_assoc_long(return_value, "scale", (zend_long) F[colno]->scale);
+    add_assoc_long(return_value, "scale", (zend_long) F[colno].scale);
     add_assoc_string(return_value, "native_type",
-                     (char *) snowflake_type_to_string(F[colno]->type));
+                     (char *) snowflake_type_to_string(F[colno].type));
     add_assoc_zval(return_value, "flags", &flags);
 
     PDO_DBG_RETURN(0);
