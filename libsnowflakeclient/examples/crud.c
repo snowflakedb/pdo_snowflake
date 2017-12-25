@@ -46,7 +46,7 @@ int fetch_data(SF_STMT *stmt, int64 expected_sum) {
     }
 
     uint64 num_fields = snowflake_num_fields(stmt);
-    SF_COLUMN_DESC **descs = snowflake_desc(stmt);
+    SF_COLUMN_DESC *descs = snowflake_desc(stmt);
 
     if (num_fields != 2) {
         fprintf(stderr,
@@ -60,14 +60,14 @@ int fetch_data(SF_STMT *stmt, int64 expected_sum) {
         printf(
           "name: %s, type: %d, C type: %d, byte_size: %lld, "
             "internal_size: %lld, precision: %lld, scale: %lld, null ok: %d\n",
-          descs[i]->name,
-          descs[i]->type,
-          descs[i]->c_type,
-          descs[i]->byte_size,
-          descs[i]->internal_size,
-          descs[i]->precision,
-          descs[i]->scale,
-          descs[i]->null_ok);
+          descs[i].name,
+          descs[i].type,
+          descs[i].c_type,
+          descs[i].byte_size,
+          descs[i].internal_size,
+          descs[i].precision,
+          descs[i].scale,
+          descs[i].null_ok);
     }
     int64 total = 0;
     while ((status = snowflake_fetch(stmt)) == SF_STATUS_SUCCESS) {

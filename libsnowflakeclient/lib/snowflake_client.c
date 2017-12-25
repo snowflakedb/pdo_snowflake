@@ -508,8 +508,7 @@ static void STDCALL _snowflake_stmt_desc_reset(SF_STMT *sfstmt) {
     if (sfstmt->desc) {
         /* column metadata */
         for (i = 0; i < sfstmt->total_fieldcount; i++) {
-            SF_FREE(sfstmt->desc[i]->name);
-            SF_FREE(sfstmt->desc[i]);
+            SF_FREE(sfstmt->desc[i].name);
         }
         SF_FREE(sfstmt->desc);
     }
@@ -711,7 +710,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
         if (result == NULL) {
             continue;
         } else {
-            if (result->c_type != sfstmt->desc[i]->c_type && result->c_type != SF_C_TYPE_STRING) {
+            if (result->c_type != sfstmt->desc[i].c_type && result->c_type != SF_C_TYPE_STRING) {
                 // TODO add error msg
                 goto cleanup;
             }
@@ -732,7 +731,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
             raw_result = cJSON_GetArrayItem(row, i);
             switch(result->c_type) {
                 case SF_C_TYPE_INT8:
-                    if (sfstmt->desc[i]->type == SF_TYPE_BOOLEAN) {
+                    if (sfstmt->desc[i].type == SF_TYPE_BOOLEAN) {
                         *(int8 *) result->value = cJSON_IsTrue(raw_result) ? SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
                     } else {
                         // field is a char?
@@ -757,7 +756,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                     result->len = sizeof(float64);
                     break;
                 case SF_C_TYPE_STRING:
-                    if (sfstmt->desc[i]->type == SF_TYPE_BOOLEAN) {
+                    if (sfstmt->desc[i].type == SF_TYPE_BOOLEAN) {
                         if (strcmp(raw_result->valuestring, "0") == 0) {
                             /* False */
                             strncpy(result->value, SF_BOOLEAN_FALSE_STR, result->max_length);
@@ -1122,7 +1121,7 @@ const char *STDCALL snowflake_sqlstate(SF_STMT *sfstmt) {
     return sfstmt->error.sqlstate;
 }
 
-SF_COLUMN_DESC** STDCALL snowflake_desc(SF_STMT *sfstmt) {
+SF_COLUMN_DESC* STDCALL snowflake_desc(SF_STMT *sfstmt) {
     if (!sfstmt) {
         return NULL;
     }
