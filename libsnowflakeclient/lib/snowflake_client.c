@@ -730,7 +730,8 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
             continue;
         } else {
             time_t epoch_time = 0L;
-            struct tm *tm_ptr = NULL;
+            struct tm tm_obj;
+            memset(&tm_obj, 0, sizeof(tm_obj));
             raw_result = cJSON_GetArrayItem(row, i);
             switch(result->c_type) {
                 case SF_C_TYPE_INT8:
@@ -777,9 +778,12 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                         case SF_TYPE_DATE:
                             epoch_time = (time_t)(atol(raw_result->valuestring) * 86400L);
                             pthread_mutex_lock(&gmtime_lock);
-                            tm_ptr = gmtime(&epoch_time);
-                            /* TODO: error check */
-                            result->len = strftime(result->value, result->max_length, "%Y-%m-%d", tm_ptr);
+                            if (gmtime_r(&epoch_time, &tm_obj) != NULL) {
+                                result->len = strftime(result->value, result->max_length, "%Y-%m-%d", &tm_obj);
+                            } else {
+                                /* TODO: error handling */
+                                result->len = 0;
+                            }
                             pthread_mutex_unlock(&gmtime_lock);
                             break;
                         default:
