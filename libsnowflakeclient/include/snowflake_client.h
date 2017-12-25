@@ -238,7 +238,7 @@ typedef struct sf_snowflake_statement {
     // TODO Create Bind list
     void* params;
     void *results;
-    SF_COLUMN_DESC **desc;
+    SF_COLUMN_DESC *desc;
     void *stmt_attrs;
     sf_bool is_dml;
     SF_CHUNK_DOWNLOADER *chunk_downloader;
@@ -449,12 +449,12 @@ uint64 STDCALL snowflake_num_fields(SF_STMT *sfstmt);
 const char *STDCALL snowflake_sqlstate(SF_STMT *sfstmt);
 
 /**
- * Gets an array of column metadata.
+ * Gets an array of column metadata. The value returned by snowflake_num_fields is the size of the column metadata array
  *
  * @param sf SNOWFLAKE_STMT context.
  * @return SF_COLUMN_DESC if success or NULL
  */
-SF_COLUMN_DESC** STDCALL snowflake_desc(SF_STMT *sfstmt);
+SF_COLUMN_DESC* STDCALL snowflake_desc(SF_STMT *sfstmt);
 
 /**
  * Prepares a statement.
