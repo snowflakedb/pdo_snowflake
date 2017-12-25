@@ -157,7 +157,10 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
             case SF_TYPE_BINARY:
                 break;
             case SF_TYPE_BOOLEAN:
-                len = sizeof(SF_BOOLEAN_FALSE_STR);
+                len =
+                  (sizeof(SF_BOOLEAN_TRUE_STR) > sizeof(SF_BOOLEAN_FALSE_STR)
+                   ? sizeof(SF_BOOLEAN_TRUE_STR)
+                   : sizeof(SF_BOOLEAN_FALSE_STR)) - 1;
                 break;
             case SF_TYPE_DATE:
                 break;
@@ -285,7 +288,7 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
                 cols[i].maxlen = SF_MAX_OBJECT_SIZE;
                 break;
             case SF_TYPE_BOOLEAN:
-                cols[i].maxlen = sizeof(SF_BOOLEAN_FALSE_STR);
+                cols[i].maxlen = sizeof(SF_BOOLEAN_INT_FALSE_STR);
             case SF_TYPE_TIMESTAMP_TZ:
             case SF_TYPE_TIMESTAMP_NTZ:
             case SF_TYPE_TIMESTAMP_LTZ:
@@ -553,7 +556,7 @@ static int pdo_snowflake_stmt_col_meta(
     }
     add_assoc_long(return_value, "scale", (zend_long) F[colno]->scale);
     add_assoc_string(return_value, "native_type",
-                     (char*)snowflake_type_to_string(F[colno]->type));
+                     (char *) snowflake_type_to_string(F[colno]->type));
     add_assoc_zval(return_value, "flags", &flags);
 
     PDO_DBG_RETURN(0);

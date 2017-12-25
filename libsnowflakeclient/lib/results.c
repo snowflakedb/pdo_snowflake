@@ -152,9 +152,9 @@ char *value_to_string(void *value, size_t len, SF_C_TYPE c_type) {
             snprintf(ret, size, "%f", *(float64 *) value);
             return ret;
         case SF_C_TYPE_BOOLEAN:
-            size = *(sf_bool*)value == SF_BOOLEAN_TRUE ? sizeof(SF_BOOLEAN_TRUE_STR) : sizeof(SF_BOOLEAN_FALSE_STR) + 1;
-            ret = (char*) SF_CALLOC(1, size);
-            strncpy(ret, *(sf_bool*)value == SF_BOOLEAN_TRUE ? SF_BOOLEAN_TRUE_STR : SF_BOOLEAN_FALSE_STR, size);
+            size = *(sf_bool*)value == SF_BOOLEAN_TRUE ? sizeof(SF_BOOLEAN_INT_TRUE_STR) : sizeof(SF_BOOLEAN_INT_FALSE_STR);
+            ret = (char*) SF_CALLOC(1, size + 1);
+            strncpy(ret, *(sf_bool*)value == SF_BOOLEAN_TRUE ? SF_BOOLEAN_INT_TRUE_STR : SF_BOOLEAN_INT_FALSE_STR, size + 1);
             return ret;
         case SF_C_TYPE_STRING:
             size = (size_t)len + 1;
