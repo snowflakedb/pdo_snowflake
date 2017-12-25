@@ -40,7 +40,7 @@ Download the PHP source code to build PHP PDO driver for Snowflake.
     # Download php source code and copy to $WORKSPACE, for example
     cd $WORKSPACE
 
-Set PHP version to the environment variable. For example, set ``SF_PHP_VERSION=`` to ``7.1.6``
+Set PHP version to the environment variable. For example, set ``SF_PHP_VERSION`` to ``7.1.6``
 if the downloaded PHP version is 7.1.6.
 
 .. code-block:: bash
@@ -67,28 +67,9 @@ Clone the this repository and run ``phpize``, ``configure``, ``make`` and ``make
 
     git clone git@github.com:snowflakedb/pdo_snowflake.git
     cd pdo_snowflake
-    $WORKSPACE/install-php-$SF_PHP_VERSION/bin/phpize
-    ./configure \
-        --with-php-config=$WORKSPACE/install-php-$SF_PHP_VERSION/bin/php-config
-        --enable-pdo_snowflake
-    make
-    # Workaround for libtool issue, which cannot keep the order of Link options
-    # and --whole-archive is ignored.
-    cc -shared \
-        .libs/pdo_snowflake.o \
-        .libs/snowflake_driver.o \
-        .libs/snowflake_stmt.o \
-        -L libsnowflakeclient/cmake-build \
-        -L libsnowflakeclient/deps-build/linux/openssl/lib \
-        -L libsnowflakeclient/deps-build/linux/curl/lib \
-        -Wl,--whole-archive \
-        -lsnowflakeclient -lcrypto -lssl -lcurl \
-        -Wl,--no-whole-archive \
-        -Wl,-soname -Wl,pdo_snowflake.so \
-        -o .libs/pdo_snowflake.so
-    (cd .libs && rm -f pdo_snowflake.la && ln -s ../pdo_snowflake.la pdo_snowflake.la)
-    ./libtool --mode=install cp ./pdo_snowflake.la $(pwd)/modules
-    make test
+    export PHP_HOME=$WORKSPACE/install-php-$SF_PHP_VERSION
+    ./scripts/build_pdo_snowflake.sh -r # build all
+    REPORT_EXIT_STATUS=1 NO_INTERACTION=true make test
 
 Test Framework
 --------------------
@@ -105,4 +86,19 @@ Run the following command to check if PHP PDO Driver for Snowflake is successful
 
 .. code-block:: bash
 
-    php -dextension=modules/pdo_snowflake.so -m | grep pdo_snowflake
+    $PHP_HOME/bin/php -dextension=modules/pdo_snowflake.so -m | grep pdo_snowflake
+
+Run Valgrind
+--------------------
+
+Use ``valgrind`` to check memeory leak. For example, run ``tests/selectnum.phpt`` testcase using ``valgrind`` by the following command.
+
+.. code-block:: bash
+
+    valgrind --leak-check=full $PHP_HOME/bin/php -dextension=modules/pdo_snowflake.so tests/selectnum.phpt
+
+and verify no error in the output:
+
+.. code-block:: bash
+
+     ERROR SUMMARY: 0 errors from 0 contexts ...
