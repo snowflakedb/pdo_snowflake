@@ -15,7 +15,7 @@ static size_t _bin2hex(
     if (dst_max_len < src_len * 2) {
         return 0;
     }
-    for (i=0; i < src_len && dlen < dst_max_len; ++i) {
+    for (i=0, dlen=0; i < src_len && dlen < dst_max_len; ++i, dlen+=2) {
         unsigned char hb = (unsigned char)src[i] >> 4;
         unsigned char lb = (unsigned char)src[i] & (unsigned char)0xf;
         if (hb > 9) {
@@ -28,9 +28,8 @@ static size_t _bin2hex(
         } else {
             dst[i*2+1] = (unsigned char)'0' + lb;
         }
-        dlen += 2;
     }
-    return (size_t)i * 2;
+    return dlen;
 }
 
 SF_TYPE string_to_snowflake_type(const char *string) {
