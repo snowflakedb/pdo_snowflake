@@ -299,7 +299,7 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
                 cols[i].maxlen = (size_t) F[i].byte_size;
                 break;
             case SF_TYPE_DATE:
-                cols[i].maxlen = (size_t) F[i]->byte_size;
+                cols[i].maxlen = (size_t) F[i].byte_size;
                 break;
             case SF_TYPE_TIMESTAMP_TZ:
             case SF_TYPE_TIMESTAMP_NTZ:
