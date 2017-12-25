@@ -734,7 +734,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
             raw_result = cJSON_GetArrayItem(row, i);
             switch(result->c_type) {
                 case SF_C_TYPE_INT8:
-                    switch(sfstmt->desc[i]->type) {
+                    switch(sfstmt->desc[i].type) {
                         case SF_TYPE_BOOLEAN:
                             *(int8 *) result->value = cJSON_IsTrue(raw_result) ? SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
                             break;
@@ -762,7 +762,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                     result->len = sizeof(float64);
                     break;
                 case SF_C_TYPE_STRING:
-                    switch(sfstmt->desc[i]->type) {
+                    switch(sfstmt->desc[i].type) {
                         case SF_TYPE_BOOLEAN:
                             if (strcmp(raw_result->valuestring, "0") == 0) {
                                 /* False */
