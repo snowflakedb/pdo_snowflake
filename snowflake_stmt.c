@@ -164,6 +164,7 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
                    : sizeof(SF_BOOLEAN_FALSE_STR)) - 1;
                 break;
             case SF_TYPE_DATE:
+                len = (size_t) 64; /* TODO: YYYY-MM-DD, MON DD, YYYY, etc */
                 break;
             case SF_TYPE_TIME:
                 break;
@@ -297,10 +298,12 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
             case SF_TYPE_BINARY:
                 cols[i].maxlen = (size_t) F[i].byte_size;
                 break;
+            case SF_TYPE_DATE:
+                cols[i].maxlen = (size_t) F[i]->byte_size;
+                break;
             case SF_TYPE_TIMESTAMP_TZ:
             case SF_TYPE_TIMESTAMP_NTZ:
             case SF_TYPE_TIMESTAMP_LTZ:
-            case SF_TYPE_DATE:
             case SF_TYPE_TIME:
                 /* TODO */
                 break;

@@ -1,5 +1,5 @@
 --TEST--
-pdo_snowflake - insert and select BINARY data type
+pdo_snowflake - insert and select DATE data type
 --INI--
 pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 --FILE--
@@ -12,24 +12,19 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         echo "Connected to Snowflake\n";
 
         /* INSERT bool */
-        $count = $dbh->exec("create or replace table t (c1 int, c2 binary)");
+        $count = $dbh->exec("create or replace table t (c1 int, c2 date)");
         if ($count == 0) {
             print_r($dbh->errorInfo());
         }
         $sth = $dbh->prepare("insert into t values(?,?)");
         $v1 = 101;
         $sth->bindParam(1, $v1);
-        $v2 = pack("nvc*", 0x1234, 0x5678, 65, 66);
-        $sth->bindParam(2, $v2, PDO::PARAM_LOB);
+        $v2 = new DateTime("now");
+        $v2str = $v2->format("Y-m-d");
+        $sth->bindParam(2, $v2str); // must convert to str
         $sth->execute();
 
-        $v1 = 102;
-        $sth->bindParam(1, $v1);
-        $v2 = pack("nvc*", 0xabcd, 0xdef0, 67, 68);
-        $sth->bindParam(2, $v2, PDO::PARAM_LOB);
-        $sth->execute();
-
-        /* SELECT binary */
+        /* SELECT date */
         $sth = $dbh->query("select * from t order by 1");
         $meta = $sth->getColumnMeta(0);
         print_r($meta);
@@ -37,14 +32,11 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         print_r($meta);
             echo "Results in String\n";
         while($row = $sth->fetch()) {
-            echo sprintf("C1: %s, ", $row[0]);
-            $out = unpack("nval1/vval2/cval3/cval4", hex2bin($row[1]));
-            echo sprintf(
-                "C2: %x,%x,%d,%d\n",
-                $out["val1"],
-                $out["val2"],
-                $out["val3"],
-                $out["val4"]);
+            echo sprintf("C1: %s, C2: (TODAY)\n", $row[0]);
+            if ($row[1] != $v2str) {
+                echo sprintf("Incorrect Value. expected: %s, got: %s",
+                $v2str, $row[1]);
+            }
         }
         // $count = $dbh->exec("drop table if exists t");
 
@@ -75,17 +67,16 @@ Array
 Array
 (
     [scale] => 0
-    [native_type] => BINARY
+    [native_type] => DATE
     [flags] => Array
         (
         )
 
     [name] => C2
-    [len] => 8388608
+    [len] => 0
     [precision] => 0
     [pdo_type] => 2
 )
 Results in String
-C1: 101, C2: 1234,5678,65,66
-C1: 102, C2: abcd,def0,67,68
+C1: 101, C2: (TODAY)
 ===DONE===
