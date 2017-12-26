@@ -416,8 +416,8 @@ static int pdo_snowflake_stmt_param_hook(
         PDO_DBG_RETURN(0);
     }
     if (!param->is_param) {
-        /* is not parameter? */
-        PDO_DBG_RETURN(0);
+        /* nop if not binding parameter but column */
+        PDO_DBG_RETURN(1);
     }
     if (Z_ISREF(param->parameter)) {
         parameter = Z_REFVAL(param->parameter);
