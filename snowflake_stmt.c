@@ -409,7 +409,8 @@ static int pdo_snowflake_stmt_param_hook(
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     zval *parameter = NULL;
     PDO_DBG_ENTER("pdo_snowflake_stmt_param_hook");
-    PDO_DBG_INF("event = %s", pdo_param_event_names[event_type]);
+    PDO_DBG_INF("event = %s, paramno: %ld",
+                pdo_param_event_names[event_type], param->paramno);
 
     if (S->stmt == NULL) {
         /* internal error */
@@ -456,7 +457,18 @@ static int pdo_snowflake_stmt_param_hook(
             snowflake_bind_param(S->stmt, v);
 
             PDO_DBG_INF("%s", php_zval_type_names[Z_TYPE_P(parameter)]);
+            if (Z_TYPE_P(parameter) == IS_NULL) {
+                v->c_type = SF_C_TYPE_STRING;
+                v->len = (size_t)0;
+                v->value = NULL;
+                break;
+            }
             switch (param->param_type) {
+                case PDO_PARAM_NULL:
+                    v->c_type = SF_C_TYPE_STRING;
+                    v->len = (size_t)0;
+                    v->value = NULL;
+                    break;
                 case PDO_PARAM_INT:
                     PDO_DBG_INF(
                       "value: %ld",
@@ -507,17 +519,20 @@ static int pdo_snowflake_stmt_param_hook(
         case PDO_PARAM_EVT_FREE:
             v = pdo_sf_array_list_get(S->bound_params,
                                       (size_t) param->paramno + 1);
-            switch (param->param_type) {
-                case PDO_PARAM_INT:
-                    efree(v->value);
-                    break;
-                case PDO_PARAM_STR:
-                case PDO_PARAM_BOOL:
-                    /* nop */
-                    break;
-                default:
-                    /* TODO: nop */
-                    break;
+            if (Z_TYPE_P(parameter) != IS_NULL) {
+                switch (param->param_type) {
+                    case PDO_PARAM_INT:
+                        efree(v->value);
+                        break;
+                    case PDO_PARAM_STR:
+                    case PDO_PARAM_BOOL:
+                    case PDO_PARAM_NULL:
+                        /* nop */
+                        break;
+                    default:
+                        /* TODO: nop */
+                        break;
+                }
             }
             efree(v);
             pdo_sf_array_list_set(S->bound_params, NULL,

@@ -20,6 +20,7 @@ SET(EXAMPLES
         selectbool
         selectbin
         timezone
+        selectnull
         check_ctypes)
 
 set(SOURCE_UTILS

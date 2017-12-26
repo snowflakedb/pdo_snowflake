@@ -154,6 +154,9 @@ SF_TYPE c_type_to_snowflake(SF_C_TYPE c_type, SF_TYPE tsmode) {
 char *value_to_string(void *value, size_t len, SF_C_TYPE c_type) {
     size_t size;
     char *ret;
+    if (value == NULL) {
+        return NULL;
+    }
     // TODO turn cases into macro and check to see if ret if null
     switch (c_type) {
         case SF_C_TYPE_INT8:
