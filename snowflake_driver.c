@@ -433,6 +433,9 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     pdo_snowflake_db_handle *H;
     size_t i;
     int ret = 0;
+    /* NOTE: the parameters are referenced by index, so if you change
+     * the order of parameters, ensure changing the index of vars below.
+     */
     struct pdo_data_src_parser vars[] = {
       {"host",          "",      0},
       {"port",          "",      0},
@@ -442,11 +445,14 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
       {"warehouse",     "",      0},
       {"role",          "",      0},
       {"protocol",      "https", 0},
-      {"insecure_mode", "",      0}
-    }; // 9 input parameters
+      {"insecure_mode", "",      0},
+      {"timezone",      "",      0}
+    };
 
     // Parse the input data parameters
-    php_pdo_parse_data_source(dbh->data_source, dbh->data_source_len, vars, 9);
+    php_pdo_parse_data_source(dbh->data_source, dbh->data_source_len, vars,
+                              sizeof(vars) /
+                              sizeof(struct pdo_data_src_parser));
 
     H = pecalloc(1, sizeof(pdo_snowflake_db_handle), dbh->is_persistent);
 
@@ -477,11 +483,6 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         zend_long auto_commit = pdo_attr_lval(
           driver_options,
           PDO_ATTR_AUTOCOMMIT, 1) ? 0 : 1;
-
-        /* timezone */
-        zend_string *timezone = pdo_attr_strval(
-          driver_options, PDO_SNOWFLAKE_ATTR_TIMEZONE, NULL);
-        snowflake_set_attr(H->server, SF_CON_TIMEZONE, ZSTR_VAL(timezone));
 
         /*TODO: disable verify peer? do we need this option? */
         snowflake_global_set_attribute(
@@ -515,6 +516,11 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     snowflake_set_attr(
       H->server, SF_CON_AUTOCOMMIT,
       dbh->auto_commit ? &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
+
+    if (strcmp(vars[9].optval, "") != 0) {
+        /* timezone */
+        snowflake_set_attr(H->server, SF_CON_TIMEZONE, vars[9].optval);
+    }
 
     if (snowflake_connect(H->server) == SF_STATUS_ERROR) {
         pdo_snowflake_error(dbh);
