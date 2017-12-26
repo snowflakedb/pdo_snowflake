@@ -734,6 +734,11 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
             struct tm tm_obj;
             memset(&tm_obj, 0, sizeof(tm_obj));
             raw_result = cJSON_GetArrayItem(row, i);
+            if (raw_result->valuestring == NULL) {
+                result->value = NULL;
+                result->len = (size_t)0;
+                continue;
+            }
             switch(result->c_type) {
                 case SF_C_TYPE_INT8:
                     switch(sfstmt->desc[i].type) {
@@ -790,7 +795,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                         default:
                             /* copy original data as is except Date/Time/Timestamp/Binary type */
                             strncpy(result->value, raw_result->valuestring, result->max_length);
-                            result->len = strlen(raw_result->valuestring); /* TODO: what if null is included? */
+                            result->len = strlen(raw_result->valuestring);
                             break;
                     }
                     break;
@@ -952,6 +957,9 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
         for (i = 0; i < p->used; i++) {
             cJSON *binding;
             input = (SF_BIND_INPUT *) sf_array_list_get(p, i + 1);
+            if (input == NULL) {
+                continue;
+            }
             // TODO check if input is null and either set error or write msg to log
             type = snowflake_type_to_string(c_type_to_snowflake(input->c_type, SF_TYPE_TIMESTAMP_NTZ));
             value = value_to_string(input->value, input->len, input->c_type);
@@ -961,7 +969,9 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
             cJSON_AddStringToObject(binding, "type", type);
             cJSON_AddStringToObject(binding, "value", value);
             cJSON_AddItemToObject(bindings, idxbuf, binding);
-            SF_FREE(value);
+            if (value) {
+                SF_FREE(value);
+            }
         }
     }
 
