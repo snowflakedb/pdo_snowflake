@@ -16,13 +16,14 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 
         $sth = $dbh->prepare("insert into t(c1,c2) values(?,?)");
 
-        // looks like every data are taken as STRING data type
+        // data are taken as String if no data type is specified
         $data = array(11, "test111");
         $ret = $sth->execute($data);
         if (!$ret) {
             echo "Execution failed.\n";
         }
         echo "inserted rows: " . $sth->rowCount() . "\n";
+
         $data = array(12, "test112");
         $ret = $sth->execute($data);
         if (!$ret) {
@@ -30,10 +31,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         }
         echo "inserted rows: " . $sth->rowCount() . "\n";
 
-        $sth = $dbh->prepare("insert into t(c1,c2) values(?,?)");
-
-        // looks like every data are taken as STRING data type if type
-        // is not specified.
+        // data are taken as String if no data type is specified
         $c1 = 13;
         $c2 = "test113";
         $sth->bindParam(1, $c1);
@@ -42,8 +40,17 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         if (!$ret) {
             echo "Execution failed.\n";
         }
+        echo "inserted rows: " . $sth->rowCount() . "\n";
 
-        echo "==> fetch by default \n";
+        // reusing the previously bound parameter
+        $c1 = 14;
+        $sth->bindParam(1, $c1);
+        $ret = $sth->execute();
+        if (!$ret) {
+            echo "Execution failed.\n";
+        }
+
+        echo "==> fetch by default\n";
         $sth = $dbh->query("select * from t order by 1");
         while($row = $sth->fetch()) {
             echo $row["C1"] . " " . $row["C2"] . "\n";
@@ -65,6 +72,16 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
             echo $id. " " . $name . "\n";
         }
 
+        // not bound error
+        $sth = $dbh->prepare("insert into t(c1,c2) values(?,?)");
+        // data are taken as String if no data type is specified
+        $c1 = 15;
+        $sth->bindParam(1, $c1);
+        $ret = $sth->execute();
+        if (!$ret) {
+            echo sprintf("Expected: Execution failed: %d.\n", $sth->errorInfo()[0]);
+        }
+
         $count = $dbh->exec("drop table if exists t");
         if ($count == 0) {
             print_r($dbh->errorInfo());
@@ -82,16 +99,21 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 Connected to Snowflake
 inserted rows: 1
 inserted rows: 1
-==> fetch by default 
+inserted rows: 1
+==> fetch by default
 11 test111
 12 test112
 13 test113
+14 test113
 ==> bind Column
 11 test111
 12 test112
 13 test113
+14 test113
 ==> bind Column with type
 11 test111
 12 test112
 13 test113
+14 test113
+Expected: Execution failed: 42601.
 ===DONE===
