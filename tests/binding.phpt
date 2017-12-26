@@ -43,9 +43,26 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
             echo "Execution failed.\n";
         }
 
+        echo "==> fetch by default \n";
         $sth = $dbh->query("select * from t order by 1");
         while($row = $sth->fetch()) {
             echo $row["C1"] . " " . $row["C2"] . "\n";
+        }
+
+        echo "==> bind Column\n";
+        $sth = $dbh->query("select * from t order by 1");
+        $sth->bindColumn(1, $id);
+        $sth->bindColumn(2, $name);
+        while($row = $sth->fetch(PDO::FETCH_BOUND)) {
+            echo $id. " " . $name . "\n";
+        }
+
+        echo "==> bind Column with type\n";
+        $sth = $dbh->query("select * from t order by 1");
+        $sth->bindColumn(1, $id, PDO::PARAM_INT);
+        $sth->bindColumn(2, $name, PDO::PARAM_STR);
+        while($row = $sth->fetch(PDO::FETCH_BOUND)) {
+            echo $id. " " . $name . "\n";
         }
 
         $count = $dbh->exec("drop table if exists t");
@@ -65,6 +82,15 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 Connected to Snowflake
 inserted rows: 1
 inserted rows: 1
+==> fetch by default 
+11 test111
+12 test112
+13 test113
+==> bind Column
+11 test111
+12 test112
+13 test113
+==> bind Column with type
 11 test111
 12 test112
 13 test113
