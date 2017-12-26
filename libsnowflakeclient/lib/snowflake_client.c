@@ -286,7 +286,7 @@ void STDCALL snowflake_term(SF_CONNECT *sf) {
         URL_KEY_VALUE url_params[] = {
           {"delete=", "true", NULL, NULL, 0, 0}
         };
-        if (request(sf, &resp, DELETE_SESSION_URL, url_params, 1, NULL, NULL,
+        if (request(sf, &resp, DELETE_SESSION_URL, url_params, sizeof(url_params)/sizeof(URL_KEY_VALUE), NULL, NULL,
                     POST_REQUEST_TYPE, &sf->error)) {
             s_resp = cJSON_Print(resp);
             log_trace("JSON response:\n%s", s_resp);
@@ -358,7 +358,7 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
     }
 
     // Send request and get data
-    if (request(sf, &resp, SESSION_URL, url_params, 5, s_body, NULL, POST_REQUEST_TYPE, &sf->error)) {
+    if (request(sf, &resp, SESSION_URL, url_params, sizeof(url_params)/sizeof(URL_KEY_VALUE), s_body, NULL, POST_REQUEST_TYPE, &sf->error)) {
         s_resp = cJSON_Print(resp);
         log_trace("Here is JSON response:\n%s", s_resp);
         if ((json_error = json_copy_bool(&success, resp, "success")) != SF_JSON_ERROR_NONE ) {
@@ -992,7 +992,7 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
     log_debug("Created body");
     log_trace("Here is constructed body:\n%s", s_body);
 
-    if (request(sfstmt->connection, &resp, QUERY_URL, url_params, 1, s_body, NULL, POST_REQUEST_TYPE, &sfstmt->error)) {
+    if (request(sfstmt->connection, &resp, QUERY_URL, url_params, sizeof(url_params)/sizeof(URL_KEY_VALUE), s_body, NULL, POST_REQUEST_TYPE, &sfstmt->error)) {
         s_resp = cJSON_Print(resp);
         log_trace("Here is JSON response:\n%s", s_resp);
         data = cJSON_GetObjectItem(resp, "data");
