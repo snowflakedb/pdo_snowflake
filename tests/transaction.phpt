@@ -4,6 +4,13 @@ pdo_snowflake - transaction
 pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 --FILE--
 <?php
+    /*
+     * NOTE: no autocommit=false option is supported by PDO Snowflake.
+     * Based on PHP PDO doc, autocommit is on right after connection.
+     * When beginTransaction() is called, autocommit is turned off and
+     * all DMLs will be committed by commit() or rollbacked by rollback()
+     * and autocommit is turned on.
+     */
     include __DIR__ . "/common.php";
 
     $dbh = new PDO($dsn, $user, $password);
@@ -29,7 +36,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
             $dbh->exec("insert into aa");
             $dbh->commit();
         } catch (PDOException $e) {
-            echo $e->getMessage() . "\n";
+            echo "Expected: " . $e->getMessage() . "\n";
             $dbh->rollback();
         }
 
@@ -75,7 +82,23 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 
     $dbh = null;
 
-    /* TODO: add autocommit=false tests */
+    // rollback without beginTransaction
+    $dbh = new PDO($dsn, $user, $password);
+    echo "Connected to Snowflake\n";
+    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $count = $dbh->exec("create or replace table t (c1 int, c2 string)");
+    if ($count == 0) {
+        print_r($dbh->errorInfo());
+    }
+    $dbh->exec("insert into t (c1, c2) values (23, 'Joe'),(25, 'Mary')");
+    try {
+        $dbh->rollback();
+        throw new Exception("must fail");
+    } catch (PDOException $e) {
+        echo "Expected: ".  $e->getMessage() . "\n";
+    }
+    $dbh = null;
 ?>
 ===DONE===
 <?php exit(0); ?>
@@ -84,7 +107,7 @@ Connected to Snowflake
 23 Joe
 25 Mary
 Ken is inserted in a transaction
-SQLSTATE[42000]: Syntax error or access violation: 1003 SQL compilation error:
+Expected: SQLSTATE[42000]: Syntax error or access violation: 1003 SQL compilation error:
 syntax error line 1 at position 14 unexpected '<EOF>'.
 Ken should not show up
 23 Joe
@@ -93,5 +116,7 @@ Ken is inserted in a transaction again but the connection is closed.
 Connected to Snowflake
 23 Joe
 25 Mary
+Connected to Snowflake
+Expected: There is no active transaction
 ===DONE===
 
