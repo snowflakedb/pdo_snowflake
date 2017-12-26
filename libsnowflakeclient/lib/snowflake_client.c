@@ -4,7 +4,6 @@
 
 #include <assert.h>
 #include <time.h>
-#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -376,7 +375,7 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
             }
             codeJson = cJSON_GetObjectItem(resp, "code");
             if (codeJson) {
-                code = (int64)atoi(codeJson->valuestring);
+                code = strtol(codeJson->valuestring, NULL, 10);
             } else {
                 log_debug("no code element.");
             }
@@ -782,7 +781,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                             }
                             break;
                         case SF_TYPE_DATE:
-                            epoch_time = (time_t)(atol(raw_result->valuestring) * 86400L);
+                            epoch_time = (time_t)strtol(raw_result->valuestring, NULL, 10) * 86400L;
                             pthread_mutex_lock(&gmtime_lock);
                             if (gmtime_r(&epoch_time, &tm_obj) != NULL) {
                                 result->len = strftime(result->value, result->max_length, "%Y-%m-%d", &tm_obj);
