@@ -66,6 +66,20 @@ static sf_bool detect_stmt_type(int64 stmt_type_id) {
 #define _SF_STMT_SQL_COMMIT "commit"
 #define _SF_STMT_SQL_ROLLBACK "rollback"
 
+
+const int64 pow10_int64[] = {
+  1LL,
+  10LL,
+  100LL,
+  1000LL,
+  10000LL,
+  100000LL,
+  1000000LL,
+  10000000LL,
+  100000000LL,
+  1000000000LL
+};
+
 /*
  * Convenience method to find string size, create buffer, copy over, and return.
  */
@@ -746,9 +760,13 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
         if (result == NULL) {
             continue;
         } else {
-            time_t epoch_time = 0L;
+            time_t nsec = 0L;
+            time_t sec = 0L;
             struct tm tm_obj;
+            struct tm *tm_ptr;
             memset(&tm_obj, 0, sizeof(tm_obj));
+            char *ptr = NULL;
+
             raw_result = cJSON_GetArrayItem(row, i);
             if (raw_result->valuestring == NULL) {
                 result->value = NULL;
@@ -798,15 +816,55 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                             }
                             break;
                         case SF_TYPE_DATE:
-                            epoch_time = (time_t)strtol(raw_result->valuestring, NULL, 10) * 86400L;
+                            sec = (time_t)strtol(raw_result->valuestring, NULL, 10) * 86400L;
                             pthread_mutex_lock(&gmtime_lock);
-                            if (gmtime_r(&epoch_time, &tm_obj) != NULL) {
+                            tm_ptr = gmtime_r(&sec, &tm_obj);
+                            pthread_mutex_unlock(&gmtime_lock);
+                            if (tm_ptr != NULL) {
                                 result->len = strftime(result->value, result->max_length, "%Y-%m-%d", &tm_obj);
                             } else {
                                 /* TODO: error handling */
                                 result->len = 0;
+                                goto cleanup;
                             }
-                            pthread_mutex_unlock(&gmtime_lock);
+                            break;
+                        case SF_TYPE_TIMESTAMP_NTZ:
+                            ptr = strchr(raw_result->valuestring, (int)'.');
+                            if (ptr == NULL) {
+                                /* TODO: error handling */
+                                result->len = 0;
+                                goto cleanup;
+                            } else {
+                                /* replace a dot character with NULL */
+                                *ptr = '\0';
+                                sec = strtoll(raw_result->valuestring, NULL, 10);
+                                nsec = strtoll(ptr+1, NULL, 10);
+                                if (sec < 0) {
+                                    nsec = pow10_int64[sfstmt->desc[i].scale] - nsec;
+                                    sec--;
+                                }
+                                pthread_mutex_lock(&gmtime_lock);
+                                tm_ptr = gmtime_r(&sec, &tm_obj);
+                                pthread_mutex_unlock(&gmtime_lock);
+                                if (tm_ptr != NULL) {
+                                    /* adjust scale */
+                                    char fmt[20];
+                                    sprintf(fmt, "%%0%lldld", sfstmt->desc[i].scale);
+                                    result->len = strftime(
+                                      result->value,
+                                      result->max_length,
+                                      "%Y-%m-%d %H:%M:%S", &tm_obj);
+                                    strcat(result->value, ".");
+                                    result->len++;
+                                    result->len += snprintf(
+                                      &((char*)result->value)[result->len],
+                                      result->max_length - result->len, fmt,
+                                      nsec);
+                                } else {
+                                    result->len = 0;
+                                    goto cleanup;
+                                }
+                            }
                             break;
                         default:
                             /* copy original data as is except Date/Time/Timestamp/Binary type */
