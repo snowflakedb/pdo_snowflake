@@ -3,6 +3,7 @@
  */
 
 #include <string.h>
+#include <sys/utsname.h>
 #include "connection.h"
 #include <snowflake_logger.h>
 #include "snowflake_memory.h"
@@ -133,7 +134,32 @@ cJSON *STDCALL create_auth_json_body(SF_CONNECT *sf,
     //Create Client Environment JSON blob
     client_env = cJSON_CreateObject();
     cJSON_AddStringToObject(client_env, "APPLICATION", application);
-    cJSON_AddStringToObject(client_env, "OS_VERSION", "Linux");
+    struct utsname u;
+    if (uname(&u) >= 0) {
+        char buf[1024];
+        strcpy(buf, u.sysname);
+        strcat(buf, "-");
+        strcat(buf, u.release);
+        strcat(buf, "-");
+        strcat(buf, u.version);
+        strcat(buf, "-");
+        strcat(buf, u.machine);
+        cJSON_AddStringToObject(client_env, "OS_VERSION", buf);
+    } else {
+#if defined(linux)
+        cJSON_AddStringToObject(client_env, "OS_VERSION", "Linux");
+#else
+#  if defined(_WIN32)
+        cJSON_AddStringToObject(client_env, "OS_VERSION", "Windows");
+#  else
+#    if defined(__APPLE__)
+        cJSON_AddStringToObject(client_env, "OS_VERSION", "MacOS");
+#    else
+        cJSON_AddStringToObject(client_env, "OS_VERSION", "Unknown");
+#    endif
+#  endif
+#endif
+    }
 
     session_parameters = cJSON_CreateObject();
     cJSON_AddStringToObject(
