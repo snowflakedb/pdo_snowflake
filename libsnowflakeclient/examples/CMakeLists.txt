@@ -21,6 +21,7 @@ SET(EXAMPLES
         selectbin
         timezone
         selectnull
+        selecttsntz
         check_ctypes)
 
 set(SOURCE_UTILS
