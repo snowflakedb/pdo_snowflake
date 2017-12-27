@@ -7,6 +7,16 @@
 #include <snowflake_logger.h>
 #include "snowflake_arraylist.h"
 
+/**
+ * PHP PDO Snowflake Driver name
+ */
+#define PHP_PDO_SNOWFLAKE_NAME "PDO"
+
+/**
+ * PHP PDO Snowflake Driver version
+ */
+#define PHP_PDO_SNOWFLAKE_VERSION "0.1"
+
 #if 1
 #define PDO_DBG_ENABLED 1
 
@@ -56,8 +66,6 @@ typedef struct {
 
     ARRAY_LIST *bound_params;
     SF_BIND_OUTPUT *bound_result;
-    sf_bool *out_null; /* TODO: need this? */
-    zend_ulong *out_length; /* TODO: need this? */
 } pdo_snowflake_stmt;
 
 extern pdo_driver_t pdo_snowflake_driver;

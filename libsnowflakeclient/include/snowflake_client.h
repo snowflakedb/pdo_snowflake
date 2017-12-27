@@ -20,9 +20,30 @@ extern "C" {
 #include "snowflake_client_version.h"
 
 /**
+ * API Name
+ */
+#define SF_API_NAME "C API"
+
+/**
+ * API Version
+ */
+#define SF_API_VERSION "0.1"
+
+/**
  * SQLState code length
  */
 #define SF_SQLSTATE_LEN 6
+
+/**
+ * Authenticator, Default
+ */
+#define SF_AUTHENTICATOR_DEFAULT "snowflake"
+
+/**
+ * Authenticator, external browser
+ * TODO
+ */
+#define SF_AUTHENTICATOR_EXTERNAL_BROWSER "externalbrowser"
 
 /**
  * UUID4 length
@@ -125,7 +146,8 @@ typedef enum sf_attribute {
     SF_CON_PROTOCOL,
     SF_CON_PASSCODE,
     SF_CON_PASSCODE_IN_PASSWORD,
-    SF_CON_APPLICATION,
+    SF_CON_APPLICATION_NAME,
+    SF_CON_APPLICATION_VERSION,
     SF_CON_AUTHENTICATOR,
     SF_CON_INSECURE_MODE,
     SF_CON_LOGIN_TIMEOUT,
@@ -184,6 +206,12 @@ typedef struct sf_snowflake_connection {
     sf_bool insecure_mode;
     sf_bool autocommit;
     char *timezone;
+
+    char *authenticator;
+
+    // Overrider application name and version
+    char *application_name;
+    char *application_version;
 
     // Session info
     char *token;

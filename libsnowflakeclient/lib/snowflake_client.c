@@ -261,6 +261,10 @@ SF_CONNECT *STDCALL snowflake_init() {
         sf->insecure_mode = SF_BOOLEAN_FALSE;
         sf->autocommit = SF_BOOLEAN_FALSE;
         sf->timezone = NULL;
+        alloc_buffer_and_copy(&sf->authenticator, SF_AUTHENTICATOR_DEFAULT);
+        alloc_buffer_and_copy(&sf->application_name, SF_API_NAME);
+        alloc_buffer_and_copy(&sf->application_version, SF_API_VERSION);
+
         sf->token = NULL;
         sf->master_token = NULL;
         sf->login_timeout = 120;
@@ -307,6 +311,10 @@ void STDCALL snowflake_term(SF_CONNECT *sf) {
         SF_FREE(sf->schema);
         SF_FREE(sf->protocol);
         SF_FREE(sf->passcode);
+        SF_FREE(sf->authenticator);
+        SF_FREE(sf->application_name);
+        SF_FREE(sf->application_version);
+        SF_FREE(sf->timezone);
         SF_FREE(sf->master_token);
         SF_FREE(sf->token);
     }
@@ -348,7 +356,13 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
     }
 
     // Create body
-    body = create_auth_json_body(sf, "C API", "C API", "0.1", sf->timezone, sf->autocommit);
+    body = create_auth_json_body(
+      sf,
+      sf->application_name,
+      sf->application_name,
+      sf->application_version,
+      sf->timezone,
+      sf->autocommit);
     log_debug("Created body");
     s_body = cJSON_Print(body);
     // TODO delete password before printing
@@ -462,11 +476,14 @@ SF_STATUS STDCALL snowflake_set_attr(
         case SF_CON_PASSCODE_IN_PASSWORD:
             sf->passcode_in_password = *((sf_bool *) value);
             break;
-        case SF_CON_APPLICATION:
-            // TODO Implement this
+        case SF_CON_APPLICATION_NAME:
+            alloc_buffer_and_copy(&sf->application_name, value);
+            break;
+        case SF_CON_APPLICATION_VERSION:
+            alloc_buffer_and_copy(&sf->application_version, value);
             break;
         case SF_CON_AUTHENTICATOR:
-            // TODO Implement this
+            alloc_buffer_and_copy(&sf->authenticator, value);
             break;
         case SF_CON_INSECURE_MODE:
             sf->insecure_mode = *((sf_bool *) value);
