@@ -42,7 +42,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
             switch($cnt) {
             case 0:
                 if (substr($row[1], 0, strlen($v2str)) != $v2str) {
-                    echo sprintf("Incorrect Value. expected: %s, got: %s",
+                    echo sprintf("Incorrect Value. expected: %s, got: %s\n",
                     $v2str, $row[1]);
                 } else {
                     echo "(TODAY)\n";
@@ -50,7 +50,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
                 break;
             case 1:
                 if (substr($row[1], 0, strlen($v2str2)) != $v2str2) {
-                    echo sprintf("Incorrect Value. expected: %s, got: %s",
+                    echo sprintf("Incorrect Value. expected: %s, got: %s\n",
                     $v2str, $row[1]);
                 } else {
                     echo "(OLD DATE)\n";

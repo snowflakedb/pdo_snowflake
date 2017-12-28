@@ -32,8 +32,8 @@ sf_bool DEBUG;
 static char *LOG_PATH = NULL;
 static FILE *LOG_FP = NULL;
 
-pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t gmtime_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t gmlocaltime_lock = PTHREAD_MUTEX_INITIALIZER;
 
 SF_STATUS _snowflake_internal_query(SF_CONNECT *sf, const char *sql);
 
@@ -44,6 +44,11 @@ SF_STATUS _snowflake_internal_query(SF_CONNECT *sf, const char *sql);
 #define _SF_STMT_TYPE_MERGE (_SF_STMT_TYPE_DML + 0x400)
 #define _SF_STMT_TYPE_MULTI_TABLE_INSERT (_SF_STMT_TYPE_DML + 0x500)
 
+/**
+ * Detects statement type is DML
+ * @param stmt_type_id statement type id
+ * @return SF_BOOLEAN_TRUE if the statement is DM or SF_BOOLEAN_FALSE
+ */
 static sf_bool detect_stmt_type(int64 stmt_type_id) {
     sf_bool ret;
     switch (stmt_type_id) {
@@ -66,8 +71,10 @@ static sf_bool detect_stmt_type(int64 stmt_type_id) {
 #define _SF_STMT_SQL_COMMIT "commit"
 #define _SF_STMT_SQL_ROLLBACK "rollback"
 
-
-const int64 pow10_int64[] = {
+/**
+ * precomputed 10^N for int64
+ */
+static const int64 pow10_int64[] = {
   1LL,
   10LL,
   100LL,
@@ -80,10 +87,17 @@ const int64 pow10_int64[] = {
   1000000000LL
 };
 
-/*
- * Convenience method to find string size, create buffer, copy over, and return.
+/**
+ * Maximum one-directional range of offset-based timezones (24 hours)
  */
-void alloc_buffer_and_copy(char **var, const char *str) {
+#define TIMEZONE_OFFSET_RANGE  (int64)(24 * 60);
+
+/**
+ * Find string size, create buffer, copy over, and return.
+ * @param var output buffer
+ * @param str source string
+ */
+static void alloc_buffer_and_copy(char **var, const char *str) {
     size_t str_size;
     SF_FREE(*var);
     // If passed in string is null, then return since *var is already null from being freed
@@ -94,7 +108,13 @@ void alloc_buffer_and_copy(char **var, const char *str) {
     }
 }
 
-int mkpath(char* file_path, mode_t mode) {
+/**
+ * Make a directory with the mode
+ * @param file_path directory name
+ * @param mode mode
+ * @return 0 if success otherwise -1
+ */
+static int mkpath(char* file_path, mode_t mode) {
     assert(file_path && *file_path);
     char* p;
     for (p=strchr(file_path+1, '/'); p; p=strchr(p+1, '/')) {
@@ -107,7 +127,12 @@ int mkpath(char* file_path, mode_t mode) {
     return 0;
 }
 
-void log_lock_func(void *udata, int lock) {
+/**
+ * Lock/Unlock log file for writing by mutex
+ * @param udata user data (not used)
+ * @param lock non-zere for lock or zero for unlock
+ */
+static void log_lock_func(void *udata, int lock) {
     if (lock) {
         pthread_mutex_lock(&log_lock);
     } else {
@@ -115,10 +140,124 @@ void log_lock_func(void *udata, int lock) {
     }
 }
 
+/**
+ * Extracts a Snowflake internal representation of timestamp into
+ * seconds, nanoseconds and optionally Timezone offset.
+ * @param sec pointer of seconds
+ * @param nsec pointer of nanoseconds
+ * @param tzoffset pointer of Timezone offset.
+ * @param src source buffer including a Snowflake internal timestamp
+ * @param scale Timestamp data type scale between 0 and 9
+ * @return SF_BOOLEAN_TRUE if success otherwise SF_BOOLEAN_FALSE
+ */
+static sf_bool _extract_timestamp(
+  SF_BIND_OUTPUT *result, SF_TYPE sftype,
+  const char* src, const char *timezone, int64 scale) {
+    time_t nsec = 0L;
+    time_t sec = 0L;
+    int64 tzoffset = 0;
+    struct tm tm_obj;
+    struct tm *tm_ptr = NULL;
+    memset(&tm_obj, 0, sizeof(tm_obj));
+
+    /* Search for a decimal point */
+    char *ptr = strchr(src, (int) '.');
+    if (ptr == NULL) {
+        return SF_BOOLEAN_FALSE;
+    }
+    sec = strtoll(src, NULL, 10);
+
+    /* Search for a space for TIMESTAMP_TZ */
+    char *sptr = strchr(ptr+1, (int)' ');
+    nsec = strtoll(ptr + 1, NULL, 10);
+    if (sptr != NULL) {
+        /* TIMESTAMP_TZ */
+        nsec = strtoll(ptr + 1, NULL, 10);
+        tzoffset = strtoll(sptr + 1, NULL, 10) - TIMEZONE_OFFSET_RANGE;
+    }
+    if (sec < 0) {
+        nsec = pow10_int64[scale] - nsec;
+        sec--;
+    }
+    log_info("sec: %lld, nsec: %lld", sec, nsec);
+    /* replace a dot character with NULL */
+    if (sftype == SF_TYPE_TIMESTAMP_NTZ) {
+        tm_ptr = gmtime_r(&sec, &tm_obj);
+    } else if (sftype == SF_TYPE_TIMESTAMP_LTZ) {
+        /* set the environment variable TZ to the session timezone
+         * so that localtime_tz honors it.
+         */
+        pthread_mutex_lock(&gmlocaltime_lock);
+        const char *prev_tz_ptr =  getenv("TZ");
+        setenv("TZ", timezone, 1);
+        tzset();
+        tm_ptr = localtime_r(&sec, &tm_obj);
+        if (prev_tz_ptr != NULL) {
+            setenv("TZ", prev_tz_ptr, 1); /* cannot set to NULL */
+        } else {
+            unsetenv("TZ");
+        }
+        tzset();
+        pthread_mutex_unlock(&gmlocaltime_lock);
+    } else {
+        /* TODO: TIMESTAMP_TZ */
+        tm_ptr = NULL;
+    }
+    if (tm_ptr == NULL) {
+        result->len = 0;
+        return SF_BOOLEAN_FALSE;
+    }
+    /* adjust scale */
+    char fmt[20];
+    sprintf(fmt, ".%%0%lldld", scale);
+    result->len = strftime(result->value,
+      result->max_length, "%Y-%m-%d %H:%M:%S", &tm_obj);
+    if (scale > 0) {
+        result->len += snprintf(
+          &((char *) result->value)[result->len],
+          result->max_length - result->len, fmt,
+          nsec);
+    }
+    if (sftype == SF_TYPE_TIMESTAMP_LTZ) {
+        /* Timezone info */
+        const char* tz = getenv("TZ");
+        ldiv_t dm = ldiv(tm_obj.tm_gmtoff, 3600L);
+        result->len += snprintf(
+          &((char*)result->value)[result->len],
+          result->max_length - result->len,
+          " %c%02ld:%02ld", dm.quot > 0 ? '+' : '-',
+          labs(dm.quot), dm.rem/60L);
+    } else if (sftype == SF_TYPE_TIMESTAMP_TZ) {
+        /* TODO: TIMESTAMP_TZ */
+    }
+    return SF_BOOLEAN_TRUE;
+}
+
+/**
+ * Reset the connection parameters with the returned parameteres
+ * @param sf SF_CONNECT object
+ * @param parameters the returned parameters
+ */
+static void _reset_connection_parameters(SF_CONNECT* sf, cJSON *parameters) {
+    if (parameters != NULL) {
+        int i, len;
+        for (i = 0, len=cJSON_GetArraySize(parameters);  i<len ; ++i) {
+            cJSON *p1 = cJSON_GetArrayItem(parameters, i);
+            cJSON *name = cJSON_GetObjectItem(p1, "name");
+            cJSON *value = cJSON_GetObjectItem(p1, "value");
+            if (strcmp(name->valuestring, "TIMEZONE") == 0) {
+                if (sf->timezone == NULL || strcmp(sf->timezone, value->valuestring) != 0) {
+                    alloc_buffer_and_copy(&sf->timezone, value->valuestring);
+                }
+            }
+        }
+    }
+}
+
 /*
  * Initializes logging file
  */
-sf_bool STDCALL log_init(const char *log_path) {
+static sf_bool STDCALL log_init(const char *log_path) {
     sf_bool ret = SF_BOOLEAN_FALSE;
     time_t current_time;
     struct tm * time_info;
@@ -140,7 +279,7 @@ sf_bool STDCALL log_init(const char *log_path) {
     } else {
         log_set_quiet(SF_BOOLEAN_TRUE);
     }
-    log_set_level(SF_LOG_TRACE);
+    log_set_level(SF_LOG_TRACE); /* TODO: move to the parameter */
     log_set_lock(&log_lock_func);
     // If log path is specified, use absolute path. Otherwise set logging dir to be relative to current directory
     if (sf_log_path) {
@@ -183,7 +322,7 @@ cleanup:
 /*
  * Cleans up memory allocated for log init and closes log file.
  */
-void STDCALL log_term() {
+static void STDCALL log_term() {
     SF_FREE(LOG_PATH);
     if (LOG_FP) {
         fclose(LOG_FP);
@@ -279,6 +418,8 @@ SF_CONNECT *STDCALL snowflake_init() {
         alloc_buffer_and_copy(&sf->application_name, SF_API_NAME);
         alloc_buffer_and_copy(&sf->application_version, SF_API_VERSION);
 
+        pthread_mutex_init(&sf->mutex_parameters, NULL);
+
         sf->token = NULL;
         sf->master_token = NULL;
         sf->login_timeout = 120;
@@ -314,6 +455,7 @@ void STDCALL snowflake_term(SF_CONNECT *sf) {
         SF_FREE(s_resp);
 
         pthread_mutex_destroy(&sf->mutex_sequence_counter);
+        pthread_mutex_destroy(&sf->mutex_parameters);
         SF_FREE(sf->host);
         SF_FREE(sf->port);
         SF_FREE(sf->user);
@@ -418,6 +560,11 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
         if (!set_tokens(sf, data, "token", "masterToken", &sf->error)) {
             goto cleanup;
         }
+
+        pthread_mutex_lock(&sf->mutex_parameters);
+        _reset_connection_parameters(
+          sf, cJSON_GetObjectItem(data, "parameters"));
+        pthread_mutex_unlock(&sf->mutex_parameters);
     } else {
         log_error("No response");
         SET_SNOWFLAKE_ERROR(&sf->error, SF_ERROR_BAD_JSON, "No valid JSON response", SF_SQLSTATE_UNABLE_TO_CONNECT);
@@ -757,15 +904,14 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
     // TODO error checking for conversions during fetch
     for (i = 0; i < sfstmt->total_fieldcount; i++) {
         result = sf_array_list_get(sfstmt->results, i + 1);
+        log_info("snowflake type: %lld", sfstmt->desc[i].type);
         if (result == NULL) {
             continue;
         } else {
-            time_t nsec = 0L;
             time_t sec = 0L;
             struct tm tm_obj;
             struct tm *tm_ptr;
             memset(&tm_obj, 0, sizeof(tm_obj));
-            char *ptr = NULL;
 
             raw_result = cJSON_GetArrayItem(row, i);
             if (raw_result->valuestring == NULL) {
@@ -817,53 +963,29 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                             break;
                         case SF_TYPE_DATE:
                             sec = (time_t)strtol(raw_result->valuestring, NULL, 10) * 86400L;
-                            pthread_mutex_lock(&gmtime_lock);
+                            pthread_mutex_lock(&gmlocaltime_lock);
                             tm_ptr = gmtime_r(&sec, &tm_obj);
-                            pthread_mutex_unlock(&gmtime_lock);
-                            if (tm_ptr != NULL) {
-                                result->len = strftime(result->value, result->max_length, "%Y-%m-%d", &tm_obj);
-                            } else {
+                            pthread_mutex_unlock(&gmlocaltime_lock);
+                            if (tm_ptr == NULL) {
                                 /* TODO: error handling */
                                 result->len = 0;
                                 goto cleanup;
                             }
+                            result->len = strftime(
+                              result->value, result->max_length,
+                              "%Y-%m-%d", &tm_obj);
                             break;
                         case SF_TYPE_TIMESTAMP_NTZ:
-                            ptr = strchr(raw_result->valuestring, (int)'.');
-                            if (ptr == NULL) {
+                        case SF_TYPE_TIMESTAMP_LTZ:
+                            if (!_extract_timestamp(
+                              result,
+                              sfstmt->desc[i].type,
+                              raw_result->valuestring,
+                              sfstmt->connection->timezone,
+                              sfstmt->desc[i].scale)) {
                                 /* TODO: error handling */
                                 result->len = 0;
                                 goto cleanup;
-                            } else {
-                                /* replace a dot character with NULL */
-                                *ptr = '\0';
-                                sec = strtoll(raw_result->valuestring, NULL, 10);
-                                nsec = strtoll(ptr+1, NULL, 10);
-                                if (sec < 0) {
-                                    nsec = pow10_int64[sfstmt->desc[i].scale] - nsec;
-                                    sec--;
-                                }
-                                pthread_mutex_lock(&gmtime_lock);
-                                tm_ptr = gmtime_r(&sec, &tm_obj);
-                                pthread_mutex_unlock(&gmtime_lock);
-                                if (tm_ptr != NULL) {
-                                    /* adjust scale */
-                                    char fmt[20];
-                                    sprintf(fmt, "%%0%lldld", sfstmt->desc[i].scale);
-                                    result->len = strftime(
-                                      result->value,
-                                      result->max_length,
-                                      "%Y-%m-%d %H:%M:%S", &tm_obj);
-                                    strcat(result->value, ".");
-                                    result->len++;
-                                    result->len += snprintf(
-                                      &((char*)result->value)[result->len],
-                                      result->max_length - result->len, fmt,
-                                      nsec);
-                                } else {
-                                    result->len = 0;
-                                    goto cleanup;
-                                }
                             }
                             break;
                         default:
@@ -878,7 +1000,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                     result->len = sizeof(sf_bool);
                     break;
                 case SF_C_TYPE_TIMESTAMP:
-                    /* TODO */
+                    /* TODO: may need Snowflake TIMESTAMP struct like super set of strust tm */
                     break;
                 default:
                     break;
@@ -938,7 +1060,7 @@ int64 STDCALL snowflake_affected_rows(SF_STMT *sfstmt) {
     cJSON *raw_row_result;
     clear_snowflake_error(&sfstmt->error);
     if (!sfstmt) {
-        /* TODO: set error - set_snowflake_error */
+        /* no way tot set the error other than return value */
         return ret;
     }
     if (cJSON_GetArraySize(sfstmt->raw_results) == 0) {
@@ -1075,6 +1197,7 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
         }
         if ((json_error = json_copy_bool(&success, resp, "success")) == SF_JSON_ERROR_NONE && success) {
             // Set Database info
+            pthread_mutex_lock(&sfstmt->connection->mutex_parameters);
             if (json_copy_string(&sfstmt->connection->database, data, "finalDatabaseName")) {
                 log_warn("No valid database found in response");
             }
@@ -1087,6 +1210,11 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
             if (json_copy_string(&sfstmt->connection->role, data, "finalRoleName")) {
                 log_warn("No valid role found in response");
             }
+            /* Set other parameters */
+            _reset_connection_parameters(
+              sfstmt->connection, cJSON_GetObjectItem(data, "parameters"));
+            pthread_mutex_unlock(&sfstmt->connection->mutex_parameters);
+
             int64 stmt_type_id;
             if (json_copy_int(&stmt_type_id, data, "statementTypeId")) {
                 /* failed to get statement type id */

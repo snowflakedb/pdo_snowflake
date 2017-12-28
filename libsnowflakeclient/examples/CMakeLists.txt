@@ -22,6 +22,7 @@ SET(EXAMPLES
         timezone
         selectnull
         selecttsntz
+        selecttsltz
         check_ctypes)
 
 set(SOURCE_UTILS
