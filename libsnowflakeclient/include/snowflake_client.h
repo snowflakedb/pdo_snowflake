@@ -207,6 +207,9 @@ typedef struct sf_snowflake_connection {
     sf_bool autocommit;
     char *timezone;
 
+    /* used when updating parameters */
+    pthread_mutex_t mutex_parameters;
+
     char *authenticator;
 
     // Overrider application name and version

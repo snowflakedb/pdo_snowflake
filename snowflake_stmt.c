@@ -165,14 +165,10 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
                 break;
             case SF_TYPE_DATE:
             case SF_TYPE_TIMESTAMP_NTZ:
-                len = (size_t) 64; /* TODO: YYYY-MM-DD, MON DD, YYYY, etc */
-                break;
-            case SF_TYPE_TIME:
-                break;
             case SF_TYPE_TIMESTAMP_LTZ:
-                break;
             case SF_TYPE_TIMESTAMP_TZ:
-                break;
+            case SF_TYPE_TIME:
+                len = (size_t) 64; /* TODO: YYYY-MM-DD, MON DD, YYYY, etc */
                 break;
             default:
                 break;
