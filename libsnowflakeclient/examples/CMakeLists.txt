@@ -24,6 +24,7 @@ SET(EXAMPLES
         selecttsntz
         selecttsltz
         selecttstz
+        selecttime
         check_ctypes)
 
 set(SOURCE_UTILS
