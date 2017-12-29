@@ -97,7 +97,7 @@ int main() {
         goto cleanup;
     }
 
-    SF_BIND_OUTPUT c1;
+    SF_BIND_OUTPUT c1 = {0};
     char c1buf[1024];
     c1.idx = 1;
     c1.c_type = SF_C_TYPE_STRING;
@@ -106,7 +106,7 @@ int main() {
     c1.max_length = sizeof(c1buf);
     snowflake_bind_result(sfstmt, &c1);
 
-    SF_BIND_OUTPUT c2;
+    SF_BIND_OUTPUT c2 = {0};
     char c2buf[1024];
     c2.idx = 2;
     c2.c_type = SF_C_TYPE_STRING;
@@ -115,7 +115,7 @@ int main() {
     c2.max_length = sizeof(c2buf);
     snowflake_bind_result(sfstmt, &c2);
 
-    SF_BIND_OUTPUT c3;
+    SF_BIND_OUTPUT c3 = {0};
     char c3buf[1024];
     c3.idx = 3;
     c3.c_type = SF_C_TYPE_STRING;

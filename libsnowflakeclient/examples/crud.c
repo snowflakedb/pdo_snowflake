@@ -22,7 +22,7 @@ int fetch_data(SF_STMT *stmt, int64 expected_sum) {
     }
 
     int64 c1v = 0;
-    SF_BIND_OUTPUT c1;
+    SF_BIND_OUTPUT c1 = {0};
     c1.idx = 1;
     c1.max_length = sizeof(c1v);
     c1.c_type = SF_C_TYPE_INT64;
@@ -34,7 +34,7 @@ int fetch_data(SF_STMT *stmt, int64 expected_sum) {
     }
 
     char c2v[1000];
-    SF_BIND_OUTPUT c2;
+    SF_BIND_OUTPUT c2 = {0};
     c2.idx = 2;
     c2.max_length = sizeof(c2v);
     c2.c_type = SF_C_TYPE_STRING;

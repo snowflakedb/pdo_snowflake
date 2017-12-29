@@ -32,7 +32,7 @@ int main() {
         SF_ERROR *error = snowflake_stmt_error(sfstmt);
         fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
     }
-    SF_BIND_OUTPUT c1;
+    SF_BIND_OUTPUT c1 = {0};
     int64 out = 0;
     c1.idx = 1;
     c1.c_type = SF_C_TYPE_INT64;
@@ -40,7 +40,7 @@ int main() {
     c1.max_length = sizeof(out);
     snowflake_bind_result(sfstmt, &c1);
 
-    SF_BIND_OUTPUT c2;
+    SF_BIND_OUTPUT c2 = {0};
     char c2buf[1001];
     c2.idx = 2;
     c2.c_type = SF_C_TYPE_STRING;

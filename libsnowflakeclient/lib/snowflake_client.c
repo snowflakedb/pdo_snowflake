@@ -928,109 +928,117 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
     // TODO error checking for conversions during fetch
     for (i = 0; i < sfstmt->total_fieldcount; i++) {
         result = sf_array_list_get(sfstmt->results, i + 1);
-        log_info("snowflake type: %lld", sfstmt->desc[i].type);
+        log_info("snowflake type: %s, C type: %s",
+                 snowflake_type_to_string(sfstmt->desc[i].type),
+                 result != NULL ?
+                 snowflake_c_type_to_string(result->c_type) : NULL);
         if (result == NULL) {
+            // not bound. skipping
             continue;
-        } else {
-            time_t sec = 0L;
-            struct tm tm_obj;
-            struct tm *tm_ptr;
-            memset(&tm_obj, 0, sizeof(tm_obj));
+        }
+        time_t sec = 0L;
+        struct tm tm_obj;
+        struct tm *tm_ptr;
+        memset(&tm_obj, 0, sizeof(tm_obj));
 
-            raw_result = cJSON_GetArrayItem(row, i);
-            if (raw_result->valuestring == NULL) {
-                result->value = NULL;
-                result->len = (size_t)0;
-                continue;
-            }
-            switch(result->c_type) {
-                case SF_C_TYPE_INT8:
-                    switch(sfstmt->desc[i].type) {
-                        case SF_TYPE_BOOLEAN:
-                            *(int8 *) result->value = cJSON_IsTrue(raw_result) ? SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
-                            break;
-                        default:
-                            // field is a char?
-                            *(int8 *) result->value = (int8) raw_result->valuestring[0];
-                            break;
-                    }
-                    result->len = sizeof(int8);
-                    break;
-                case SF_C_TYPE_UINT8:
-                    *(uint8 *) result->value = (uint8) raw_result->valuestring[0];
-                    result->len = sizeof(uint8);
-                    break;
-                case SF_C_TYPE_INT64:
-                    *(int64 *) result->value = (int64) strtoll(raw_result->valuestring, NULL, 10);
-                    result->len = sizeof(int64);
-                    break;
-                case SF_C_TYPE_UINT64:
-                    *(uint64 *) result->value = (uint64) strtoull(raw_result->valuestring, NULL, 10);
-                    result->len = sizeof(uint64);
-                    break;
-                case SF_C_TYPE_FLOAT64:
-                    *(float64 *) result->value = (float64) strtod(raw_result->valuestring, NULL);
-                    result->len = sizeof(float64);
-                    break;
-                case SF_C_TYPE_STRING:
-                    switch(sfstmt->desc[i].type) {
-                        case SF_TYPE_BOOLEAN:
-                            if (strcmp(raw_result->valuestring, "0") == 0) {
-                                /* False */
-                                strncpy(result->value, SF_BOOLEAN_FALSE_STR, result->max_length);
-                                result->len = sizeof(SF_BOOLEAN_FALSE_STR)-1;
-                            } else {
-                                /* True */
-                                strncpy(result->value, SF_BOOLEAN_TRUE_STR, result->max_length);
-                                result->len = sizeof(SF_BOOLEAN_TRUE_STR)-1;
-                            }
-                            break;
-                        case SF_TYPE_DATE:
-                            sec = (time_t)strtol(raw_result->valuestring, NULL, 10) * 86400L;
-                            pthread_mutex_lock(&gmlocaltime_lock);
-                            tm_ptr = gmtime_r(&sec, &tm_obj);
-                            pthread_mutex_unlock(&gmlocaltime_lock);
-                            if (tm_ptr == NULL) {
-                                /* TODO: error handling */
-                                result->len = 0;
-                                goto cleanup;
-                            }
-                            result->len = strftime(
-                              result->value, result->max_length,
-                              "%Y-%m-%d", &tm_obj);
-                            break;
-                        case SF_TYPE_TIME:
-                        case SF_TYPE_TIMESTAMP_NTZ:
-                        case SF_TYPE_TIMESTAMP_LTZ:
-                        case SF_TYPE_TIMESTAMP_TZ:
-                            if (!_extract_timestamp(
-                              result,
-                              sfstmt->desc[i].type,
-                              raw_result->valuestring,
-                              sfstmt->connection->timezone,
-                              sfstmt->desc[i].scale)) {
-                                /* TODO: error handling */
-                                result->len = 0;
-                                goto cleanup;
-                            }
-                            break;
-                        default:
-                            /* copy original data as is except Date/Time/Timestamp/Binary type */
-                            strncpy(result->value, raw_result->valuestring, result->max_length);
-                            result->len = strlen(raw_result->valuestring);
-                            break;
-                    }
-                    break;
-                case SF_C_TYPE_BOOLEAN:
-                    *(sf_bool *) result->value = cJSON_IsTrue(raw_result) ? SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
-                    result->len = sizeof(sf_bool);
-                    break;
-                case SF_C_TYPE_TIMESTAMP:
-                    /* TODO: may need Snowflake TIMESTAMP struct like super set of strust tm */
-                    break;
-                default:
-                    break;
-            }
+        raw_result = cJSON_GetArrayItem(row, i);
+        if (raw_result->valuestring == NULL) {
+            log_info("setting value and len = NULL");
+            ((char*)result->value)[0] = '\0'; // empty string
+            result->len = (size_t)0;
+            result->is_null = SF_BOOLEAN_TRUE;
+            continue;
+        }
+        result->is_null = SF_BOOLEAN_FALSE;
+        switch(result->c_type) {
+            case SF_C_TYPE_INT8:
+                switch(sfstmt->desc[i].type) {
+                    case SF_TYPE_BOOLEAN:
+                        *(int8 *) result->value = cJSON_IsTrue(raw_result) ? SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
+                        break;
+                    default:
+                        // field is a char?
+                        *(int8 *) result->value = (int8) raw_result->valuestring[0];
+                        break;
+                }
+                result->len = sizeof(int8);
+                break;
+            case SF_C_TYPE_UINT8:
+                *(uint8 *) result->value = (uint8) raw_result->valuestring[0];
+                result->len = sizeof(uint8);
+                break;
+            case SF_C_TYPE_INT64:
+                *(int64 *) result->value = (int64) strtoll(raw_result->valuestring, NULL, 10);
+                result->len = sizeof(int64);
+                break;
+            case SF_C_TYPE_UINT64:
+                *(uint64 *) result->value = (uint64) strtoull(raw_result->valuestring, NULL, 10);
+                result->len = sizeof(uint64);
+                break;
+            case SF_C_TYPE_FLOAT64:
+                *(float64 *) result->value = (float64) strtod(raw_result->valuestring, NULL);
+                result->len = sizeof(float64);
+                break;
+            case SF_C_TYPE_STRING:
+                switch(sfstmt->desc[i].type) {
+                    case SF_TYPE_BOOLEAN:
+                        log_info("value: %p, max_length: %lld, len: %lld",
+                                 result->value, result->max_length, result->len);
+                        if (strcmp(raw_result->valuestring, "0") == 0) {
+                            /* False */
+                            strncpy(result->value, SF_BOOLEAN_FALSE_STR, result->max_length);
+                            result->len = sizeof(SF_BOOLEAN_FALSE_STR)-1;
+                        } else {
+                            /* True */
+                            strncpy(result->value, SF_BOOLEAN_TRUE_STR, result->max_length);
+                            result->len = sizeof(SF_BOOLEAN_TRUE_STR)-1;
+                        }
+                        break;
+                    case SF_TYPE_DATE:
+                        sec = (time_t)strtol(raw_result->valuestring, NULL, 10) * 86400L;
+                        pthread_mutex_lock(&gmlocaltime_lock);
+                        tm_ptr = gmtime_r(&sec, &tm_obj);
+                        pthread_mutex_unlock(&gmlocaltime_lock);
+                        if (tm_ptr == NULL) {
+                            /* TODO: error handling */
+                            result->len = 0;
+                            goto cleanup;
+                        }
+                        result->len = strftime(
+                          result->value, result->max_length,
+                          "%Y-%m-%d", &tm_obj);
+                        break;
+                    case SF_TYPE_TIME:
+                    case SF_TYPE_TIMESTAMP_NTZ:
+                    case SF_TYPE_TIMESTAMP_LTZ:
+                    case SF_TYPE_TIMESTAMP_TZ:
+                        if (!_extract_timestamp(
+                          result,
+                          sfstmt->desc[i].type,
+                          raw_result->valuestring,
+                          sfstmt->connection->timezone,
+                          sfstmt->desc[i].scale)) {
+                            /* TODO: error handling */
+                            result->len = 0;
+                            goto cleanup;
+                        }
+                        break;
+                    default:
+                        /* copy original data as is except Date/Time/Timestamp/Binary type */
+                        strncpy(result->value, raw_result->valuestring, result->max_length);
+                        result->len = strlen(raw_result->valuestring);
+                        break;
+                }
+                break;
+            case SF_C_TYPE_BOOLEAN:
+                *(sf_bool *) result->value = cJSON_IsTrue(raw_result) ? SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
+                result->len = sizeof(sf_bool);
+                break;
+            case SF_C_TYPE_TIMESTAMP:
+                /* TODO: may need Snowflake TIMESTAMP struct like super set of strust tm */
+                break;
+            default:
+                break;
         }
     }
 
