@@ -50,7 +50,7 @@ int main() {
         goto cleanup;
     }
 
-    SF_BIND_INPUT ic1;
+    SF_BIND_INPUT ic1 = {0};
     int64 ic1buf = 101;
     ic1.idx = 1;
     ic1.c_type = SF_C_TYPE_INT64;
@@ -58,7 +58,7 @@ int main() {
     ic1.len = sizeof(ic1buf);
     snowflake_bind_param(sfstmt, &ic1);
 
-    SF_BIND_INPUT ic2;
+    SF_BIND_INPUT ic2 = {0};
     char ic2buf[5];
     ic2buf[0] = (char)0xab;
     ic2buf[1] = (char)0xcd;
@@ -116,7 +116,7 @@ int main() {
         goto cleanup;
     }
 
-    SF_BIND_OUTPUT c1;
+    SF_BIND_OUTPUT c1 = {0};
     char c1buf[1024];
     c1.idx = 1;
     c1.c_type = SF_C_TYPE_STRING;
@@ -125,7 +125,7 @@ int main() {
     c1.max_length = sizeof(c1buf);
     snowflake_bind_result(sfstmt, &c1);
 
-    SF_BIND_OUTPUT c2;
+    SF_BIND_OUTPUT c2 = {0};
     char c2buf[1024];
     c2.idx = 2;
     c2.c_type = SF_C_TYPE_STRING;

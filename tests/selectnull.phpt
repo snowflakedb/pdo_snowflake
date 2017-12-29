@@ -16,13 +16,23 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
             print_r($dbh->errorInfo());
         }
         $sth = $dbh->prepare("insert into t(c1,c2,c3,c4) values(?,?,?,?)");
-        $sth->bindValue(1, 101); // bindValue
-        $v2 = null;
-        $sth->bindParam(2, $v2); // bindParam null
-        $sth->bindValue(3, null, PDO::PARAM_NULL); // null with PARAM_NULL
-        $v4 = null;
-        $sth->bindParam(4, $v4, PDO::PARAM_BOOL); // cannot use PARAM_STR
-        $sth->execute();
+
+        $tests = [
+            [
+                "input" => [101, null, null, null],
+                "output" => null
+            ]
+        ];
+        foreach ($tests as $t) {
+            $v1 = $t["input"][0];
+            $sth->bindParam(1, $v1);
+            $v2 = $t["input"][1];
+            $sth->bindParam(2, $v2);
+            $sth->bindValue(3, $t["input"][2], PDO::PARAM_NULL);
+            $v4 = $t["input"][3];
+            $sth->bindParam(4, $v4, PDO::PARAM_BOOL); // cannot use PARAM_STR
+            $sth->execute();
+        }
 
         /* SELECT null */
         echo "==> fetching null \n";
@@ -32,6 +42,8 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         $meta = $sth->getColumnMeta(1);
         print_r($meta);
         echo "Results in String\n";
+
+        $cnt = 0;
         while($row = $sth->fetch()) {
             echo sprintf(
                 "C1: %s, C2:%s, C3:%s, C4:%s\n",
@@ -39,6 +51,29 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
                  $row[1] == null ? "(NULL)" : "EMPTY",
                  $row[2] == null ? "(NULL)" : "EMPTY",
                  $row[3] == null ? "(NULL)" : "EMPTY");
+
+            if ($tests[$cnt]["output"] == null) {
+                $output = $tests[$cnt]["input"];
+            } else {
+                $output = $tests[$cnt]["output"];
+            }
+            if ($output[0] != $row[0]) {
+                echo sprintf("ERR: testcase #%d -- expected: %s, got: %s\n",
+                    $cnt, $output[0], $row[0]);
+            }
+            if ($output[1] != $row[1]) {
+                echo sprintf("ERR: testcase #%d -- expected: %s, got: %s\n",
+                    $cnt, $output[1], $row[1]);
+            }
+            if ($output[2] != $row[2]) {
+                echo sprintf("ERR: testcase #%d -- expected: %s, got: %s\n",
+                    $cnt, $output[2], $row[2]);
+            }
+            if ($output[3] != $row[3]) {
+                echo sprintf("ERR: testcase #%d -- expected: %s, got: %s\n",
+                    $cnt, $output[3], $row[3]);
+            }
+            ++$cnt;
         }
         // $count = $dbh->exec("drop table if exists t");
 

@@ -25,8 +25,8 @@ typedef double float64;
 typedef float float32;
 typedef int8 sf_bool;
 
-extern int8 SF_BOOLEAN_TRUE;
-extern int8 SF_BOOLEAN_FALSE;
+extern const int8 SF_BOOLEAN_TRUE;
+extern const int8 SF_BOOLEAN_FALSE;
 
 /**
  * Boolean data type string representation for Snowflake
@@ -47,4 +47,4 @@ extern int8 SF_BOOLEAN_FALSE;
 }
 #endif
 
-#endif //SNOWFLAKE_BASIC_TYPES_H
+#endif /* SNOWFLAKE_BASIC_TYPES_H */

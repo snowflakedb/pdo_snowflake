@@ -25,7 +25,7 @@ int main() {
     /* query */
     SF_STMT *sfstmt = snowflake_stmt(sf);
     snowflake_query(sfstmt, "select 1;", 0);
-    SF_BIND_OUTPUT c1;
+    SF_BIND_OUTPUT c1 = {0};
     int64 out = 0;
     c1.idx = 1;
     c1.c_type = SF_C_TYPE_INT64;

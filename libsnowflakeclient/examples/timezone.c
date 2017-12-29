@@ -41,7 +41,7 @@ int main() {
         goto cleanup;
     }
 
-    SF_BIND_OUTPUT c2;
+    SF_BIND_OUTPUT c2 = {0};
     char c2buf[1024];
     c2.idx = 2;
     c2.c_type = SF_C_TYPE_STRING;

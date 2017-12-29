@@ -103,7 +103,7 @@ int main() {
     if (status != SF_STATUS_SUCCESS) {
         goto err_stmt;
     }
-    SF_BIND_OUTPUT v1;
+    SF_BIND_OUTPUT v1 = {0};
 
     v1.idx = 1;
     v1.c_type = SF_C_TYPE_INT64;

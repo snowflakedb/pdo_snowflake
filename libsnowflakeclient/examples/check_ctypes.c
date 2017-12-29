@@ -7,29 +7,6 @@
 #include <snowflake_client.h>
 #include <example_setup.h>
 
-const char *c_type_to_string(SF_C_TYPE type) {
-    switch (type) {
-        case SF_C_TYPE_STRING:
-            return "SF_C_TYPE_STRING";
-        case SF_C_TYPE_UINT8:
-            return "SF_C_TYPE_UINT8";
-        case SF_C_TYPE_INT8:
-            return "SF_C_TYPE_INT8";
-        case SF_C_TYPE_UINT64:
-            return "SF_C_TYPE_UINT64";
-        case SF_C_TYPE_INT64:
-            return "SF_C_TYPE_INT64";
-        case SF_C_TYPE_FLOAT64:
-            return "SF_C_TYPE_FLOAT64";
-        case SF_C_TYPE_BOOLEAN:
-            return "SF_C_TYPE_BOOLEAN";
-        case SF_C_TYPE_TIMESTAMP:
-            return "SF_C_TYPE_TIMESTAMP";
-        default:
-            return "unknown";
-    }
-}
-
 int main() {
     /* init */
     SF_STATUS status;
@@ -60,7 +37,8 @@ int main() {
 
     // Check seq4 type
     if (desc[0].c_type != SF_C_TYPE_INT64) {
-        fprintf(stderr, "Error, seq4 column is not type SF_C_TYPE_INT64. Actual type is %s\n", c_type_to_string(desc[0].c_type));
+        fprintf(stderr, "Error, seq4 column is not type SF_C_TYPE_INT64. Actual type is %s\n",
+                snowflake_c_type_to_string(desc[0].c_type));
         status = SF_STATUS_ERROR;
     } else {
         printf("INT64 type check succeeded\n");
@@ -68,7 +46,8 @@ int main() {
 
     // Check randstr type
     if (desc[1].c_type != SF_C_TYPE_STRING) {
-        fprintf(stderr, "Error, randstr column is not type SF_C_TYPE_STRING. Actual type is %s\n", c_type_to_string(desc[1].c_type));
+        fprintf(stderr, "Error, randstr column is not type SF_C_TYPE_STRING. Actual type is %s\n",
+                snowflake_c_type_to_string(desc[1].c_type));
         status = SF_STATUS_ERROR;
     } else {
         printf("STRING type check succeeded\n");
@@ -76,7 +55,8 @@ int main() {
 
     // Check as_double type
     if (desc[2].c_type != SF_C_TYPE_FLOAT64) {
-        fprintf(stderr, "Error, as_double('10.01') column is not type SF_C_TYPE_FLOAT64. Actual type is %s\n", c_type_to_string(desc[2].c_type));
+        fprintf(stderr, "Error, as_double('10.01') column is not type SF_C_TYPE_FLOAT64. Actual type is %s\n",
+                snowflake_c_type_to_string(desc[2].c_type));
         status = SF_STATUS_ERROR;
     } else {
         printf("FLOAT64 type check succeeded\n");

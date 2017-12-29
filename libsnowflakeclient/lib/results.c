@@ -98,6 +98,32 @@ const char *snowflake_type_to_string(SF_TYPE type) {
     }
 }
 
+const char *snowflake_c_type_to_string(SF_C_TYPE type) {
+    switch (type) {
+        case SF_C_TYPE_STRING:
+            return "SF_C_TYPE_STRING";
+        case SF_C_TYPE_UINT8:
+            return "SF_C_TYPE_UINT8";
+        case SF_C_TYPE_INT8:
+            return "SF_C_TYPE_INT8";
+        case SF_C_TYPE_UINT64:
+            return "SF_C_TYPE_UINT64";
+        case SF_C_TYPE_INT64:
+            return "SF_C_TYPE_INT64";
+        case SF_C_TYPE_FLOAT64:
+            return "SF_C_TYPE_FLOAT64";
+        case SF_C_TYPE_BOOLEAN:
+            return "SF_C_TYPE_BOOLEAN";
+        case SF_C_TYPE_TIMESTAMP:
+            return "SF_C_TYPE_TIMESTAMP";
+        case SF_C_TYPE_BINARY:
+            return "SF_C_TYPE_BINARY";
+        default:
+            return "unknown";
+    }
+}
+
+
 SF_C_TYPE snowflake_to_c_type(SF_TYPE type, int64 precision, int64 scale) {
     if (type == SF_TYPE_FIXED) {
         if (scale > 0 || precision >= 19) {
@@ -185,9 +211,9 @@ char *value_to_string(void *value, size_t len, SF_C_TYPE c_type) {
             snprintf(ret, size, "%f", *(float64 *) value);
             return ret;
         case SF_C_TYPE_BOOLEAN:
-            size = *(sf_bool*)value == SF_BOOLEAN_TRUE ? sizeof(SF_BOOLEAN_INT_TRUE_STR) : sizeof(SF_BOOLEAN_INT_FALSE_STR);
+            size = *(sf_bool*)value != (sf_bool)0 ? sizeof(SF_BOOLEAN_INT_TRUE_STR) : sizeof(SF_BOOLEAN_INT_FALSE_STR);
             ret = (char*) SF_CALLOC(1, size + 1);
-            strncpy(ret, *(sf_bool*)value == SF_BOOLEAN_TRUE ? SF_BOOLEAN_INT_TRUE_STR : SF_BOOLEAN_INT_FALSE_STR, size + 1);
+            strncpy(ret, *(sf_bool*)value != (sf_bool)0 ? SF_BOOLEAN_INT_TRUE_STR : SF_BOOLEAN_INT_FALSE_STR, size + 1);
             return ret;
         case SF_C_TYPE_BINARY:
             size = (size_t)len * 2 + 1;
