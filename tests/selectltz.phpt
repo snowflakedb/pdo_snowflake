@@ -8,7 +8,12 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 
     try {
         $tz="America/New_York";
-        date_default_timezone_set($tz);
+
+        // NOTE: you could set the default timezone but will impact other
+        // thread.
+        // date_default_timezone_set($tz);
+        // Instead, set timezone using setTimeZone method for DateTime object.
+
         $dsn .=sprintf(";timezone=%s", $tz);
         $dbh = new PDO($dsn, $user, $password);
         $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
@@ -23,6 +28,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         $v1 = 101;
         $sth->bindParam(1, $v1);
         $v2 = new DateTime("now");
+        $v2->setTimeZone(new DateTimeZone($tz));
         $v2str = $v2->format("Y-m-d H:i:s.u000 P");
         $sth->bindParam(2, $v2str); // must convert to str
         $sth->execute();
