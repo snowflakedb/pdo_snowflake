@@ -194,7 +194,8 @@ static sf_bool _extract_timestamp(
     }
 
     /* replace a dot character with NULL */
-    if (sftype == SF_TYPE_TIMESTAMP_NTZ) {
+    if (sftype == SF_TYPE_TIMESTAMP_NTZ ||
+        sftype == SF_TYPE_TIME) {
         tm_ptr = gmtime_r(&sec, &tm_obj);
     } else if (sftype == SF_TYPE_TIMESTAMP_LTZ ||
                sftype == SF_TYPE_TIMESTAMP_TZ) {
@@ -214,19 +215,22 @@ static sf_bool _extract_timestamp(
         }
         tzset();
         pthread_mutex_unlock(&gmlocaltime_lock);
-    } else {
-        /* TODO: TIMESTAMP_TZ */
-        tm_ptr = NULL;
     }
     if (tm_ptr == NULL) {
         result->len = 0;
         return SF_BOOLEAN_FALSE;
     }
+    const char *fmt0;
+    if (sftype != SF_TYPE_TIME) {
+        fmt0 = "%Y-%m-%d %H:%M:%S";
+    } else {
+        fmt0 = "%H:%M:%S";
+    }
     /* adjust scale */
     char fmt[20];
     sprintf(fmt, ".%%0%lldld", scale);
     result->len = strftime(result->value,
-      result->max_length, "%Y-%m-%d %H:%M:%S", &tm_obj);
+      result->max_length, fmt0, &tm_obj);
     if (scale > 0) {
         result->len += snprintf(
           &((char *) result->value)[result->len],
@@ -995,6 +999,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                               result->value, result->max_length,
                               "%Y-%m-%d", &tm_obj);
                             break;
+                        case SF_TYPE_TIME:
                         case SF_TYPE_TIMESTAMP_NTZ:
                         case SF_TYPE_TIMESTAMP_LTZ:
                         case SF_TYPE_TIMESTAMP_TZ:
