@@ -19,8 +19,8 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
         echo "Connected to Snowflake\n";
 
-        /* INSERT bool */
-        $count = $dbh->exec("create or replace table t (c1 int, c2 timestamp_tz)");
+        $count = $dbh->exec("create or replace table t (
+            c1 int, c2 timestamp_tz)");
         if ($count == 0) {
             print_r($dbh->errorInfo());
         }
