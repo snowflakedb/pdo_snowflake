@@ -17,10 +17,6 @@ int main() {
     SF_STATUS status;
     const char *tz = USER_TZ;
 
-    /* The client application must set the session parameter TIMEZONE
-     * to the local timezone.
-     * You could set the environment variable TZ but won't impact the result.
-     */
     initialize_snowflake_example(SF_BOOLEAN_FALSE);
     SF_CONNECT *sf = setup_snowflake_connection_with_autocommit(
       tz, SF_BOOLEAN_TRUE);
@@ -37,7 +33,7 @@ int main() {
     SF_STMT *sfstmt = snowflake_stmt(sf);
     status = snowflake_query(
       sfstmt,
-      "create or replace table t (c1 int, c2 timestamp_ltz(5))",
+      "create or replace table t (c1 int, c2 timestamp_tz(5))",
       0
     );
     if (status != SF_STATUS_SUCCESS) {
@@ -70,7 +66,8 @@ int main() {
     SF_BIND_INPUT ic2;
     char ic2buf[1024];
 
-    const char *r1 = "2014-05-03 13:56:46.00123 -04:00";
+    /* The session parameter TIMEZONE should not impact the timestamp value. */
+    const char *r1 = "2014-05-03 13:56:46.00123 +09:00";
     strcpy(ic2buf, r1);
     ic2.idx = 2;
     ic2.c_type = SF_C_TYPE_STRING;
@@ -94,7 +91,7 @@ int main() {
     ic1.len = sizeof(ic1buf);
     snowflake_bind_param(sfstmt, &ic1);
 
-    const char *r2 = "1969-11-21 05:17:23.12300 -05:00";
+    const char *r2 = "1969-11-21 05:17:23.12300 -01:00";
     strcpy(ic2buf, r2);
     ic2.idx = 2;
     ic2.c_type = SF_C_TYPE_STRING;

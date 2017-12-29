@@ -23,6 +23,7 @@ SET(EXAMPLES
         selectnull
         selecttsntz
         selecttsltz
+        selecttstz
         check_ctypes)
 
 set(SOURCE_UTILS
