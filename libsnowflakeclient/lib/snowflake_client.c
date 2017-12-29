@@ -147,6 +147,7 @@ static void log_lock_func(void *udata, int lock) {
  * @param nsec pointer of nanoseconds
  * @param tzoffset pointer of Timezone offset.
  * @param src source buffer including a Snowflake internal timestamp
+ * @param timezone Timezone for TIMESTAMP_LTZ
  * @param scale Timestamp data type scale between 0 and 9
  * @return SF_BOOLEAN_TRUE if success otherwise SF_BOOLEAN_FALSE
  */
@@ -158,6 +159,9 @@ static sf_bool _extract_timestamp(
     int64 tzoffset = 0;
     struct tm tm_obj;
     struct tm *tm_ptr = NULL;
+    char tzname[64];
+    char *tzptr = (char*)timezone;
+
     memset(&tm_obj, 0, sizeof(tm_obj));
 
     /* Search for a decimal point */
@@ -180,17 +184,28 @@ static sf_bool _extract_timestamp(
         sec--;
     }
     log_info("sec: %lld, nsec: %lld", sec, nsec);
+
+    if (sftype == SF_TYPE_TIMESTAMP_TZ) {
+        /* make up Timezone name from the tzoffset */
+        ldiv_t dm = ldiv(tzoffset, 60L);
+        sprintf(tzname, "UTC%c%02ld:%02ld",
+                dm.quot > 0 ? '+' : '-', labs(dm.quot), dm.rem);
+        tzptr = tzname;
+    }
+
     /* replace a dot character with NULL */
     if (sftype == SF_TYPE_TIMESTAMP_NTZ) {
         tm_ptr = gmtime_r(&sec, &tm_obj);
-    } else if (sftype == SF_TYPE_TIMESTAMP_LTZ) {
+    } else if (sftype == SF_TYPE_TIMESTAMP_LTZ ||
+               sftype == SF_TYPE_TIMESTAMP_TZ) {
         /* set the environment variable TZ to the session timezone
          * so that localtime_tz honors it.
          */
         pthread_mutex_lock(&gmlocaltime_lock);
         const char *prev_tz_ptr =  getenv("TZ");
-        setenv("TZ", timezone, 1);
+        setenv("TZ", tzptr, 1);
         tzset();
+        sec += tzoffset * 60 * 2; /* adjust for TIMESTAMP_TZ */
         tm_ptr = localtime_r(&sec, &tm_obj);
         if (prev_tz_ptr != NULL) {
             setenv("TZ", prev_tz_ptr, 1); /* cannot set to NULL */
@@ -220,7 +235,6 @@ static sf_bool _extract_timestamp(
     }
     if (sftype == SF_TYPE_TIMESTAMP_LTZ) {
         /* Timezone info */
-        const char* tz = getenv("TZ");
         ldiv_t dm = ldiv(tm_obj.tm_gmtoff, 3600L);
         result->len += snprintf(
           &((char*)result->value)[result->len],
@@ -228,7 +242,13 @@ static sf_bool _extract_timestamp(
           " %c%02ld:%02ld", dm.quot > 0 ? '+' : '-',
           labs(dm.quot), dm.rem/60L);
     } else if (sftype == SF_TYPE_TIMESTAMP_TZ) {
-        /* TODO: TIMESTAMP_TZ */
+        /* Timezone info */
+        ldiv_t dm = ldiv(tzoffset, 60L);
+        result->len += snprintf(
+          &((char*)result->value)[result->len],
+          result->max_length - result->len,
+          " %c%02ld:%02ld",
+          dm.quot > 0 ? '+' : '-', labs(dm.quot), dm.rem);
     }
     return SF_BOOLEAN_TRUE;
 }
@@ -977,6 +997,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                             break;
                         case SF_TYPE_TIMESTAMP_NTZ:
                         case SF_TYPE_TIMESTAMP_LTZ:
+                        case SF_TYPE_TIMESTAMP_TZ:
                             if (!_extract_timestamp(
                               result,
                               sfstmt->desc[i].type,
