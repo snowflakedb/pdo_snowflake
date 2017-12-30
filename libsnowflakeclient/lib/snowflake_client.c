@@ -189,7 +189,7 @@ static sf_bool _extract_timestamp(
         /* make up Timezone name from the tzoffset */
         ldiv_t dm = ldiv(tzoffset, 60L);
         sprintf(tzname, "UTC%c%02ld:%02ld",
-                dm.quot > 0 ? '+' : '-', labs(dm.quot), dm.rem);
+                dm.quot > 0 ? '+' : '-', labs(dm.quot), labs(dm.rem));
         tzptr = tzname;
     }
 
@@ -1300,7 +1300,7 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
             }
             codeJson = cJSON_GetObjectItem(resp, "code");
             if (codeJson) {
-                code = (int64)atoi(codeJson->valuestring);
+                code = (int64)atol(codeJson->valuestring);
             } else {
                 log_debug("no code element.");
             }
