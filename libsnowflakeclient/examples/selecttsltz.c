@@ -4,33 +4,34 @@
 
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <snowflake_client.h>
 #include <example_setup.h>
-#include <string.h>
 
+typedef struct test_case_to_string {
+    const int64 c1in;
+    const char *c2in;
+    const char *c2out;
+    SF_ERROR_CODE error_code;
+} TEST_CASE_TO_STRING;
 
 #define USER_TZ "America/New_York"
 
 int main() {
     /* init */
     SF_STATUS status;
-    const char *tz = USER_TZ;
-
     /* The client application must set the session parameter TIMEZONE
      * to the local timezone.
      * You could set the environment variable TZ but won't impact the result.
      */
     initialize_snowflake_example(SF_BOOLEAN_FALSE);
     SF_CONNECT *sf = setup_snowflake_connection_with_autocommit(
-      tz, SF_BOOLEAN_TRUE);
+      USER_TZ, SF_BOOLEAN_TRUE);
 
     status = snowflake_connect(sf);
     if (status != SF_STATUS_SUCCESS) {
-        SF_ERROR *error = snowflake_error(sf);
-        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
-                error->msg, error->file, error->line);
-        goto cleanup;
+        goto error_conn;
     }
 
     /* Create a statement once and reused */
@@ -41,10 +42,7 @@ int main() {
       0
     );
     if (status != SF_STATUS_SUCCESS) {
-        SF_ERROR *error = snowflake_stmt_error(sfstmt);
-        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
-                error->msg, error->file, error->line);
-        goto cleanup;
+        goto error_stmt;
     }
 
     /* insert data */
@@ -53,71 +51,66 @@ int main() {
       "insert into t(c1,c2) values(?,?)",
       0);
     if (status != SF_STATUS_SUCCESS) {
-        SF_ERROR *error = snowflake_stmt_error(sfstmt);
-        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
-                error->msg, error->file, error->line);
-        goto cleanup;
+        goto error_stmt;
     }
 
-    SF_BIND_INPUT ic1;
-    int64 ic1buf = 101;
-    ic1.idx = 1;
-    ic1.c_type = SF_C_TYPE_INT64;
-    ic1.value = (void *) &ic1buf;
-    ic1.len = sizeof(ic1buf);
-    snowflake_bind_param(sfstmt, &ic1);
+    TEST_CASE_TO_STRING test_cases[] = {
+      {.c1in = 1, .c2in = "2014-05-03 13:56:46.123 -04:00", .c2out = "2014-05-03 13:56:46.12300"},
+      {.c1in = 2, .c2in = "1969-11-21 05:17:23.0123 -05:00", .c2out = "1969-11-21 05:17:23.01230"},
+      {.c1in = 3, .c2in = "1960-01-01 00:00:00.0000", .c2out = "1960-01-01 00:00:00.00000"},
+      // timestamp before 1600 doesn't work properly.
+      {.c1in = 4, .c2in = "1500-01-01 00:00:00.0000", .c2out = "1500-01-01 00:00:00.00000"},
 
-    SF_BIND_INPUT ic2;
-    char ic2buf[1024];
+      {.c1in = 5, .c2in = "0001-01-01 00:00:00.0000", .c2out = "1-01-01 00:00:00.00000"},
+      {.c1in = 6, .c2in = "9999-01-01 00:00:00.0000", .c2out = "9999-01-01 00:00:00.00000"},
+      {.c1in = 7, .c2in = "99999-12-31 23:59:59.9999", .c2out = "", .error_code=100035},
+      {.c1in = 8, .c2in = NULL, .c2out = ""},
+      /*
+      {.c1in = 9, .c2in = "9999-12-31 23:59:59.9999", .c2out = "9999-12-31 23:59:59.99990 -05:00"},
+       */
+    };
 
-    const char *r1 = "2014-05-03 13:56:46.00123 -04:00";
-    strcpy(ic2buf, r1);
-    ic2.idx = 2;
-    ic2.c_type = SF_C_TYPE_STRING;
-    ic2.value = (void *) ic2buf;
-    ic2.len = strlen(ic2buf);
-    snowflake_bind_param(sfstmt, &ic2);
+    size_t i;
+    size_t len;
+    for (i = 0, len = sizeof(test_cases) / sizeof(TEST_CASE_TO_STRING);
+         i < len; i++) {
+        TEST_CASE_TO_STRING v = test_cases[i];
+        SF_BIND_INPUT ic1;
+        ic1.idx = 1;
+        ic1.c_type = SF_C_TYPE_INT64;
+        ic1.value = (void *) &v.c1in;
+        ic1.len = sizeof(v.c1in);
+        status = snowflake_bind_param(sfstmt, &ic1);
+        if (status != SF_STATUS_SUCCESS) {
+            goto error_stmt;
+        }
 
-    status = snowflake_execute(sfstmt);
-    if (status != SF_STATUS_SUCCESS) {
-        SF_ERROR *error = snowflake_stmt_error(sfstmt);
-        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
-                error->msg, error->file, error->line);
-        goto cleanup;
+        SF_BIND_INPUT ic2;
+        ic2.idx = 2;
+        ic2.c_type = SF_C_TYPE_STRING;
+        ic2.value = (void *) v.c2in;
+        ic2.len = v.c2in != NULL ? strlen(v.c2in) : 0;
+        status = snowflake_bind_param(sfstmt, &ic2);
+        if (status != SF_STATUS_SUCCESS) {
+            goto error_stmt;
+        }
+
+        status = snowflake_execute(sfstmt);
+        if (status != SF_STATUS_SUCCESS) {
+            SF_ERROR *error = snowflake_stmt_error(sfstmt);
+            if (v.error_code != error->error_code) {
+                goto error_stmt;
+            }
+            printf("Expected ERROR: %d\n", error->error_code);
+        } else {
+            printf("Inserted one row\n");
+        }
     }
-    printf("Inserted one row\n");
-
-    ic1buf = 102;
-    ic1.idx = 1;
-    ic1.c_type = SF_C_TYPE_INT64;
-    ic1.value = (void *) &ic1buf;
-    ic1.len = sizeof(ic1buf);
-    snowflake_bind_param(sfstmt, &ic1);
-
-    const char *r2 = "1969-11-21 05:17:23.12300 -05:00";
-    strcpy(ic2buf, r2);
-    ic2.idx = 2;
-    ic2.c_type = SF_C_TYPE_STRING;
-    ic2.value = (void *) ic2buf;
-    ic2.len = strlen(ic2buf);
-    snowflake_bind_param(sfstmt, &ic2);
-
-    status = snowflake_execute(sfstmt);
-    if (status != SF_STATUS_SUCCESS) {
-        SF_ERROR *error = snowflake_stmt_error(sfstmt);
-        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
-                error->msg, error->file, error->line);
-        goto cleanup;
-    }
-    printf("Inserted one row\n");
 
     /* query */
     status = snowflake_query(sfstmt, "select * from t", 0);
     if (status != SF_STATUS_SUCCESS) {
-        SF_ERROR *error = snowflake_stmt_error(sfstmt);
-        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
-                error->msg, error->file, error->line);
-        goto cleanup;
+        goto error_stmt;
     }
 
     SF_BIND_OUTPUT c1 = {0};
@@ -127,7 +120,10 @@ int main() {
     c1.value = (void *) c1buf;
     c1.len = sizeof(c1buf);
     c1.max_length = sizeof(c1buf);
-    snowflake_bind_result(sfstmt, &c1);
+    status = snowflake_bind_result(sfstmt, &c1);
+    if (status != SF_STATUS_SUCCESS) {
+        goto error_stmt;
+    }
 
     SF_BIND_OUTPUT c2 = {0};
     char c2buf[1024];
@@ -136,34 +132,49 @@ int main() {
     c2.value = (void *) c2buf;
     c2.len = sizeof(c2buf);
     c2.max_length = sizeof(c2buf);
-    snowflake_bind_result(sfstmt, &c2);
+    status = snowflake_bind_result(sfstmt, &c2);
+    if (status != SF_STATUS_SUCCESS) {
+        goto error_stmt;
+    }
 
     printf("Number of rows: %d\n", (int) snowflake_num_rows(sfstmt));
 
-    int counter = 0;
     while ((status = snowflake_fetch(sfstmt)) == SF_STATUS_SUCCESS) {
-        printf("result: %s, '%s'\n", (char *) c1.value, (char *) c2.value);
-        if (counter == 0) {
-            if (strcmp(r1, c2.value) != 0) {
-                fprintf(stderr, "expected: %s, got: %s\n", r1,
-                        (char *) c2.value);
-            }
-        } else {
-            if (strcmp(r2, c2.value) != 0) {
-                fprintf(stderr, "expected: %s, got: %s\n", r2,
-                        (char *) c2.value);
+        TEST_CASE_TO_STRING v = test_cases[atoll(c1.value) - 1];
+        if (v.error_code == SF_ERROR_NONE) {
+            printf("result: %s, '%s'(%s)\n", (char *) c1.value,
+                   (char *) c2.value,
+                   c2.is_null ? "NULL" : "NOT NULL");
+            if (v.c2out != NULL && strcmp(v.c2out, c2.value) != 0 ||
+                v.c2out == NULL && !c2.is_null) {
+                fprintf(stderr, "ERROR: testcase: %s, expected: %s, got %s\n",
+                        (char *) c1.value, v.c2out, (char *) c2.value);
             }
         }
-        ++counter;
     }
 
     // If we reached end of line, then we were successful
-    if (status == SF_STATUS_EOL) {
-        status = SF_STATUS_SUCCESS;
-    } else if (status == SF_STATUS_ERROR || status == SF_STATUS_WARNING) {
+    if (status == SF_STATUS_ERROR || status == SF_STATUS_WARNING) {
+        goto error_stmt;
+    }
+    status = SF_STATUS_SUCCESS;
+    goto cleanup;
+
+error_stmt:
+    {
         SF_ERROR *error = snowflake_stmt_error(sfstmt);
-        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
+        fprintf(stderr, "Error: %d: %s\nIn File, %s, Line, %d\n",
+                error->error_code,
                 error->msg, error->file, error->line);
+        goto cleanup;
+    }
+error_conn:
+    {
+        SF_ERROR *error = snowflake_error(sf);
+        fprintf(stderr, "Error: %d: %s\nIn File, %s, Line, %d\n",
+                error->error_code,
+                error->msg, error->file, error->line);
+        goto cleanup;
     }
 
 cleanup:

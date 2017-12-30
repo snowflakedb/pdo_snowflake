@@ -7,6 +7,7 @@
 #include <string.h>
 #include <snowflake_client.h>
 #include <example_setup.h>
+#include <stdlib.h>
 
 
 typedef struct test_case_to_string {
@@ -126,13 +127,13 @@ int main() {
     }
     printf("Number of rows: %d\n", (int) snowflake_num_rows(sfstmt));
 
-    size_t cnt = 0;
     while ((status = snowflake_fetch(sfstmt)) == SF_STATUS_SUCCESS) {
-        TEST_CASE_TO_STRING v = test_cases[cnt];
+        TEST_CASE_TO_STRING v = test_cases[atoll(c1.value) - 1];
         printf("result: %s, '%s(%s)'\n",
                (char *) c1.value, (char *) c2.value,
                c2.is_null ? "NULL" : "NOT NULL");
-        if (strcmp(v.c2out, c2.value) != 0 && v.c2_is_null == c2.is_null) {
+        if (v.c2out != NULL && strcmp(v.c2out, c2.value) != 0 &&
+            v.c2_is_null == c2.is_null) {
             fprintf(stderr, "ERROR: testcase: %s,"
                       " expected: %s(%s), got %s(%s)\n",
                     (char *) c1.value, v.c2out,
@@ -140,7 +141,6 @@ int main() {
                     (char *) c2.value,
                     c2.is_null ? "NULL" : "NOT NULL");
         }
-        ++cnt;
     }
 
     // If we reached end of line, then we were successful
@@ -151,6 +151,7 @@ int main() {
     if (status != SF_STATUS_SUCCESS) {
         goto error_stmt;
     }
+    status = SF_STATUS_SUCCESS;
     goto cleanup;
 error_stmt:
     {

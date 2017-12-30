@@ -49,7 +49,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
             echo sprintf("C1: %s, C2: ", $row[0]);
             switch($cnt) {
             case 0:
-                if (substr($row[1], 0, strlen($v2str)) != $v2str) {
+                if (substr($v2str, 0, strlen($row[1])) != $row[1]) {
                     echo sprintf("Incorrect Value. expected: %s, got: %s\n",
                     $v2str, $row[1]);
                 } else {
@@ -57,7 +57,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
                 }
                 break;
             case 1:
-                if (substr($row[1], 0, strlen($v2str2)) != $v2str2) {
+                if (substr($v2str2, 0, strlen($row[1])) !=  $row[1]) {
                     echo sprintf("Incorrect Value. expected: %s, got: %s\n",
                     $v2str2, $row[1]);
                 } else {
