@@ -1,7 +1,5 @@
 /* Copyright (c) 2017 Snowflake Computing Inc. All right reserved.  */
 
-#define PDO_SNOWFLAKE_VERSION "0.1"
-
 #ifdef HAVE_CONFIG_H
 
 #include "config.h"
@@ -25,6 +23,7 @@ ZEND_TSRMLS_CACHE_DEFINE()
 #   endif /* PHP_VERSION_ID */
 
 ZEND_GET_MODULE(pdo_snowflake)
+
 #endif /* COMPILE_DL_PDO_SNOWFLAKE */
 
 /* {{{ PHP_INI_BEGIN
@@ -129,7 +128,7 @@ zend_module_entry pdo_snowflake_module_entry = {
   NULL,
   NULL,
   PHP_MINFO(pdo_snowflake),
-  PHP_PDO_SNOWFLAKE_VERSION,
+  PDO_SNOWFLAKE_VERSION,
   PHP_MODULE_GLOBALS(pdo_snowflake),
   PHP_GINIT(pdo_snowflake),
   NULL,

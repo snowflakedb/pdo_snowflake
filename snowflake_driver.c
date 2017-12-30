@@ -5,6 +5,7 @@
 
 #include "php.h"
 #include "pdo/php_pdo_driver.h"
+#include "php_pdo_snowflake.h"
 #include "php_pdo_snowflake_int.h"
 #include "Zend/zend_exceptions.h"
 
@@ -501,8 +502,14 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     }
 
     // Set context attributes
-    snowflake_set_attr(H->server, SF_CON_APPLICATION_NAME, PHP_PDO_SNOWFLAKE_NAME);
-    snowflake_set_attr(H->server, SF_CON_APPLICATION_VERSION, PHP_PDO_SNOWFLAKE_VERSION);
+    char version[128];
+    strcpy(version, PHP_VERSION);
+    strcat(version, "-");
+    strcat(version, PDO_SNOWFLAKE_VERSION);
+
+    snowflake_set_attr(H->server, SF_CON_APPLICATION_NAME,
+                       PHP_PDO_SNOWFLAKE_NAME);
+    snowflake_set_attr(H->server, SF_CON_APPLICATION_VERSION, version);
     snowflake_set_attr(H->server, SF_CON_USER, dbh->username);
     snowflake_set_attr(H->server, SF_CON_PASSWORD, dbh->password);
     snowflake_set_attr(H->server, SF_CON_HOST, vars[0].optval);

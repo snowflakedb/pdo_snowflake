@@ -509,9 +509,9 @@ static int pdo_snowflake_stmt_param_hook(
                       "value: %s",
                       php_zval_type_names[Z_TYPE_P(parameter)]);
                     if (Z_TYPE_P(parameter) == IS_FALSE) {
-                        v->value = &SF_BOOLEAN_FALSE;
+                        v->value = (void*)&SF_BOOLEAN_FALSE;
                     } else {
-                        v->value = &SF_BOOLEAN_TRUE;
+                        v->value = (void*)&SF_BOOLEAN_TRUE;
                     }
                     v->len = sizeof(sf_bool);
                     v->c_type = SF_C_TYPE_BOOLEAN;
@@ -533,6 +533,7 @@ static int pdo_snowflake_stmt_param_hook(
                     case PDO_PARAM_STR:
                     case PDO_PARAM_BOOL:
                     case PDO_PARAM_NULL:
+                    case PDO_PARAM_LOB:
                         /* nop */
                         break;
                     default:

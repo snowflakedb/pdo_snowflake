@@ -12,11 +12,6 @@
  */
 #define PHP_PDO_SNOWFLAKE_NAME "PDO"
 
-/**
- * PHP PDO Snowflake Driver version
- */
-#define PHP_PDO_SNOWFLAKE_VERSION "0.1"
-
 #if 1
 #define PDO_DBG_ENABLED 1
 
