@@ -41,7 +41,7 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
   LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/curl/lib/libcurl.a"
   LDFLAGS="$LDFLAGS -Wl,--no-whole-archive"
 
-  CFLAGS="-std=c99 $CFLAGS"
+  CFLAGS="-std=c99 -Werror $CFLAGS"
 
   PHP_NEW_EXTENSION(
     pdo_snowflake,
