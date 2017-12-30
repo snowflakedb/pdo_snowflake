@@ -6,50 +6,97 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php
     include __DIR__ . "/common.php";
 
-    try {
-        $dbh = new PDO($dsn, $user, $password);
-        $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
-        echo "Connected to Snowflake\n";
+    $dbh = new PDO($dsn, $user, $password);
+    $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+    echo "Connected to Snowflake\n";
 
-        $count = $dbh->exec("create or replace table t (c1 int, c2 date)");
-        if ($count == 0) {
-            print_r($dbh->errorInfo());
-        }
-        $sth = $dbh->prepare("insert into t values(?,?)");
-        $v1 = 101;
-        $sth->bindParam(1, $v1);
-        $v2 = new DateTime("now");
-        $v2str = $v2->format("Y-m-d");
-        $sth->bindParam(2, $v2str); // must convert to str
-        $sth->execute();
-
-        /* SELECT date */
-        $sth = $dbh->query("select * from t order by 1");
-        $meta = $sth->getColumnMeta(0);
-        print_r($meta);
-        $meta = $sth->getColumnMeta(1);
-        print_r($meta);
-            echo "Results in String\n";
-        while($row = $sth->fetch()) {
-            echo sprintf("C1: %s, C2: (TODAY)\n", $row[0]);
-            if ($row[1] != $v2str) {
-                echo sprintf("Incorrect Value. expected: %s, got: %s\n",
-                $v2str, $row[1]);
-            }
-        }
-        $count = $dbh->exec("drop table if exists t");
-
-    } catch(Exception $e) {
-        print_r($e);
-        echo "dsn is: $dsn\n";
-        echo "user is: $user\n";
+    $count = $dbh->exec(
+        "create or replace table t (c1 int, c2 date)");
+    if ($count == 0) {
+        print_r($dbh->errorInfo());
     }
+    $sth = $dbh->prepare("insert into t values(?,?)");
+
+    $tests = [
+        [
+            "input" => [1, "1989-12-30"],
+            "output" => [1, "1989-12-30"],
+        ],
+        [
+            "input" => [2, "1701-05-21"],
+            "output" => [2, "1701-05-21"],
+        ],
+        [
+            "input" => [3, "0001-01-01"],
+            "output" => [3, "1-01-01"],
+        ],
+        [
+            "input" => [4, "0000-01-01"],
+            "output" => [4, "0-01-01"],
+        ],
+        [
+            "input" => [5, null],
+            "output" => [5, null],
+        ],
+        [
+            "input" => [6, "", 100040], // not recognized date error
+            "output" => [6, ""],
+        ],
+        [
+            "input" => [7, "GGGGGG", 100040], // not recognized date error
+            "output" => [7, ""],
+        ],
+        [
+            "input" => [8, "9999-12-31"],
+            "output" => [8, "9999-12-31"],
+        ],
+    ];
+
+    foreach ($tests as $t) {
+        $v1 = $t["input"][0];
+        $sth->bindParam(1, $v1);
+        $v2 = $t["input"][1];
+        $sth->bindParam(2, $v2);
+        try {
+            $sth->execute();
+        } catch(PDOException $e) {
+            if ($e->errorInfo[1] != $t["input"][2]) {
+                throw $e;
+            }
+            echo sprintf(
+                "Expected ERR: testcase #%d -- %s\n",
+                 $t["input"][0], $e->errorInfo[1]);
+        }
+    }
+
+    /* SELECT */
+    $sth = $dbh->query("select * from t order by 1");
+
+    $meta = $sth->getColumnMeta(0);
+    print_r($meta);
+    $meta = $sth->getColumnMeta(1);
+    print_r($meta);
+
+    echo "Results in String\n";
+    while($row = $sth->fetch()) {
+        $idx = $row[0];
+        echo sprintf("C1: %s, C2: %s\n", $idx, $row[1]);
+        $expected = $tests[$idx-1]["output"];
+        if ($expected[1] != $row[1]) {
+            echo sprintf("ERR: testcase #%d -- expected: %s, got: %s\n",
+                $idx, $expected[1], $row[1]);
+        }
+    }
+    $count = $dbh->exec("drop table if exists t");
+
     $dbh = null;
 ?>
 ===DONE===
 <?php exit(0); ?>
 --EXPECT--
 Connected to Snowflake
+Expected ERR: testcase #6 -- 100040
+Expected ERR: testcase #7 -- 100040
 Array
 (
     [scale] => 0
@@ -77,5 +124,10 @@ Array
     [pdo_type] => 2
 )
 Results in String
-C1: 101, C2: (TODAY)
+C1: 1, C2: 1989-12-30
+C1: 2, C2: 1701-05-21
+C1: 3, C2: 1-01-01
+C1: 4, C2: 0-01-01
+C1: 5, C2: 
+C1: 8, C2: 9999-12-31
 ===DONE===

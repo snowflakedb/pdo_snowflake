@@ -8,24 +8,21 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 
     $counter = 0;
     $prev_col1 = -1;
-    try {
-        $dbh = new PDO($dsn, $user, $password);
-        echo 'Connected to Snowflake' . "\n";
-        $sth = $dbh->query("select seq8(), randstr(1000, random()) from table(generator(rowcount=>20000))");
-        while($row = $sth->fetch()) {
-            if ($row[0] % 10000 == 0) {
-                echo "Result :" . $row["0"] . " " . $row["1"] . "\n";
-            }
-            $counter += $row[0];
-            if ($prev_col1 + 1 != $row[0]) {
-                echo sprintf("ERROR: the id is not sequential. expected: %d, got: %d\n", $prev_col1 + 1, $row[0]);
-                break;
-            }
-            $prev_col1++;
+
+    $dbh = new PDO($dsn, $user, $password);
+    $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+    echo 'Connected to Snowflake' . "\n";
+    $sth = $dbh->query("select seq8(), randstr(1000, random()) from table(generator(rowcount=>20000))");
+    while($row = $sth->fetch()) {
+        if ($row[0] % 10000 == 0) {
+            echo "Result :" . $row["0"] . " " . $row["1"] . "\n";
         }
-    } catch (PDOException $e) {
-        echo 'Connection failed: ' . $e->getMessage();
-        echo "dsn is: $dsn";
+        $counter += $row[0];
+        if ($prev_col1 + 1 != $row[0]) {
+            echo sprintf("ERROR: the id is not sequential. expected: %d, got: %d\n", $prev_col1 + 1, $row[0]);
+            break;
+        }
+        $prev_col1++;
     }
     echo sprintf("Sum: %d\n", $counter);
     $dbh = null;

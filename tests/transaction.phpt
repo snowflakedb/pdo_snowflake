@@ -14,43 +14,38 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     include __DIR__ . "/common.php";
 
     $dbh = new PDO($dsn, $user, $password);
+    $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
     echo "Connected to Snowflake\n";
 
+    $count = $dbh->exec("create or replace table t (c1 int, c2 string)");
+    if ($count == 0) {
+        print_r($dbh->errorInfo());
+    }
+    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $dbh->beginTransaction();
+    $dbh->exec("insert into t (c1, c2) values (23, 'Joe'),(25, 'Mary')");
+    $dbh->commit();
+    $sth = $dbh->query("select * from t order by 1");
+    while($row = $sth->fetch()) {
+        echo $row["C1"] . " " . $row["C2"] . "\n";
+    }
     try {
-        $count = $dbh->exec("create or replace table t (c1 int, c2 string)");
-        if ($count == 0) {
-            print_r($dbh->errorInfo());
-        }
-        $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $dbh->beginTransaction();
-        $dbh->exec("insert into t (c1, c2) values (23, 'Joe'),(25, 'Mary')");
+        $dbh->exec("insert into t (c1, c2) values (27, 'Ken')");
+        echo "Ken is inserted in a transaction\n";
+        $dbh->exec("insert into aa");
         $dbh->commit();
-        $sth = $dbh->query("select * from t order by 1");
-        while($row = $sth->fetch()) {
-            echo $row["C1"] . " " . $row["C2"] . "\n";
-        }
-        try {
-            $dbh->beginTransaction();
-            $dbh->exec("insert into t (c1, c2) values (27, 'Ken')");
-            echo "Ken is inserted in a transaction\n";
-            $dbh->exec("insert into aa");
-            $dbh->commit();
-        } catch (PDOException $e) {
-            echo "Expected: " . $e->getMessage() . "\n";
-            $dbh->rollback();
-        }
-
-        /* should be rollbacked and you should not see Ken */
-        echo "Ken should not show up\n";
-        $sth = $dbh->query("select * from t order by 1");
-        while($row = $sth->fetch()) {
-            echo $row["C1"] . " " . $row["C2"] . "\n";
-        }
     } catch (PDOException $e) {
-        echo 'Connection failed: ' . $e->getMessage() . "\n";
-        echo "dsn is: $dsn";
+        echo "Expected: " . $e->getMessage() . "\n";
+        $dbh->rollback();
     }
 
+    /* should be rollbacked and you should not see Ken */
+    echo "Ken should not show up\n";
+    $sth = $dbh->query("select * from t order by 1");
+    while($row = $sth->fetch()) {
+        echo $row["C1"] . " " . $row["C2"] . "\n";
+    }
 
     // Trying to insert Ken again but will forget commit
     $dbh->beginTransaction();
@@ -64,22 +59,16 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     $dbh = new PDO($dsn, $user, $password);
     echo "Connected to Snowflake\n";
 
-    try {
-        /* should be rollbacked and you should not see Ken */
-        $sth = $dbh->query("select * from t order by 1");
-        while($row = $sth->fetch()) {
-            echo $row["C1"] . " " . $row["C2"] . "\n";
-        }
-
-        $count = $dbh->exec("drop table if exists t");
-        if ($count == 0) {
-            print_r($dbh->errorInfo());
-        }
-    } catch (PDOException $e) {
-        echo 'Connection failed: ' . $e->getMessage() . "\n";
-        echo "dsn is: $dsn";
+    /* should be rollbacked and you should not see Ken */
+    $sth = $dbh->query("select * from t order by 1");
+    while($row = $sth->fetch()) {
+        echo $row["C1"] . " " . $row["C2"] . "\n";
     }
 
+    $count = $dbh->exec("drop table if exists t");
+    if ($count == 0) {
+        print_r($dbh->errorInfo());
+    }
     $dbh = null;
 
     // rollback without beginTransaction

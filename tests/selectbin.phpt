@@ -6,52 +6,80 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php
     include __DIR__ . "/common.php";
 
-    try {
-        $dbh = new PDO($dsn, $user, $password);
-        $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
-        echo "Connected to Snowflake\n";
+    $dbh = new PDO($dsn, $user, $password);
+    $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+    echo "Connected to Snowflake\n";
 
-        $count = $dbh->exec("create or replace table t (c1 int, c2 binary)");
-        if ($count == 0) {
-            print_r($dbh->errorInfo());
-        }
-        $sth = $dbh->prepare("insert into t values(?,?)");
-        $v1 = 101;
+    $count = $dbh->exec(
+        "create or replace table t (c1 int, c2 binary)");
+    if ($count == 0) {
+        print_r($dbh->errorInfo());
+    }
+    $sth = $dbh->prepare("insert into t values(?,?)");
+
+    $tests = [
+        [
+            "input" => [1, pack("nvc*", 0x1234, 0x5678, 65, 66)],
+            "output" => [1, "1234,5678,65,66"]
+        ],
+        [
+            "input" => [2, pack("nvc*", 0xabcd, 0xdef0, 67, 68)],
+            "output" => [2, "abcd,def0,67,68"]
+        ],
+        [
+            "input" => [3, null],
+            "output" => [3, null]
+        ],
+        [
+            "input" => [4, pack("nvc*", 0xabcd, 0x0, 67, 68)],
+            "output" => [4, "abcd,0,67,68"]
+        ],
+        [
+            "input" => [5, pack("nvc*", 0xabcd, 0x0, 67, 0)],
+            "output" => [5, "abcd,0,67,0"]
+        ],
+    ];
+
+    foreach ($tests as $t) {
+        $v1 = $t["input"][0];
         $sth->bindParam(1, $v1);
-        $v2 = pack("nvc*", 0x1234, 0x5678, 65, 66);
+        $v2 = $t["input"][1];
         $sth->bindParam(2, $v2, PDO::PARAM_LOB);
         $sth->execute();
+    }
 
-        $v1 = 102;
-        $sth->bindParam(1, $v1);
-        $v2 = pack("nvc*", 0xabcd, 0xdef0, 67, 68);
-        $sth->bindParam(2, $v2, PDO::PARAM_LOB);
-        $sth->execute();
+    /* SELECT */
+    $sth = $dbh->query("select * from t order by 1");
 
-        /* SELECT binary */
-        $sth = $dbh->query("select * from t order by 1");
-        $meta = $sth->getColumnMeta(0);
-        print_r($meta);
-        $meta = $sth->getColumnMeta(1);
-        print_r($meta);
-            echo "Results in String\n";
-        while($row = $sth->fetch()) {
-            echo sprintf("C1: %s, ", $row[0]);
+    $meta = $sth->getColumnMeta(0);
+    print_r($meta);
+    $meta = $sth->getColumnMeta(1);
+    print_r($meta);
+    echo "Results in String\n";
+
+    while($row = $sth->fetch()) {
+        $idx = $row[0];
+        echo sprintf("C1: %s, C2: ", $idx);
+        if ($row[1] != null) {
             $out = unpack("nval1/vval2/cval3/cval4", hex2bin($row[1]));
-            echo sprintf(
-                "C2: %x,%x,%d,%d\n",
+            $row1 = sprintf(
+                "%x,%x,%d,%d",
                 $out["val1"],
                 $out["val2"],
                 $out["val3"],
                 $out["val4"]);
+            echo $row1 . "\n";
+        } else {
+            $row1 = null;
+            echo "NULL\n";
         }
-        // $count = $dbh->exec("drop table if exists t");
-
-    } catch(Exception $e) {
-        print_r($e);
-        echo "dsn is: $dsn\n";
-        echo "user is: $user\n";
+        $expected = $tests[$idx-1]["output"];
+        if ($expected[1] != $row1) {
+            echo sprintf("ERR: testcase #%d -- expected: %s, got: %s\n",
+                $idx, $expected[1], $row1);
+        }
     }
+    $count = $dbh->exec("drop table if exists t");
     $dbh = null;
 ?>
 ===DONE===
@@ -85,6 +113,9 @@ Array
     [pdo_type] => 2
 )
 Results in String
-C1: 101, C2: 1234,5678,65,66
-C1: 102, C2: abcd,def0,67,68
+C1: 1, C2: 1234,5678,65,66
+C1: 2, C2: abcd,def0,67,68
+C1: 3, C2: NULL
+C1: 4, C2: abcd,0,67,68
+C1: 5, C2: abcd,0,67,0
 ===DONE===
