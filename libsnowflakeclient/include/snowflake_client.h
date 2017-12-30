@@ -134,6 +134,45 @@ typedef enum sf_error_code {
 #define SF_SQLSTATE_CONNECTION_NOT_EXIST "08003"
 #define SF_SQLSTATE_APP_REJECT_CONNECTION "08004"
 
+// For general purpose
+#define SF_SQLSTATE_NO_DATA "02000"
+
+// For CLI specific
+#define SF_SQLSTATE_GENERAL_ERROR "HY000"
+#define SF_SQLSTATE_MEMORY_ALLOCATION_ERROR "HY001"
+#define SF_SQLSTATE_INVALID_DATA_TYPE_IN_APPLICATION_DESCRIPTOR "HY003"
+#define SF_SQLSTATE_INVALID_DATA_TYPE "HY004"
+#define SF_SQLSTATE_ASSOCIATED_STATEMENT_IS_NOT_PREPARED "HY007"
+#define SF_SQLSTATE_OPERATION_CANCELED "HY008"
+#define SF_SQLSTATE_INVALID_USE_OF_NULL_POINTER "HY009"
+#define SF_SQLSTATE_FUNCTION_SEQUENCE_ERROR "HY010"
+#define SF_SQLSTATE_ATTRIBUTE_CANNOT_BE_SET_NOW "HY011"
+#define SF_SQLSTATE_INVALID_TRANSACTION_OPERATION_CODE "HY012"
+#define SF_SQLSTATE_MEMORY_MANAGEMENT_ERROR "HY013"
+#define SF_SQLSTATE_LIMIT_ON_THE_NUMBER_OF_HANDLES_EXCEEDED "HY014"
+#define SF_SQLSTATE_INVALID_USE_OF_AN_AUTOMATICALLY_ALLOCATED_DESCRIPTOR_HANDLE "HY017"
+#define SF_SQLSTATE_SERVER_DECLINED_THE_CANCELLATION_REQUEST "HY018"
+#define SF_SQLSTATE_NON_STRING_DATA_CANNOT_BE_SENT_IN_PIECES "HY019"
+#define SF_SQLSTATE_ATTEMPT_TO_CONCATENATE_A_NULL_VALUE "HY020"
+#define SF_SQLSTATE_INCONSISTENT_DESCRIPTOR_INFORMATION "HY021"
+#define SF_SQLSTATE_INVALID_ATTRIBUTE_VALUE "HY024"
+#define SF_SQLSTATE_NON_STRING_DATA_CANNOT_BE_USED_WITH_STRING_ROUTINE "HY055"
+#define SF_SQLSTATE_INVALID_STRING_LENGTH_OR_BUFFER_LENGTH "HY090"
+#define SF_SQLSTATE_INVALID_DESCRIPTOR_FIELD_IDENTIFIER "HY091"
+#define SF_SQLSTATE_INVALID_ATTRIBUTE_IDENTIFIER "HY092"
+#define SF_SQLSTATE_INVALID_FUNCTIONID_SPECIFIED "HY095"
+#define SF_SQLSTATE_INVALID_INFORMATION_TYPE "HY096"
+#define SF_SQLSTATE_COLUMN_TYPE_OUT_OF_RANGE "HY097"
+#define SF_SQLSTATE_SCOPE_OUT_OF_RANGE "HY098"
+#define SF_SQLSTATE_NULLABLE_TYPE_OUT_OF_RANGE "HY099"
+#define SF_SQLSTATE_INVALID_RETRIEVAL_CODE "HY103"
+#define SF_SQLSTATE_INVALID_LENGTHPRECISION_VALUE "HY104"
+#define SF_SQLSTATE_INVALID_PARAMETER_TYPE "HY105"
+#define SF_SQLSTATE_INVALID_FETCH_ORIENTATION "HY106"
+#define SF_SQLSTATE_ROW_VALUE_OUT_OF_RANGE "HY107"
+#define SF_SQLSTATE_INVALID_CURSOR_POSITION "HY108"
+#define SF_SQLSTATE_OPTIONAL_FEATURE_NOT_IMPLEMENTED "HYC00"
+
 /**
  * Attributes for Snowflake database session context.
  */
@@ -323,7 +362,12 @@ SF_STATUS STDCALL snowflake_global_init(const char *log_path);
  */
 SF_STATUS STDCALL snowflake_global_term();
 
-// TODO set description
+/**
+ * Set a global attribute
+ * @param type
+ * @param value
+ * @return
+ */
 SF_STATUS STDCALL snowflake_global_set_attribute(
         SF_GLOBAL_ATTRIBUTE type, const void *value);
 
@@ -342,8 +386,9 @@ SF_CONNECT *STDCALL snowflake_init();
  * Purge a SNOWFLAKE connection context
  *
  * @param sf SNOWFLAKE context. The data will be freed from memory.
+ * @return 0 if success, otherwise an errno is returned.
  */
-void STDCALL snowflake_term(SF_CONNECT *sf);
+SF_STATUS STDCALL snowflake_term(SF_CONNECT *sf);
 
 /**
  * Creates a new session and connects to Snowflake database.
@@ -361,8 +406,8 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf);
  * @param value pointer to the attribute value
  * @return 0 if success, otherwise an errno is returned.
  */
-SF_STATUS STDCALL snowflake_set_attr(
-        SF_CONNECT *sf, SF_ATTRIBUTE type, const void *value);
+SF_STATUS STDCALL snowflake_set_attribute(
+  SF_CONNECT *sf, SF_ATTRIBUTE type, const void *value);
 
 /**
  * Gets the attribute value from the session.
@@ -372,8 +417,8 @@ SF_STATUS STDCALL snowflake_set_attr(
  * @param value pointer to the attribute value buffer
  * @return 0 if success, otherwise an errno is returned.
  */
-SF_STATUS STDCALL snowflake_get_attr(
-        SF_CONNECT *sf, SF_ATTRIBUTE type, void **value);
+SF_STATUS STDCALL snowflake_get_attribute(
+  SF_CONNECT *sf, SF_ATTRIBUTE type, void **value);
 
 /**
  * Creates sf SNOWFLAKE_STMT context.

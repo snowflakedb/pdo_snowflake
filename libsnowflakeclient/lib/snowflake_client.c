@@ -449,54 +449,67 @@ SF_CONNECT *STDCALL snowflake_init() {
     return sf;
 }
 
-void STDCALL snowflake_term(SF_CONNECT *sf) {
+SF_STATUS STDCALL snowflake_term(SF_CONNECT *sf) {
     // Ensure object is not null
-    if (sf) {
-        cJSON *resp = NULL;
-        char *s_resp = NULL;
-        clear_snowflake_error(&sf->error);
-
-        /* delete the session */
-        URL_KEY_VALUE url_params[] = {
-          {"delete=", "true", NULL, NULL, 0, 0}
-        };
-        if (request(sf, &resp, DELETE_SESSION_URL, url_params, sizeof(url_params)/sizeof(URL_KEY_VALUE), NULL, NULL,
-                    POST_REQUEST_TYPE, &sf->error)) {
-            s_resp = cJSON_Print(resp);
-            log_trace("JSON response:\n%s", s_resp);
-            /* The error doesn't matter here. Everything will be cleaned up
-             * anyway. */
-        }
-        cJSON_Delete(resp);
-        SF_FREE(s_resp);
-
-        pthread_mutex_destroy(&sf->mutex_sequence_counter);
-        pthread_mutex_destroy(&sf->mutex_parameters);
-        SF_FREE(sf->host);
-        SF_FREE(sf->port);
-        SF_FREE(sf->user);
-        SF_FREE(sf->password);
-        SF_FREE(sf->database);
-        SF_FREE(sf->account);
-        SF_FREE(sf->role);
-        SF_FREE(sf->warehouse);
-        SF_FREE(sf->schema);
-        SF_FREE(sf->protocol);
-        SF_FREE(sf->passcode);
-        SF_FREE(sf->authenticator);
-        SF_FREE(sf->application_name);
-        SF_FREE(sf->application_version);
-        SF_FREE(sf->timezone);
-        SF_FREE(sf->master_token);
-        SF_FREE(sf->token);
+    if (!sf) {
+        SET_SNOWFLAKE_ERROR(&sf->error, SF_ERROR_APPLICATION_ERROR,
+        "Connection not exists.", SF_SQLSTATE_CONNECTION_NOT_EXIST);
+        return SF_STATUS_ERROR;
     }
+    cJSON *resp = NULL;
+    char *s_resp = NULL;
+    clear_snowflake_error(&sf->error);
+
+    /* delete the session */
+    URL_KEY_VALUE url_params[] = {
+      {"delete=", "true", NULL, NULL, 0, 0}
+    };
+    if (request(sf, &resp, DELETE_SESSION_URL, url_params, sizeof(url_params)/sizeof(URL_KEY_VALUE), NULL, NULL,
+                POST_REQUEST_TYPE, &sf->error)) {
+        s_resp = cJSON_Print(resp);
+        log_trace("JSON response:\n%s", s_resp);
+        /* Even if the session deletion fails, it will be cleaned after 7 days.
+         * Catching error here won't help
+         */
+    }
+    cJSON_Delete(resp);
+    SF_FREE(s_resp);
+
+    pthread_mutex_destroy(&sf->mutex_sequence_counter);
+    pthread_mutex_destroy(&sf->mutex_parameters);
+    SF_FREE(sf->host);
+    SF_FREE(sf->port);
+    SF_FREE(sf->user);
+    SF_FREE(sf->password);
+    SF_FREE(sf->database);
+    SF_FREE(sf->account);
+    SF_FREE(sf->role);
+    SF_FREE(sf->warehouse);
+    SF_FREE(sf->schema);
+    SF_FREE(sf->protocol);
+    SF_FREE(sf->passcode);
+    SF_FREE(sf->authenticator);
+    SF_FREE(sf->application_name);
+    SF_FREE(sf->application_version);
+    SF_FREE(sf->timezone);
+    SF_FREE(sf->master_token);
+    SF_FREE(sf->token);
     SF_FREE(sf);
+
+    return SF_STATUS_SUCCESS;
 }
 
 SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
     sf_bool success = SF_BOOLEAN_FALSE;
     SF_JSON_ERROR json_error;
     if (!sf) {
+        return SF_STATUS_ERROR;
+    }
+    if (sf->token || sf->master_token) {
+        // safe guard not to override the existing connection
+        SET_SNOWFLAKE_ERROR(
+          &sf->error, SF_ERROR_APPLICATION_ERROR,
+        "Connection already exists.", SF_SQLSTATE_CONNECTION_ALREADY_EXIST);
         return SF_STATUS_ERROR;
     }
     // Reset error context
@@ -610,8 +623,8 @@ cleanup:
     return ret;
 }
 
-SF_STATUS STDCALL snowflake_set_attr(
-        SF_CONNECT *sf, SF_ATTRIBUTE type, const void *value) {
+SF_STATUS STDCALL snowflake_set_attribute(
+  SF_CONNECT *sf, SF_ATTRIBUTE type, const void *value) {
     if (!sf) {
         return SF_STATUS_ERROR;
     }
@@ -684,8 +697,8 @@ SF_STATUS STDCALL snowflake_set_attr(
     return SF_STATUS_SUCCESS;
 }
 
-SF_STATUS STDCALL snowflake_get_attr(
-        SF_CONNECT *sf, SF_ATTRIBUTE type, void **value) {
+SF_STATUS STDCALL snowflake_get_attribute(
+  SF_CONNECT *sf, SF_ATTRIBUTE type, void **value) {
     if (!sf) {
         return SF_STATUS_ERROR;
     }
@@ -1091,8 +1104,12 @@ int64 STDCALL snowflake_affected_rows(SF_STMT *sfstmt) {
     }
     if (cJSON_GetArraySize(sfstmt->raw_results) == 0) {
         /* no affected rows is determined. The potential cause is
-         * the query is not DML. */
-        /* TODO: set error - set_snowflake_error */
+         * the query is not DML or no stmt was executed at all . */
+        SET_SNOWFLAKE_STMT_ERROR(
+          &sfstmt->error,
+          SF_ERROR_APPLICATION_ERROR, "No results found.",
+          SF_SQLSTATE_NO_DATA, sfstmt->sfqid);
+        sfstmt->error.error_code = SF_ERROR_APPLICATION_ERROR;
         return ret;
     }
 

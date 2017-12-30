@@ -89,7 +89,6 @@ static int pdo_snowflake_stmt_dtor(pdo_stmt_t *stmt) /* {{{ */
         /* free the array of results */
         efree(S->bound_result);
     }
-
     snowflake_stmt_term(S->stmt);
     efree(S);
     stmt->driver_data = NULL;
@@ -390,20 +389,20 @@ pdo_snowflake_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr, size_t *len,
  *              release any resources associated with that parameter now.
  *         PDO_PARAM_EXEC_PRE
  *              Called once for each parameter immediately before calling
- *              SKEL_stmt_execute; take this opportunity to make any final
+ *              stmt_execute; take this opportunity to make any final
  *              adjustments ready for execution. In particular, you should
  *              note that variables bound via PDOStatement::bindParam() are
  *              only legal to touch now, and not any sooner.
  *         PDO_PARAM_EXEC_POST
  *              Called once for each parameter immediately after calling
- *              SKEL_stmt_execute; take this opportunity to make any
+ *              stmt_execute; take this opportunity to make any
  *              post-execution actions that might be required by your driver.
  *         PDO_PARAM_FETCH_PRE
  *              Called once for each parameter immediately prior to calling
- *              SKEL_stmt_fetch.
+ *              stmt_fetch.
  *         PDO_PARAM_FETCH_POST
  *              Called once for each parameter immediately after calling
- *              SKEL_stmt_fetch.
+ *              stmt_fetch.
  * @return 1 if success or 0 if error occurs
  */
 static int pdo_snowflake_stmt_param_hook(
@@ -509,9 +508,9 @@ static int pdo_snowflake_stmt_param_hook(
                       "value: %s",
                       php_zval_type_names[Z_TYPE_P(parameter)]);
                     if (Z_TYPE_P(parameter) == IS_FALSE) {
-                        v->value = (void*)&SF_BOOLEAN_FALSE;
+                        v->value = (void *) &SF_BOOLEAN_FALSE;
                     } else {
-                        v->value = (void*)&SF_BOOLEAN_TRUE;
+                        v->value = (void *) &SF_BOOLEAN_TRUE;
                     }
                     v->len = sizeof(sf_bool);
                     v->c_type = SF_C_TYPE_BOOLEAN;
@@ -574,7 +573,7 @@ static int pdo_snowflake_stmt_col_meta(
     PDO_DBG_ENTER("pdo_snowflake_stmt_col_meta");
     PDO_DBG_INF("colno: %lld", colno);
     if (!stmt) {
-        PDO_DBG_RETURN(1);
+        PDO_DBG_RETURN(0);
     }
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     SF_COLUMN_DESC *F;
@@ -583,7 +582,7 @@ static int pdo_snowflake_stmt_col_meta(
     if (colno >= stmt->column_count) {
         /* error invalid column */
         PDO_DBG_ERR("invalid column index: %d", colno);
-        PDO_DBG_RETURN(FAILURE);
+        PDO_DBG_RETURN(0);
     }
 
     array_init(return_value);
@@ -602,7 +601,7 @@ static int pdo_snowflake_stmt_col_meta(
                      (char *) snowflake_type_to_string(F[colno].type));
     add_assoc_zval(return_value, "flags", &flags);
 
-    PDO_DBG_RETURN(0);
+    PDO_DBG_RETURN(1);
 }
 /* }}} */
 
@@ -618,6 +617,7 @@ static int pdo_snowflake_stmt_col_meta(
 static int pdo_snowflake_stmt_next_rowset(pdo_stmt_t *stmt) /* {{{ */
 {
     PDO_DBG_ENTER("pdo_snowflake_stmt_next_rowset");
+    /* NOP. no multiple statement is supported at the momemnt. */
     PDO_DBG_RETURN(1);
 }
 /* }}} */
@@ -634,6 +634,9 @@ static int pdo_snowflake_stmt_next_rowset(pdo_stmt_t *stmt) /* {{{ */
 static int pdo_snowflake_stmt_cursor_closer(pdo_stmt_t *stmt) /* {{{ */
 {
     PDO_DBG_ENTER("pdo_snowflake_stmt_cursor_closer");
+    /* NOP. unlike other database, Snowflake doesn't need to fetch
+     * all data to close the statement.
+     * */
     PDO_DBG_RETURN(1);
 }
 
