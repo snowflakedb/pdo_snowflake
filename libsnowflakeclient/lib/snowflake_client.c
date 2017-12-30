@@ -179,7 +179,7 @@ static sf_bool _extract_timestamp(
         nsec = strtoll(ptr + 1, NULL, 10);
         tzoffset = strtoll(sptr + 1, NULL, 10) - TIMEZONE_OFFSET_RANGE;
     }
-    if (sec < 0) {
+    if (sec < 0 && nsec > 0) {
         nsec = pow10_int64[scale] - nsec;
         sec--;
     }
@@ -237,22 +237,14 @@ static sf_bool _extract_timestamp(
           result->max_length - result->len, fmt,
           nsec);
     }
-    if (sftype == SF_TYPE_TIMESTAMP_LTZ) {
-        /* Timezone info */
-        ldiv_t dm = ldiv(tm_obj.tm_gmtoff, 3600L);
-        result->len += snprintf(
-          &((char*)result->value)[result->len],
-          result->max_length - result->len,
-          " %c%02ld:%02ld", dm.quot > 0 ? '+' : '-',
-          labs(dm.quot), dm.rem/60L);
-    } else if (sftype == SF_TYPE_TIMESTAMP_TZ) {
+    if (sftype == SF_TYPE_TIMESTAMP_TZ) {
         /* Timezone info */
         ldiv_t dm = ldiv(tzoffset, 60L);
         result->len += snprintf(
           &((char*)result->value)[result->len],
           result->max_length - result->len,
           " %c%02ld:%02ld",
-          dm.quot > 0 ? '+' : '-', labs(dm.quot), dm.rem);
+          dm.quot > 0 ? '+' : '-', labs(dm.quot), labs(dm.rem));
     }
     return SF_BOOLEAN_TRUE;
 }
