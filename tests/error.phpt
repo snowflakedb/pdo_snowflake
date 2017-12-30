@@ -6,17 +6,12 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php
     include __DIR__ . "/common.php";
 
-    try {
-        $dbh = new PDO($dsn, $user, $password);
-        echo 'Connected to Snowflake' . "\n";
-        $sth = $dbh->query("select 1 frooom dual");
-        $earr = $dbh->errorInfo();
-        echo "sqlstate: " . $earr[0] . "\n";
-        echo "Snowflake Error: " . $earr[1] . "\n";
-    } catch (PDOException $e) {
-        echo 'Connection failed: ' . $e->getMessage();
-        echo "dsn is: $dsn";
-    }
+    $dbh = new PDO($dsn, $user, $password);
+    echo 'Connected to Snowflake' . "\n";
+    $sth = $dbh->query("select 1 frooom dual");
+    $earr = $dbh->errorInfo();
+    echo "sqlstate: " . $earr[0] . "\n";
+    echo "Snowflake Error: " . $earr[1] . "\n";
 
     $dbh = null; // Ensure closing db.
 
@@ -64,7 +59,7 @@ Snowflake Error: 1003
 Connected to Snowflake
 
 Warning: PDO::query(): SQLSTATE[42000]: Syntax error or access violation: 1003 SQL compilation error:
-syntax error line 1 at position 16 unexpected 'dual'. in %s on line 23
+syntax error line 1 at position 16 unexpected 'dual'. in %s on line 18
 Connected to Snowflake
 sqlstate: 42000
 Snowflake Error: 1003

@@ -6,14 +6,9 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php
     include __DIR__ . "/common.php";
 
-    try {
-        $dbh = new PDO($dsn, $user, $password);
-        echo 'Connected to Snowflake' . "\n";
-    } catch (PDOException $e) {
-        echo 'Connection failed: ' . $e->getMessage();
-        echo "dsn is: $dsn\n";
-        echo "user is: $user\n";
-    }
+    $dbh = new PDO($dsn, $user, $password);
+    $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+    echo 'Connected to Snowflake' . "\n";
 ?>
 ===DONE===
 <?php exit(0); ?>
