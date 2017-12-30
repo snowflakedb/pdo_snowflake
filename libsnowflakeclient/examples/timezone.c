@@ -15,7 +15,7 @@ int main() {
     SF_STATUS status;
     initialize_snowflake_example(SF_BOOLEAN_FALSE);
     SF_CONNECT *sf = setup_snowflake_connection();
-    snowflake_set_attr(sf, SF_CON_TIMEZONE, local_timezone);
+    snowflake_set_attribute(sf, SF_CON_TIMEZONE, local_timezone);
 
     status = snowflake_connect(sf);
     if (status != SF_STATUS_SUCCESS) {

@@ -27,35 +27,40 @@ int main() {
     status = snowflake_execute(sfstmt);
     if (status != SF_STATUS_SUCCESS) {
         SF_ERROR *error = snowflake_stmt_error(sfstmt);
-        printf("OK, running query to snowflake failed. Error message: %s. In File, %s, Line, %d\n", error->msg, error->file, error->line);
+        printf(
+          "OK, running query to snowflake failed. Error message: %s. In File, %s, Line, %d\n",
+          error->msg, error->file, error->line);
     } else {
         fprintf(stderr, "Running query succeeded...exiting");
         goto cleanup;
     }
 
     // Connect with minimum parameters and retry running query
-    snowflake_set_attr(sf, SF_CON_ACCOUNT, getenv("SNOWFLAKE_TEST_ACCOUNT"));
-    snowflake_set_attr(sf, SF_CON_USER, getenv("SNOWFLAKE_TEST_USER"));
-    snowflake_set_attr(sf, SF_CON_PASSWORD, getenv("SNOWFLAKE_TEST_PASSWORD"));
+    snowflake_set_attribute(sf, SF_CON_ACCOUNT,
+                            getenv("SNOWFLAKE_TEST_ACCOUNT"));
+    snowflake_set_attribute(sf, SF_CON_USER, getenv("SNOWFLAKE_TEST_USER"));
+    snowflake_set_attribute(sf, SF_CON_PASSWORD,
+                            getenv("SNOWFLAKE_TEST_PASSWORD"));
     char *host, *port, *protocol;
     host = getenv("SNOWFLAKE_TEST_HOST");
     if (host) {
-        snowflake_set_attr(sf, SF_CON_HOST, host);
+        snowflake_set_attribute(sf, SF_CON_HOST, host);
     }
     port = getenv("SNOWFLAKE_TEST_PORT");
     if (port) {
-        snowflake_set_attr(sf, SF_CON_PORT, port);
+        snowflake_set_attribute(sf, SF_CON_PORT, port);
     }
     protocol = getenv("SNOWFLAKE_TEST_PROTOCOL");
     if (protocol) {
-        snowflake_set_attr(sf, SF_CON_PROTOCOL, protocol);
+        snowflake_set_attribute(sf, SF_CON_PROTOCOL, protocol);
     }
     status = snowflake_connect(sf);
     if (status != SF_STATUS_SUCCESS) {
         SF_ERROR *error = snowflake_error(sf);
         fprintf(stderr, "Failed connecting with minimum parameters set.\n");
-        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
-        
+        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
+                error->msg, error->file, error->line);
+
     } else {
         printf("OK, connected with just account, user, password\n");
     }
@@ -64,8 +69,10 @@ int main() {
     status = snowflake_execute(sfstmt);
     if (status != SF_STATUS_SUCCESS) {
         SF_ERROR *error = snowflake_stmt_error(sfstmt);
-        fprintf(stderr, "Failed running query with connect snowflake object.\n");
-        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
+        fprintf(stderr,
+                "Failed running query with connect snowflake object.\n");
+        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
+                error->msg, error->file, error->line);
     } else {
         printf("OK, query executed successfully\n");
     }
@@ -74,7 +81,8 @@ int main() {
     while ((status = snowflake_fetch(sfstmt)) != SF_STATUS_EOL) {
         if (status == SF_STATUS_ERROR || status == SF_STATUS_WARNING) {
             SF_ERROR *error = snowflake_stmt_error(sfstmt);
-            fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
+            fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
+                    error->msg, error->file, error->line);
             break;
         }
         printf("result: %d\n", *((int *) c1.value));

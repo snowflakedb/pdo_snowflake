@@ -47,8 +47,8 @@ cleanup1:
 
     /* Case 2: failed with incorrect password */
     sf = setup_snowflake_connection();
-    snowflake_set_attr(sf, SF_CON_USER, "HIHIHI");
-    snowflake_set_attr(sf, SF_CON_PASSWORD, "HAHAHA");
+    snowflake_set_attribute(sf, SF_CON_USER, "HIHIHI");
+    snowflake_set_attribute(sf, SF_CON_PASSWORD, "HAHAHA");
     status = snowflake_connect(sf);
     if (status == SF_STATUS_SUCCESS) {
         fprintf(stderr, "FAIL. Must fail with incorrect passowrd error.\n");

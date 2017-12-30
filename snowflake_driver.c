@@ -44,18 +44,18 @@ int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
 
     /* Set SQLSTATE */
     strcpy(*pdo_err, einfo->sqlstate);
-    PDO_DBG_INF("sqlstate: %s", pdo_err);
-    PDO_DBG_INF("msg: %s", einfo->msg);
+    PDO_DBG_INF("sqlstate: %s, msg: %s", pdo_err, einfo->msg);
 
     if (!dbh->methods) {
         PDO_DBG_INF("Failed to allocate DBH");
+        // If the error occurs when intializing dbh, always raise an exception
         zend_throw_exception_ex(
           php_pdo_get_exception(),
           einfo->error_code,
           "SQLSTATE[%s] [%d] %s",
           *pdo_err, einfo->error_code, einfo->msg);
     }
-    PDO_DBG_RETURN(einfo->error_code);
+    PDO_DBG_RETURN(1);
 }
 
 /* }}} */
@@ -89,7 +89,9 @@ static int pdo_snowflake_fetch_error_func(
         einfo = &H->server->error;
     }
     if (einfo->error_code) {
+        // errorInfo[1]
         add_next_index_long(info, einfo->error_code);
+        // errorInfo[2]
         add_next_index_string(info, einfo->msg);
     }
     PDO_DBG_RETURN(1);
@@ -164,8 +166,6 @@ snowflake_handle_preparer(pdo_dbh_t *dbh, const char *sql, size_t sql_len,
     /* allocate PDO stmt */
     pdo_snowflake_stmt *S = ecalloc(1, sizeof(pdo_snowflake_stmt));
 
-    // TODO Add debugging info stuff
-
     S->H = H;
     stmt->driver_data = S;
     stmt->methods = &snowflake_stmt_methods;
@@ -195,7 +195,7 @@ snowflake_handle_preparer(pdo_dbh_t *dbh, const char *sql, size_t sql_len,
  * @param dbh Pointer to the database handle initialized by the handle factory
  * @param sql Pointer to a character string containing the SQL statement to be prepared.
  * @param sql_len The length of the SQL statement.
- * @return 1 if success or 0 if error occurs
+ * @return the number of affected rows or -1 if an error occurs
  */
 static zend_long
 snowflake_handle_doer(pdo_dbh_t *dbh, const char *sql, size_t sql_len) /* {{{ */
@@ -507,28 +507,28 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     strcat(version, "-");
     strcat(version, PDO_SNOWFLAKE_VERSION);
 
-    snowflake_set_attr(H->server, SF_CON_APPLICATION_NAME,
-                       PHP_PDO_SNOWFLAKE_NAME);
-    snowflake_set_attr(H->server, SF_CON_APPLICATION_VERSION, version);
-    snowflake_set_attr(H->server, SF_CON_USER, dbh->username);
-    snowflake_set_attr(H->server, SF_CON_PASSWORD, dbh->password);
-    snowflake_set_attr(H->server, SF_CON_HOST, vars[0].optval);
-    snowflake_set_attr(H->server, SF_CON_PORT, vars[1].optval);
-    snowflake_set_attr(H->server, SF_CON_ACCOUNT, vars[2].optval);
-    snowflake_set_attr(H->server, SF_CON_DATABASE, vars[3].optval);
-    snowflake_set_attr(H->server, SF_CON_SCHEMA, vars[4].optval);
-    snowflake_set_attr(H->server, SF_CON_WAREHOUSE, vars[5].optval);
-    snowflake_set_attr(H->server, SF_CON_ROLE, vars[6].optval);
-    snowflake_set_attr(H->server, SF_CON_PROTOCOL, vars[7].optval);
-    snowflake_set_attr(H->server, SF_CON_INSECURE_MODE, vars[8].optval);
+    snowflake_set_attribute(H->server, SF_CON_APPLICATION_NAME,
+                            PHP_PDO_SNOWFLAKE_NAME);
+    snowflake_set_attribute(H->server, SF_CON_APPLICATION_VERSION, version);
+    snowflake_set_attribute(H->server, SF_CON_USER, dbh->username);
+    snowflake_set_attribute(H->server, SF_CON_PASSWORD, dbh->password);
+    snowflake_set_attribute(H->server, SF_CON_HOST, vars[0].optval);
+    snowflake_set_attribute(H->server, SF_CON_PORT, vars[1].optval);
+    snowflake_set_attribute(H->server, SF_CON_ACCOUNT, vars[2].optval);
+    snowflake_set_attribute(H->server, SF_CON_DATABASE, vars[3].optval);
+    snowflake_set_attribute(H->server, SF_CON_SCHEMA, vars[4].optval);
+    snowflake_set_attribute(H->server, SF_CON_WAREHOUSE, vars[5].optval);
+    snowflake_set_attribute(H->server, SF_CON_ROLE, vars[6].optval);
+    snowflake_set_attribute(H->server, SF_CON_PROTOCOL, vars[7].optval);
+    snowflake_set_attribute(H->server, SF_CON_INSECURE_MODE, vars[8].optval);
     PDO_DBG_INF("autocomit: %u", dbh->auto_commit);
-    snowflake_set_attr(
+    snowflake_set_attribute(
       H->server, SF_CON_AUTOCOMMIT,
       dbh->auto_commit ? &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
 
     if (strcmp(vars[9].optval, "") != 0) {
         /* timezone */
-        snowflake_set_attr(H->server, SF_CON_TIMEZONE, vars[9].optval);
+        snowflake_set_attribute(H->server, SF_CON_TIMEZONE, vars[9].optval);
     }
 
     if (snowflake_connect(H->server) == SF_STATUS_ERROR) {

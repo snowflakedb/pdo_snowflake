@@ -35,21 +35,23 @@ int main()
     }
 
     // Connect to Snowflake with minimum parameters
-    snowflake_set_attr(sf, SF_CON_ACCOUNT, getenv("SNOWFLAKE_TEST_ACCOUNT"));
-    snowflake_set_attr(sf, SF_CON_USER, getenv("SNOWFLAKE_TEST_USER"));
-    snowflake_set_attr(sf, SF_CON_PASSWORD, getenv("SNOWFLAKE_TEST_PASSWORD"));
+    snowflake_set_attribute(sf, SF_CON_ACCOUNT,
+                            getenv("SNOWFLAKE_TEST_ACCOUNT"));
+    snowflake_set_attribute(sf, SF_CON_USER, getenv("SNOWFLAKE_TEST_USER"));
+    snowflake_set_attribute(sf, SF_CON_PASSWORD,
+                            getenv("SNOWFLAKE_TEST_PASSWORD"));
     char *host, *port, *protocol;
     host = getenv("SNOWFLAKE_TEST_HOST");
     if (host) {
-        snowflake_set_attr(sf, SF_CON_HOST, host);
+        snowflake_set_attribute(sf, SF_CON_HOST, host);
     }
     port = getenv("SNOWFLAKE_TEST_PORT");
     if (port) {
-        snowflake_set_attr(sf, SF_CON_PORT, port);
+        snowflake_set_attribute(sf, SF_CON_PORT, port);
     }
     protocol = getenv("SNOWFLAKE_TEST_PROTOCOL");
     if (protocol) {
-        snowflake_set_attr(sf, SF_CON_PROTOCOL, protocol);
+        snowflake_set_attribute(sf, SF_CON_PROTOCOL, protocol);
     }
 
     status = snowflake_connect(sf);
