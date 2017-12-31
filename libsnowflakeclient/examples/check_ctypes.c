@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <snowflake_client.h>
+#include <snowflake/client.h>
 #include <example_setup.h>
 
 int main() {

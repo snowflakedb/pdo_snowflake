@@ -5,8 +5,8 @@
 #include <string.h>
 #include "results.h"
 #include "connection.h"
-#include "snowflake_memory.h"
-#include <snowflake_logger.h>
+#include "memory.h"
+#include <snowflake/logger.h>
 
 static size_t _bin2hex(
   char *dst, const char *src, size_t dst_max_len, size_t src_len) {

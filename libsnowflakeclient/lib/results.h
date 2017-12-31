@@ -15,7 +15,7 @@ extern "C" {
 #define STDCALL __stdcall
 #endif
 
-#include <snowflake_client.h>
+#include <snowflake/client.h>
 #include "cJSON.h"
 
 SF_TYPE string_to_snowflake_type(const char *string);

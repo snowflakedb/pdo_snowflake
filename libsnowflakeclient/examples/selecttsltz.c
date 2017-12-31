@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <snowflake_client.h>
+#include <snowflake/client.h>
 #include <example_setup.h>
 
 typedef struct test_case_to_string {

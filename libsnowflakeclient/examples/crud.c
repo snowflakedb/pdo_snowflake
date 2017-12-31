@@ -3,7 +3,7 @@
  */
 
 #include <stdio.h>
-#include <snowflake_client.h>
+#include <snowflake/client.h>
 #include <example_setup.h>
 #include <memory.h>
 

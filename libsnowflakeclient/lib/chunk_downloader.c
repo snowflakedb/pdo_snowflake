@@ -3,13 +3,12 @@
  */
 
 #include "chunk_downloader.h"
-#include "snowflake_memory.h"
+#include "memory.h"
 #include "connection.h"
 #include "error.h"
-#include "snowflake_client_int.h"
+#include "client_int.h"
 #include <errno.h>
 #include <string.h>
-#include <unistd.h>
 
 static void *chunk_downloader_thread(void *downloader);
 

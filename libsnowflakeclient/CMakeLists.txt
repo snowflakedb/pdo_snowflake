@@ -12,18 +12,18 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -pg -pthread -fPIC -Werror")
 
 set(SOURCE_FILES
         include
-        lib/snowflake_client.c
+        lib/client.c
         lib/constants.h
         lib/cJSON.c
-        lib/snowflake_logger.c
+        lib/logger.c
         lib/arraylist.c
-        lib/snowflake_memory.c
+        lib/memory.c
         lib/connection.c
         lib/results.c
         lib/uuid4.c
-        lib/snowflake_basic_types.c
+        lib/basic_types.c
         lib/error.c
-        lib/snowflake_client_int.h
+        lib/client_int.h
         lib/chunk_downloader.c)
 
 find_library(CURL_LIB libcurl.a PATHS deps-build/linux/curl/lib/ REQUIRED)

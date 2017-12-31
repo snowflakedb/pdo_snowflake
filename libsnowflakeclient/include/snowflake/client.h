@@ -16,8 +16,8 @@ extern "C" {
 #endif
 
 #include <pthread.h>
-#include "snowflake_basic_types.h"
-#include "snowflake_client_version.h"
+#include "snowflake/basic_types.h"
+#include "version.h"
 
 /**
  * API Name

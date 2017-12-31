@@ -15,7 +15,7 @@ extern "C" {
 #define STDCALL __stdcall
 #endif
 
-#include <snowflake_client.h>
+#include <snowflake/client.h>
 
 #define SET_SNOWFLAKE_ERROR(e, ec, m, sqlstate) set_snowflake_error(e, ec, m, sqlstate, "", __FILE__, __LINE__)
 #define SET_SNOWFLAKE_STMT_ERROR(e, ec, m, sqlstate, uuid) set_snowflake_error(e, ec, m, sqlstate, uuid, __FILE__, __LINE__)

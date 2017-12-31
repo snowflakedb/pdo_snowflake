@@ -2,8 +2,8 @@
  * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
  */
 
-#include "snowflake_memory.h"
-#include <snowflake_logger.h>
+#include "memory.h"
+#include <snowflake/logger.h>
 #include <pthread.h>
 
 // Basic hashing function. Works well for memory addresses

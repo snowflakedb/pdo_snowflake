@@ -3,8 +3,8 @@
 #ifndef PHP_PDO_SNOWFLAKE_INT_H
 #define PHP_PDO_SNOWFLAKE_INT_H
 
-#include <snowflake_client.h>
-#include <snowflake_logger.h>
+#include <snowflake/client.h>
+#include <snowflake/logger.h>
 #include "snowflake_arraylist.h"
 
 /**
