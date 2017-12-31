@@ -3,7 +3,7 @@
  */
 
 #include "arraylist.h"
-#include "snowflake_memory.h"
+#include "memory.h"
 
 ARRAY_LIST *sf_array_list_init() {
     ARRAY_LIST *al = (ARRAY_LIST *) calloc(1, sizeof(ARRAY_LIST));

@@ -4,10 +4,10 @@
 
 
 #include <stdio.h>
-#include <snowflake_client.h>
-#include <example_setup.h>
 #include <string.h>
 #include <stdlib.h>
+#include <snowflake/client.h>
+#include <example_setup.h>
 
 typedef struct test_case_to_string {
     const int64 c1in;

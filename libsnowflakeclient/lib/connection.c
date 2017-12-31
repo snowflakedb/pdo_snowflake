@@ -5,9 +5,9 @@
 #include <string.h>
 #include <sys/utsname.h>
 #include "connection.h"
-#include <snowflake_logger.h>
-#include "snowflake_memory.h"
-#include "snowflake_client_int.h"
+#include <snowflake/logger.h>
+#include "memory.h"
+#include "client_int.h"
 #include "constants.h"
 #include "error.h"
 

@@ -11,7 +11,7 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
 
   dnl # --with-pdo_snowflake -> check with-path
   SEARCH_PATH="libsnowflakeclient"
-  SEARCH_FOR="include/snowflake_client.h"
+  SEARCH_FOR="include/snowflake/client.h"
   if test -r $PHP_PDO_SNOWFLAKE/$SEARCH_FOR; then # path given as parameter
     SNOWFLAKE_CLIENT_DIR=$PHP_PDO_SNOWFLAKE
   else # search default path list

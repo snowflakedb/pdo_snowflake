@@ -15,7 +15,7 @@ extern "C" {
 #define STDCALL __stdcall
 #endif
 
-#include <snowflake_client.h>
+#include <snowflake/client.h>
 
 void initialize_snowflake_example(sf_bool debug);
 SF_CONNECT *setup_snowflake_connection();

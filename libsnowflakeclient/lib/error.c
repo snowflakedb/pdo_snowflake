@@ -3,9 +3,9 @@
  */
 
 #include <string.h>
-#include <snowflake_logger.h>
+#include <snowflake/logger.h>
 #include "error.h"
-#include "snowflake_memory.h"
+#include "memory.h"
 
 #include <pthread.h>
 

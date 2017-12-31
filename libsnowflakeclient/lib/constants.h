@@ -15,7 +15,7 @@ extern "C" {
 #define STDCALL __stdcall
 #endif
 
-#include <snowflake_basic_types.h>
+#include <snowflake/basic_types.h>
 
 extern sf_bool DISABLE_VERIFY_PEER;
 extern char *CA_BUNDLE_FILE;

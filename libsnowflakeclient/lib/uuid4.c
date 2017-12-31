@@ -13,7 +13,7 @@
 #include <wincrypt.h>
 #endif
 
-#include "snowflake_client_int.h"
+#include "client_int.h"
 enum {
     UUID4_ESUCCESS =  0,
     UUID4_EFAILURE = -1

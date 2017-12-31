@@ -10,12 +10,12 @@
 #include <errno.h>
 #include <pthread.h>
 #include <openssl/crypto.h>
-#include <snowflake_client.h>
-#include <snowflake_logger.h>
+#include <snowflake/client.h>
+#include <snowflake/logger.h>
 #include "constants.h"
-#include "snowflake_client_int.h"
+#include "client_int.h"
 #include "connection.h"
-#include "snowflake_memory.h"
+#include "memory.h"
 #include "results.h"
 #include "error.h"
 #include "chunk_downloader.h"
