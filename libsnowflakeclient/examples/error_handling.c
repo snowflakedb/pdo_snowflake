@@ -51,7 +51,7 @@ cleanup1:
     snowflake_set_attribute(sf, SF_CON_PASSWORD, "HAHAHA");
     status = snowflake_connect(sf);
     if (status == SF_STATUS_SUCCESS) {
-        fprintf(stderr, "FAIL. Must fail with incorrect passowrd error.\n");
+        fprintf(stderr, "FAIL. Must fail with incorrect passoword error.\n");
         goto cleanup2;
     }
 
@@ -61,6 +61,7 @@ cleanup1:
       "OK. Error code: %d, sqlstate: %s, message: %s\nIn File, %s, Line, %d\n",
       error->error_code, error->sqlstate, error->msg, error->file,
       error->line);
+    status = SF_STATUS_SUCCESS;
 
 cleanup2:
     /* delete statement */
