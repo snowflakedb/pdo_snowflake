@@ -257,7 +257,8 @@ static sf_bool _extract_timestamp(
  * @param sf SF_CONNECT object
  * @param parameters the returned parameters
  */
-static void _reset_connection_parameters(SF_CONNECT *sf, cJSON *parameters) {
+static SF_STATUS STDCALL _reset_connection_parameters(
+  SF_CONNECT *sf, cJSON *parameters, cJSON *session_info, sf_bool do_validate) {
     if (parameters != NULL) {
         int i, len;
         for (i = 0, len = cJSON_GetArraySize(parameters); i < len; ++i) {
@@ -272,6 +273,56 @@ static void _reset_connection_parameters(SF_CONNECT *sf, cJSON *parameters) {
             }
         }
     }
+    SF_STATUS ret = SF_STATUS_ERROR_GENERAL;
+    if (session_info != NULL) {
+        // database
+        cJSON *db = cJSON_GetObjectItem(session_info, "databaseName");
+        if (do_validate && sf->database && db->valuestring == NULL) {
+            SET_SNOWFLAKE_ERROR(
+              &sf->error,
+              SF_STATUS_ERROR_APPLICATION_ERROR,
+              "Specified database doesn't exists",
+              SF_SQLSTATE_UNABLE_TO_CONNECT
+            );
+            goto cleanup;
+        }
+        alloc_buffer_and_copy(&sf->database, db->valuestring);
+
+        // schema
+        cJSON *schema = cJSON_GetObjectItem(session_info, "schemaName");
+        if (do_validate && sf->schema && schema->valuestring == NULL) {
+            SET_SNOWFLAKE_ERROR(
+              &sf->error,
+              SF_STATUS_ERROR_APPLICATION_ERROR,
+              "Specified schema doesn't exists",
+              SF_SQLSTATE_UNABLE_TO_CONNECT
+            );
+            goto cleanup;
+
+        }
+        alloc_buffer_and_copy(&sf->schema, schema->valuestring);
+
+        // warehouse
+        cJSON *warehouse = cJSON_GetObjectItem(session_info, "warehouseName");
+        if (do_validate && sf->warehouse && warehouse->valuestring == NULL) {
+            SET_SNOWFLAKE_ERROR(
+              &sf->error,
+              SF_STATUS_ERROR_APPLICATION_ERROR,
+              "Specified warehouse doesn't exists",
+              SF_SQLSTATE_UNABLE_TO_CONNECT
+            );
+            goto cleanup;
+        }
+        alloc_buffer_and_copy(&sf->warehouse, warehouse->valuestring);
+
+        // role
+        cJSON *role = cJSON_GetObjectItem(session_info, "roleName");
+        // No validation is required as already done by the server
+        alloc_buffer_and_copy(&sf->role, role->valuestring);
+    }
+    ret = SF_STATUS_SUCCESS;
+cleanup:
+    return ret;
 }
 
 /*
@@ -636,9 +687,14 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
         }
 
         pthread_mutex_lock(&sf->mutex_parameters);
-        _reset_connection_parameters(
-          sf, cJSON_GetObjectItem(data, "parameters"));
+        ret = _reset_connection_parameters(
+          sf,
+          cJSON_GetObjectItem(data, "parameters"),
+          cJSON_GetObjectItem(data, "sessionInfo"), SF_BOOLEAN_TRUE);
         pthread_mutex_unlock(&sf->mutex_parameters);
+        if (ret > 0) {
+            goto cleanup;
+        }
     } else {
         log_error("No response");
         SET_SNOWFLAKE_ERROR(&sf->error, SF_STATUS_ERROR_BAD_JSON,
@@ -1343,9 +1399,11 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
                                  "finalRoleName")) {
                 log_warn("No valid role found in response");
             }
-            /* Set other parameters */
+            /* Set other parameters. Ignore the status */
             _reset_connection_parameters(
-              sfstmt->connection, cJSON_GetObjectItem(data, "parameters"));
+              sfstmt->connection,
+              cJSON_GetObjectItem(data, "parameters"),
+              cJSON_GetObjectItem(data, "sessionInfo"), SF_BOOLEAN_FALSE);
             pthread_mutex_unlock(&sfstmt->connection->mutex_parameters);
 
             int64 stmt_type_id;
