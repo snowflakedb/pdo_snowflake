@@ -53,7 +53,7 @@ int main() {
     snowflake_bind_result(sfstmt, &c2);
 
     uint64 counter = 0;
-    while ((status = snowflake_fetch(sfstmt)) != SF_STATUS_EOL) {
+    while ((status = snowflake_fetch(sfstmt)) != SF_STATUS_EOF) {
         if (status > 0) {
             SF_ERROR *error = snowflake_stmt_error(sfstmt);
             fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
@@ -79,7 +79,7 @@ int main() {
     }
 
     // If we reached end of line, then we were successful
-    if (status == SF_STATUS_EOL) {
+    if (status == SF_STATUS_EOF) {
         status = SF_STATUS_SUCCESS;
     }
 

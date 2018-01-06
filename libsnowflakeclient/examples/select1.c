@@ -39,7 +39,7 @@ int main() {
     }
 
     // If we reached end of line, then we were successful
-    if (status == SF_STATUS_EOL) {
+    if (status == SF_STATUS_EOF) {
         status = SF_STATUS_SUCCESS;
     } else if (status > 0) {
         SF_ERROR *error = snowflake_stmt_error(sfstmt);
