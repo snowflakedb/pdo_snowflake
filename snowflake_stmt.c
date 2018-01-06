@@ -245,7 +245,7 @@ static int pdo_snowflake_stmt_fetch(
         /* TODO: raise error */
     }
     SF_STATUS ret = snowflake_fetch(S->stmt);
-    if (ret == SF_STATUS_EOL) {
+    if (ret == SF_STATUS_EOF) {
         PDO_DBG_INF("EOL");
         PDO_DBG_RETURN(0);
     } else if (ret != SF_STATUS_SUCCESS) {

@@ -875,7 +875,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
         goto cleanup;
     }
 
-    // If no more results, set return to SF_STATUS_EOL
+    // If no more results, set return to SF_STATUS_EOF
     if (sfstmt->chunk_rowcount == 0) {
         if (sfstmt->chunk_downloader) {
             log_debug("Fetching next chunk from chunk downloader.");
@@ -887,7 +887,7 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
                     log_debug("Out of chunks, setting EOL.");
                     cJSON_Delete(sfstmt->raw_results);
                     sfstmt->raw_results = NULL;
-                    ret = SF_STATUS_EOL;
+                    ret = SF_STATUS_EOF;
                     break;
                 } else {
                     // Get index and increment
@@ -935,11 +935,11 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt) {
         } else {
             // If there is no chunk downloader set, then we've truly reached the end of the results and should set EOL
             log_debug("No chunk downloader set, end of results.");
-            ret = SF_STATUS_EOL;
+            ret = SF_STATUS_EOF;
         }
 
         // If we've reached the end, or we have an error getting the next chunk, goto cleanup and return status
-        if (ret == SF_STATUS_EOL || !get_chunk_success) {
+        if (ret == SF_STATUS_EOF || !get_chunk_success) {
             goto cleanup;
         }
     }

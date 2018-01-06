@@ -82,7 +82,7 @@ int fetch_data(SF_STMT *stmt, int64 expected_sum) {
         goto exit;
     }
 
-    if (status != SF_STATUS_EOL) {
+    if (status != SF_STATUS_EOF) {
         fprintf(stderr, "failed to fetch data\n");
         goto exit;
     }

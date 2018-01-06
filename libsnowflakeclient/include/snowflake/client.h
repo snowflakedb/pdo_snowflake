@@ -98,7 +98,7 @@ typedef enum sf_c_type {
  */
 typedef enum sf_status {
     // Special status are negative
-      SF_STATUS_EOL = -1,
+      SF_STATUS_EOF = -1,
     // Success is zero
       SF_STATUS_SUCCESS = 0,
     // Errors are positive

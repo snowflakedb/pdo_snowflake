@@ -78,7 +78,7 @@ int main() {
     }
     printf("Number of rows: %d\n", (int) snowflake_num_rows(sfstmt));
 
-    while ((status = snowflake_fetch(sfstmt)) != SF_STATUS_EOL) {
+    while ((status = snowflake_fetch(sfstmt)) != SF_STATUS_EOF) {
         if (status > 0) {
             SF_ERROR *error = snowflake_stmt_error(sfstmt);
             fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
@@ -88,7 +88,7 @@ int main() {
         printf("result: %d\n", *((int *) c1.value));
     }
     // If we reached end of line, then we were successful
-    if (status == SF_STATUS_EOL) {
+    if (status == SF_STATUS_EOF) {
         status = SF_STATUS_SUCCESS;
     }
 
