@@ -51,7 +51,7 @@ int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
         // If the error occurs when intializing dbh, always raise an exception
         zend_throw_exception_ex(
           php_pdo_get_exception(),
-          einfo->error_code,
+          einfo->error_code, // driver specific error code
           "SQLSTATE[%s] [%d] %s",
           *pdo_err, einfo->error_code, einfo->msg);
     }
@@ -342,7 +342,8 @@ pdo_snowflake_set_attribute(pdo_dbh_t *dbh, zend_long attr, zval *val) /* {{{ */
                 dbh->auto_commit = bval;
                 PDO_DBG_INF(
                   "value=%s",
-                  bval ? SF_BOOLEAN_INT_TRUE_STR : SF_BOOLEAN_INT_FALSE_STR);
+                  bval ? SF_BOOLEAN_INTERNAL_TRUE_STR
+                       : SF_BOOLEAN_INTERNAL_FALSE_STR);
             }
             PDO_DBG_RETURN(1);
             break;

@@ -8,6 +8,7 @@ include_directories(
 
 SET(EXAMPLES
         connect
+        connect_negative
         select1
         transaction
         ping_pong

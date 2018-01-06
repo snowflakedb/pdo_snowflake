@@ -468,21 +468,23 @@ SF_STATUS STDCALL snowflake_term(SF_CONNECT *sf) {
     char *s_resp = NULL;
     clear_snowflake_error(&sf->error);
 
-    /* delete the session */
-    URL_KEY_VALUE url_params[] = {
-      {"delete=", "true", NULL, NULL, 0, 0}
-    };
-    if (request(sf, &resp, DELETE_SESSION_URL, url_params,
-                sizeof(url_params) / sizeof(URL_KEY_VALUE), NULL, NULL,
-                POST_REQUEST_TYPE, &sf->error)) {
-        s_resp = cJSON_Print(resp);
-        log_trace("JSON response:\n%s", s_resp);
-        /* Even if the session deletion fails, it will be cleaned after 7 days.
-         * Catching error here won't help
-         */
+    if (sf->token && sf->master_token) {
+        /* delete the session */
+        URL_KEY_VALUE url_params[] = {
+          {"delete=", "true", NULL, NULL, 0, 0}
+        };
+        if (request(sf, &resp, DELETE_SESSION_URL, url_params,
+                    sizeof(url_params) / sizeof(URL_KEY_VALUE), NULL, NULL,
+                    POST_REQUEST_TYPE, &sf->error)) {
+            s_resp = cJSON_Print(resp);
+            log_trace("JSON response:\n%s", s_resp);
+            /* Even if the session deletion fails, it will be cleaned after 7 days.
+             * Catching error here won't help
+             */
+        }
+        cJSON_Delete(resp);
+        SF_FREE(s_resp);
     }
-    cJSON_Delete(resp);
-    SF_FREE(s_resp);
 
     pthread_mutex_destroy(&sf->mutex_sequence_counter);
     pthread_mutex_destroy(&sf->mutex_parameters);
@@ -512,24 +514,27 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
     sf_bool success = SF_BOOLEAN_FALSE;
     SF_JSON_ERROR json_error;
     if (!sf) {
+        // connection object doesn't exists
         return SF_STATUS_ERROR_CONNECTION_NOT_EXIST;
     }
     if (sf->token || sf->master_token) {
         // safe guard not to override the existing connection
         SET_SNOWFLAKE_ERROR(
-          &sf->error, SF_STATUS_ERROR_APPLICATION_ERROR,
-          "Connection already exists.", SF_SQLSTATE_CONNECTION_ALREADY_EXIST);
+          &sf->error,
+          SF_STATUS_ERROR_APPLICATION_ERROR,
+          ERR_MSG_CONNECTION_ALREADY_EXISTS,
+          SF_SQLSTATE_CONNECTION_ALREADY_EXIST);
         return SF_STATUS_ERROR_GENERAL;
     }
     // Reset error context
     clear_snowflake_error(&sf->error);
+
     cJSON *body = NULL;
     cJSON *data = NULL;
     cJSON *resp = NULL;
     char *s_body = NULL;
     char *s_resp = NULL;
     // Encoded URL to use with libcurl
-    uuid4_generate(sf->request_id);
     URL_KEY_VALUE url_params[] = {
       {"request_id=",    sf->request_id, NULL, NULL, 0, 0},
       {"&databaseName=", sf->database,   NULL, NULL, 0, 0},
@@ -539,16 +544,41 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
     };
     SF_STATUS ret = SF_STATUS_ERROR_GENERAL;
 
-    if (is_string_empty(sf->user) || is_string_empty(sf->account)) {
+    if (is_string_empty(sf->account)) {
         // Invalid connection
-        log_error(
-          "Missing essential connection parameters. Either user or account (or both) are missing");
-        SET_SNOWFLAKE_ERROR(&sf->error,
-                            SF_STATUS_ERROR_BAD_CONNECTION_PARAMS,
-                            "Missing essential connection parameters. Either user or account (or both) are missing",
-                            SF_SQLSTATE_UNABLE_TO_CONNECT);
+        log_error(ERR_MSG_ACCOUNT_PARAMETER_IS_MISSING);
+        SET_SNOWFLAKE_ERROR(
+          &sf->error,
+          SF_STATUS_ERROR_BAD_CONNECTION_PARAMS,
+          ERR_MSG_ACCOUNT_PARAMETER_IS_MISSING,
+          SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     }
+
+    if (is_string_empty(sf->user)) {
+        // Invalid connection
+        log_error(ERR_MSG_USER_PARAMETER_IS_MISSING);
+        SET_SNOWFLAKE_ERROR(
+          &sf->error,
+          SF_STATUS_ERROR_BAD_CONNECTION_PARAMS,
+          ERR_MSG_USER_PARAMETER_IS_MISSING,
+          SF_SQLSTATE_UNABLE_TO_CONNECT);
+        goto cleanup;
+    }
+
+    if (is_string_empty(sf->password)) {
+        // Invalid connection
+        log_error(ERR_MSG_PASSWORD_PARAMETER_IS_MISSING);
+        SET_SNOWFLAKE_ERROR(
+          &sf->error,
+          SF_STATUS_ERROR_BAD_CONNECTION_PARAMS,
+          ERR_MSG_PASSWORD_PARAMETER_IS_MISSING,
+          SF_SQLSTATE_UNABLE_TO_CONNECT);
+        goto cleanup;
+    }
+
+    // request id
+    uuid4_generate(sf->request_id);
 
     // Create body
     body = create_auth_json_body(
@@ -594,7 +624,7 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
                 log_debug("no code element.");
             }
 
-            SET_SNOWFLAKE_ERROR(&sf->error, code,
+            SET_SNOWFLAKE_ERROR(&sf->error, (SF_STATUS) code,
                                 message ? message : "Query was not successful",
                                 SF_SQLSTATE_UNABLE_TO_CONNECT);
             goto cleanup;

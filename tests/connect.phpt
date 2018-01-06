@@ -6,13 +6,22 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php
     include __DIR__ . "/common.php";
 
+    // full parameters
     $dbh = new PDO($dsn, $user, $password);
-    $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-    echo 'Connected to Snowflake' . "\n";
+    $dbh = null;
+
+    if (!array_key_exists('SNOWFLAKE_TEST_HOST', $p)) {
+        // connect with the minimum requirement
+        // This test runs only on Travis or the connect parameters
+        // are for production.
+        $dbh = new PDO("snowflake:account=$account", $user, $password);
+        $dbh = null;
+    }
+    echo "OK\n";
 ?>
 ===DONE===
 <?php exit(0); ?>
 --EXPECT--
-Connected to Snowflake
+OK
 ===DONE===
 
