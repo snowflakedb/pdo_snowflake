@@ -8,7 +8,11 @@ project(snowflakeclient)
 add_definitions(-DLOG_USE_COLOR)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -pg -pthread -fPIC -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -pthread -fPIC -Werror")
+
+if (NOT "$ENV{BUILD_WITH_PROFILE_OPTION}" STREQUAL "")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pg")
+endif()
 
 set(SOURCE_FILES
         include

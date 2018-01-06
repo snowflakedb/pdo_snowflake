@@ -32,6 +32,9 @@ Create a database handle with connection parameters:
 Build and Tests
 ================================================================================
 
+Basic Usage
+----------------------------------------------------------------------
+
 Download the PHP source code to build PHP PDO driver for Snowflake.
 
 .. code-block:: bash
@@ -71,6 +74,44 @@ Clone the this repository and run ``phpize``, ``configure``, ``make`` and ``make
     ./scripts/build_pdo_snowflake.sh -r # build all
     REPORT_EXIT_STATUS=1 NO_INTERACTION=true make test
 
+Profile C API
+----------------------------------------------------------------------
+
+If you want to use ``gprof`` for C API, add ``-p`` option to the build script, run a test program followed by ``gprof``, for example:
+
+.. code-block:: bash
+
+    ./scripts/build_pdo_snowflake.sh -r -p # build all with profile option
+    ./libsnowflakeclient/cmake-build/examples/ex_connect
+    gprof ./libsnowflakeclient/cmake-build/examples/ex_connect gmon.out
+
+Note PHP PDO won't be built with profile option as ``gprof`` won't work the dynamic link library (.so). Use callgrind.
+
+Profile PHP PDO
+----------------------------------------------------------------------
+
+You can use ``callgrind`` to profile PHP PDO programs. For example, run ``tests/selectnum.phpt`` testcase using ``valgrind`` along with ``callgrind`` option.
+
+.. code-block:: bash
+
+    valgrind --tool=callgrind $PHP_HOME/bin/php -dextension=modules/pdo_snowflake.so tests/selectnum.phpt
+    callgrind_annotate callgrind.out.*
+
+Check memory leak by valgrind
+----------------------------------------------------------------------
+
+Use ``valgrind`` to check memeory leak. Both C API and PHP PDO can run along with ``valgrind``. For example, run ``tests/selectnum.phpt`` testcase using ``valgrind`` by the following command.
+
+.. code-block:: bash
+
+    valgrind --leak-check=full $PHP_HOME/bin/php -dextension=modules/pdo_snowflake.so tests/selectnum.phpt
+
+and verify no error in the output:
+
+.. code-block:: bash
+
+     ERROR SUMMARY: 0 errors from 0 contexts ...
+
 Test Framework
 --------------------
 
@@ -88,17 +129,3 @@ Run the following command to check if PHP PDO Driver for Snowflake is successful
 
     $PHP_HOME/bin/php -dextension=modules/pdo_snowflake.so -m | grep pdo_snowflake
 
-Run Valgrind
---------------------
-
-Use ``valgrind`` to check memeory leak. For example, run ``tests/selectnum.phpt`` testcase using ``valgrind`` by the following command.
-
-.. code-block:: bash
-
-    valgrind --leak-check=full $PHP_HOME/bin/php -dextension=modules/pdo_snowflake.so tests/selectnum.phpt
-
-and verify no error in the output:
-
-.. code-block:: bash
-
-     ERROR SUMMARY: 0 errors from 0 contexts ...

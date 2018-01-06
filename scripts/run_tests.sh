@@ -11,7 +11,10 @@ cd $DIR/..
 export REPORT_EXIT_STATUS=1
 export NO_INTERACTION=true
 echo "===> Test parameters"
-cat $DIR/../testenv.ini | grep -v PASSWORD
+if ! cat $DIR/../testenv.ini | grep -v PASSWORD; then
+    echo "[ERROR] no connection parameter is set in the test environment file. set SNOWFLAKE_TEST_* in the environment variables, rebuild all code and run this script again."
+    exit 1
+fi
 echo "===> Running Tests"
 if ! make test; then
     echo "Test Failed"
