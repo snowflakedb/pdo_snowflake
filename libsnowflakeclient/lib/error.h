@@ -32,6 +32,11 @@ void STDCALL clear_snowflake_error(SF_ERROR *error);
 
 void STDCALL copy_snowflake_error(SF_ERROR *dst, SF_ERROR *src);
 
+#define ERR_MSG_ACCOUNT_PARAMETER_IS_MISSING "account parameter is missing"
+#define ERR_MSG_USER_PARAMETER_IS_MISSING "user parameter is missing"
+#define ERR_MSG_PASSWORD_PARAMETER_IS_MISSING "password parameter is missing"
+#define ERR_MSG_CONNECTION_ALREADY_EXISTS "Connection already exists."
+
 #ifdef __cplusplus
 }
 #endif

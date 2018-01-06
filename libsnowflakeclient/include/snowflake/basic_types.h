@@ -31,8 +31,8 @@ extern const int8 SF_BOOLEAN_FALSE;
 /**
  * Boolean data type string representation for Snowflake
  */
-#define SF_BOOLEAN_INT_TRUE_STR "TRUE"
-#define SF_BOOLEAN_INT_FALSE_STR "FALSE"
+#define SF_BOOLEAN_INTERNAL_TRUE_STR "TRUE"
+#define SF_BOOLEAN_INTERNAL_FALSE_STR "FALSE"
 
 /**
  * Boolean data type string representation for results.

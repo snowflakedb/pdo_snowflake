@@ -17,51 +17,55 @@
 /*
  * Debug functions from curl example. Should update at somepoint, and possibly remove from header since these are private functions
  */
-static void dump(const char *text, FILE *stream, unsigned char *ptr, size_t size, char nohex);
-static int my_trace(CURL *handle, curl_infotype type, char *data, size_t size, void *userp);
+static void
+dump(const char *text, FILE *stream, unsigned char *ptr, size_t size,
+     char nohex);
+
+static int my_trace(CURL *handle, curl_infotype type, char *data, size_t size,
+                    void *userp);
 
 static
 void dump(const char *text,
           FILE *stream, unsigned char *ptr, size_t size,
-          char nohex)
-{
+          char nohex) {
     size_t i;
     size_t c;
 
     unsigned int width = 0x10;
 
-    if(nohex)
+    if (nohex)
         /* without the hex output, we can fit more on screen */
         width = 0x40;
 
     fprintf(stream, "%s, %10.10ld bytes (0x%8.8lx)\n",
-            text, (long)size, (long)size);
+            text, (long) size, (long) size);
 
-    for(i = 0; i<size; i += width) {
+    for (i = 0; i < size; i += width) {
 
-        fprintf(stream, "%4.4lx: ", (long)i);
+        fprintf(stream, "%4.4lx: ", (long) i);
 
-        if(!nohex) {
+        if (!nohex) {
             /* hex not disabled, show it */
-            for(c = 0; c < width; c++)
-                if(i + c < size)
+            for (c = 0; c < width; c++)
+                if (i + c < size)
                     fprintf(stream, "%02x ", ptr[i + c]);
                 else
                     fputs("   ", stream);
         }
 
-        for(c = 0; (c < width) && (i + c < size); c++) {
+        for (c = 0; (c < width) && (i + c < size); c++) {
             /* check for 0D0A; if found, skip past and start a new line of output */
-            if(nohex && (i + c + 1 < size) && ptr[i + c] == 0x0D &&
-               ptr[i + c + 1] == 0x0A) {
+            if (nohex && (i + c + 1 < size) && ptr[i + c] == 0x0D &&
+                ptr[i + c + 1] == 0x0A) {
                 i += (c + 2 - width);
                 break;
             }
             fprintf(stream, "%c",
-                    (ptr[i + c] >= 0x20) && (ptr[i + c]<0x80)?ptr[i + c]:'.');
+                    (ptr[i + c] >= 0x20) && (ptr[i + c] < 0x80) ? ptr[i + c]
+                                                                : '.');
             /* check again for 0D0A, to avoid an extra \n if it's at width */
-            if(nohex && (i + c + 2 < size) && ptr[i + c + 1] == 0x0D &&
-               ptr[i + c + 2] == 0x0A) {
+            if (nohex && (i + c + 2 < size) && ptr[i + c + 1] == 0x0D &&
+                ptr[i + c + 2] == 0x0A) {
                 i += (c + 3 - width);
                 break;
             }
@@ -74,13 +78,12 @@ void dump(const char *text,
 static
 int my_trace(CURL *handle, curl_infotype type,
              char *data, size_t size,
-             void *userp)
-{
-    struct data *config = (struct data *)userp;
+             void *userp) {
+    struct data *config = (struct data *) userp;
     const char *text;
-    (void)handle; /* prevent compiler warning */
+    (void) handle; /* prevent compiler warning */
 
-    switch(type) {
+    switch (type) {
         case CURLINFO_TEXT:
             fprintf(stderr, "== Info: %s", data);
             /* FALLTHROUGH */
@@ -107,7 +110,7 @@ int my_trace(CURL *handle, curl_infotype type,
             break;
     }
 
-    dump(text, stderr, (unsigned char *)data, size, config->trace_ascii);
+    dump(text, stderr, (unsigned char *) data, size, config->trace_ascii);
     return 0;
 }
 
@@ -165,7 +168,8 @@ cJSON *STDCALL create_auth_json_body(SF_CONNECT *sf,
     cJSON_AddStringToObject(
       session_parameters,
       "AUTOCOMMIT",
-      autocommit == SF_BOOLEAN_TRUE ? SF_BOOLEAN_INT_TRUE_STR : SF_BOOLEAN_INT_FALSE_STR);
+      autocommit == SF_BOOLEAN_TRUE ? SF_BOOLEAN_INTERNAL_TRUE_STR
+                                    : SF_BOOLEAN_INTERNAL_FALSE_STR);
 
     cJSON_AddStringToObject(session_parameters, "TIMEZONE", timezone);
 
@@ -211,19 +215,21 @@ cJSON *STDCALL create_renew_session_json_body(const char *old_token) {
     return body;
 }
 
-struct curl_slist * STDCALL create_header_no_token() {
-    struct curl_slist * header = NULL;
+struct curl_slist *STDCALL create_header_no_token() {
+    struct curl_slist *header = NULL;
     header = curl_slist_append(header, HEADER_CONTENT_TYPE_APPLICATION_JSON);
-    header = curl_slist_append(header, HEADER_ACCEPT_TYPE_APPLICATION_SNOWFLAKE);
+    header = curl_slist_append(header,
+                               HEADER_ACCEPT_TYPE_APPLICATION_SNOWFLAKE);
     header = curl_slist_append(header, HEADER_C_API_USER_AGENT);
     return header;
 }
 
-struct curl_slist * STDCALL create_header_token(const char *header_token) {
-    struct curl_slist * header = NULL;
+struct curl_slist *STDCALL create_header_token(const char *header_token) {
+    struct curl_slist *header = NULL;
     header = curl_slist_append(header, header_token);
     header = curl_slist_append(header, HEADER_CONTENT_TYPE_APPLICATION_JSON);
-    header = curl_slist_append(header, HEADER_ACCEPT_TYPE_APPLICATION_SNOWFLAKE);
+    header = curl_slist_append(header,
+                               HEADER_ACCEPT_TYPE_APPLICATION_SNOWFLAKE);
     header = curl_slist_append(header, HEADER_C_API_USER_AGENT);
     return header;
 }
@@ -250,14 +256,19 @@ sf_bool STDCALL curl_post_call(SF_CONNECT *sf,
     memset(query_code, 0, QUERYCODE_LEN);
 
     do {
-        if(!http_perform(curl, POST_REQUEST_TYPE, url, header, body, json, sf->network_timeout, SF_BOOLEAN_FALSE, error) || !*json) {
+        if (!http_perform(curl, POST_REQUEST_TYPE, url, header, body, json,
+                          sf->network_timeout, SF_BOOLEAN_FALSE, error) ||
+            !*json) {
             // Error is set in the perform function
             break;
         }
-        if ((json_error = json_copy_string_no_alloc(query_code, *json, "code", QUERYCODE_LEN)) != SF_JSON_ERROR_NONE &&
-                json_error != SF_JSON_ERROR_ITEM_NULL) {
+        if ((json_error = json_copy_string_no_alloc(query_code, *json, "code",
+                                                    QUERYCODE_LEN)) !=
+            SF_JSON_ERROR_NONE &&
+            json_error != SF_JSON_ERROR_ITEM_NULL) {
             JSON_ERROR_MSG(json_error, error_msg, "Query code");
-            SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON, error_msg, SF_SQLSTATE_UNABLE_TO_CONNECT);
+            SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON, error_msg,
+                                SF_SQLSTATE_UNABLE_TO_CONNECT);
             break;
         }
 
@@ -274,46 +285,58 @@ sf_bool STDCALL curl_post_call(SF_CONNECT *sf,
             } else {
                 // TODO refactor creating the header token string
                 // Create new header since we have a new token
-                header_token_size = strlen(HEADER_SNOWFLAKE_TOKEN_FORMAT) - 2 + strlen(sf->token) + 1;
+                header_token_size = strlen(HEADER_SNOWFLAKE_TOKEN_FORMAT) - 2 +
+                                    strlen(sf->token) + 1;
                 header_token = (char *) SF_CALLOC(1, header_token_size);
                 if (!header_token) {
                     SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_OUT_OF_MEMORY,
-                                        "Ran out of memory trying to create header token", SF_SQLSTATE_UNABLE_TO_CONNECT);
+                                        "Ran out of memory trying to create header token",
+                                        SF_SQLSTATE_UNABLE_TO_CONNECT);
                     break;
                 }
-                snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->token);
+                snprintf(header_token, header_token_size,
+                         HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->token);
                 new_header = create_header_token(header_token);
-                if (!curl_post_call(sf, curl, url, new_header, body, json, error)) {
+                if (!curl_post_call(sf, curl, url, new_header, body, json,
+                                    error)) {
                     // Error is set in curl call
                     break;
                 }
             }
         }
 
-        while (strcmp(query_code, QUERY_IN_PROGRESS_CODE) == 0 || strcmp(query_code, QUERY_IN_PROGRESS_ASYNC_CODE) == 0) {
+        while (strcmp(query_code, QUERY_IN_PROGRESS_CODE) == 0 ||
+               strcmp(query_code, QUERY_IN_PROGRESS_ASYNC_CODE) == 0) {
             // Remove old result URL and query code if this isn't our first rodeo
             SF_FREE(result_url);
             memset(query_code, 0, QUERYCODE_LEN);
             data = cJSON_GetObjectItem(*json, "data");
-            if (json_copy_string(&result_url, data, "getResultUrl") != SF_JSON_ERROR_NONE) {
+            if (json_copy_string(&result_url, data, "getResultUrl") !=
+                SF_JSON_ERROR_NONE) {
                 stop = SF_BOOLEAN_TRUE;
                 JSON_ERROR_MSG(json_error, error_msg, "Result URL");
-                SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON, error_msg, SF_SQLSTATE_UNABLE_TO_CONNECT);
+                SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON, error_msg,
+                                    SF_SQLSTATE_UNABLE_TO_CONNECT);
                 break;
             }
 
             log_debug("ping pong starting...");
-            if (!request(sf, json, result_url, NULL, 0, NULL, header, GET_REQUEST_TYPE, error)) {
+            if (!request(sf, json, result_url, NULL, 0, NULL, header,
+                         GET_REQUEST_TYPE, error)) {
                 // Error came from request up, just break
                 stop = SF_BOOLEAN_TRUE;
                 break;
             }
 
-            if ((json_error = json_copy_string_no_alloc(query_code, *json, "code", QUERYCODE_LEN)) != SF_JSON_ERROR_NONE &&
-                json_error != SF_JSON_ERROR_ITEM_NULL) {
+            if (
+              (json_error = json_copy_string_no_alloc(query_code, *json, "code",
+                                                      QUERYCODE_LEN)) !=
+              SF_JSON_ERROR_NONE &&
+              json_error != SF_JSON_ERROR_ITEM_NULL) {
                 stop = SF_BOOLEAN_TRUE;
                 JSON_ERROR_MSG(json_error, error_msg, "Query code");
-                SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON, error_msg, SF_SQLSTATE_UNABLE_TO_CONNECT);
+                SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON, error_msg,
+                                    SF_SQLSTATE_UNABLE_TO_CONNECT);
                 break;
             }
         }
@@ -323,7 +346,8 @@ sf_bool STDCALL curl_post_call(SF_CONNECT *sf,
         }
 
         ret = SF_BOOLEAN_TRUE;
-    } while (0); // Dummy loop to break out of
+    }
+    while (0); // Dummy loop to break out of
 
     SF_FREE(result_url);
     SF_FREE(header_token);
@@ -351,14 +375,19 @@ sf_bool STDCALL curl_get_call(SF_CONNECT *sf,
     memset(query_code, 0, QUERYCODE_LEN);
 
     do {
-        if(!http_perform(curl, GET_REQUEST_TYPE, url, header, NULL, json, sf->network_timeout, SF_BOOLEAN_FALSE, error) || !*json) {
+        if (!http_perform(curl, GET_REQUEST_TYPE, url, header, NULL, json,
+                          sf->network_timeout, SF_BOOLEAN_FALSE, error) ||
+            !*json) {
             // Error is set in the perform function
             break;
         }
-        if ((json_error = json_copy_string_no_alloc(query_code, *json, "code", QUERYCODE_LEN)) != SF_JSON_ERROR_NONE &&
+        if ((json_error = json_copy_string_no_alloc(query_code, *json, "code",
+                                                    QUERYCODE_LEN)) !=
+            SF_JSON_ERROR_NONE &&
             json_error != SF_JSON_ERROR_ITEM_NULL) {
             JSON_ERROR_MSG(json_error, error_msg, "Query code");
-            SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON, error_msg, SF_SQLSTATE_UNABLE_TO_CONNECT);
+            SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON, error_msg,
+                                SF_SQLSTATE_UNABLE_TO_CONNECT);
             break;
         }
 
@@ -375,14 +404,17 @@ sf_bool STDCALL curl_get_call(SF_CONNECT *sf,
             } else {
                 // TODO refactor creating the header token string
                 // Create new header since we have a new token
-                header_token_size = strlen(HEADER_SNOWFLAKE_TOKEN_FORMAT) - 2 + strlen(sf->token) + 1;
+                header_token_size = strlen(HEADER_SNOWFLAKE_TOKEN_FORMAT) - 2 +
+                                    strlen(sf->token) + 1;
                 header_token = (char *) SF_CALLOC(1, header_token_size);
                 if (!header_token) {
                     SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_OUT_OF_MEMORY,
-                                        "Ran out of memory trying to create header token", SF_SQLSTATE_UNABLE_TO_CONNECT);
+                                        "Ran out of memory trying to create header token",
+                                        SF_SQLSTATE_UNABLE_TO_CONNECT);
                     break;
                 }
-                snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->token);
+                snprintf(header_token, header_token_size,
+                         HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->token);
                 new_header = create_header_token(header_token);
                 if (!curl_get_call(sf, curl, url, new_header, json, error)) {
                     // Error is set in curl call
@@ -392,7 +424,8 @@ sf_bool STDCALL curl_get_call(SF_CONNECT *sf,
         }
 
         ret = SF_BOOLEAN_TRUE;
-    } while (0); // Dummy loop to break out of
+    }
+    while (0); // Dummy loop to break out of
 
     SF_FREE(result_url);
     SF_FREE(header_token);
@@ -405,26 +438,29 @@ void STDCALL decorrelate_jitter_free(DECORRELATE_JITTER_BACKOFF *djb) {
     SF_FREE(djb);
 }
 
-DECORRELATE_JITTER_BACKOFF *STDCALL decorrelate_jitter_init(uint32 base, uint32 cap) {
-    DECORRELATE_JITTER_BACKOFF *djb = (DECORRELATE_JITTER_BACKOFF *) SF_CALLOC(1, sizeof(DECORRELATE_JITTER_BACKOFF));
+DECORRELATE_JITTER_BACKOFF *
+STDCALL decorrelate_jitter_init(uint32 base, uint32 cap) {
+    DECORRELATE_JITTER_BACKOFF *djb = (DECORRELATE_JITTER_BACKOFF *) SF_CALLOC(
+      1, sizeof(DECORRELATE_JITTER_BACKOFF));
     djb->base = base;
     djb->cap = cap;
     return djb;
 }
 
-uint32 decorrelate_jitter_next_sleep(DECORRELATE_JITTER_BACKOFF *djb, uint32 sleep) {
+uint32
+decorrelate_jitter_next_sleep(DECORRELATE_JITTER_BACKOFF *djb, uint32 sleep) {
     return uimin(djb->cap, uimax(djb->base, (uint32) (rand() % (sleep * 3))));
 }
 
-char * encode_url(CURL *curl,
-                  const char *protocol,
-                  const char *account,
-                  const char *host,
-                  const char *port,
-                  const char *url,
-                  URL_KEY_VALUE* vars,
-                  int num_args,
-                  SF_ERROR *error) {
+char *encode_url(CURL *curl,
+                 const char *protocol,
+                 const char *account,
+                 const char *host,
+                 const char *port,
+                 const char *url,
+                 URL_KEY_VALUE *vars,
+                 int num_args,
+                 SF_ERROR *error) {
     int i;
     sf_bool host_empty = is_string_empty(host);
     sf_bool port_empty = is_string_empty(port);
@@ -444,13 +480,13 @@ char * encode_url(CURL *curl,
         base_url_size += 4;
         // Set account to an empty string since host overwrites account
         account = "";
-    } else if(port_empty && !host_empty) {
+    } else if (port_empty && !host_empty) {
         format = "%s://%s%s%s%s";
         base_url_size += 3;
         port = "";
         // Set account to an empty string since host overwrites account
         account = "";
-    } else if(!port_empty && host_empty) {
+    } else if (!port_empty && host_empty) {
         format = "%s://%s.%s:%s%s";
         base_url_size += 5;
         host = DEFAULT_SNOWFLAKE_BASE_URL;
@@ -460,12 +496,14 @@ char * encode_url(CURL *curl,
         host = DEFAULT_SNOWFLAKE_BASE_URL;
         port = "";
     }
-    base_url_size += strlen(protocol) + strlen(account) + strlen(host) + strlen(port) + strlen(url);
+    base_url_size +=
+      strlen(protocol) + strlen(account) + strlen(host) + strlen(port) +
+      strlen(url);
 
     encoded_url_size = base_url_size;
     // Encode URL parameters and set size info
     for (i = 0; i < num_args; i++) {
-        if(vars[i].value && *vars[i].value) {
+        if (vars[i].value && *vars[i].value) {
             vars[i].formatted_key = vars[i].key;
             vars[i].formatted_value = curl_easier_escape(curl, vars[i].value);
         } else {
@@ -479,10 +517,13 @@ char * encode_url(CURL *curl,
 
     encoded_url = (char *) SF_CALLOC(1, encoded_url_size);
     if (!encoded_url) {
-        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_OUT_OF_MEMORY, "Ran out of memory trying to create encoded url", SF_SQLSTATE_UNABLE_TO_CONNECT);
+        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_OUT_OF_MEMORY,
+                            "Ran out of memory trying to create encoded url",
+                            SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     }
-    snprintf(encoded_url, base_url_size, format, protocol, account, host, port, url);
+    snprintf(encoded_url, base_url_size, format, protocol, account, host, port,
+             url);
 
     // Add encoded URL parameters to encoded_url buffer
     for (i = 0; i < num_args; i++) {
@@ -505,12 +546,13 @@ sf_bool is_string_empty(const char *str) {
     return (str && strcmp(str, "") != 0) ? SF_BOOLEAN_FALSE : SF_BOOLEAN_TRUE;
 }
 
-SF_JSON_ERROR STDCALL json_copy_string(char **dest, cJSON *data, const char *item) {
+SF_JSON_ERROR STDCALL
+json_copy_string(char **dest, cJSON *data, const char *item) {
     size_t blob_size;
     cJSON *blob = cJSON_GetObjectItem(data, item);
     if (!blob) {
         return SF_JSON_ERROR_ITEM_MISSING;
-    } else if(cJSON_IsNull(blob)) {
+    } else if (cJSON_IsNull(blob)) {
         return SF_JSON_ERROR_ITEM_NULL;
     } else if (!cJSON_IsString(blob)) {
         return SF_JSON_ERROR_ITEM_WRONG_TYPE;
@@ -528,11 +570,13 @@ SF_JSON_ERROR STDCALL json_copy_string(char **dest, cJSON *data, const char *ite
     return SF_JSON_ERROR_NONE;
 }
 
-SF_JSON_ERROR STDCALL json_copy_string_no_alloc(char *dest, cJSON *data, const char *item, size_t dest_size) {
+SF_JSON_ERROR STDCALL
+json_copy_string_no_alloc(char *dest, cJSON *data, const char *item,
+                          size_t dest_size) {
     cJSON *blob = cJSON_GetObjectItem(data, item);
     if (!blob) {
         return SF_JSON_ERROR_ITEM_MISSING;
-    } else if(cJSON_IsNull(blob)) {
+    } else if (cJSON_IsNull(blob)) {
         return SF_JSON_ERROR_ITEM_NULL;
     } else if (!cJSON_IsString(blob)) {
         return SF_JSON_ERROR_ITEM_WRONG_TYPE;
@@ -548,11 +592,12 @@ SF_JSON_ERROR STDCALL json_copy_string_no_alloc(char *dest, cJSON *data, const c
     return SF_JSON_ERROR_NONE;
 }
 
-SF_JSON_ERROR STDCALL json_copy_bool(sf_bool *dest, cJSON *data, const char *item) {
+SF_JSON_ERROR STDCALL
+json_copy_bool(sf_bool *dest, cJSON *data, const char *item) {
     cJSON *blob = cJSON_GetObjectItem(data, item);
     if (!blob) {
         return SF_JSON_ERROR_ITEM_MISSING;
-    } else if(cJSON_IsNull(blob)) {
+    } else if (cJSON_IsNull(blob)) {
         return SF_JSON_ERROR_ITEM_NULL;
     } else if (!cJSON_IsBool(blob)) {
         return SF_JSON_ERROR_ITEM_WRONG_TYPE;
@@ -564,11 +609,12 @@ SF_JSON_ERROR STDCALL json_copy_bool(sf_bool *dest, cJSON *data, const char *ite
     return SF_JSON_ERROR_NONE;
 }
 
-SF_JSON_ERROR STDCALL json_copy_int(int64 *dest, cJSON *data, const char *item) {
+SF_JSON_ERROR STDCALL
+json_copy_int(int64 *dest, cJSON *data, const char *item) {
     cJSON *blob = cJSON_GetObjectItem(data, item);
     if (!blob) {
         return SF_JSON_ERROR_ITEM_MISSING;
-    } else if(cJSON_IsNull(blob)) {
+    } else if (cJSON_IsNull(blob)) {
         return SF_JSON_ERROR_ITEM_NULL;
     } else if (!cJSON_IsNumber(blob)) {
         return SF_JSON_ERROR_ITEM_WRONG_TYPE;
@@ -580,11 +626,12 @@ SF_JSON_ERROR STDCALL json_copy_int(int64 *dest, cJSON *data, const char *item) 
     return SF_JSON_ERROR_NONE;
 }
 
-SF_JSON_ERROR STDCALL json_detach_array_from_object(cJSON **dest, cJSON *data, const char *item) {
+SF_JSON_ERROR STDCALL
+json_detach_array_from_object(cJSON **dest, cJSON *data, const char *item) {
     cJSON *blob = cJSON_DetachItemFromObject(data, item);
     if (!blob) {
         return SF_JSON_ERROR_ITEM_MISSING;
-    } else if(cJSON_IsNull(blob)) {
+    } else if (cJSON_IsNull(blob)) {
         return SF_JSON_ERROR_ITEM_NULL;
     } else if (!cJSON_IsArray(blob)) {
         return SF_JSON_ERROR_ITEM_WRONG_TYPE;
@@ -599,11 +646,12 @@ SF_JSON_ERROR STDCALL json_detach_array_from_object(cJSON **dest, cJSON *data, c
     return SF_JSON_ERROR_NONE;
 }
 
-SF_JSON_ERROR STDCALL json_detach_array_from_array(cJSON **dest, cJSON *data, int index) {
+SF_JSON_ERROR STDCALL
+json_detach_array_from_array(cJSON **dest, cJSON *data, int index) {
     cJSON *blob = cJSON_DetachItemFromArray(data, index);
     if (!blob) {
         return SF_JSON_ERROR_ITEM_MISSING;
-    } else if(cJSON_IsNull(blob)) {
+    } else if (cJSON_IsNull(blob)) {
         return SF_JSON_ERROR_ITEM_NULL;
     } else if (!cJSON_IsArray(blob)) {
         return SF_JSON_ERROR_ITEM_WRONG_TYPE;
@@ -618,11 +666,12 @@ SF_JSON_ERROR STDCALL json_detach_array_from_array(cJSON **dest, cJSON *data, in
     return SF_JSON_ERROR_NONE;
 }
 
-SF_JSON_ERROR STDCALL json_detach_object_from_array(cJSON **dest, cJSON *data, int index) {
+SF_JSON_ERROR STDCALL
+json_detach_object_from_array(cJSON **dest, cJSON *data, int index) {
     cJSON *blob = cJSON_DetachItemFromArray(data, index);
     if (!blob) {
         return SF_JSON_ERROR_ITEM_MISSING;
-    } else if(cJSON_IsNull(blob)) {
+    } else if (cJSON_IsNull(blob)) {
         return SF_JSON_ERROR_ITEM_NULL;
     } else if (!cJSON_IsObject(blob)) {
         return SF_JSON_ERROR_ITEM_WRONG_TYPE;
@@ -637,7 +686,7 @@ SF_JSON_ERROR STDCALL json_detach_object_from_array(cJSON **dest, cJSON *data, i
     return SF_JSON_ERROR_NONE;
 }
 
-ARRAY_LIST *json_get_object_keys(const cJSON * const item) {
+ARRAY_LIST *json_get_object_keys(const cJSON *const item) {
     if (!item || !cJSON_IsObject(item)) {
         return NULL;
     }
@@ -659,10 +708,12 @@ ARRAY_LIST *json_get_object_keys(const cJSON * const item) {
     return al;
 }
 
-size_t json_resp_cb(char *data, size_t size, size_t nmemb, RAW_JSON_BUFFER *raw_json) {
+size_t
+json_resp_cb(char *data, size_t size, size_t nmemb, RAW_JSON_BUFFER *raw_json) {
     size_t data_size = size * nmemb;
     log_debug("Curl response size: %zu\n", data_size);
-    raw_json->buffer = (char *) SF_REALLOC(raw_json->buffer, raw_json->size + data_size + 1);
+    raw_json->buffer = (char *) SF_REALLOC(raw_json->buffer,
+                                           raw_json->size + data_size + 1);
     // Start copying where last null terminator existed
     memcpy(&raw_json->buffer[raw_json->size], data, data_size);
     raw_json->size += data_size;
@@ -685,8 +736,8 @@ sf_bool STDCALL http_perform(CURL *curl,
     sf_bool retry = SF_BOOLEAN_FALSE;
     int32 http_code = 0;
     DECORRELATE_JITTER_BACKOFF djb = {
-            1,      //base
-            16      //cap
+      1,      //base
+      16      //cap
     };
     /* TODO: let's remove this if not used.
     RETRY_CONTEXT retry_ctx = {
@@ -767,7 +818,8 @@ sf_bool STDCALL http_perform(CURL *curl,
         if (DISABLE_VERIFY_PEER) {
             res = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
             if (res != CURLE_OK) {
-                log_error("Failed to disable peer verification [%s]", curl_easy_strerror(res));
+                log_error("Failed to disable peer verification [%s]",
+                          curl_easy_strerror(res));
                 break;
             }
         }
@@ -775,14 +827,16 @@ sf_bool STDCALL http_perform(CURL *curl,
         if (CA_BUNDLE_FILE) {
             res = curl_easy_setopt(curl, CURLOPT_CAINFO, CA_BUNDLE_FILE);
             if (res != CURLE_OK) {
-                log_error("Unable to set certificate file [%s]", curl_easy_strerror(res));
+                log_error("Unable to set certificate file [%s]",
+                          curl_easy_strerror(res));
                 break;
             }
         }
 
         res = curl_easy_setopt(curl, CURLOPT_SSLVERSION, SSL_VERSION);
         if (res != CURLE_OK) {
-            log_error("Unable to set SSL Version [%s]", curl_easy_strerror(res));
+            log_error("Unable to set SSL Version [%s]",
+                      curl_easy_strerror(res));
             break;
         }
 
@@ -790,12 +844,14 @@ sf_bool STDCALL http_perform(CURL *curl,
         if (chunk_downloader) {
             res = curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "");
             if (res != CURLE_OK) {
-                log_error("Unable to set accepted content encoding", curl_easy_strerror(res));
+                log_error("Unable to set accepted content encoding",
+                          curl_easy_strerror(res));
                 break;
             }
 
             // Set the first character in the buffer as a bracket
-            buffer.buffer = (char *) SF_CALLOC(1, 2); // Don't forget null terminator
+            buffer.buffer = (char *) SF_CALLOC(1,
+                                               2); // Don't forget null terminator
             buffer.size = 1;
             strncpy(buffer.buffer, "[", 2);
         }
@@ -807,16 +863,25 @@ sf_bool STDCALL http_perform(CURL *curl,
         res = curl_easy_perform(curl);
         /* Check for errors */
         if (res != CURLE_OK) {
-            log_error("curl_easy_perform() failed: %s", curl_easy_strerror(res));
-            SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_CURL, "Failed during easy perform", SF_SQLSTATE_UNABLE_TO_CONNECT);
+            log_error("curl_easy_perform() failed: %s",
+                      curl_easy_strerror(res));
+            SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_CURL,
+                                "Failed during easy perform",
+                                SF_SQLSTATE_UNABLE_TO_CONNECT);
         } else {
-            if (curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code) != CURLE_OK) {
-                log_error("Unable to get http response code [%s]", curl_easy_strerror(res));
-                SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_CURL, "Unable to get http response code", SF_SQLSTATE_UNABLE_TO_CONNECT);
+            if (curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code) !=
+                CURLE_OK) {
+                log_error("Unable to get http response code [%s]",
+                          curl_easy_strerror(res));
+                SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_CURL,
+                                    "Unable to get http response code",
+                                    SF_SQLSTATE_UNABLE_TO_CONNECT);
             } else if (http_code != 200) {
                 retry = is_retryable_http_code(http_code);
                 if (!retry) {
-                    SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_RETRY, "Received unretryable http code", SF_SQLSTATE_UNABLE_TO_CONNECT);
+                    SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_RETRY,
+                                        "Received unretryable http code",
+                                        SF_SQLSTATE_UNABLE_TO_CONNECT);
                 }
             } else {
                 ret = SF_BOOLEAN_TRUE;
@@ -826,12 +891,14 @@ sf_bool STDCALL http_perform(CURL *curl,
         // Reset everything
         reset_curl(curl);
         http_code = 0;
-    } while(retry);
+    }
+    while (retry);
 
     // We were successful so parse JSON from text
     if (ret) {
         if (chunk_downloader) {
-            buffer.buffer = (char *) SF_REALLOC(buffer.buffer, buffer.size + 2); // 1 byte for closing bracket, 1 for null terminator
+            buffer.buffer = (char *) SF_REALLOC(buffer.buffer, buffer.size +
+                                                               2); // 1 byte for closing bracket, 1 for null terminator
             memcpy(&buffer.buffer[buffer.size], "]", 1);
             buffer.size += 1;
             // Set null terminator
@@ -843,7 +910,9 @@ sf_bool STDCALL http_perform(CURL *curl,
         if (*json) {
             ret = SF_BOOLEAN_TRUE;
         } else {
-            SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON, "Unable to parse JSON text response.", SF_SQLSTATE_UNABLE_TO_CONNECT);
+            SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON,
+                                "Unable to parse JSON text response.",
+                                SF_SQLSTATE_UNABLE_TO_CONNECT);
             ret = SF_BOOLEAN_FALSE;
         }
     }
@@ -854,13 +923,14 @@ sf_bool STDCALL http_perform(CURL *curl,
 }
 
 sf_bool STDCALL is_retryable_http_code(int32 code) {
-    return ((code >= 500 && code < 600) || code == 400 || code == 403 || code == 408) ? SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
+    return ((code >= 500 && code < 600) || code == 400 || code == 403 ||
+            code == 408) ? SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
 }
 
 sf_bool STDCALL request(SF_CONNECT *sf,
                         cJSON **json,
                         const char *url,
-                        URL_KEY_VALUE* url_params,
+                        URL_KEY_VALUE *url_params,
                         int num_url_params,
                         char *body,
                         struct curl_slist *header,
@@ -881,14 +951,17 @@ sf_bool STDCALL request(SF_CONNECT *sf,
         } else {
             // Create header
             if (sf->token) {
-                header_token_size = strlen(HEADER_SNOWFLAKE_TOKEN_FORMAT) - 2 + strlen(sf->token) + 1;
+                header_token_size = strlen(HEADER_SNOWFLAKE_TOKEN_FORMAT) - 2 +
+                                    strlen(sf->token) + 1;
                 header_token = (char *) SF_CALLOC(1, header_token_size);
                 if (!header_token) {
                     SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_OUT_OF_MEMORY,
-                                        "Ran out of memory trying to create header token", SF_SQLSTATE_UNABLE_TO_CONNECT);
+                                        "Ran out of memory trying to create header token",
+                                        SF_SQLSTATE_UNABLE_TO_CONNECT);
                     goto cleanup;
                 }
-                snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->token);
+                snprintf(header_token, header_token_size,
+                         HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->token);
                 my_header = create_header_token(header_token);
             } else {
                 my_header = create_header_no_token();
@@ -896,19 +969,23 @@ sf_bool STDCALL request(SF_CONNECT *sf,
             log_debug("Created header");
         }
 
-        encoded_url = encode_url(curl, sf->protocol, sf->account, sf->host, sf->port, url, url_params, num_url_params, error);
+        encoded_url = encode_url(curl, sf->protocol, sf->account, sf->host,
+                                 sf->port, url, url_params, num_url_params,
+                                 error);
         if (encoded_url == NULL) {
             goto cleanup;
         }
 
         // Execute request and set return value to result
         if (request_type == POST_REQUEST_TYPE) {
-            ret = curl_post_call(sf, curl, encoded_url, my_header, body, json, error);
+            ret = curl_post_call(sf, curl, encoded_url, my_header, body, json,
+                                 error);
         } else if (request_type == GET_REQUEST_TYPE) {
             ret = curl_get_call(sf, curl, encoded_url, my_header, json, error);
         } else {
             SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_REQUEST,
-                                "An unknown request type was passed to the request function", SF_SQLSTATE_UNABLE_TO_CONNECT);
+                                "An unknown request type was passed to the request function",
+                                SF_SQLSTATE_UNABLE_TO_CONNECT);
             goto cleanup;
         }
     }
@@ -941,26 +1018,31 @@ sf_bool STDCALL renew_session(CURL *curl, SF_CONNECT *sf, SF_ERROR *error) {
     cJSON *data = NULL;
     cJSON_bool has_token = 0;
     URL_KEY_VALUE url_params[] = {
-            {"request_id=", NULL, NULL, NULL, 0, 0},
+      {"request_id=", NULL, NULL, NULL, 0, 0},
     };
     if (!curl) {
         return ret;
     }
     if (is_string_empty(sf->master_token)) {
-        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_REQUEST, "Missing master token when trying to renew session. "
-                "Are you sure your connection was properly setup?", SF_SQLSTATE_UNABLE_TO_CONNECT);
+        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_REQUEST,
+                            "Missing master token when trying to renew session. "
+                              "Are you sure your connection was properly setup?",
+                            SF_SQLSTATE_UNABLE_TO_CONNECT);
         return ret;
     }
     log_debug("Updating session. Master token: %s", sf->master_token);
     // Create header
-    header_token_size = strlen(HEADER_SNOWFLAKE_TOKEN_FORMAT) - 2 + strlen(sf->master_token) + 1;
+    header_token_size =
+      strlen(HEADER_SNOWFLAKE_TOKEN_FORMAT) - 2 + strlen(sf->master_token) + 1;
     header_token = (char *) SF_CALLOC(1, header_token_size);
     if (!header_token) {
         SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_OUT_OF_MEMORY,
-                            "Ran out of memory trying to create header token", SF_SQLSTATE_UNABLE_TO_CONNECT);
+                            "Ran out of memory trying to create header token",
+                            SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     }
-    snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT, sf->master_token);
+    snprintf(header_token, header_token_size, HEADER_SNOWFLAKE_TOKEN_FORMAT,
+             sf->master_token);
     header = create_header_token(header_token);
 
     // Create body and convert to string
@@ -970,33 +1052,42 @@ sf_bool STDCALL renew_session(CURL *curl, SF_CONNECT *sf, SF_ERROR *error) {
     // Create request id, set in url parameter and encode url
     uuid4_generate(request_id);
     url_params[0].value = request_id;
-    encoded_url = encode_url(curl, sf->protocol, sf->account, sf->host, sf->port, RENEW_SESSION_URL, url_params, 1, error);
+    encoded_url = encode_url(curl, sf->protocol, sf->account, sf->host,
+                             sf->port, RENEW_SESSION_URL, url_params, 1, error);
     if (!encoded_url) {
         goto cleanup;
     }
 
     // Successful call, non-null json, successful success code, data object and session token must all be present
     // otherwise set an error
-    if (!curl_post_call(sf, curl, encoded_url, header, s_body, &json, error) || !json) {
+    if (!curl_post_call(sf, curl, encoded_url, header, s_body, &json, error) ||
+        !json) {
         // Do nothing, let error propogate up from post call
         log_error("Curl call failed during renew session");
         goto cleanup;
     } else if ((json_error = json_copy_bool(&success, json, "success"))) {
         log_error("Error finding success in JSON response for renew session");
         JSON_ERROR_MSG(json_error, error_msg, "Success");
-        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON, error_msg, SF_SQLSTATE_UNABLE_TO_CONNECT);
+        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON, error_msg,
+                            SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     } else if (!success) {
         log_error("Renew session was unsuccessful");
-        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_RESPONSE, "Request returned as being unsuccessful", SF_SQLSTATE_UNABLE_TO_CONNECT);
+        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_RESPONSE,
+                            "Request returned as being unsuccessful",
+                            SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     } else if (!(data = cJSON_GetObjectItem(json, "data"))) {
         log_error("Missing data field in response");
-        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON, "No data object in JSON response", SF_SQLSTATE_UNABLE_TO_CONNECT);
+        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON,
+                            "No data object in JSON response",
+                            SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     } else if (!(has_token = cJSON_HasObjectItem(data, "sessionToken"))) {
         log_error("No session token in JSON response");
-        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON, "No session token in JSON response", SF_SQLSTATE_UNABLE_TO_CONNECT);
+        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON,
+                            "No session token in JSON response",
+                            SF_SQLSTATE_UNABLE_TO_CONNECT);
         goto cleanup;
     } else {
         log_debug("Successful renew session");
@@ -1028,7 +1119,8 @@ void STDCALL retry_ctx_free(RETRY_CONTEXT *retry_ctx) {
 }
 
 RETRY_CONTEXT *STDCALL retry_ctx_init(uint64 timeout) {
-    RETRY_CONTEXT *retry_ctx = (RETRY_CONTEXT *) SF_CALLOC(1, sizeof(RETRY_CONTEXT));
+    RETRY_CONTEXT *retry_ctx = (RETRY_CONTEXT *) SF_CALLOC(1,
+                                                           sizeof(RETRY_CONTEXT));
     retry_ctx->retry_timeout = timeout;
     retry_ctx->retry_count = 0;
     retry_ctx->sleep_time = 1;
@@ -1037,7 +1129,8 @@ RETRY_CONTEXT *STDCALL retry_ctx_init(uint64 timeout) {
 }
 
 uint32 STDCALL retry_ctx_next_sleep(RETRY_CONTEXT *retry_ctx) {
-    retry_ctx->sleep_time = decorrelate_jitter_next_sleep(retry_ctx->djb, retry_ctx->sleep_time);
+    retry_ctx->sleep_time = decorrelate_jitter_next_sleep(retry_ctx->djb,
+                                                          retry_ctx->sleep_time);
     return retry_ctx->sleep_time;
 }
 
@@ -1049,13 +1142,17 @@ sf_bool STDCALL set_tokens(SF_CONNECT *sf,
     // Get token
     if (json_copy_string(&sf->token, data, session_token_str)) {
         log_error("No valid token found in response");
-        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON, "Cannot find valid session token in response", SF_SQLSTATE_UNABLE_TO_CONNECT);
+        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON,
+                            "Cannot find valid session token in response",
+                            SF_SQLSTATE_UNABLE_TO_CONNECT);
         return SF_BOOLEAN_FALSE;
     }
     // Get master token
     if (json_copy_string(&sf->master_token, data, master_token_str)) {
         log_error("No valid master token found in response");
-        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON, "Cannot find valid master token in response", SF_SQLSTATE_UNABLE_TO_CONNECT);
+        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_BAD_JSON,
+                            "Cannot find valid master token in response",
+                            SF_SQLSTATE_UNABLE_TO_CONNECT);
         return SF_BOOLEAN_FALSE;
     }
 

@@ -8,8 +8,7 @@
 #include <example_setup.h>
 
 
-int main()
-{
+int main() {
     /* init */
     SF_STATUS status;
     initialize_snowflake_example(SF_BOOLEAN_FALSE);
@@ -29,7 +28,9 @@ int main()
     status = snowflake_connect(sf);
     if (status != SF_STATUS_SUCCESS) {
         SF_ERROR *error = snowflake_error(sf);
-        printf("OK, connecting to snowflake failed. Error message: %s. In File, %s, Line, %d\n", error->msg, error->file, error->line);
+        printf(
+          "OK, connecting to snowflake failed. Error message: %s. In File, %s, Line, %d\n",
+          error->msg, error->file, error->line);
     } else {
         fprintf(stderr, "Connecting to snowflake succeeded...exiting");
     }
@@ -58,11 +59,13 @@ int main()
     if (status != SF_STATUS_SUCCESS) {
         SF_ERROR *error = snowflake_error(sf);
         fprintf(stderr, "Failed connecting with minimum parameters set.\n");
-        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
+        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
+                error->msg, error->file, error->line);
     } else {
         printf("OK, connected with just account, user, password\n");
     }
-    snowflake_term(sf); // purge snowflake context to setup next connection attempt
+    snowflake_term(
+      sf); // purge snowflake context to setup next connection attempt
 
     // Connect with all parameters set
     sf = setup_snowflake_connection();
@@ -71,7 +74,8 @@ int main()
     if (status != SF_STATUS_SUCCESS) {
         SF_ERROR *error = snowflake_error(sf);
         fprintf(stderr, "Failed connecting with full parameters set\n");
-        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
+        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
+                error->msg, error->file, error->line);
     } else {
         printf("OK, connected with full parameters\n");
     }
