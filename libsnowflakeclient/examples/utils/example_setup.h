@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Snowflake Computing, Inc. All rights reserved.
+ * Copyright (c) 2017-2018 Snowflake Computing, Inc. All rights reserved.
  */
 
 #ifndef PDO_SNOWFLAKE_SETUP_H

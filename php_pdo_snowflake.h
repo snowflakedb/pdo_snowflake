@@ -1,4 +1,4 @@
-/* Copyright (c) 2017 Snowflake Computing Inc. All right reserved.  */
+/* Copyright (c) 2017-2018 Snowflake Computing Inc. All right reserved.  */
 
 #ifndef PHP_PDO_SNOWFLAKE_H
 #define PHP_PDO_SNOWFLAKE_H

@@ -1,4 +1,4 @@
-/* Copyright (c) 2017 Snowflake Computing Inc. All right reserved.  */
+/* Copyright (c) 2017-2018 Snowflake Computing Inc. All right reserved.  */
 
 #ifdef HAVE_CONFIG_H
 
