@@ -97,33 +97,31 @@ typedef enum sf_c_type {
  * Snowflake API status
  */
 typedef enum sf_status {
-    SF_STATUS_SUCCESS,
-    SF_STATUS_ERROR,
-    SF_STATUS_WARNING,
-    SF_STATUS_EOL
-} SF_STATUS;
+    // Special status are negative
+      SF_STATUS_EOL = -1,
+    // Success is zero
+      SF_STATUS_SUCCESS = 0,
+    // Errors are positive
+    SF_STATUS_ERROR_GENERAL = 240000,
+    SF_STATUS_ERROR_OUT_OF_MEMORY = 240001,
+    SF_STATUS_ERROR_REQUEST_TIMEOUT = 240002,
+    SF_STATUS_ERROR_DATA_CONVERSION = 240003,
+    SF_STATUS_ERROR_BAD_DATA_OUTPUT_TYPE = 240004,
+    SF_STATUS_ERROR_BAD_CONNECTION_PARAMS = 240005,
+    SF_STATUS_ERROR_STRING_FORMATTING = 240006,
+    SF_STATUS_ERROR_STRING_COPY = 240007,
+    SF_STATUS_ERROR_BAD_REQUEST = 240008,
+    SF_STATUS_ERROR_BAD_RESPONSE = 240009,
+    SF_STATUS_ERROR_BAD_JSON = 240010,
+    SF_STATUS_ERROR_RETRY = 240011,
+    SF_STATUS_ERROR_CURL = 240012,
+    SF_STATUS_ERROR_BAD_ATTRIBUTE_TYPE = 240013,
+    SF_STATUS_ERROR_APPLICATION_ERROR = 240014,
+    SF_STATUS_ERROR_PTHREAD = 240015,
+    SF_STATUS_ERROR_CONNECTION_NOT_EXIST = 240016,
+    SF_STATUS_ERROR_STATEMENT_NOT_EXIST = 240017,
 
-/**
- * Snowflake API status
- */
-typedef enum sf_error_code {
-    SF_ERROR_NONE,
-    SF_ERROR_OUT_OF_MEMORY,
-    SF_ERROR_REQUEST_TIMEOUT,
-    SF_ERROR_DATA_CONVERSION,
-    SF_ERROR_BAD_DATA_OUTPUT_TYPE,
-    SF_ERROR_BAD_CONNECTION_PARAMS,
-    SF_ERROR_STRING_FORMATTING,
-    SF_ERROR_STRING_COPY,
-    SF_ERROR_BAD_REQUEST,
-    SF_ERROR_BAD_RESPONSE,
-    SF_ERROR_BAD_JSON,
-    SF_ERROR_RETRY,
-    SF_ERROR_CURL,
-    SF_ERROR_BAD_ATTRIBUTE_TYPE,
-    SF_ERROR_APPLICATION_ERROR,
-    SF_ERROR_PTHREAD
-} SF_ERROR_CODE;
+} SF_STATUS;
 
 /**
  * SQLState for client errors
@@ -220,7 +218,7 @@ typedef enum sf_stmt_attribute {
  * Snowflake Error
  */
 typedef struct sf_error {
-    SF_ERROR_CODE error_code;
+    SF_STATUS error_code;
     char sqlstate[SF_SQLSTATE_LEN];
     char *msg;
     sf_bool is_shared_msg;
@@ -310,7 +308,7 @@ typedef struct sf_snowflake_statement {
     int64 total_rowcount;
     int64 total_fieldcount;
     int64 total_row_index;
-    void* params;
+    void *params;
     void *results;
     SF_COLUMN_DESC *desc;
     void *stmt_attrs;
@@ -321,20 +319,18 @@ typedef struct sf_snowflake_statement {
 /**
  * Bind input parameter context
  */
-typedef struct sf_snowflake_input
-{
-  size_t idx; /* One based index of the columns */
-  SF_C_TYPE c_type; /* input data type in C */
-  void *value; /* input value */
-  size_t len; /* input value length. valid only for SF_C_TYPE_STRING */
-  SF_TYPE type; /* (optional) target Snowflake data type */
+typedef struct sf_snowflake_input {
+    size_t idx; /* One based index of the columns */
+    SF_C_TYPE c_type; /* input data type in C */
+    void *value; /* input value */
+    size_t len; /* input value length. valid only for SF_C_TYPE_STRING */
+    SF_TYPE type; /* (optional) target Snowflake data type */
 } SF_BIND_INPUT;
 
 /**
  * Bind output parameter context
  */
-typedef struct sf_snowflake_output
-{
+typedef struct sf_snowflake_output {
     size_t idx; /* One based index of the columns */
     SF_C_TYPE c_type; /* expected data type in C */
     size_t max_length; /* maximum buffer size provided by application */
@@ -369,11 +365,11 @@ SF_STATUS STDCALL snowflake_global_term();
  * @return
  */
 SF_STATUS STDCALL snowflake_global_set_attribute(
-        SF_GLOBAL_ATTRIBUTE type, const void *value);
+  SF_GLOBAL_ATTRIBUTE type, const void *value);
 
 // TODO set description
 SF_STATUS STDCALL snowflake_global_get_attribute(
-        SF_GLOBAL_ATTRIBUTE type, void *value);
+  SF_GLOBAL_ATTRIBUTE type, void *value);
 
 /**
  * Initializes a SNOWFLAKE connection context
@@ -493,7 +489,8 @@ SF_STATUS STDCALL snowflake_propagate_error(SF_CONNECT *sf, SF_STMT *sfstmt);
  * @param command a query or command that returns results.
  * @return 0 if success, otherwise an errno is returned.
  */
-SF_STATUS STDCALL snowflake_query(SF_STMT *sfstmt, const char *command, size_t command_size);
+SF_STATUS STDCALL
+snowflake_query(SF_STMT *sfstmt, const char *command, size_t command_size);
 
 /**
  * Returns the number of affected rows in the last execution.  This function
@@ -535,7 +532,7 @@ const char *STDCALL snowflake_sqlstate(SF_STMT *sfstmt);
  * @param sf SNOWFLAKE_STMT context.
  * @return SF_COLUMN_DESC if success or NULL
  */
-SF_COLUMN_DESC* STDCALL snowflake_desc(SF_STMT *sfstmt);
+SF_COLUMN_DESC *STDCALL snowflake_desc(SF_STMT *sfstmt);
 
 /**
  * Prepares a statement.
@@ -544,7 +541,8 @@ SF_COLUMN_DESC* STDCALL snowflake_desc(SF_STMT *sfstmt);
  * @param command a query or command that returns results.
  * @return 0 if success, otherwise an errno is returned.
  */
-SF_STATUS STDCALL snowflake_prepare(SF_STMT *sfstmt, const char *command,  size_t command_size);
+SF_STATUS STDCALL
+snowflake_prepare(SF_STMT *sfstmt, const char *command, size_t command_size);
 
 /**
  * Sets a statement attribute.
@@ -554,7 +552,9 @@ SF_STATUS STDCALL snowflake_prepare(SF_STMT *sfstmt, const char *command,  size_
  * @param value pointer to the attribute value
  * @return 0 if success, otherwise an errno is returned.
  */
-SF_STATUS STDCALL snowflake_stmt_set_attr(SF_STMT *sfstmt, SF_STMT_ATTRIBUTE type, const void *value);
+SF_STATUS STDCALL
+snowflake_stmt_set_attr(SF_STMT *sfstmt, SF_STMT_ATTRIBUTE type,
+                        const void *value);
 
 /**
  * Gets a statement attribute value.
@@ -564,7 +564,8 @@ SF_STATUS STDCALL snowflake_stmt_set_attr(SF_STMT *sfstmt, SF_STMT_ATTRIBUTE typ
  * @param value pointer to the attribute value buffer
  * @return 0 if success, otherwise an errno is returned.
  */
-SF_STATUS STDCALL snowflake_stmt_get_attr(SF_STMT *sfstmt, SF_STMT_ATTRIBUTE type, void *value);
+SF_STATUS STDCALL
+snowflake_stmt_get_attr(SF_STMT *sfstmt, SF_STMT_ATTRIBUTE type, void *value);
 
 /**
  * Executes a statement.
@@ -599,7 +600,7 @@ uint64 STDCALL snowflake_num_params(SF_STMT *sfstmt);
  * @return 0 if success, otherwise an errno is returned.
  */
 SF_STATUS STDCALL snowflake_bind_param(
-    SF_STMT *sfstmt, SF_BIND_INPUT *sfbind);
+  SF_STMT *sfstmt, SF_BIND_INPUT *sfbind);
 
 /**
  * Binds buffers with the statement for result set processing.
@@ -609,7 +610,7 @@ SF_STATUS STDCALL snowflake_bind_param(
  * @return 0 if success, otherwise an errno is returned.
  */
 SF_STATUS STDCALL snowflake_bind_result(
-    SF_STMT *sfstmt, SF_BIND_OUTPUT *sfbind);
+  SF_STMT *sfstmt, SF_BIND_OUTPUT *sfbind);
 
 /**
  * Returns a query id associated with the statement after execution. If not

@@ -84,19 +84,19 @@ sf_bool init_locks(SF_CHUNK_DOWNLOADER *chunk_downloader) {
     const char *error_msg;
     if ((pthread_ret = pthread_mutex_init(&chunk_downloader->queue_lock, NULL)) != 0) {
         PTHREAD_LOCK_INIT_ERROR_MSG(pthread_ret, error_msg);
-        SET_SNOWFLAKE_ERROR(error, SF_ERROR_PTHREAD, error_msg, "");
+        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_PTHREAD, error_msg, "");
         goto cleanup;
     } else if ((pthread_ret = pthread_rwlock_init(&chunk_downloader->attr_lock, NULL)) != 0) {
         PTHREAD_LOCK_INIT_ERROR_MSG(pthread_ret, error_msg);
-        SET_SNOWFLAKE_ERROR(error, SF_ERROR_PTHREAD, error_msg, "");
+        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_PTHREAD, error_msg, "");
         goto cleanup;
     } else if ((pthread_ret = pthread_cond_init(&chunk_downloader->producer_cond, NULL)) != 0) {
         PTHREAD_LOCK_INIT_ERROR_MSG(pthread_ret, error_msg);
-        SET_SNOWFLAKE_ERROR(error, SF_ERROR_PTHREAD, error_msg, "");
+        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_PTHREAD, error_msg, "");
         goto cleanup;
     } else if ((pthread_ret = pthread_cond_init(&chunk_downloader->consumer_cond, NULL)) != 0) {
         PTHREAD_LOCK_INIT_ERROR_MSG(pthread_ret, error_msg);
-        SET_SNOWFLAKE_ERROR(error, SF_ERROR_PTHREAD, error_msg, "");
+        SET_SNOWFLAKE_ERROR(error, SF_STATUS_ERROR_PTHREAD, error_msg, "");
         goto cleanup;
     } else {
         // Success
@@ -173,7 +173,7 @@ sf_bool create_chunk_headers(SF_CHUNK_DOWNLOADER *chunk_downloader, cJSON *json_
         // I can use the faster case sensitive version
         item = cJSON_GetObjectItemCaseSensitive(json_headers, key);
         if (!item || (header_field_size = snprintf(NULL, 0, "%s: %s", key, item->valuestring)) < 0) {
-            SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_ERROR_BAD_JSON,
+            SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_STATUS_ERROR_BAD_JSON,
                                 "Could not find critical chunk header item", "");
             goto cleanup;
         }
@@ -286,7 +286,7 @@ SF_CHUNK_DOWNLOADER *STDCALL chunk_downloader_init(const char *qrmk,
                                           chunk_downloader_thread, (void *)chunk_downloader)) != 0) {
             chunk_downloader_term(chunk_downloader);
             PTHREAD_CREATE_ERROR_MSG(pthread_ret, error_msg);
-            SET_SNOWFLAKE_ERROR(sf_error, SF_ERROR_PTHREAD, error_msg, "");
+            SET_SNOWFLAKE_ERROR(sf_error, SF_STATUS_ERROR_PTHREAD, error_msg, "");
             return NULL;
         }
 
@@ -319,7 +319,7 @@ sf_bool STDCALL chunk_downloader_term(SF_CHUNK_DOWNLOADER *chunk_downloader) {
         pthread_rwlock_wrlock(&chunk_downloader->attr_lock);
         if (!chunk_downloader->has_error) {
             PTHREAD_LOCK_INIT_ERROR_MSG(pthread_ret, error_msg);
-            SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_ERROR_PTHREAD, error_msg, "");
+            SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_STATUS_ERROR_PTHREAD, error_msg, "");
             chunk_downloader->has_error = SF_BOOLEAN_TRUE;
         }
         pthread_rwlock_unlock(&chunk_downloader->attr_lock);
@@ -341,7 +341,7 @@ sf_bool STDCALL chunk_downloader_term(SF_CHUNK_DOWNLOADER *chunk_downloader) {
             // Set and error and then try to continue with cleanup
             pthread_rwlock_wrlock(&chunk_downloader->attr_lock);
             if (!chunk_downloader->has_error) {
-                SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_ERROR_PTHREAD, "Error during condition broadcast", "");
+                SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_STATUS_ERROR_PTHREAD, "Error during condition broadcast", "");
                 chunk_downloader->has_error = SF_BOOLEAN_TRUE;
             }
             pthread_rwlock_unlock(&chunk_downloader->attr_lock);
@@ -352,12 +352,12 @@ sf_bool STDCALL chunk_downloader_term(SF_CHUNK_DOWNLOADER *chunk_downloader) {
             if ((pthread_ret = pthread_join(chunk_downloader->threads[i], NULL)) != 0) {
                 if (!get_error(chunk_downloader)) {
                     PTHREAD_JOIN_ERROR_MSG(pthread_ret, error_msg);
-                    SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_ERROR_PTHREAD, error_msg, "");
+                    SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_STATUS_ERROR_PTHREAD, error_msg, "");
                 }
                 pthread_rwlock_wrlock(&chunk_downloader->attr_lock);
                 if (!chunk_downloader->has_error) {
                     PTHREAD_JOIN_ERROR_MSG(pthread_ret, error_msg);
-                    SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_ERROR_PTHREAD, error_msg, "");
+                    SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_STATUS_ERROR_PTHREAD, error_msg, "");
                     chunk_downloader->has_error = SF_BOOLEAN_TRUE;
                 }
                 pthread_rwlock_unlock(&chunk_downloader->attr_lock);
@@ -444,7 +444,7 @@ static void *chunk_downloader_thread(void *downloader) {
         if (pthread_cond_signal(&chunk_downloader->consumer_cond)) {
             pthread_rwlock_wrlock(&chunk_downloader->attr_lock);
             if (!chunk_downloader->has_error) {
-                SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_ERROR_PTHREAD,
+                SET_SNOWFLAKE_ERROR(chunk_downloader->sf_error, SF_STATUS_ERROR_PTHREAD,
                                     "Error sending consumer signal to notify of chunk downloaded", "");
                 chunk_downloader->has_error = SF_BOOLEAN_TRUE;
             }

@@ -13,7 +13,7 @@ typedef struct test_case_to_string {
     const int64 c1in;
     const char *c2in;
     const char *c2out;
-    SF_ERROR_CODE error_code;
+    SF_STATUS error_code;
 } TEST_CASE_TO_STRING;
 
 
@@ -141,7 +141,7 @@ int main() {
 
     while ((status = snowflake_fetch(sfstmt)) == SF_STATUS_SUCCESS) {
         TEST_CASE_TO_STRING v = test_cases[atoll(c1.value) - 1];
-        if (v.error_code == SF_ERROR_NONE) {
+        if (v.error_code == SF_STATUS_SUCCESS) {
             printf("result: %s, '%s(%s)'\n",
                    (char *) c1.value, (char *) c2.value,
                    c2.is_null ? "NULL" : "NOT NULL");
@@ -153,7 +153,7 @@ int main() {
     }
 
     // If we reached end of line, then we were successful
-    if (status == SF_STATUS_ERROR || status == SF_STATUS_WARNING) {
+    if (status > 0) {
         goto error_stmt;
     }
 

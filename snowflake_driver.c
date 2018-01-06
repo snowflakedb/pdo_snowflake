@@ -531,7 +531,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         snowflake_set_attribute(H->server, SF_CON_TIMEZONE, vars[9].optval);
     }
 
-    if (snowflake_connect(H->server) == SF_STATUS_ERROR) {
+    if (snowflake_connect(H->server) > 0) {
         pdo_snowflake_error(dbh);
         goto cleanup;
     }
