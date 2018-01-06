@@ -208,7 +208,7 @@ int main() {
     }
 
     // If we reached end of line, then we were successful
-    if (status == SF_STATUS_ERROR || status == SF_STATUS_WARNING) {
+    if (status > 0) {
         goto error_stmt;
     }
     status = snowflake_query(sfstmt, "drop table if exists t", 0);

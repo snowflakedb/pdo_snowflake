@@ -3,11 +3,8 @@
  */
 
 #include <string.h>
-#include <snowflake/logger.h>
 #include "error.h"
 #include "memory.h"
-
-#include <pthread.h>
 
 /*
  * Shared message buffer for emergency use.
@@ -16,12 +13,12 @@ pthread_mutex_t mutex_shared_msg = PTHREAD_MUTEX_INITIALIZER;
 static char _shared_msg[8192];
 
 void STDCALL set_snowflake_error(SF_ERROR *error,
-                                  SF_ERROR_CODE error_code,
-                                  const char *msg,
-                                  const char *sqlstate,
-                                  const char *sfqid,
-                                  const char *file,
-                                  int line) {
+                                 SF_STATUS error_code,
+                                 const char *msg,
+                                 const char *sqlstate,
+                                 const char *sfqid,
+                                 const char *file,
+                                 int line) {
     size_t msglen = strlen(msg);
     // NULL error passed in. Should never happen
     if (!error) {
@@ -38,7 +35,7 @@ void STDCALL set_snowflake_error(SF_ERROR *error,
     if (sqlstate != NULL) {
         /* set SQLState if specified */
         strncpy(error->sqlstate, sqlstate, sizeof(error->sqlstate));
-        error->sqlstate[sizeof(error->sqlstate)-1] = '\0';
+        error->sqlstate[sizeof(error->sqlstate) - 1] = '\0';
     }
 
     if (error->msg != NULL && !error->is_shared_msg) {
@@ -55,17 +52,18 @@ void STDCALL set_snowflake_error(SF_ERROR *error,
     } else {
         /* if failed to allocate a memory to store error */
         pthread_mutex_lock(&mutex_shared_msg);
-        size_t len = msglen > sizeof(_shared_msg) ? sizeof(_shared_msg) : msglen;
+        size_t len =
+          msglen > sizeof(_shared_msg) ? sizeof(_shared_msg) : msglen;
         memset(_shared_msg, 0, sizeof(_shared_msg));
         strncpy(_shared_msg, msg, len);
-        _shared_msg[sizeof(_shared_msg)-1] = '\0';
+        _shared_msg[sizeof(_shared_msg) - 1] = '\0';
         pthread_mutex_unlock(&mutex_shared_msg);
 
         error->is_shared_msg = SF_BOOLEAN_TRUE;
         error->msg = _shared_msg;
     }
 
-    error->file = (char*)file;
+    error->file = (char *) file;
     error->line = line;
 }
 
@@ -79,7 +77,7 @@ void STDCALL clear_snowflake_error(SF_ERROR *error) {
         SF_FREE(error->msg);
     }
     strcpy(error->sqlstate, SF_SQLSTATE_NO_ERROR);
-    error->error_code = SF_ERROR_NONE;
+    error->error_code = SF_STATUS_SUCCESS;
     error->msg = NULL;
     error->file = NULL;
     error->line = 0;
@@ -91,6 +89,7 @@ void STDCALL copy_snowflake_error(SF_ERROR *dst, SF_ERROR *src) {
     if (!dst || !src) {
         return;
     }
-    
-    set_snowflake_error(dst, src->error_code, src->msg, src->sqlstate, src->sfqid, src->file, src->line);
+
+    set_snowflake_error(dst, src->error_code, src->msg, src->sqlstate,
+                        src->sfqid, src->file, src->line);
 }

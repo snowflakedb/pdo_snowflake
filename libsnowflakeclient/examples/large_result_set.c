@@ -19,7 +19,8 @@ int main() {
     if (status != SF_STATUS_SUCCESS) {
         fprintf(stderr, "Connecting to snowflake failed, exiting...\n");
         SF_ERROR *error = snowflake_error(sf);
-        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
+        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
+                error->msg, error->file, error->line);
         goto cleanup;
     } else {
         printf("Connected to Snowflake\n");
@@ -27,10 +28,13 @@ int main() {
 
     /* query */
     sfstmt = snowflake_stmt(sf);
-    status = snowflake_query(sfstmt, "select seq4(),randstr(1000,random()) from table(generator(rowcount=>100000));", 0);
+    status = snowflake_query(sfstmt,
+                             "select seq4(),randstr(1000,random()) from table(generator(rowcount=>100000));",
+                             0);
     if (status != SF_STATUS_SUCCESS) {
         SF_ERROR *error = snowflake_stmt_error(sfstmt);
-        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
+        fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
+                error->msg, error->file, error->line);
     }
     SF_BIND_OUTPUT c1 = {0};
     int64 out = 0;
@@ -50,9 +54,10 @@ int main() {
 
     uint64 counter = 0;
     while ((status = snowflake_fetch(sfstmt)) != SF_STATUS_EOL) {
-        if (status == SF_STATUS_ERROR || status == SF_STATUS_WARNING) {
+        if (status > 0) {
             SF_ERROR *error = snowflake_stmt_error(sfstmt);
-            fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n", error->msg, error->file, error->line);
+            fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
+                    error->msg, error->file, error->line);
             break;
         }
         counter++;
@@ -64,10 +69,12 @@ int main() {
     printf("Number of rows in result: %llu\n", snowflake_num_rows(sfstmt));
     printf("Number of rows fetched: %llu\n", counter);
     if (counter == snowflake_num_rows(sfstmt)) {
-        printf("Number of rows fetched equals number of rows expected in result\n");
+        printf(
+          "Number of rows fetched equals number of rows expected in result\n");
     } else {
-        status = SF_STATUS_ERROR;
-        fprintf(stderr, "Number of rows fetched is different from number of rows expected\n");
+        status = SF_STATUS_ERROR_GENERAL;
+        fprintf(stderr,
+                "Number of rows fetched is different from number of rows expected\n");
         goto cleanup;
     }
 

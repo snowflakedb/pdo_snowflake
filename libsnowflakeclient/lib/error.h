@@ -21,13 +21,15 @@ extern "C" {
 #define SET_SNOWFLAKE_STMT_ERROR(e, ec, m, sqlstate, uuid) set_snowflake_error(e, ec, m, sqlstate, uuid, __FILE__, __LINE__)
 
 void STDCALL set_snowflake_error(SF_ERROR *error,
-                                  SF_ERROR_CODE error_code,
-                                  const char *msg,
-                                  const char *sqlstate,
-                                  const char *sfqid,
-                                  const char *file,
-                                  int line);
+                                 SF_STATUS error_code,
+                                 const char *msg,
+                                 const char *sqlstate,
+                                 const char *sfqid,
+                                 const char *file,
+                                 int line);
+
 void STDCALL clear_snowflake_error(SF_ERROR *error);
+
 void STDCALL copy_snowflake_error(SF_ERROR *dst, SF_ERROR *src);
 
 #ifdef __cplusplus

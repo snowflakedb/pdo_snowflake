@@ -79,7 +79,7 @@ int main() {
     printf("Number of rows: %d\n", (int) snowflake_num_rows(sfstmt));
 
     while ((status = snowflake_fetch(sfstmt)) != SF_STATUS_EOL) {
-        if (status == SF_STATUS_ERROR || status == SF_STATUS_WARNING) {
+        if (status > 0) {
             SF_ERROR *error = snowflake_stmt_error(sfstmt);
             fprintf(stderr, "Error message: %s\nIn File, %s, Line, %d\n",
                     error->msg, error->file, error->line);
