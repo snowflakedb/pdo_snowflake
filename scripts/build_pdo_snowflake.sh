@@ -3,8 +3,9 @@
 # Build PDO Snowflake
 #
 function usage() {
-    echo "Usage: `basename $0` [-r]"
+    echo "Usage: `basename $0` [-r] [-p]"
     echo "-r                 : Rebuild Snowflake Client. default: no build"
+    echo "-p                 : Rebuild Snowflake Client with profile option. default: no profile"
     exit 2
 }
 set -o pipefail
@@ -14,17 +15,23 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/..
 
 rebuild_snowflake_client=false
-while getopts "hr" opt; do
+rebuild_snowflake_client_with_profile=false
+while getopts "hrp" opt; do
   case $opt in
     r) rebuild_snowflake_client=true ;;
+    p) rebuild_snowflake_client_with_profile=true ;;
     h) usage;;
     \?) echo "Invalid option: -$OPTARG" >&2; exit 1 ;;
     :) echo "Option -$OPTARG requires an argument." >&2; exit 1 ;;
   esac
 done
 
+REBUILD_SNOWFLAKE_CLIENT_OPTIONS=()
+if [[ "$rebuild_snowflake_client_with_profile" == "true" ]]; then
+    REBUILD_SNOWFLAKE_CLIENT_OPTIONS+=("-p")
+fi
 if [[ "$rebuild_snowflake_client" == "true" ]]; then
-    ./libsnowflakeclient/scripts/build_libsnowflakeclient.sh
+    ./libsnowflakeclient/scripts/build_libsnowflakeclient.sh "${REBUILD_SNOWFLAKE_CLIENT_OPTIONS[@]}"
 fi
 export PATH=$PHP_HOME/bin:$PATH
 if [[ -e "Makefile" ]]; then
