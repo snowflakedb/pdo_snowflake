@@ -64,7 +64,7 @@ REPORT_COVERAGE=1 $DIR/build_pdo_snowflake.sh -r
 travis_fold_end
 
 travis_fold_start ctests "Tests C Library"
-$LIB_SNOWFLAKE_CLIENT_DIR/scripts/run_tests.sh
+$LIB_SNOWFLAKE_CLIENT_DIR/scripts/run_tests.sh -m
 travis_fold_end
 
 travis_fold_start phptests "Tests PHP PDO"
