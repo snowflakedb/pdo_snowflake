@@ -22,7 +22,7 @@ VALGRIND_CMD=(
 use_valgrind=()
 while getopts "hm" opt; do
   case $opt in
-    m) use_valgrind=$VALGRIND_CMD ;;
+    m) use_valgrind=("${VALGRIND_CMD[@]}") ;;
     h) usage;;
     \?) echo "Invalid option: -$OPTARG" >&2; exit 1 ;;
     :) echo "Option -$OPTARG requires an argument." >&2; exit 1 ;;
@@ -31,6 +31,6 @@ done
 
 for f in $(ls $DIR/../cmake-build/examples/ex_*); do
     echo -e "\n==> $f"
-    echo ${use_valgrind[@]} $f
-    ${use_valgrind[@]} $f
+    echo "${use_valgrind[@]}" $f
+    "${use_valgrind[@]}" $f
 done
