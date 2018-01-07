@@ -14,6 +14,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 VALGRIND_CMD=(
     "valgrind"
+    "--tool=memcheck"
     "--leak-check=full"
     "--error-exitcode=1"
     "--run-libc-freeres=no"

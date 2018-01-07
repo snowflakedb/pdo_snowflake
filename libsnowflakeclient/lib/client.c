@@ -1444,10 +1444,13 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
                 // We don't care if there is no qrmk, so ignore return code
                 json_copy_string(&qrmk, data, "qrmk");
                 chunk_headers = cJSON_GetObjectItem(data, "chunkHeaders");
-                sfstmt->chunk_downloader = chunk_downloader_init(qrmk,
-                                                                 chunk_headers,
-                                                                 chunks, 2, 4,
-                                                                 &sfstmt->error);
+                sfstmt->chunk_downloader = chunk_downloader_init(
+                  qrmk,
+                  chunk_headers,
+                  chunks,
+                  2, // thread count
+                  4, // fetch slot
+                  &sfstmt->error);
                 if (!sfstmt->chunk_downloader) {
                     // Unable to create chunk downloader. Error is set in chunk_downloader_init function.
                     goto cleanup;
