@@ -7,7 +7,7 @@ before_install:
   - openssl aes-256-cbc -k "$super_secret_password" -in parameters.json.enc -out parameters.json -d
 install:
   - sudo apt-get update
-  - sudo apt-get install lcov
+  - sudo apt-get install lcov valgrind
 script:
   - ./scripts/run_travis.sh
 after_success:
