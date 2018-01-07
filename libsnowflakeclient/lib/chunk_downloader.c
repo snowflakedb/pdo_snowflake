@@ -362,6 +362,7 @@ sf_bool STDCALL chunk_downloader_term(SF_CHUNK_DOWNLOADER *chunk_downloader) {
                 }
                 pthread_rwlock_unlock(&chunk_downloader->attr_lock);
             }
+            pthread_detach(chunk_downloader->threads[i]); // TODO
         }
     } while (0);
 
