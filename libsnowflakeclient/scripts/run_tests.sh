@@ -15,8 +15,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 VALGRIND_CMD=(
     "valgrind"
     "--leak-check=full"
-    "--run-libc-freeres=no"
     "--error-exitcode=1"
+    "--run-libc-freeres=no"
 )
 
 use_valgrind=()
@@ -31,5 +31,6 @@ done
 
 for f in $(ls $DIR/../cmake-build/examples/ex_*); do
     echo -e "\n==> $f"
+    echo ${use_valgrind[@]} $f
     ${use_valgrind[@]} $f
 done
