@@ -30,7 +30,7 @@ int main() {
     sfstmt = snowflake_stmt(sf);
     status = snowflake_query(
       sfstmt,
-      "select seq4(),randstr(1000,random()) from table(generator(rowcount=>25000));",
+      "select seq4(),randstr(1000,random()) from table(generator(rowcount=>100000));",
       0);
     if (status != SF_STATUS_SUCCESS) {
         SF_ERROR *error = snowflake_stmt_error(sfstmt);

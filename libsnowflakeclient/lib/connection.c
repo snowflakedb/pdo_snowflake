@@ -536,7 +536,7 @@ char *encode_url(CURL *curl,
 cleanup:
     // Free created memory
     for (i = 0; i < num_args; i++) {
-        SF_FREE(vars[i].formatted_value);
+        curl_free(vars[i].formatted_value);
     }
 
     return encoded_url;
@@ -1018,7 +1018,7 @@ sf_bool STDCALL renew_session(CURL *curl, SF_CONNECT *sf, SF_ERROR *error) {
     cJSON *data = NULL;
     cJSON_bool has_token = 0;
     URL_KEY_VALUE url_params[] = {
-      {"request_id=", NULL, NULL, NULL, 0, 0},
+      {.key="request_id=", .value=NULL, .formatted_key=NULL, .formatted_value=NULL, .key_size=0, .value_size=0},
     };
     if (!curl) {
         return ret;
