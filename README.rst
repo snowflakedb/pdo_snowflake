@@ -113,7 +113,7 @@ and verify no error in the output:
      ERROR SUMMARY: 0 errors from 0 contexts ...
 
 Test Framework
---------------------
+----------------------------------------------------------------------
 
 The PHP PDO Snowflake driver uses phpt test framework. Refer the following documents to write tests.
 
@@ -121,7 +121,7 @@ The PHP PDO Snowflake driver uses phpt test framework. Refer the following docum
 - https://qa.php.net/phpt_details.php
 
 Check if the PDO Snowflake module can be loaded
---------------------
+----------------------------------------------------------------------
 
 Run the following command to check if PHP PDO Driver for Snowflake is successfully loaded in memory.
 
@@ -129,3 +129,31 @@ Run the following command to check if PHP PDO Driver for Snowflake is successful
 
     $PHP_HOME/bin/php -dextension=modules/pdo_snowflake.so -m | grep pdo_snowflake
 
+Trouble Shootings
+================================================================================
+
+Cannot load module 'pdo_snowflake' because required module 'pdo' is not loaded
+----------------------------------------------------------------------
+
+In some environments, e.g., Ubuntu 16, when you run ``make test``, the following error message shows up and no test won't run.
+
+.. code-block:: bash
+
+    PHP Warning:  Cannot load module 'pdo_snowflake' because required module 'pdo' is not loaded in Unknown on line 0
+
+Ensure the php has PDO:
+
+.. code-block:: bash
+
+    $ php -i | grep -i "pdo support"
+    PDO support => enabled
+
+If not installed, install the package. WIP
+
+Locate ``pdo.so`` under ``/usr/lib`` and specify it in ``phpt`` files, e.g.,
+
+.. code-block:: bash
+
+    --INI--
+    extension=/usr/lib/php/20151012/pdo.so
+    pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
