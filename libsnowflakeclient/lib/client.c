@@ -522,7 +522,7 @@ SF_STATUS STDCALL snowflake_term(SF_CONNECT *sf) {
     if (sf->token && sf->master_token) {
         /* delete the session */
         URL_KEY_VALUE url_params[] = {
-          {"delete=", "true", NULL, NULL, 0, 0}
+          {.key="delete=", .value="true", .formatted_key=NULL, .formatted_value=NULL, .key_size=0, .value_size=0}
         };
         if (request(sf, &resp, DELETE_SESSION_URL, url_params,
                     sizeof(url_params) / sizeof(URL_KEY_VALUE), NULL, NULL,
@@ -587,11 +587,11 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf) {
     char *s_resp = NULL;
     // Encoded URL to use with libcurl
     URL_KEY_VALUE url_params[] = {
-      {"request_id=",    sf->request_id, NULL, NULL, 0, 0},
-      {"&databaseName=", sf->database,   NULL, NULL, 0, 0},
-      {"&schemaName=",   sf->schema,     NULL, NULL, 0, 0},
-      {"&warehouse=",    sf->warehouse,  NULL, NULL, 0, 0},
-      {"&roleName=",     sf->role,       NULL, NULL, 0, 0},
+      {.key = "request_id=", .value=sf->request_id, .formatted_key=NULL, .formatted_value=NULL, .key_size=0, .value_size=0},
+      {.key = "&databaseName=", .value=sf->database, .formatted_key=NULL, .formatted_value=NULL, .key_size=0, .value_size=0},
+      {.key = "&schemaName=", .value=sf->schema, .formatted_key=NULL, .formatted_value=NULL, .key_size=0, .value_size=0},
+      {.key = "&warehouse=", .value=sf->warehouse, .formatted_key=NULL, .formatted_value=NULL, .key_size=0, .value_size=0},
+      {.key = "&roleName=", .value=sf->role, .formatted_key=NULL, .formatted_value=NULL, .key_size=0, .value_size=0},
     };
     SF_STATUS ret = SF_STATUS_ERROR_GENERAL;
 
@@ -1310,7 +1310,7 @@ SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt) {
     sf_bool success = SF_BOOLEAN_FALSE;
     uuid4_generate(sfstmt->request_id);
     URL_KEY_VALUE url_params[] = {
-      {"requestId=", sfstmt->request_id, NULL, NULL, 0, 0}
+      {.key="requestId=", .value=sfstmt->request_id, .formatted_key=NULL, .formatted_value=NULL, .key_size=0, .value_size=0}
     };
     size_t i;
     cJSON *bindings = NULL;

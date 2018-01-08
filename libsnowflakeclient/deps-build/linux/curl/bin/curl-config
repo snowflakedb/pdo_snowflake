@@ -164,7 +164,7 @@ while test $# -gt 0; do
         ;;
 
     --configure)
-        echo " '--with-ssl=/home/stakeda/git/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/openssl' '--without-nss' '--enable-static' '--disable-shared' '--prefix=/home/stakeda/git/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/curl' '--without-libssh2' '--disable-rtsp' '--disable-ldap' '--disable-ldaps' '--disable-telnet' '--disable-tftp' '--disable-imap' '--disable-smb' '--disable-smtp' '--disable-gopher' '--disable-pop3' '--disable-ftp' '--disable-dict' '--disable-file' '--disable-manual' 'LIBS=-ldl'"
+        echo " '--enable-debug' '--with-ssl=/home/stakeda/git/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/openssl' '--without-nss' '--enable-static' '--disable-shared' '--prefix=/home/stakeda/git/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/curl' '--without-libssh2' '--disable-rtsp' '--disable-ldap' '--disable-ldaps' '--disable-telnet' '--disable-tftp' '--disable-imap' '--disable-smb' '--disable-smtp' '--disable-gopher' '--disable-pop3' '--disable-ftp' '--disable-dict' '--disable-file' '--disable-manual' 'LIBS=-ldl'"
         ;;
 
     *)
