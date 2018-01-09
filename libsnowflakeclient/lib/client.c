@@ -105,6 +105,8 @@ static void alloc_buffer_and_copy(char **var, const char *str) {
         str_size = strlen(str) + 1; // For null terminator
         *var = (char *) SF_CALLOC(1, str_size);
         strncpy(*var, str, str_size);
+    } else {
+        *var = NULL;
     }
 }
 
@@ -275,13 +277,17 @@ static SF_STATUS STDCALL _reset_connection_parameters(
     }
     SF_STATUS ret = SF_STATUS_ERROR_GENERAL;
     if (session_info != NULL) {
+        char msg[1024];
         // database
         cJSON *db = cJSON_GetObjectItem(session_info, "databaseName");
-        if (do_validate && sf->database && db->valuestring == NULL) {
+        if (do_validate && sf->database && sf->database[0] != (char)0 &&
+            db->valuestring == NULL) {
+            sprintf(msg, "Specified database doesn't exists: [%s]",
+                    sf->database);
             SET_SNOWFLAKE_ERROR(
               &sf->error,
               SF_STATUS_ERROR_APPLICATION_ERROR,
-              "Specified database doesn't exists",
+              msg,
               SF_SQLSTATE_UNABLE_TO_CONNECT
             );
             goto cleanup;
@@ -290,11 +296,14 @@ static SF_STATUS STDCALL _reset_connection_parameters(
 
         // schema
         cJSON *schema = cJSON_GetObjectItem(session_info, "schemaName");
-        if (do_validate && sf->schema && schema->valuestring == NULL) {
+        if (do_validate && sf->schema && sf->schema[0] != (char)0 &&
+            schema->valuestring == NULL) {
+            sprintf(msg, "Specified schema doesn't exists: [%s]",
+                    sf->schema);
             SET_SNOWFLAKE_ERROR(
               &sf->error,
               SF_STATUS_ERROR_APPLICATION_ERROR,
-              "Specified schema doesn't exists",
+              msg,
               SF_SQLSTATE_UNABLE_TO_CONNECT
             );
             goto cleanup;
@@ -304,11 +313,14 @@ static SF_STATUS STDCALL _reset_connection_parameters(
 
         // warehouse
         cJSON *warehouse = cJSON_GetObjectItem(session_info, "warehouseName");
-        if (do_validate && sf->warehouse && warehouse->valuestring == NULL) {
+        if (do_validate && sf->warehouse && sf->warehouse[0] != (char)0 &&
+            warehouse->valuestring == NULL) {
+            sprintf(msg, "Specified warehouse doesn't exists: [%s]",
+                    sf->warehouse);
             SET_SNOWFLAKE_ERROR(
               &sf->error,
               SF_STATUS_ERROR_APPLICATION_ERROR,
-              "Specified warehouse doesn't exists",
+              msg,
               SF_SQLSTATE_UNABLE_TO_CONNECT
             );
             goto cleanup;
