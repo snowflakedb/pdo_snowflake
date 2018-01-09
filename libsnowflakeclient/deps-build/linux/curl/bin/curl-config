@@ -148,7 +148,7 @@ while test $# -gt 0; do
            CURLLIBDIR=""
         fi
         if test "Xyes" = "Xyes"; then
-          echo ${CURLLIBDIR}-lcurl -lssl -lcrypto -lssl -lcrypto -lz -lrt -ldl
+          echo ${CURLLIBDIR}-lcurl -lssl -lcrypto -lpthread -lssl -lcrypto -lz -lrt -ldl -lpthread
         else
           echo ${CURLLIBDIR}-lcurl
         fi
@@ -156,7 +156,7 @@ while test $# -gt 0; do
 
     --static-libs)
         if test "Xyes" != "Xno" ; then
-          echo ${exec_prefix}/lib/libcurl.a -L/home/stakeda/git/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/openssl/lib -lssl -lcrypto -lssl -lcrypto -lz -lrt -ldl
+          echo ${exec_prefix}/lib/libcurl.a -L/home/stakeda/git/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/openssl/lib -lssl -lcrypto -lpthread -lssl -lcrypto -lz -lrt -ldl -lpthread
         else
           echo "curl was built with static libraries disabled" >&2
           exit 1

@@ -22779,7 +22779,7 @@ if ${ac_cv_lib_crypto_HMAC_Update+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcrypto  $LIBS"
+LIBS="-lcrypto -lpthread $LIBS -lpthread"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -22809,7 +22809,7 @@ $as_echo "$ac_cv_lib_crypto_HMAC_Update" >&6; }
 if test "x$ac_cv_lib_crypto_HMAC_Update" = xyes; then :
 
      HAVECRYPTO="yes"
-     LIBS="-lcrypto $LIBS"
+     LIBS="-lcrypto -lpthread $LIBS -lpthread"
 
 else
 
@@ -22821,7 +22821,7 @@ if ${ac_cv_lib_crypto_HMAC_Init_ex+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcrypto  $LIBS"
+LIBS="-lcrypto -lpthread $LIBS -lpthread"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -22851,7 +22851,7 @@ $as_echo "$ac_cv_lib_crypto_HMAC_Init_ex" >&6; }
 if test "x$ac_cv_lib_crypto_HMAC_Init_ex" = xyes; then :
 
        HAVECRYPTO="yes"
-       LIBS="-lcrypto $LIBS"
+LIBS="-lcrypto -lpthread $LIBS -lpthread"
 else
 
 
@@ -23930,7 +23930,7 @@ if ${ac_cv_lib_crypto_SRP_Calc_client_key+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcrypto  $LIBS"
+LIBS="-lcrypto -lpthread $LIBS -lpthread"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
