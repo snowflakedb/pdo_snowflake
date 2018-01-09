@@ -1,0 +1,20 @@
+FROM ubuntu:14.04
+
+# PHP 7.1
+ARG PHP_VERSION=7.1
+
+RUN apt-get update -q -y
+RUN apt-get update -q -y
+RUN apt-get install -y valgrind git vim cmake pkg-config curl gcc g++
+RUN apt-get install -y  language-pack-en-base software-properties-common
+
+ENV LC_ALL en_US.UTF-8
+ENV PHP_HOME=/usr
+
+RUN add-apt-repository ppa:ondrej/php
+RUN apt-get update -q -y
+RUN apt-get install -y php${PHP_VERSION}-dev php${PHP_VERSION}-cli php${PHP_VERSION}-fpm php${PHP_VERSION}-gd php${PHP_VERSION}-json php${PHP_VERSION}-mysql php${PHP_VERSION}-readline
+
+RUN apt-get install -y zlib1g-dev
+
+RUN apt-get install -y jq
