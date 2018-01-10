@@ -42,7 +42,7 @@ Mount $HOME to ``/cfg`` and start a container:
 
 .. code-block:: bash
 
-    docker run -v $HOME:/cfg -it pdo-snowflake-ubuntu12:latest
+    docker run -v $HOME:/cfg -it pdo-snowflake-ubuntu14:latest
 
 Set up
 ----------------------------------------------------------------------
