@@ -55,8 +55,8 @@ Checkout and build code. Update the test parameters
     git clone https://github.com/snowflakedb/pdo_snowflake.git
     cd pdo_snowflake
     ./scripts/build_pdo_snowflake.sh -r
-    PHP_JSON=$(find /usr/lib/php -name "pdo.so") && for f in $(ls tests/\*.phpt); do sed -i "/--INI--/a extension=$PHP_JSON" $f; done
-    PHP_JSON=$(find /usr/lib/php -name "json.so") && for f in $(ls tests/\*.phpt); do sed -i "/--INI--/a extension=$PHP_JSON" $f; done
+    PHP_EXT=$(find /usr/lib/php -name "pdo.so") && for f in $(ls tests/\*.phpt); do sed -i "/--INI--/a extension=$PHP_EXT" $f; done
+    PHP_EXT=$(find /usr/lib/php -name "json.so") && for f in $(ls tests/\*.phpt); do sed -i "/--INI--/a extension=$PHP_EXT" $f; done
 
 Test
 ----------------------------------------------------------------------
