@@ -603,6 +603,17 @@ SF_STATUS STDCALL snowflake_bind_param(
   SF_STMT *sfstmt, SF_BIND_INPUT *sfbind);
 
 /**
+ * Binds an array of parameters with the statement for execution.
+ *
+ * @param sfstmt SF_STMT context.
+ * @param sfbind_array SF_BIND_INPUT array of bind input values.
+ * @param size size_t size of the parameter array (sfbind_array).
+ * @return 0 if success, otherwise an errno is returned.
+ */
+SF_STATUS snowflake_bind_param_array(
+  SF_STMT *sfstmt, SF_BIND_INPUT *sfbind_array, size_t size);
+
+/**
  * Binds buffers with the statement for result set processing.
  *
  * @param sfstmt SNOWFLAKE_STMT context.
@@ -611,6 +622,17 @@ SF_STATUS STDCALL snowflake_bind_param(
  */
 SF_STATUS STDCALL snowflake_bind_result(
   SF_STMT *sfstmt, SF_BIND_OUTPUT *sfbind);
+
+/**
+ * Binds an array of buffers with the statement for result set processing.
+ *
+ * @param sfstmt SF_STMT context.
+ * @param sfbind_array SF_BIND_OUTPUT array of result buffers.
+ * @param size size_t size of the result buffer array (sfbind_array).
+ * @return 0 if success, otherwise an errno is returned.
+ */
+SF_STATUS snowflake_bind_result_array(
+  SF_STMT *sfstmt, SF_BIND_OUTPUT *sfbind_array, size_t size);
 
 /**
  * Returns a query id associated with the statement after execution. If not

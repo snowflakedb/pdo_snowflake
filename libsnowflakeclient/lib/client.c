@@ -925,6 +925,22 @@ SF_STATUS STDCALL snowflake_bind_param(
     return SF_STATUS_SUCCESS;
 }
 
+SF_STATUS snowflake_bind_param_array(
+  SF_STMT *sfstmt, SF_BIND_INPUT *sfbind_array, size_t size) {
+    size_t i;
+    if (!sfstmt) {
+        return SF_STATUS_ERROR_STATEMENT_NOT_EXIST;
+    }
+    clear_snowflake_error(&sfstmt->error);
+    if (sfstmt->params == NULL) {
+        sfstmt->params = sf_array_list_init();
+    }
+    for (i = 0; i < size; i++) {
+        sf_array_list_set(sfstmt->params, &sfbind_array[i], sfbind_array[i].idx);
+    }
+    return SF_STATUS_SUCCESS;
+}
+
 SF_STATUS STDCALL snowflake_bind_result(
   SF_STMT *sfstmt, SF_BIND_OUTPUT *sfbind) {
     if (!sfstmt) {
@@ -935,6 +951,22 @@ SF_STATUS STDCALL snowflake_bind_result(
         sfstmt->results = sf_array_list_init();
     }
     sf_array_list_set(sfstmt->results, sfbind, sfbind->idx);
+    return SF_STATUS_SUCCESS;
+}
+
+SF_STATUS snowflake_bind_result_array(
+  SF_STMT *sfstmt, SF_BIND_OUTPUT *sfbind_array, size_t size) {
+    size_t i;
+    if (!sfstmt) {
+        return SF_STATUS_ERROR_STATEMENT_NOT_EXIST;
+    }
+    clear_snowflake_error(&sfstmt->error);
+    if (sfstmt->results == NULL) {
+        sfstmt->results = sf_array_list_init();
+    }
+    for (i = 0; i < size; i++) {
+        sf_array_list_set(sfstmt->results, &sfbind_array[i], sfbind_array[i].idx);
+    }
     return SF_STATUS_SUCCESS;
 }
 
