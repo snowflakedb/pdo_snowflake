@@ -28,7 +28,8 @@ SET(EXAMPLES
         selecttstz
         selecttime
         check_ctypes
-        bind_params)
+        bind_params
+        bind_results)
 
 set(SOURCE_UTILS
         example_setup.c)
