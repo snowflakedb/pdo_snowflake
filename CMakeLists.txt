@@ -34,6 +34,7 @@ set(SOURCE_FILES
 include_directories(
         include
         libsnowflakeclient/include
+        libsnowflakeclient/lib
         ${PHP_HOME}/include/php
         ${PHP_HOME}/include/php/main
         ${PHP_HOME}/include/php/TSRM
@@ -41,7 +42,6 @@ include_directories(
         ${PHP_HOME}/include/php/ext
         ${PHP_HOME}/include/php/ext/date/lib
 )
-add_subdirectory(libsnowflakeclient)
 
 add_library(pdo_snowflake SHARED ${SOURCE_FILES})
 

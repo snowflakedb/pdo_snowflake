@@ -1,14 +1,11 @@
 ********************************************************************************
-Snowflake Connector for C
+Snowflake Connector for C/C++
 ********************************************************************************
 
-Snowflake Connector for C provides the API for C language.
+The source code for Snowflake Connector for C/C++ has been moved to https://github.com/snowflakedb/libsnowflakeclient.
 
-Ensure you have cmake 2.8 or later version.
+Update headers and libraries as needed.
 
-.. code-block:: bash
-
-    mkdir cmake-build
-    cd cmake-build
-    cmake .. -G"Unix Makefiles"
-    make
+- ./include/snowflake        ... The header files for Snowflake Connector for C/C++
+- ./lib/libsnowflakeclient.a ... The library file for Snowflake Connector for C/C++
+- ./dep-build                ... Curl, OpenSSL and Zlib headers and libraries.
