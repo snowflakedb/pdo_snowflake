@@ -56,15 +56,11 @@ if [[ -n "$TRAVIS_JOB_ID" ]]; then
 fi
 travis_fold_end
 
-travis_fold_start build_pdo_snowflake "Builds C Library and PHP PDO"
+travis_fold_start build_pdo_snowflake "Builds PHP PDO"
 echo "PHP_HOME:   $PHP_HOME"
 echo "phpize:     $(which phpize)"
 echo "php-config: $(which php-config)"
 REPORT_COVERAGE=1 $DIR/build_pdo_snowflake.sh
-travis_fold_end
-
-travis_fold_start ctests "Tests C Library"
-$LIB_SNOWFLAKE_CLIENT_DIR/scripts/run_tests.sh
 travis_fold_end
 
 travis_fold_start phptests "Tests PHP PDO"
