@@ -74,20 +74,7 @@ Clone the this repository and run ``phpize``, ``configure``, ``make`` and ``make
     ./scripts/build_pdo_snowflake.sh -r # build all
     REPORT_EXIT_STATUS=1 NO_INTERACTION=true make test
 
-Profile C API
-----------------------------------------------------------------------
-
-If you want to use ``gprof`` for C API, add ``-p`` option to the build script, run a test program followed by ``gprof``, for example:
-
-.. code-block:: bash
-
-    ./scripts/build_pdo_snowflake.sh -r -p # build all with profile option
-    ./libsnowflakeclient/cmake-build/examples/ex_connect
-    gprof ./libsnowflakeclient/cmake-build/examples/ex_connect gmon.out
-
-Note PHP PDO won't be built with profile option as ``gprof`` won't work the dynamic link library (.so). Use callgrind.
-
-Profile PHP PDO
+Profile
 ----------------------------------------------------------------------
 
 You can use ``callgrind`` to profile PHP PDO programs. For example, run ``tests/selectnum.phpt`` testcase using ``valgrind`` along with ``callgrind`` option.
