@@ -71,7 +71,7 @@ Clone the this repository and run ``phpize``, ``configure``, ``make`` and ``make
     git clone git@github.com:snowflakedb/pdo_snowflake.git
     cd pdo_snowflake
     export PHP_HOME=$WORKSPACE/install-php-$SF_PHP_VERSION
-    ./scripts/build_pdo_snowflake.sh -r # build all
+    ./scripts/build_pdo_snowflake.sh
     REPORT_EXIT_STATUS=1 NO_INTERACTION=true make test
 
 Profile
