@@ -60,7 +60,7 @@ travis_fold_start build_pdo_snowflake "Builds C Library and PHP PDO"
 echo "PHP_HOME:   $PHP_HOME"
 echo "phpize:     $(which phpize)"
 echo "php-config: $(which php-config)"
-REPORT_COVERAGE=1 $DIR/build_pdo_snowflake.sh -r
+REPORT_COVERAGE=1 $DIR/build_pdo_snowflake.sh
 travis_fold_end
 
 travis_fold_start ctests "Tests C Library"
