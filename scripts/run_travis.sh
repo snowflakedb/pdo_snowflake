@@ -46,7 +46,7 @@ travis_fold_end
 
 trap finish EXIT
 
-eval $(jq -r '.testconnection | to_entries | map("export \(.key)=\(.value|tostring)")|.[]' ./parameters.json)
+source $DIR/env.sh
 
 travis_fold_start create_schema "Create test schema"
 python $DIR/create_schema.py 

@@ -16,14 +16,14 @@
 
 typedef void (*log_LockFn)(void *udata, int lock);
 
-enum {
+typedef enum SF_LOG_LEVEL {
     SF_LOG_TRACE,
     SF_LOG_DEBUG,
     SF_LOG_INFO,
     SF_LOG_WARN,
     SF_LOG_ERROR,
     SF_LOG_FATAL
-};
+} SF_LOG_LEVEL;
 
 #define log_trace(...) log_log(SF_LOG_TRACE, __FILE__, __LINE__, __VA_ARGS__)
 #define log_debug(...) log_log(SF_LOG_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
