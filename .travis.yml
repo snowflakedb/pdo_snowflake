@@ -3,6 +3,7 @@ language: php
 php:
   - '7.0'
   - '7.1'
+  - '7.2'
 before_install:
   - openssl aes-256-cbc -k "$super_secret_password" -in parameters.json.enc -out parameters.json -d
 install:
