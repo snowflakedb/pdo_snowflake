@@ -14,7 +14,7 @@ int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
 {
     pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
     pdo_error_type *pdo_err;
-    SF_ERROR *einfo;
+    SF_ERROR_STRUCT *einfo;
     pdo_snowflake_stmt *S = NULL;
 
     PDO_DBG_ENTER("_pdo_snowflake_error");
@@ -78,7 +78,7 @@ static int pdo_snowflake_fetch_error_func(
   pdo_dbh_t *dbh, pdo_stmt_t *stmt, zval *info) /* {{{ */
 {
     pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
-    SF_ERROR *einfo = NULL;
+    SF_ERROR_STRUCT *einfo = NULL;
 
     PDO_DBG_ENTER("pdo_snowflake_fetch_error_func");
     PDO_DBG_INF("dbh=%p stmt=%p", dbh, stmt);

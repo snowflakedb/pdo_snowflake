@@ -9,12 +9,11 @@
 extern "C" {
 #endif
 
-#if !defined(_WIN32)
-#define STDCALL
-#else
-#define STDCALL __stdcall
-#endif
+#include "platform.h"
 
+/**
+ * Supported data types
+ */
 typedef char int8;
 typedef unsigned char uint8;
 typedef unsigned long int uint32;

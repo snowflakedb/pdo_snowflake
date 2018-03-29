@@ -51,7 +51,7 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
 
     char *log = PDO_SNOWFLAKE_G(log);
     char *cacert = PDO_SNOWFLAKE_G(cacert);
-    snowflake_global_init(log);
+    snowflake_global_init(log, SF_LOG_INFO);
     snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, cacert);
 
     REGISTER_PDO_CLASS_CONST_LONG("SNOWFLAKE_ATTR_SSL_CAPATH",

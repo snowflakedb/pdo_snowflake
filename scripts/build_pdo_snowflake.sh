@@ -61,4 +61,6 @@ cc -shared \
 (cd .libs && rm -f pdo_snowflake.la && ln -s ../pdo_snowflake.la pdo_snowflake.la)
 ./libtool --mode=install cp ./pdo_snowflake.la $(pwd)/modules
 
+source $DIR/env.sh
+
 env | grep SNOWFLAKE_TEST > $DIR/../testenv.ini

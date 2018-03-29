@@ -10,7 +10,7 @@ set(CMAKE_C_FLAGS
 
 # coverage
 set(CMAKE_C_FLAGS
-        "${CMAKE_C_FLAGS} -g -O0 -ggdb -fprofile-arcs -ftest-coverage -fPIC")
+        "${CMAKE_C_FLAGS} -std=c99 -Werror -g -O0 -ggdb -fprofile-arcs -ftest-coverage -fPIC")
 
 if (UNIX AND NOT APPLE)
     set(LINUX TRUE)
@@ -34,7 +34,6 @@ set(SOURCE_FILES
 include_directories(
         include
         libsnowflakeclient/include
-        libsnowflakeclient/lib
         ${PHP_HOME}/include/php
         ${PHP_HOME}/include/php/main
         ${PHP_HOME}/include/php/TSRM
@@ -49,6 +48,12 @@ SET_TARGET_PROPERTIES(pdo_snowflake PROPERTIES PREFIX "")
 set_target_properties(pdo_snowflake PROPERTIES LINK_FLAGS "-Wl,-E")
 
 target_link_libraries(pdo_snowflake
-        snowflakeclient
+        -fPIC
+        -Wl,--whole-archive
+        ${CMAKE_CURRENT_SOURCE_DIR}/libsnowflakeclient/lib/libsnowflakeclient.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/libsnowflakeclient/deps-build/linux/curl/lib/libcurl.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/libsnowflakeclient/deps-build/linux/openssl/lib/libssl.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/libsnowflakeclient/deps-build/linux/openssl/lib/libcrypto.a
+        -Wl,--no-whole-archive
         -fprofile-arcs
         -Wl,-soname -Wl,pdo_snowflake.so)
