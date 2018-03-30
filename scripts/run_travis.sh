@@ -37,7 +37,8 @@ function finish {
 travis_fold_start pythonvenv "Set up Python Virtualenv (pyenv)"
 pyenv local 3.6
 pyenv versions
-pip install -U pip
+curl -O https://bootstrap.pypa.io/get-pip.py
+python get-pip.py
 pip install -U virtualenv
 virtualenv $PYVENV_HOME
 source $PYVENV_HOME/bin/activate
