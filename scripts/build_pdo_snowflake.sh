@@ -52,8 +52,9 @@ cc -shared \
     -L libsnowflakeclient/lib \
     -L libsnowflakeclient/deps-build/linux/openssl/lib \
     -L libsnowflakeclient/deps-build/linux/curl/lib \
+    -lsnowflakeclient \
     -Wl,--whole-archive \
-    -lsnowflakeclient -lcrypto -lssl -lcurl \
+    -lcrypto -lssl -lcurl \
     -Wl,--no-whole-archive \
     $LINK_OPTS \
     -Wl,-soname -Wl,pdo_snowflake.so \

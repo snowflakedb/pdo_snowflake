@@ -29,16 +29,14 @@ ZEND_GET_MODULE(pdo_snowflake)
 /* {{{ PHP_INI_BEGIN
 */
 PHP_INI_BEGIN()
-#if PDO_DBG_ENABLED
-    STD_PHP_INI_ENTRY
-    ("pdo_snowflake.debug", NULL, PHP_INI_SYSTEM, OnUpdateString, debug,
-     zend_pdo_snowflake_globals, pdo_snowflake_globals)
-#endif
     STD_PHP_INI_ENTRY
     ("pdo_snowflake.cacert", NULL, PHP_INI_SYSTEM, OnUpdateString, cacert,
      zend_pdo_snowflake_globals, pdo_snowflake_globals)
     STD_PHP_INI_ENTRY
-    ("pdo_snowflake.log", NULL, PHP_INI_SYSTEM, OnUpdateString, log,
+    ("pdo_snowflake.logdir", NULL, PHP_INI_SYSTEM, OnUpdateString, logdir,
+     zend_pdo_snowflake_globals, pdo_snowflake_globals)
+    STD_PHP_INI_ENTRY
+    ("pdo_snowflake.loglevel", NULL, PHP_INI_SYSTEM, OnUpdateString, loglevel,
      zend_pdo_snowflake_globals, pdo_snowflake_globals)
 
 PHP_INI_END()
@@ -49,9 +47,11 @@ PHP_INI_END()
 static PHP_MINIT_FUNCTION(pdo_snowflake) {
     REGISTER_INI_ENTRIES();
 
-    char *log = PDO_SNOWFLAKE_G(log);
     char *cacert = PDO_SNOWFLAKE_G(cacert);
-    snowflake_global_init(log, SF_LOG_INFO);
+    char *logdir = PDO_SNOWFLAKE_G(logdir);
+    char* loglevel = PDO_SNOWFLAKE_G(loglevel);
+
+    snowflake_global_init(logdir, log_from_str_to_level(loglevel));
     snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, cacert);
 
     REGISTER_PDO_CLASS_CONST_LONG("SNOWFLAKE_ATTR_SSL_CAPATH",
@@ -96,10 +96,8 @@ static PHP_GINIT_FUNCTION(pdo_snowflake) {
     ZEND_TSRMLS_CACHE_UPDATE();
 #endif
 #endif
-
-#if PDO_DBG_ENABLED
-    pdo_snowflake_globals->debug = NULL;
-#endif
+    pdo_snowflake_globals->logdir = NULL;
+    pdo_snowflake_globals->loglevel = "DEBUG";
     pdo_snowflake_globals->cacert = NULL;
 }
 /* }}} */

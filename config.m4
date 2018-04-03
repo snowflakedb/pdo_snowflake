@@ -40,6 +40,8 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
   LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/openssl/lib/libssl.a"
   LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/curl/lib/libcurl.a"
   LDFLAGS="$LDFLAGS -Wl,--no-whole-archive"
+  dnl # IMPORTANT NOTE: Change scripts/build_pdo_snowflake.sh to update
+  dnl # the actual link options for pdo_snowflake.so
 
   CFLAGS="-std=c99 -Werror $CFLAGS"
 

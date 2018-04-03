@@ -36,7 +36,7 @@ extern const int8 SF_BOOLEAN_FALSE;
 /**
  * Boolean data type string representation for results.
  *
- * This is mainly used by PHP PDO Snwoflake but should work fine
+ * This is mainly used by PHP PDO Snowflake but should work fine
  * for other cases.
  */
 #define SF_BOOLEAN_TRUE_STR "1"
