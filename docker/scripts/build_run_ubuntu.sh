@@ -18,8 +18,15 @@ cd pdo_snowflake
 cp $CONFIG_FILE parameters.json  # replicate a parameter file
 source ./scripts/env.sh
 
+# Check Ubuntu version
+# Ubuntu 16 has gcc5/gcov5 but doesn't work along with lcov12
+UBUNTU_VERSION=$(lsb_release -r | awk '{print $2}')
+if [[ "$UBUNTU_VERSION" != "16.04" ]]; then
+    export REPORT_COVERAGE=1
+fi
+
 # Build and generate testenv.ini
-REPORT_COVERAGE=1 ./scripts/build_pdo_snowflake.sh
+./scripts/build_pdo_snowflake.sh
 
 # Update tests with parameters
 PHP_API_VER=$(php -i | grep "PHP API" | awk '{print $4}')
