@@ -19,7 +19,7 @@ Testing Code
 Before running a container
 ----------------------------------------------------------------------
 
-Set the Snowflake connection info in ``parameters.json`` and place it in $HOME:
+Set the Snowflake connection info in ``parameters.json`` and place it in ``pdo_snowflake`` directory:
 
 .. code-block:: json
 
@@ -35,34 +35,13 @@ Set the Snowflake connection info in ``parameters.json`` and place it in $HOME:
         }
     }
 
-Start a docker container
+Run Tests on Containers
 ----------------------------------------------------------------------
 
-Mount $HOME to ``/cfg`` and start a container:
+Mount ``/cfg`` and ``/base`` and start a container:
 
 .. code-block:: bash
 
-    docker run -v $HOME:/cfg -it pdo-snowflake-ubuntu14:latest
-
-Set up
-----------------------------------------------------------------------
-
-Checkout and build code. Update the test parameters
-
-.. code-block:: bash
-
-    eval $(jq -r '.testconnection | to_entries | map("export \(.key)=\(.value|tostring)")|.[]' /cfg/parameters.json)
-    git clone https://github.com/snowflakedb/pdo_snowflake.git
     cd pdo_snowflake
-    ./scripts/build_pdo_snowflake.sh -r
-    PHP_EXT=$(find /usr/lib/php -name "pdo.so") && for f in $(ls tests/\*.phpt); do sed -i "/--INI--/a extension=$PHP_EXT" $f; done
-    PHP_EXT=$(find /usr/lib/php -name "json.so") && for f in $(ls tests/\*.phpt); do sed -i "/--INI--/a extension=$PHP_EXT" $f; done
-
-Test
-----------------------------------------------------------------------
-
-Run test
-
-.. code-block:: bash
-
-    REPORT_EXIT_STATUS=1 NO_INTERACTION=true make test
+    docker run -v $(pwd):/cfg -v $(pwd):/base -it pdo-snowflake:php7.0-ubuntu14.04 /base/docker/scripts/build_run_ubuntu.sh
+    docker run -v $(pwd):/cfg -v $(pwd):/base -it pdo-snowflake:php7.1-ubuntu14.04 /base/docker/scripts/build_run_ubuntu.sh
