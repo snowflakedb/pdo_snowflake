@@ -5,7 +5,7 @@ ARG PHP_VERSION=7.1
 
 RUN apt-get update -q -y
 RUN apt-get upgrade -q -y
-RUN apt-get install -y valgrind git vim cmake pkg-config curl gcc g++ zlib1g-dev jq
+RUN apt-get install -y valgrind git vim cmake pkg-config curl gcc g++ zlib1g-dev jq lcov
 RUN apt-get install -y  language-pack-en-base software-properties-common
 
 ENV LC_ALL en_US.UTF-8
@@ -13,7 +13,10 @@ ENV LC_ALL en_US.UTF-8
 # Install PHP 7 from the third party repository
 RUN add-apt-repository ppa:ondrej/php
 RUN apt-get update -q -y
-RUN apt-get install -y php${PHP_VERSION}-dev php${PHP_VERSION}-cli php${PHP_VERSION}-fpm php${PHP_VERSION}-gd php${PHP_VERSION}-json php${PHP_VERSION}-mysql php${PHP_VERSION}-readline
+RUN apt-get install -y php${PHP_VERSION}-dev php${PHP_VERSION}-cli php${PHP_VERSION}-fpm php${PHP_VERSION}-json php${PHP_VERSION}-mysql php${PHP_VERSION}-readline
+
+# Remove 7.1 package if 7.0 is installed
+RUN /bin/bash -c 'if [[ ${PHP_VERSION} == "7.0" ]]; then apt-get -y remove php7.1-common php7.1-xml; fi'
 
 # Environmet variables for tests
 ENV PHP_HOME=/usr
