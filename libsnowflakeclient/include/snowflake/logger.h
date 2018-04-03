@@ -44,4 +44,6 @@ void log_set_quiet(int enable);
 
 void log_log(int level, const char *file, int line, const char *fmt, ...);
 
+SF_LOG_LEVEL log_from_str_to_level(const char* level_in_str);
+
 #endif /* SNOWFLAKE_LOGGER_H */

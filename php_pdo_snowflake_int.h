@@ -12,32 +12,19 @@
  */
 #define PHP_PDO_SNOWFLAKE_NAME "PDO"
 
-#if 1
-#define PDO_DBG_ENABLED 1
-
 #define PDO_DBG_INF(...) log_debug(__VA_ARGS__)
 #define PDO_DBG_ERR(...) log_error(__VA_ARGS__)
 #define PDO_DBG_ENTER(func_name) log_debug("Entering: %s", func_name)
 #define PDO_DBG_RETURN(value)  do { log_debug("Leaving: %d", value); return (value); } while (0)
 #define PDO_DBG_VOID_RETURN(value)  do { log_debug("Leaving"); return; } while (0)
-#else
-#define PDO_DBG_ENABLED 0
-static inline void PDO_DBG_INF(char *format, ...) {}
-static inline void PDO_DBG_ERR(char *format, ...) {}
-static inline void PDO_DBG_ENTER(char *func_name) {}
-#define PDO_DBG_RETURN(value)	return (value)
-#define PDO_DBG_VOID_RETURN		return;
-#endif
 
 /**
  * Snowflake module global variables.
  */
 ZEND_BEGIN_MODULE_GLOBALS(pdo_snowflake)
-#if PDO_DBG_ENABLED
-    char *debug;
-#endif
     char *cacert; /* location of cacert.pem */
-    char *log; /* location of log file */
+    char *logdir; /* log directory */
+    char *loglevel; /* log level */
 ZEND_END_MODULE_GLOBALS(pdo_snowflake)
 
 ZEND_EXTERN_MODULE_GLOBALS(pdo_snowflake)

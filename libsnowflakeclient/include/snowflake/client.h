@@ -41,6 +41,16 @@ extern "C" {
 #define SF_UUID4_LEN 37
 
 /**
+ * Source compression value length returned by server
+ */
+#define SF_SOURCE_COMPRESSION_TYPE_LEN 15
+
+/**
+ * Download/upload length
+ */
+#define SF_COMMAND_LEN 10
+
+/**
  * The maximum object size
  */
 #define SF_MAX_OBJECT_SIZE 16777216
@@ -281,6 +291,11 @@ typedef struct SF_COLUMN_DESC {
 typedef struct SF_CHUNK_DOWNLOADER SF_CHUNK_DOWNLOADER;
 
 /**
+ * Put get response struct
+ */
+typedef struct SF_PUT_GET_RESPONSE SF_PUT_GET_RESPONSE;
+
+/**
  * Statement context
  */
 typedef struct SF_STMT {
@@ -302,6 +317,7 @@ typedef struct SF_STMT {
     void *stmt_attrs;
     sf_bool is_dml;
     SF_CHUNK_DOWNLOADER *chunk_downloader;
+    SF_PUT_GET_RESPONSE *put_get_response;
 } SF_STMT;
 
 /**

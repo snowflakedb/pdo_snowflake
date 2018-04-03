@@ -27,7 +27,8 @@ set(SOURCE_FILES
         snowflake_stmt.c
         php_pdo_snowflake_int.h
         php_pdo_snowflake.h
-        pdo_snowflake.c)
+        pdo_snowflake.c
+        )
 
 # set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
 
@@ -49,8 +50,9 @@ set_target_properties(pdo_snowflake PROPERTIES LINK_FLAGS "-Wl,-E")
 
 target_link_libraries(pdo_snowflake
         -fPIC
+        -L ${CMAKE_CURRENT_SOURCE_DIR}/libsnowflakeclient/lib
+        -lsnowflakeclient
         -Wl,--whole-archive
-        ${CMAKE_CURRENT_SOURCE_DIR}/libsnowflakeclient/lib/libsnowflakeclient.a
         ${CMAKE_CURRENT_SOURCE_DIR}/libsnowflakeclient/deps-build/linux/curl/lib/libcurl.a
         ${CMAKE_CURRENT_SOURCE_DIR}/libsnowflakeclient/deps-build/linux/openssl/lib/libssl.a
         ${CMAKE_CURRENT_SOURCE_DIR}/libsnowflakeclient/deps-build/linux/openssl/lib/libcrypto.a
