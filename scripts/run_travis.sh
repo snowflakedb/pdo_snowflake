@@ -65,5 +65,5 @@ REPORT_COVERAGE=1 $DIR/build_pdo_snowflake.sh
 travis_fold_end
 
 travis_fold_start phptests "Tests PHP PDO"
-$DIR/run_tests.sh
+REPORT_COVERAGE=1 $DIR/run_tests.sh
 travis_fold_end
