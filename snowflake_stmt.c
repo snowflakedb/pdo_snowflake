@@ -51,10 +51,10 @@ static void _pdo_snowflake_stmt_set_row_count(pdo_stmt_t *stmt) /* {{{ */
     zend_long row_count;
     pdo_snowflake_stmt *S = stmt->driver_data;
 
-    PDO_DBG_ENTER("_pdo_snowflake_stmt_set_row_count");
+    PDO_LOG_ENTER("_pdo_snowflake_stmt_set_row_count");
 
     row_count = (zend_long) snowflake_affected_rows(S->stmt);
-    PDO_DBG_INF("row count: %lld", row_count);
+    PDO_LOG_DBG("row count: %lld", row_count);
     if (row_count != (zend_long) -1) {
         stmt->row_count = row_count;
     }
@@ -72,14 +72,14 @@ static void _pdo_snowflake_stmt_set_row_count(pdo_stmt_t *stmt) /* {{{ */
  */
 static int pdo_snowflake_stmt_dtor(pdo_stmt_t *stmt) /* {{{ */
 {
-    PDO_DBG_ENTER("pdo_snowflake_stmt_dtor");
+    PDO_LOG_ENTER("pdo_snowflake_stmt_dtor");
     pdo_snowflake_stmt *S = stmt->driver_data;
 
     if (S->bound_params) {
         pdo_sf_array_list_deallocate(S->bound_params);
     }
 
-    PDO_DBG_INF("number of columns: %d", stmt->column_count);
+    PDO_LOG_DBG("number of columns: %d", stmt->column_count);
     if (S->bound_result) {
         int i;
         for (i = 0; i < stmt->column_count; ++i) {
@@ -92,7 +92,7 @@ static int pdo_snowflake_stmt_dtor(pdo_stmt_t *stmt) /* {{{ */
     snowflake_stmt_term(S->stmt);
     efree(S);
     stmt->driver_data = NULL;
-    PDO_DBG_RETURN(1);
+    PDO_LOG_RETURN(1);
 }
 /* }}} */
 
@@ -106,19 +106,19 @@ static int pdo_snowflake_stmt_dtor(pdo_stmt_t *stmt) /* {{{ */
  */
 static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
 {
-    PDO_DBG_ENTER("pdo_snowflake_stmt_execute_prepared");
+    PDO_LOG_ENTER("pdo_snowflake_stmt_execute_prepared");
     int i;
     pdo_snowflake_stmt *S = stmt->driver_data;
 
     /* execute */
     if (snowflake_execute(S->stmt) != SF_STATUS_SUCCESS) {
         pdo_snowflake_error_stmt(stmt);
-        PDO_DBG_RETURN(0);
+        PDO_LOG_RETURN(0);
     }
 
     /* Bind Columns/Results before fetching */
     stmt->column_count = (int) snowflake_num_fields(S->stmt);
-    PDO_DBG_INF("number of columns: %d", stmt->column_count);
+    PDO_LOG_DBG("number of columns: %d", stmt->column_count);
     S->bound_result = ecalloc((size_t) stmt->column_count,
                               sizeof(SF_BIND_OUTPUT));
     for (i = 0; i < stmt->column_count; ++i) {
@@ -126,7 +126,7 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
         SF_COLUMN_DESC *desc = &S->stmt->desc[i];
         S->bound_result[i].idx = (size_t) i + 1;  /* 1 based index */
         S->bound_result[i].c_type = SF_C_TYPE_STRING; /* string type */
-        PDO_DBG_INF("name: %s, prec: %d, scale: %d, type: %s, c_type: %s, "
+        PDO_LOG_DBG("name: %s, prec: %d, scale: %d, type: %s, c_type: %s, "
                       "byte_size: %ld, internal_bytes: %ld, null_ok: %d",
                     desc->name,
                     desc->precision,
@@ -177,7 +177,7 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
             default:
                 break;
         }
-        PDO_DBG_INF("len: %ld", len);
+        PDO_LOG_DBG("len: %ld", len);
         S->bound_result[i].is_null = SF_BOOLEAN_FALSE;
         S->bound_result[i].max_length = len; // change this
         S->bound_result[i].value = ecalloc(len, sizeof(char));
@@ -186,7 +186,7 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
     }
 
     _pdo_snowflake_stmt_set_row_count(stmt);
-    PDO_DBG_RETURN(1);
+    PDO_LOG_RETURN(1);
 }
 /* }}} */
 
@@ -199,21 +199,21 @@ static int pdo_snowflake_stmt_execute(pdo_stmt_t *stmt) /* {{{ */
 {
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     pdo_snowflake_db_handle *H = S->H;
-    PDO_DBG_ENTER("pdo_snowflake_stmt_execute");
-    PDO_DBG_INF("stmt=%p", S->stmt);
+    PDO_LOG_ENTER("pdo_snowflake_stmt_execute");
+    PDO_LOG_DBG("stmt=%p", S->stmt);
 
     if (S->stmt) {
         int ret = pdo_snowflake_stmt_execute_prepared(stmt);
-        PDO_DBG_RETURN(ret);
+        PDO_LOG_RETURN(ret);
     }
 
     // TODO: stmt->active_query_stringlen should be specified.
     if (snowflake_query(S->stmt, stmt->active_query_string,
                         stmt->active_query_stringlen) !=
         SF_STATUS_SUCCESS) {
-        PDO_DBG_RETURN(0);
+        PDO_LOG_RETURN(0);
     }
-    PDO_DBG_RETURN(1);
+    PDO_LOG_RETURN(1);
 }
 /* }}} */
 
@@ -238,21 +238,21 @@ static int pdo_snowflake_stmt_fetch(
   pdo_stmt_t *stmt,
   enum pdo_fetch_orientation ori, zend_long offset) /* {{{ */
 {
-    PDO_DBG_ENTER("pdo_snowflake_stmt_fetch");
-    PDO_DBG_INF("ori: %d, offset: %d", ori, offset);
+    PDO_LOG_ENTER("pdo_snowflake_stmt_fetch");
+    PDO_LOG_DBG("ori: %d, offset: %d", ori, offset);
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     if (ori != PDO_FETCH_ORI_NEXT) {
         /* TODO: raise error */
     }
     SF_STATUS ret = snowflake_fetch(S->stmt);
     if (ret == SF_STATUS_EOF) {
-        PDO_DBG_INF("EOL");
-        PDO_DBG_RETURN(0);
+        PDO_LOG_DBG("EOL");
+        PDO_LOG_RETURN(0);
     } else if (ret != SF_STATUS_SUCCESS) {
-        PDO_DBG_INF("ERROR 1");
-        PDO_DBG_RETURN(0);
+        PDO_LOG_DBG("ERROR 1");
+        PDO_LOG_RETURN(0);
     }
-    PDO_DBG_RETURN(1);
+    PDO_LOG_RETURN(1);
 }
 /* }}} */
 
@@ -272,13 +272,13 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
     int i;
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     struct pdo_column_data *cols = stmt->columns;
-    PDO_DBG_ENTER("pdo_snowflake_stmt_describe");
-    PDO_DBG_INF("colno %d", colno);
+    PDO_LOG_ENTER("pdo_snowflake_stmt_describe");
+    PDO_LOG_DBG("colno %d", colno);
     if (colno >= stmt->column_count) {
         /* error invalid column */
-        PDO_DBG_ERR("invalid column number. max+1: %d, colno: %d",
+        PDO_LOG_ERR("invalid column number. max+1: %d, colno: %d",
                     stmt->column_count, colno);
-        PDO_DBG_RETURN(0);
+        PDO_LOG_RETURN(0);
     }
     SF_COLUMN_DESC *F = snowflake_desc(S->stmt);
     for (i = 0; i < stmt->column_count; i++) {
@@ -315,7 +315,7 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
           F[i].name, strlen(F[i].name), 0);
         cols[i].param_type = PDO_PARAM_STR; /* Always string */
     }
-    PDO_DBG_RETURN(1);
+    PDO_LOG_RETURN(1);
 }
 /* }}} */
 
@@ -341,13 +341,13 @@ static int
 pdo_snowflake_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr, size_t *len,
                            int *caller_frees) /* {{{ */
 {
-    PDO_DBG_ENTER("pdo_snowflake_stmt_get_col");
+    PDO_LOG_ENTER("pdo_snowflake_stmt_get_col");
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     if (colno >= stmt->column_count) {
         /* error invalid column */
         /* TODO */
-        PDO_DBG_ERR("ERROR 3");
-        PDO_DBG_RETURN(0);
+        PDO_LOG_ERR("ERROR 3");
+        PDO_LOG_RETURN(0);
     }
     if (S->bound_result[colno].is_null) {
         *ptr = NULL;
@@ -356,8 +356,8 @@ pdo_snowflake_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr, size_t *len,
         *ptr = S->bound_result[colno].value;
         *len = S->bound_result[colno].len;
     }
-    PDO_DBG_INF("idx: %d, value: '%.*s', len: %d", colno, *len, *ptr, *len);
-    PDO_DBG_RETURN(1);
+    PDO_LOG_DBG("idx: %d, value: '%.*s', len: %d", colno, *len, *ptr, *len);
+    PDO_LOG_RETURN(1);
 }
 /* }}} */
 
@@ -413,17 +413,17 @@ static int pdo_snowflake_stmt_param_hook(
     int ret = 1;
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     zval *parameter = NULL;
-    PDO_DBG_ENTER("pdo_snowflake_stmt_param_hook");
-    PDO_DBG_INF("event = %s, paramno: %ld",
+    PDO_LOG_ENTER("pdo_snowflake_stmt_param_hook");
+    PDO_LOG_DBG("event = %s, paramno: %ld",
                 pdo_param_event_names[event_type], param->paramno);
 
     if (S->stmt == NULL) {
         /* internal error */
-        PDO_DBG_RETURN(0);
+        PDO_LOG_RETURN(0);
     }
     if (!param->is_param) {
         /* nop if not binding parameter but column */
-        PDO_DBG_RETURN(1);
+        PDO_LOG_RETURN(1);
     }
     if (Z_ISREF(param->parameter)) {
         parameter = Z_REFVAL(param->parameter);
@@ -434,7 +434,7 @@ static int pdo_snowflake_stmt_param_hook(
 
     switch (event_type) {
         case PDO_PARAM_EVT_ALLOC:
-            PDO_DBG_INF(
+            PDO_LOG_DBG(
               "paramno: %ld, name: %s, max_len: %ld, type: %s, value: %p",
               param->paramno, param->name,
               param->max_value_len,
@@ -461,7 +461,7 @@ static int pdo_snowflake_stmt_param_hook(
             v->idx = (size_t) param->paramno + 1;
             snowflake_bind_param(S->stmt, v);
 
-            PDO_DBG_INF("%s", php_zval_type_names[Z_TYPE_P(parameter)]);
+            PDO_LOG_DBG("%s", php_zval_type_names[Z_TYPE_P(parameter)]);
             if (Z_TYPE_P(parameter) == IS_NULL) {
                 v->c_type = SF_C_TYPE_STRING;
                 v->len = (size_t) 0;
@@ -475,7 +475,7 @@ static int pdo_snowflake_stmt_param_hook(
                     v->value = NULL;
                     break;
                 case PDO_PARAM_INT:
-                    PDO_DBG_INF(
+                    PDO_LOG_DBG(
                       "value: %ld",
                       Z_LVAL_P(parameter));
                     v->c_type = SF_C_TYPE_INT64;
@@ -484,7 +484,7 @@ static int pdo_snowflake_stmt_param_hook(
                     *(int64 *) (v->value) = Z_LVAL_P(parameter);
                     break;
                 case PDO_PARAM_STR:
-                    PDO_DBG_INF(
+                    PDO_LOG_DBG(
                       "value: %.*s, len: %lld",
                       Z_STRLEN_P(parameter),
                       Z_STRVAL_P(parameter),
@@ -494,7 +494,7 @@ static int pdo_snowflake_stmt_param_hook(
                     v->value = Z_STRVAL_P(parameter);
                     break;
                 case PDO_PARAM_LOB:
-                    PDO_DBG_INF(
+                    PDO_LOG_DBG(
                       "value: %.*s, len: %lld",
                       Z_STRLEN_P(parameter),
                       Z_STRVAL_P(parameter),
@@ -504,7 +504,7 @@ static int pdo_snowflake_stmt_param_hook(
                     v->value = Z_STRVAL_P(parameter);
                     break;
                 case PDO_PARAM_BOOL:
-                    PDO_DBG_INF(
+                    PDO_LOG_DBG(
                       "value: %s",
                       php_zval_type_names[Z_TYPE_P(parameter)]);
                     if (Z_TYPE_P(parameter) == IS_FALSE) {
@@ -554,7 +554,7 @@ static int pdo_snowflake_stmt_param_hook(
     }
 clean:
 
-    PDO_DBG_RETURN(ret);
+    PDO_LOG_RETURN(ret);
 }
 /* }}} */
 
@@ -570,10 +570,10 @@ static int pdo_snowflake_stmt_col_meta(
   pdo_stmt_t *stmt, zend_long colno,
   zval *return_value) /* {{{ */
 {
-    PDO_DBG_ENTER("pdo_snowflake_stmt_col_meta");
-    PDO_DBG_INF("colno: %lld", colno);
+    PDO_LOG_ENTER("pdo_snowflake_stmt_col_meta");
+    PDO_LOG_DBG("colno: %lld", colno);
     if (!stmt) {
-        PDO_DBG_RETURN(0);
+        PDO_LOG_RETURN(0);
     }
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     SF_COLUMN_DESC *F;
@@ -581,8 +581,8 @@ static int pdo_snowflake_stmt_col_meta(
 
     if (colno >= stmt->column_count) {
         /* error invalid column */
-        PDO_DBG_ERR("invalid column index: %d", colno);
-        PDO_DBG_RETURN(0);
+        PDO_LOG_ERR("invalid column index: %d", colno);
+        PDO_LOG_RETURN(0);
     }
 
     array_init(return_value);
@@ -590,8 +590,8 @@ static int pdo_snowflake_stmt_col_meta(
 
     F = snowflake_desc(S->stmt);
     if (!F) {
-        PDO_DBG_ERR("failed to get SF_COLUMN_DESC");
-        PDO_DBG_RETURN(1);
+        PDO_LOG_ERR("failed to get SF_COLUMN_DESC");
+        PDO_LOG_RETURN(1);
     }
     if (!F[colno].null_ok) {
         add_next_index_string(&flags, "not_null");
@@ -601,7 +601,7 @@ static int pdo_snowflake_stmt_col_meta(
                      (char *) snowflake_type_to_string(F[colno].type));
     add_assoc_zval(return_value, "flags", &flags);
 
-    PDO_DBG_RETURN(1);
+    PDO_LOG_RETURN(1);
 }
 /* }}} */
 
@@ -616,9 +616,9 @@ static int pdo_snowflake_stmt_col_meta(
  */
 static int pdo_snowflake_stmt_next_rowset(pdo_stmt_t *stmt) /* {{{ */
 {
-    PDO_DBG_ENTER("pdo_snowflake_stmt_next_rowset");
+    PDO_LOG_ENTER("pdo_snowflake_stmt_next_rowset");
     /* NOP. no multiple statement is supported at the momemnt. */
-    PDO_DBG_RETURN(1);
+    PDO_LOG_RETURN(1);
 }
 /* }}} */
 
@@ -633,11 +633,11 @@ static int pdo_snowflake_stmt_next_rowset(pdo_stmt_t *stmt) /* {{{ */
  */
 static int pdo_snowflake_stmt_cursor_closer(pdo_stmt_t *stmt) /* {{{ */
 {
-    PDO_DBG_ENTER("pdo_snowflake_stmt_cursor_closer");
+    PDO_LOG_ENTER("pdo_snowflake_stmt_cursor_closer");
     /* NOP. unlike other database, Snowflake doesn't need to fetch
      * all data to close the statement.
      * */
-    PDO_DBG_RETURN(1);
+    PDO_LOG_RETURN(1);
 }
 
 /* }}} */
