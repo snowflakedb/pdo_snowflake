@@ -38,8 +38,8 @@ void pdo_sf_array_list_grow(ARRAY_LIST *al, size_t min_size) {
 }
 
 void pdo_sf_array_list_set(ARRAY_LIST *al, void *item, size_t index) {
-    if (al->size < index) {
-        pdo_sf_array_list_grow(al, index);
+    if (al->size <= index) {
+        pdo_sf_array_list_grow(al, index + 1);
     }
     // If element we are writing to is NULL and item is not NULL, we want to increment 'used'.
     // Otherwise we are writing to a spot that already contains an element
@@ -54,5 +54,8 @@ void pdo_sf_array_list_set(ARRAY_LIST *al, void *item, size_t index) {
 }
 
 void *pdo_sf_array_list_get(ARRAY_LIST *al, size_t index) {
+    if (al->size <= index) {
+        return NULL;
+    }
     return al->data[index];
 }
