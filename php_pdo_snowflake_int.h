@@ -12,11 +12,10 @@
  */
 #define PHP_PDO_SNOWFLAKE_NAME "PDO"
 
-#define PDO_DBG_INF(...) log_debug(__VA_ARGS__)
-#define PDO_DBG_ERR(...) log_error(__VA_ARGS__)
-#define PDO_DBG_ENTER(func_name) log_debug("Entering: %s", func_name)
-#define PDO_DBG_RETURN(value)  do { log_debug("Leaving: %d", value); return (value); } while (0)
-#define PDO_DBG_VOID_RETURN(value)  do { log_debug("Leaving"); return; } while (0)
+#define PDO_DBG_INF(...) sf_log_debug(PHP_PDO_SNOWFLAKE_NAME, __VA_ARGS__)
+#define PDO_DBG_ERR(...) sf_log_error(PHP_PDO_SNOWFLAKE_NAME, __VA_ARGS__)
+#define PDO_DBG_ENTER(func_name) sf_log_trace(PHP_PDO_SNOWFLAKE_NAME, "Entering: %s", func_name)
+#define PDO_DBG_RETURN(value)  do { sf_log_trace(PHP_PDO_SNOWFLAKE_NAME, "Leaving: %d", value); return (value); } while (0)
 
 /**
  * Snowflake module global variables.
