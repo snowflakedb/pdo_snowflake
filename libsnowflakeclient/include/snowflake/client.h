@@ -56,6 +56,11 @@ extern "C" {
 #define SF_MAX_OBJECT_SIZE 16777216
 
 /**
+ * Login timeout in seconds
+ */
+#define SF_LOGIN_TIMEOUT 120
+
+/**
  * Snowflake Data types
  *
  * Use snowflake_type_to_string to get the string representation.
@@ -174,6 +179,7 @@ typedef enum SF_STATUS {
  */
 typedef enum SF_ATTRIBUTE {
     SF_CON_ACCOUNT,
+    SF_CON_REGION,
     SF_CON_USER,
     SF_CON_PASSWORD,
     SF_CON_DATABASE,
@@ -230,6 +236,7 @@ typedef struct SF_ERROR_STRUCT {
  */
 typedef struct SF_CONNECT {
     char *account;
+    char *region;
     char *user;
     char *password;
     char *database;
@@ -299,7 +306,6 @@ typedef struct SF_PUT_GET_RESPONSE SF_PUT_GET_RESPONSE;
  * Statement context
  */
 typedef struct SF_STMT {
-    /* TODO */
     char sfqid[SF_UUID4_LEN];
     int64 sequence_counter;
     char request_id[SF_UUID4_LEN];
@@ -349,7 +355,8 @@ typedef struct {
  *
  * @return 0 if successful, errno otherwise
  */
-SF_STATUS STDCALL snowflake_global_init(const char *log_path, SF_LOG_LEVEL log_level);
+SF_STATUS STDCALL
+snowflake_global_init(const char *log_path, SF_LOG_LEVEL log_level);
 
 /**
  * Global Snowflake cleanup.
@@ -365,7 +372,7 @@ SF_STATUS STDCALL snowflake_global_term();
  * @return 0 if successful, errno otherise.
  */
 SF_STATUS STDCALL snowflake_global_set_attribute(
-        SF_GLOBAL_ATTRIBUTE type, const void *value);
+    SF_GLOBAL_ATTRIBUTE type, const void *value);
 
 /**
  * Get a global attribute
@@ -374,7 +381,7 @@ SF_STATUS STDCALL snowflake_global_set_attribute(
  * @return 0 if successful, errno otherise.
  */
 SF_STATUS STDCALL snowflake_global_get_attribute(
-        SF_GLOBAL_ATTRIBUTE type, void *value);
+    SF_GLOBAL_ATTRIBUTE type, void *value);
 
 /**
  * Initializes a SNOWFLAKE connection context
@@ -408,7 +415,7 @@ SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf);
  * @return 0 if success, otherwise an errno is returned.
  */
 SF_STATUS STDCALL snowflake_set_attribute(
-        SF_CONNECT *sf, SF_ATTRIBUTE type, const void *value);
+    SF_CONNECT *sf, SF_ATTRIBUTE type, const void *value);
 
 /**
  * Gets the attribute value from the session.
@@ -419,7 +426,7 @@ SF_STATUS STDCALL snowflake_set_attribute(
  * @return 0 if success, otherwise an errno is returned.
  */
 SF_STATUS STDCALL snowflake_get_attribute(
-        SF_CONNECT *sf, SF_ATTRIBUTE type, void **value);
+    SF_CONNECT *sf, SF_ATTRIBUTE type, void **value);
 
 /**
  * Creates sf SNOWFLAKE_STMT context.
@@ -605,7 +612,7 @@ uint64 STDCALL snowflake_num_params(SF_STMT *sfstmt);
  * @return 0 if success, otherwise an errno is returned.
  */
 SF_STATUS STDCALL snowflake_bind_param(
-        SF_STMT *sfstmt, SF_BIND_INPUT *sfbind);
+    SF_STMT *sfstmt, SF_BIND_INPUT *sfbind);
 
 /**
  * Binds an array of parameters with the statement for execution.
@@ -616,7 +623,7 @@ SF_STATUS STDCALL snowflake_bind_param(
  * @return 0 if success, otherwise an errno is returned.
  */
 SF_STATUS snowflake_bind_param_array(
-        SF_STMT *sfstmt, SF_BIND_INPUT *sfbind_array, size_t size);
+    SF_STMT *sfstmt, SF_BIND_INPUT *sfbind_array, size_t size);
 
 /**
  * Binds buffers with the statement for result set processing.
@@ -626,7 +633,7 @@ SF_STATUS snowflake_bind_param_array(
  * @return 0 if success, otherwise an errno is returned.
  */
 SF_STATUS STDCALL snowflake_bind_result(
-        SF_STMT *sfstmt, SF_BIND_OUTPUT *sfbind);
+    SF_STMT *sfstmt, SF_BIND_OUTPUT *sfbind);
 
 /**
  * Binds an array of buffers with the statement for result set processing.
@@ -637,7 +644,7 @@ SF_STATUS STDCALL snowflake_bind_result(
  * @return 0 if success, otherwise an errno is returned.
  */
 SF_STATUS snowflake_bind_result_array(
-        SF_STMT *sfstmt, SF_BIND_OUTPUT *sfbind_array, size_t size);
+    SF_STMT *sfstmt, SF_BIND_OUTPUT *sfbind_array, size_t size);
 
 /**
  * Returns a query id associated with the statement after execution. If not
@@ -661,6 +668,15 @@ const char *STDCALL snowflake_type_to_string(SF_TYPE type);
  * @return a string representation of Snowflake C Type
  */
 const char *STDCALL snowflake_c_type_to_string(SF_C_TYPE type);
+
+
+/**
+ * Internal: check connection parameters
+ *
+ * @param sf SF_CONNECT context
+ * @return 0 if success, otherwise an errno is returned.
+ */
+SF_STATUS STDCALL _snowflake_check_connection_parameters(SF_CONNECT *sf);
 
 #ifdef  __cplusplus
 }
