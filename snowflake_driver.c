@@ -435,19 +435,21 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     size_t i;
     int ret = 0;
     /* NOTE: the parameters are referenced by index, so if you change
-     * the order of parameters, ensure changing the index of vars below.
+     * the order of parameters, ensure changing the index of vars
+     * in php_pdo_snowflake_int.h
      */
     struct pdo_data_src_parser vars[] = {
-        {"host",          "",      0},
-        {"port",          "",      0},
-        {"account",       "",      0},
-        {"database",      "",      0},
-        {"schema",        "",      0},
-        {"warehouse",     "",      0},
-        {"role",          "",      0},
-        {"protocol",      "https", 0},
-        {"insecure_mode", "",      0},
-        {"timezone",      "",      0}
+        {"host",          NULL,      0},
+        {"port",          "443",     0},
+        {"account",       NULL,      0},
+        {"region",        NULL,      0},
+        {"database",      NULL,      0},
+        {"schema",        NULL,      0},
+        {"warehouse",     NULL,      0},
+        {"role",          NULL,      0},
+        {"protocol",      "https",   0},
+        {"insecure_mode", NULL,      0},
+        {"timezone",      NULL,      0}
     };
 
     // Parse the input data parameters
@@ -471,7 +473,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
 
     if (driver_options) {
         //TODO Set other non-essential parameters, i.e. timeout, emulate, etc.
-        zend_string * ca_bundle_file = pdo_attr_strval(
+        zend_string *ca_bundle_file = pdo_attr_strval(
             driver_options, PDO_SNOWFLAKE_ATTR_SSL_CAPATH, NULL);
         // TODO create function to set SSL Version
         zend_long ssl_version = pdo_attr_lval(
@@ -513,37 +515,73 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
                             PHP_PDO_SNOWFLAKE_NAME);
     snowflake_set_attribute(H->server, SF_CON_APPLICATION_VERSION, version);
     snowflake_set_attribute(H->server, SF_CON_USER, dbh->username);
-    PDO_LOG_DBG("user: %s", dbh->username);
+    PDO_LOG_DBG(
+        "user: %s", dbh->username);
     snowflake_set_attribute(H->server, SF_CON_PASSWORD, dbh->password);
-    PDO_LOG_DBG("password: %s", dbh->password != NULL ? "******" : "(NULL)");
-    snowflake_set_attribute(H->server, SF_CON_HOST, vars[0].optval);
-    PDO_LOG_DBG("host: %s", vars[0].optval);
-    snowflake_set_attribute(H->server, SF_CON_PORT, vars[1].optval);
-    PDO_LOG_DBG("port: %s", vars[1].optval);
-    snowflake_set_attribute(H->server, SF_CON_ACCOUNT, vars[2].optval);
-    PDO_LOG_DBG("account: %s", vars[2].optval);
-    snowflake_set_attribute(H->server, SF_CON_DATABASE, vars[3].optval);
-    PDO_LOG_DBG("database: %s", vars[3].optval);
-    snowflake_set_attribute(H->server, SF_CON_SCHEMA, vars[4].optval);
-    PDO_LOG_DBG("schema: %s", vars[4].optval);
-    snowflake_set_attribute(H->server, SF_CON_WAREHOUSE, vars[5].optval);
-    PDO_LOG_DBG("warehouse: %s", vars[5].optval);
-    snowflake_set_attribute(H->server, SF_CON_ROLE, vars[6].optval);
-    PDO_LOG_DBG("role: %s", vars[6].optval);
-    snowflake_set_attribute(H->server, SF_CON_PROTOCOL, vars[7].optval);
-    PDO_LOG_DBG("protocol: %s", vars[7].optval);
-    snowflake_set_attribute(H->server, SF_CON_INSECURE_MODE, vars[8].optval);
-    PDO_LOG_DBG("insecureMode: %s", vars[8].optval);
+    PDO_LOG_DBG(
+        "password: %s", dbh->password != NULL ? "******" : "(NULL)");
+    snowflake_set_attribute(
+        H->server, SF_CON_HOST, vars[PDO_SNOWFLAKE_CONN_ATTR_HOST_IDX].optval);
+    PDO_LOG_DBG(
+        "host: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_HOST_IDX].optval);
+    snowflake_set_attribute(
+        H->server, SF_CON_PORT, vars[PDO_SNOWFLAKE_CONN_ATTR_PORT_IDX].optval);
+    PDO_LOG_DBG(
+        "port: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_PORT_IDX].optval);
+    snowflake_set_attribute(
+        H->server, SF_CON_ACCOUNT,
+        vars[PDO_SNOWFLAKE_CONN_ATTR_ACCOUNT_IDX].optval);
+    PDO_LOG_DBG(
+        "account: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_ACCOUNT_IDX].optval);
+    snowflake_set_attribute(
+        H->server, SF_CON_REGION,
+        vars[PDO_SNOWFLAKE_CONN_ATTR_REGION_IDX].optval);
+    PDO_LOG_DBG(
+        "region: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_REGION_IDX].optval);
+    snowflake_set_attribute(
+        H->server, SF_CON_DATABASE,
+        vars[PDO_SNOWFLAKE_CONN_ATTR_DATABASE_IDX].optval);
+    PDO_LOG_DBG(
+        "database: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_DATABASE_IDX].optval);
+    snowflake_set_attribute(
+        H->server, SF_CON_SCHEMA,
+        vars[PDO_SNOWFLAKE_CONN_ATTR_SCHEMA_IDX].optval);
+    PDO_LOG_DBG(
+        "schema: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_SCHEMA_IDX].optval);
+    snowflake_set_attribute(
+        H->server, SF_CON_WAREHOUSE,
+        vars[PDO_SNOWFLAKE_CONN_ATTR_WAREHOUSE_IDX].optval);
+    PDO_LOG_DBG(
+        "warehouse: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_WAREHOUSE_IDX].optval);
+    snowflake_set_attribute(
+        H->server, SF_CON_ROLE, vars[PDO_SNOWFLAKE_CONN_ATTR_ROLE_IDX].optval);
+    PDO_LOG_DBG(
+        "role: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_ROLE_IDX].optval);
+    snowflake_set_attribute(
+        H->server, SF_CON_PROTOCOL,
+        vars[PDO_SNOWFLAKE_CONN_ATTR_PROTOCOL_IDX].optval);
+    PDO_LOG_DBG(
+        "protocol: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_PROTOCOL_IDX].optval);
+    snowflake_set_attribute(
+        H->server, SF_CON_INSECURE_MODE,
+        vars[PDO_SNOWFLAKE_CONN_ATTR_INSECURE_MODE_IDX].optval);
+    PDO_LOG_DBG(
+        "insecureMode: %s",
+        vars[PDO_SNOWFLAKE_CONN_ATTR_INSECURE_MODE_IDX].optval);
     snowflake_set_attribute(
         H->server, SF_CON_AUTOCOMMIT,
         dbh->auto_commit ? &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
 
-    if (strcmp(vars[9].optval, "") != 0) {
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_TIMEZONE_IDX].optval != NULL) {
         /* timezone */
-        snowflake_set_attribute(H->server, SF_CON_TIMEZONE, vars[9].optval);
+        snowflake_set_attribute(
+            H->server, SF_CON_TIMEZONE,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_TIMEZONE_IDX].optval);
     }
-    PDO_LOG_DBG("timezone: %s", vars[9].optval);
-    PDO_LOG_DBG("autocommit: %u", dbh->auto_commit);
+    PDO_LOG_DBG(
+        "timezone: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_TIMEZONE_IDX].optval);
+    PDO_LOG_DBG(
+        "autocommit: %u", dbh->auto_commit);
 
     if (snowflake_connect(H->server) > 0) {
         pdo_snowflake_error(dbh);
