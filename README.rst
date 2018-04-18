@@ -11,7 +11,7 @@ PHP PDO driver for Snowflake
 .. image:: http://img.shields.io/:license-Apache%202-brightgreen.svg
     :target: http://www.apache.org/licenses/LICENSE-2.0.txt
 
-*Under development. No functionality works. Suggestion is welcome at any time.*
+*Private Preview. Linux Only. No PHP 5 support. PHP 7+ only.*
 
 Usage
 ================================================================================
@@ -23,11 +23,14 @@ Create a database handle with connection parameters:
 
 .. code-block:: php
 
-    try {
-        $dbh = new PDO("snowflake:account=testaccount", "user", "password");
-    } catch (PDOException $e) {
-        echo 'Connection failed: ' . $e->getMessage();
-    }
+    $dbh = new PDO("snowflake:account=testaccount", "user", "password");
+
+For non-US-West region, specify :code:`region` parameter or append it to :code:`account` parameter.
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=testaccount.us-east-1", "user", "password");
+    $dbh = new PDO("snowflake:account=testaccount;region=us-east-1", "user", "password");
 
 Build and Tests
 ================================================================================
@@ -144,3 +147,5 @@ Locate ``pdo.so`` under ``/usr/lib`` and specify it in ``phpt`` files, e.g.,
     --INI--
     extension=/usr/lib/php/20151012/pdo.so
     pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
+    pdo_snowflake.logdir=/tmp
+    pdo_snowflake_loglevel=DEBUG
