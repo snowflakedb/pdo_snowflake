@@ -1,18 +1,21 @@
-sudo: required
-language: php
-php:
-  - '7.0'
-  - '7.1'
-  - '7.2'
-before_install:
-  - openssl aes-256-cbc -k "$super_secret_password" -in parameters.json.enc -out parameters.json -d
-install:
-  - sudo apt-get update
-  - sudo apt-get install lcov valgrind
-script:
-  - ./scripts/run_travis.sh
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+language: c
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      services:
+        - docker
+      env:
+        - label=php7.0
+      before_install:
+        - openssl aes-256-cbc -k "$super_secret_password" -in parameters.json.enc -out parameters.json -d
+        - docker pull snowflakedb/pdo-snowflake:php7.0-ubuntu14.04
+      script:
+        - pwd
+        - ls -l
+        - ./scripts/run_travis.sh
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
 env:
   global:
     secure: a8A+jnalrjC3sNzkYyDcFfAwR+Pa8wfKsSCbNV0gaFaSpOhUDCtjyMM/u8kWNr8TosA2jGtn7lFB+fsFii6O+xL6SFTxqTHeJOaEOGUnhZGReFOhvAIx2hjkShPgsCFuxbgWWfFKt38k0vkR4RqoT8qrZCkonuDVHYIoP6WTXKBK+/2D5ZPz27/ZrvugY4K3DBRNj0eNecqVLDFpR466NMj/bNTnOPlr0K4+HxJh3nvJ18eIcUIo4UCXoAqxG2AnX5EbhJHC5ojQJoBNx29FqIT7AuyfG72QL7p5VdXU7utBfND9pILRi9qCi3EMokmFM8ANCRSMaqGdnE3fnEPhTknieQakogJzo2JhrlrLQYAVdz0M24H2q8Wnj7LK429fwmql0yWMTz4xMLPZNbuDzs7F6y1sID3kottBES2D6MGl8fu1Y6mGdgmkKGiTCo462PK/X8WcMlzL7QYGsnr8zMOa6Gy4AG5DkzSMpjvkjwZlOGyjcvOvjnFtcU+GNYNlCNJ2Ij9BTUEKOUBBN6CXMwI4eZME7ufNPPWLPz4QbvrA0oWVmbAzndb5WEUhEEQmigewRAkYJUVmi/4bDpg7jWCBtqaLs5Wg19Fzgjvd/CCHpZ5CJTzDUGfm1BgelyBpkX5fe9Y9dp7zymhz3p7bkyJCQBlLryH9RPL6PflZS5U=
