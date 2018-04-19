@@ -38,6 +38,7 @@ Query
 Here is an example of fetch a row:
 
 .. code-block:: php
+
     <?php
         $account = "<account_name>";
         $user = "<user_name>";
