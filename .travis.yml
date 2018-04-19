@@ -6,14 +6,12 @@ matrix:
       services:
         - docker
       env:
-        - label=php7.0
+        - DOCKER_NAME=snowflakedb/pdo-snowflake:php7.0-ubuntu14.04
       before_install:
         - openssl aes-256-cbc -k "$super_secret_password" -in parameters.json.enc -out parameters.json -d
-        - docker pull snowflakedb/pdo-snowflake:php7.0-ubuntu14.04
+        - docker pull $DOCKER_NAME
       script:
-        - pwd
-        - ls -l
-        - ./scripts/run_travis.sh
+        - ./scripts/run_docker_test.sh
       after_success:
         - bash <(curl -s https://codecov.io/bash)
 env:
