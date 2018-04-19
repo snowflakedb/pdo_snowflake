@@ -39,22 +39,20 @@ Here is an example of fetch a row:
 
 .. code-block:: php
 
-    <?php
-        $account = "<account_name>";
-        $user = "<user_name>";
-        $password = "<password";
+    $account = "<account_name>";
+    $user = "<user_name>";
+    $password = "<password";
 
-        $dbh = new PDO("snowflake:host=$account.snowflakecomputing.com;account=$account", $user, $password);
-        $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-        echo "Connected\n";
+    $dbh = new PDO("snowflake:account=$account", $user, $password);
+    $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+    echo "Connected\n";
 
-        $sth = $dbh->query("select 1234");
-        while ($row=$sth->fetch(PDO::FETCH_NUM)) {
-            echo "RESULT: " . $row[0] . "\n";
-        }
-        $dbh = null;
-        echo "OK\n";
-    ?>
+    $sth = $dbh->query("select 1234");
+    while ($row=$sth->fetch(PDO::FETCH_NUM)) {
+        echo "RESULT: " . $row[0] . "\n";
+    }
+    $dbh = null;
+    echo "OK\n";
 
 Environments
 ================================================================================
