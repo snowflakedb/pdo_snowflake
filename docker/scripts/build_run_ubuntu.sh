@@ -27,7 +27,7 @@ function travis_fold_end() {
 
 function finish {
     travis_fold_start drop_schema "Drop test schema"
-    python $DIR/drop_schema.py 
+    python3 $DIR/drop_schema.py 
     travis_fold_end
 }
 
@@ -35,7 +35,7 @@ function finish {
 trap finish EXIT
 
 cd
-$TRAVIS_BRANCH=${TRAVIS_BRANCH:-master}
+TRAVIS_BRANCH=${TRAVIS_BRANCH:-master}
 git clone --depth=50 --branch=$TRAVIS_BRANCH https://github.com/snowflakedb/pdo_snowflake.git
 cd pdo_snowflake
 
