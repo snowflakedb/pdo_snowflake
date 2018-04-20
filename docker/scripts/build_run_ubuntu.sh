@@ -34,7 +34,7 @@ function finish {
 # clean up
 trap finish EXIT
 
-if [[ -n "$TRAVIS_JOB_ID" ]]; then
+if [[ -z "$TRAVIS_JOB_ID" ]]; then
     cd
     git clone --depth=50 --branch=master https://github.com/snowflakedb/pdo_snowflake.git
     cd pdo_snowflake
