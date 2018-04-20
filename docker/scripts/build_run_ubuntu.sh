@@ -27,7 +27,7 @@ function travis_fold_end() {
 
 function finish {
     travis_fold_start drop_schema "Drop test schema"
-    python3 $DIR/drop_schema.py 
+    python3 $BASE_DIR/drop_schema.py 
     travis_fold_end
 }
 
@@ -38,12 +38,13 @@ if [[ -z "$TRAVIS_JOB_ID" ]]; then
     cd
     git clone --depth=50 --branch=master https://github.com/snowflakedb/pdo_snowflake.git
     cd pdo_snowflake
+    cp $CONFIG_FILE parameters.json  # replicate a parameter file
 else
     cd /base
 fi
+export BASE_DIR=$(pwd)
 
 # set the test parameters
-cp $CONFIG_FILE parameters.json  # replicate a parameter file
 source ./scripts/env.sh
 
 # Check Ubuntu version
