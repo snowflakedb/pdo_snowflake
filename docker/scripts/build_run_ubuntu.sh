@@ -27,7 +27,7 @@ function travis_fold_end() {
 
 function finish {
     travis_fold_start drop_schema "Drop test schema"
-    python3 $BASE_DIR/drop_schema.py 
+    python3 $BASE_DIR/scripts/drop_schema.py 
     travis_fold_end
 }
 
