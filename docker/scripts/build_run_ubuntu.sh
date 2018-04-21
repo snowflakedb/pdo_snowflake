@@ -48,9 +48,9 @@ export BASE_DIR=$(pwd)
 source ./scripts/env.sh
 
 # Check Ubuntu version
-# Ubuntu 16 has gcc5/gcov5 but doesn't work along with lcov12
+# Ubuntu 16 and 18 has gcc5/gcov5 but doesn't work along with lcov12 and lcov13
 UBUNTU_VERSION=$(lsb_release -r | awk '{print $2}')
-if [[ "$UBUNTU_VERSION" != "16.04" ]]; then
+if [[ "$UBUNTU_VERSION" != "16.04" && "$UBUNTU_VERSION" != "18.04" ]]; then
     export REPORT_COVERAGE=1
 fi
 
