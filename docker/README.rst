@@ -22,6 +22,10 @@ Push the image to Docker hub or registory if required.
     docker push snowflakedb/pdo-snowflake:php7.1-ubuntu14.04
     docker tag pdo-snowflake:php7.0-ubuntu14.04 snowflakedb/pdo-snowflake:php7.0-ubuntu14.04
     docker push snowflakedb/pdo-snowflake:php7.0-ubuntu14.04
+    docker tag pdo-snowflake:php7.1-ubuntu16.04 snowflakedb/pdo-snowflake:php7.1-ubuntu16.04
+    docker push snowflakedb/pdo-snowflake:php7.1-ubuntu16.04
+    docker tag pdo-snowflake:php7.2-ubuntu18.04 snowflakedb/pdo-snowflake:php7.2-ubuntu18.04
+    docker push snowflakedb/pdo-snowflake:php7.2-ubuntu18.04
 
 Testing Code
 ======================================================================
