@@ -13,48 +13,7 @@ PHP PDO driver for Snowflake
 
 *Private Preview. Linux Only. No PHP 5 support. PHP 7+ only.*
 
-Usage
-================================================================================
-
-Connection String
-----------------------------------------------------------------------
-
-Create a database handle with connection parameters:
-
-.. code-block:: php
-
-    $dbh = new PDO("snowflake:account=testaccount", "user", "password");
-
-For non-US-West region, specify :code:`region` parameter or append it to :code:`account` parameter.
-
-.. code-block:: php
-
-    $dbh = new PDO("snowflake:account=testaccount.us-east-1", "user", "password");
-    $dbh = new PDO("snowflake:account=testaccount;region=us-east-1", "user", "password");
-
-Query
-----------------------------------------------------------------------
-
-Here is an example of fetch a row:
-
-.. code-block:: php
-
-    $account = "<account_name>";
-    $user = "<user_name>";
-    $password = "<password";
-
-    $dbh = new PDO("snowflake:account=$account", $user, $password);
-    $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-    echo "Connected\n";
-
-    $sth = $dbh->query("select 1234");
-    while ($row=$sth->fetch(PDO::FETCH_NUM)) {
-        echo "RESULT: " . $row[0] . "\n";
-    }
-    $dbh = null;
-    echo "OK\n";
-
-Environments
+Configuring Environment
 ================================================================================
 
 PHP Versions and Extensions
@@ -119,6 +78,10 @@ Copy :code:`pdo_snowflake.so` to the same location as `pdo.so` where all PHP ext
 
 Copy :code:`cacert.pem` to the PHP config directory. For example, PHP-FPM version 7.1 on Ubuntu12 has :code:`/etc/php/7.1/fpm/conf.d/` for the extensions.
 
+.. note::
+
+    If you don't have :code:`pdo_snowflake.so`, build it following the instruction below.
+
 .. code-block:: bash
 
     cp cacert.pem /etc/php/7.1/fpm/conf.d/
@@ -149,6 +112,47 @@ Ensure :code:`phpinfo()` function return the output including :code:`pdo_snowfla
 
     We have not finalized what package would be the best for binary distribution. So far I'm trying to get :code:`pecl` account but have not got one yet. Any suggestion is welcome.
 
+
+Usage
+================================================================================
+
+Connection String
+----------------------------------------------------------------------
+
+Create a database handle with connection parameters:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=testaccount", "user", "password");
+
+For non-US-West region, specify :code:`region` parameter or append it to :code:`account` parameter.
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=testaccount.us-east-1", "user", "password");
+    $dbh = new PDO("snowflake:account=testaccount;region=us-east-1", "user", "password");
+
+Query
+----------------------------------------------------------------------
+
+Here is an example of fetch a row:
+
+.. code-block:: php
+
+    $account = "<account_name>";
+    $user = "<user_name>";
+    $password = "<password";
+
+    $dbh = new PDO("snowflake:account=$account", $user, $password);
+    $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+    echo "Connected\n";
+
+    $sth = $dbh->query("select 1234");
+    while ($row=$sth->fetch(PDO::FETCH_NUM)) {
+        echo "RESULT: " . $row[0] . "\n";
+    }
+    $dbh = null;
+    echo "OK\n";
 
 Build and Tests
 ================================================================================
