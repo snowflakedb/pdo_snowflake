@@ -8,7 +8,7 @@ import snowflake.connector
 
 travis_job_id = os.getenv('TRAVIS_JOB_ID')
 if not travis_job_id:
-    print("[WARN] The environment variable TRAVIS_JOB_ID is not set. No test schema will be created.")
+    print("[WARN] The environment variable TRAVIS_JOB_ID is not set. No test schema will be dropped.")
     sys.exit(0)
 
 test_schema = 'TRAVIS_JOB_{0}'.format(travis_job_id)
