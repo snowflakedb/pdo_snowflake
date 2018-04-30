@@ -50,6 +50,8 @@ typedef enum SF_LOG_LEVEL {
     SF_LOG_FATAL
 } SF_LOG_LEVEL;
 
+#define CXX_LOG_NS "C++"
+
 #define log_trace(...) log_log(SF_LOG_TRACE, __FILE__, __LINE__, "C", __VA_ARGS__)
 #define log_debug(...) log_log(SF_LOG_DEBUG, __FILE__, __LINE__, "C", __VA_ARGS__)
 #define log_info(...)  log_log(SF_LOG_INFO,  __FILE__, __LINE__, "C", __VA_ARGS__)
