@@ -215,7 +215,7 @@ typedef enum SF_GLOBAL_ATTRIBUTE {
  * Attributes for Snowflake statement context.
  */
 typedef enum SF_STMT_ATTRIBUTE {
-    INTERNAL
+    SF_STMT_USER_REALLOC_FUNC
 } SF_STMT_ATTRIBUTE;
 
 /**
@@ -322,6 +322,12 @@ typedef struct SF_STMT {
     SF_COLUMN_DESC *desc;
     void *stmt_attrs;
     sf_bool is_dml;
+
+    /**
+     * User realloc function used in snowflake_fetch
+     */
+    void *(*user_realloc_func)(void*, size_t);
+
     SF_CHUNK_DOWNLOADER *chunk_downloader;
     SF_PUT_GET_RESPONSE *put_get_response;
 } SF_STMT;
@@ -577,7 +583,7 @@ snowflake_stmt_set_attr(SF_STMT *sfstmt, SF_STMT_ATTRIBUTE type,
  * @return 0 if success, otherwise an errno is returned.
  */
 SF_STATUS STDCALL
-snowflake_stmt_get_attr(SF_STMT *sfstmt, SF_STMT_ATTRIBUTE type, void *value);
+snowflake_stmt_get_attr(SF_STMT *sfstmt, SF_STMT_ATTRIBUTE type, void **value);
 
 /**
  * Executes a statement.

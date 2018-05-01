@@ -9,6 +9,13 @@
 #include "php_pdo_snowflake_int.h"
 #include "Zend/zend_exceptions.h"
 
+static void *_pdo_snowflake_user_realloc(void* org_ptr, size_t new_size) /* {{{ */
+{
+    return erealloc(org_ptr, new_size);
+}
+/* }}} */
+
+
 int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
                          int line) /* {{{ */
 {
@@ -178,6 +185,11 @@ snowflake_handle_preparer(pdo_dbh_t *dbh, const char *sql, size_t sql_len,
         PDO_LOG_RETURN(0);
     }
 
+    if (snowflake_stmt_set_attr(S->stmt, SF_STMT_USER_REALLOC_FUNC, _pdo_snowflake_user_realloc) != SF_STATUS_SUCCESS) {
+        pdo_snowflake_error_stmt(stmt);
+        PDO_LOG_RETURN(0);
+    }
+
     /* prepare SQL */
     if (snowflake_prepare(S->stmt, sql, sql_len) != SF_STATUS_SUCCESS) {
         pdo_snowflake_error_stmt(stmt);
@@ -205,6 +217,11 @@ snowflake_handle_doer(pdo_dbh_t *dbh, const char *sql, size_t sql_len) /* {{{ */
     pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
     PDO_LOG_DBG("sql: %.*s, len: %d", sql_len, sql, sql_len);
     SF_STMT *sfstmt = snowflake_stmt(H->server);
+
+    // set realloc function for large size result
+    snowflake_stmt_set_attr(sfstmt, SF_STMT_USER_REALLOC_FUNC,
+                            _pdo_snowflake_user_realloc);
+
     if (snowflake_query(sfstmt, sql, sql_len) == SF_STATUS_SUCCESS) {
         int64 rows = snowflake_affected_rows(sfstmt);
         if (rows == -1) {

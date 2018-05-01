@@ -59,6 +59,7 @@ static void _pdo_snowflake_stmt_set_row_count(pdo_stmt_t *stmt) /* {{{ */
         stmt->row_count = row_count;
     }
 }
+/* }}} */
 
 /**
  * Destroy a previously constructed statement object.
@@ -148,6 +149,9 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
                 break;
             case SF_TYPE_TEXT:
                 len = (size_t) desc->byte_size;
+                if (len > 1) {
+                    len = 1;
+                }
                 break;
             case SF_TYPE_ARRAY:
             case SF_TYPE_VARIANT:
@@ -322,7 +326,7 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
 /**
  * Retrieve data from the specified column.
  *
- * The driver should return the resultant data and length of that data in the
+ * The driver should return the result data and length of that data in the
  * ptr and len variables respectively. It should be noted that the main PDO
  * driver expects the driver to manage the lifetime of the data. This function
  * returns 1 for success or 0 in the event of failure.
