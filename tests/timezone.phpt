@@ -4,8 +4,6 @@ pdo_snowflake - timezone
 pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 --FILE--
 <?php
-    // use unlimited memory
-    ini_set('memory_limit', '-1');
     include __DIR__ . "/common.php";
 
     $dsn .=";timezone=America/New_York";
