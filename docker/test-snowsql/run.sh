@@ -17,7 +17,7 @@ cd $DIR
 
 if ! docker network ls | awk '{print $2}' | grep -q $NETWORK_NAME; then
     echo "==> Creating a network $NETWORK_NAME"
-    docker network create $NETWORK_NAME
+    docker network create --subnet 172.20.0.0/16 --ip-range 172.20.240.0/20 $NETWORK_NAME
 fi
 
 if ! docker ps | awk '{print $2}' | grep -q $PROXY_NAME; then
