@@ -13,8 +13,8 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     $dbh->query('USE '.$database);
     $dbh->query('USE WAREHOUSE '.$warehouse);
 
-    // $query = $dbh->prepare("CREATE OR REPLACE TABLE obfuscated_table_name (daily_budget number(38,6))");
-    // $query->execute();
+    $query = $dbh->prepare("CREATE OR REPLACE TABLE obfuscated_table_name (daily_input number(38,6))");
+    $query->execute();
     $dbh->exec("CREATE OR REPLACE TABLE obfuscated_table_name (daily number(38,6))");
     echo 'Created table with single column of type number(38,6)' . "\n";
 
