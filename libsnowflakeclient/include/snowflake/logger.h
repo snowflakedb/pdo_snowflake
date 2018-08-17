@@ -66,11 +66,17 @@ typedef enum SF_LOG_LEVEL {
 #define sf_log_error(ns, ...) log_log(SF_LOG_ERROR, __FILE__, __LINE__, ns, __VA_ARGS__)
 #define sf_log_fatal(ns, ...) log_log(SF_LOG_FATAL, __FILE__, __LINE__, ns, __VA_ARGS__)
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 void log_set_udata(void *udata);
 
 void log_set_lock(log_LockFn fn);
 
 void log_set_fp(FILE *fp);
+
+int log_get_level();
 
 void log_set_level(int level);
 
@@ -80,6 +86,14 @@ void
 log_log(int level, const char *file, int line, const char *ns, const char *fmt,
         ...);
 
+void
+log_log_va_list(int level, const char *file, int line, const char *ns, 
+                const char *fmt, va_list args);
+
 SF_LOG_LEVEL log_from_str_to_level(const char *level_in_str);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif /* SNOWFLAKE_LOGGER_H */
