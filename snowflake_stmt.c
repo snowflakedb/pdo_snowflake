@@ -138,7 +138,7 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
                     desc->internal_size,
                     desc->null_ok);
         switch (desc->type) {
-            case SF_TYPE_FIXED:
+            case SF_DB_TYPE_FIXED:
                 if (desc->scale == 0) {
                     /* No decimal point but integer */
                     len = (size_t) desc->precision;
@@ -147,35 +147,35 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
                     len = (size_t) desc->precision + 1;
                 }
                 break;
-            case SF_TYPE_TEXT:
+            case SF_DB_TYPE_TEXT:
                 len = (size_t) desc->byte_size;
                 if (len > 1) {
                     len = 1;
                 }
                 break;
-            case SF_TYPE_ARRAY:
-            case SF_TYPE_VARIANT:
-            case SF_TYPE_OBJECT:
+            case SF_DB_TYPE_ARRAY:
+            case SF_DB_TYPE_VARIANT:
+            case SF_DB_TYPE_OBJECT:
                 /* No length is given from the server */
                 len = SF_MAX_OBJECT_SIZE;
                 break;
-            case SF_TYPE_REAL:
+            case SF_DB_TYPE_REAL:
                 len = (size_t) 256; /* TODO */
                 break;
-            case SF_TYPE_BINARY:
+            case SF_DB_TYPE_BINARY:
                 len = SF_MAX_OBJECT_SIZE;
                 break;
-            case SF_TYPE_BOOLEAN:
+            case SF_DB_TYPE_BOOLEAN:
                 len =
                   (sizeof(SF_BOOLEAN_TRUE_STR) > sizeof(SF_BOOLEAN_FALSE_STR)
                    ? sizeof(SF_BOOLEAN_TRUE_STR)
                    : sizeof(SF_BOOLEAN_FALSE_STR)) - 1;
                 break;
-            case SF_TYPE_DATE:
-            case SF_TYPE_TIMESTAMP_NTZ:
-            case SF_TYPE_TIMESTAMP_LTZ:
-            case SF_TYPE_TIMESTAMP_TZ:
-            case SF_TYPE_TIME:
+            case SF_DB_TYPE_DATE:
+            case SF_DB_TYPE_TIMESTAMP_NTZ:
+            case SF_DB_TYPE_TIMESTAMP_LTZ:
+            case SF_DB_TYPE_TIMESTAMP_TZ:
+            case SF_DB_TYPE_TIME:
                 len = (size_t) 64; /* TODO: YYYY-MM-DD, MON DD, YYYY, etc */
                 break;
             default:
@@ -288,26 +288,26 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
     for (i = 0; i < stmt->column_count; i++) {
         cols[i].precision = (zend_ulong) F[i].precision;
         switch (F[i].type) {
-            case SF_TYPE_OBJECT:
-            case SF_TYPE_ARRAY:
-            case SF_TYPE_VARIANT:
+            case SF_DB_TYPE_OBJECT:
+            case SF_DB_TYPE_ARRAY:
+            case SF_DB_TYPE_VARIANT:
                 /* No size is given from the server */
                 cols[i].maxlen = SF_MAX_OBJECT_SIZE;
                 break;
-            case SF_TYPE_BOOLEAN:
+            case SF_DB_TYPE_BOOLEAN:
                 cols[i].maxlen =
                   (sizeof(SF_BOOLEAN_TRUE_STR) > sizeof(SF_BOOLEAN_FALSE_STR)
                    ? sizeof(SF_BOOLEAN_TRUE_STR)
                    : sizeof(SF_BOOLEAN_FALSE_STR)) - 1;
                 break;
-            case SF_TYPE_BINARY:
+            case SF_DB_TYPE_BINARY:
                 cols[i].maxlen = (size_t) F[i].byte_size;
                 break;
-            case SF_TYPE_DATE:
-            case SF_TYPE_TIMESTAMP_NTZ:
-            case SF_TYPE_TIMESTAMP_TZ:
-            case SF_TYPE_TIMESTAMP_LTZ:
-            case SF_TYPE_TIME:
+            case SF_DB_TYPE_DATE:
+            case SF_DB_TYPE_TIMESTAMP_NTZ:
+            case SF_DB_TYPE_TIMESTAMP_TZ:
+            case SF_DB_TYPE_TIMESTAMP_LTZ:
+            case SF_DB_TYPE_TIME:
                 /* length doesn't matter to allocate buffer */
                 cols[i].maxlen = (size_t) F[i].byte_size;
                 break;

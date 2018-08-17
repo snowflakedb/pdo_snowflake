@@ -22,6 +22,9 @@ typedef CONDITION_VARIABLE SF_CONDITION_HANDLE;
 typedef CRITICAL_SECTION SF_CRITICAL_SECTION_HANDLE;
 typedef SRWLOCK SF_RWLOCK_HANDLE;
 typedef HANDLE SF_MUTEX_HANDLE;
+
+#define PATH_SEP '\\'
+
 #else
 #define STDCALL
 // Get uname output for Linux and MacOSX
@@ -35,6 +38,9 @@ typedef pthread_cond_t SF_CONDITION_HANDLE;
 typedef pthread_mutex_t SF_CRITICAL_SECTION_HANDLE;
 typedef pthread_rwlock_t SF_RWLOCK_HANDLE;
 typedef pthread_mutex_t SF_MUTEX_HANDLE;
+
+#define PATH_SEP '/'
+
 #endif
 
 struct tm *STDCALL sf_gmtime(const time_t *timep, struct tm *result);
@@ -107,6 +113,12 @@ int STDCALL sf_strncasecmp(const char *s1, const char *s2, size_t n);
 char *STDCALL sf_filename_from_path(const char *path);
 
 void STDCALL sf_log_timestamp(char* tsbuf, size_t tsbufsize);
+
+int STDCALL sf_create_directory_if_not_exists(const char * directoryName);
+
+int STDCALL sf_delete_directory_if_exists(const char * directoryName);
+
+void STDCALL sf_get_tmp_dir(char * tmpDir);
 
 #ifdef __cplusplus
 }

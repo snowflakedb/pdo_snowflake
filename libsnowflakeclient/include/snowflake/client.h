@@ -65,21 +65,21 @@ extern "C" {
  *
  * Use snowflake_type_to_string to get the string representation.
  */
-typedef enum SF_TYPE {
-    SF_TYPE_FIXED,
-    SF_TYPE_REAL,
-    SF_TYPE_TEXT,
-    SF_TYPE_DATE,
-    SF_TYPE_TIMESTAMP_LTZ,
-    SF_TYPE_TIMESTAMP_NTZ,
-    SF_TYPE_TIMESTAMP_TZ,
-    SF_TYPE_VARIANT,
-    SF_TYPE_OBJECT,
-    SF_TYPE_ARRAY,
-    SF_TYPE_BINARY,
-    SF_TYPE_TIME,
-    SF_TYPE_BOOLEAN
-} SF_TYPE;
+typedef enum SF_DB_TYPE {
+    SF_DB_TYPE_FIXED,
+    SF_DB_TYPE_REAL,
+    SF_DB_TYPE_TEXT,
+    SF_DB_TYPE_DATE,
+    SF_DB_TYPE_TIMESTAMP_LTZ,
+    SF_DB_TYPE_TIMESTAMP_NTZ,
+    SF_DB_TYPE_TIMESTAMP_TZ,
+    SF_DB_TYPE_VARIANT,
+    SF_DB_TYPE_OBJECT,
+    SF_DB_TYPE_ARRAY,
+    SF_DB_TYPE_BINARY,
+    SF_DB_TYPE_TIME,
+    SF_DB_TYPE_BOOLEAN
+} SF_DB_TYPE;
 
 /**
  * C data types
@@ -198,7 +198,10 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_LOGIN_TIMEOUT,
     SF_CON_NETWORK_TIMEOUT,
     SF_CON_TIMEZONE,
-    SF_CON_AUTOCOMMIT
+    SF_CON_AUTOCOMMIT,
+    SF_DIR_QUERY_URL,
+    SF_DIR_QUERY_URL_PARAM,
+    SF_DIR_QUERY_TOKEN
 } SF_ATTRIBUTE;
 
 /**
@@ -274,6 +277,12 @@ typedef struct SF_CONNECT {
     SF_MUTEX_HANDLE mutex_sequence_counter;
     char request_id[SF_UUID4_LEN];
 
+    char *directURL;
+
+    char *directURL_param;
+
+    char *direct_query_token;
+
     // Error
     SF_ERROR_STRUCT error;
 } SF_CONNECT;
@@ -283,7 +292,7 @@ typedef struct SF_CONNECT {
  */
 typedef struct SF_COLUMN_DESC {
     char *name;
-    SF_TYPE type;
+    SF_DB_TYPE type;
     SF_C_TYPE c_type;
     int64 byte_size;
     int64 internal_size;
@@ -340,7 +349,7 @@ typedef struct {
     SF_C_TYPE c_type; /* input data type in C */
     void *value; /* input value */
     size_t len; /* input value length. valid only for SF_C_TYPE_STRING */
-    SF_TYPE type; /* (optional) target Snowflake data type */
+    SF_DB_TYPE type; /* (optional) target Snowflake data type */
 } SF_BIND_INPUT;
 
 /**
@@ -666,7 +675,7 @@ const char *STDCALL snowflake_sfqid(SF_STMT *sfstmt);
  * @param type SF_TYPE enum
  * @return a string representation of Snowflake Type
  */
-const char *STDCALL snowflake_type_to_string(SF_TYPE type);
+const char *STDCALL snowflake_type_to_string(SF_DB_TYPE type);
 
 /**
  * Converts Snowflake C Type enum value to a string representation
