@@ -1,0 +1,7 @@
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
+iptables -P FORWARD DROP
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A INPUT -j DROP
+iptables -A OUTPUT -p tcp -d 172.20.128.10 -j ACCEPT
