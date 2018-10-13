@@ -429,6 +429,12 @@ static int pdo_snowflake_stmt_param_hook(
         /* nop if not binding parameter but column */
         PDO_LOG_RETURN(1);
     }
+    if (param->paramno == -1) {
+        // If paramno is -1, then this is a named parameter which is not supported yet
+        pdo_raise_impl_error(stmt->dbh, stmt, SF_SQLSTATE_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
+          "Named parameters are not supported yet in the Snowflake PDO Driver");
+        PDO_LOG_RETURN(0);
+    }
     if (Z_ISREF(param->parameter)) {
         parameter = Z_REFVAL(param->parameter);
     } else {
