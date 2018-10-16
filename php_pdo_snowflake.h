@@ -11,7 +11,7 @@ extern zend_module_entry pdo_snowflake_module_entry;
 /**
  * PHP PDO Snowflake version for PHP info
  */
-#define PDO_SNOWFLAKE_VERSION "0.1.3"
+#define PDO_SNOWFLAKE_VERSION "0.1.4"
 
 #ifdef PHP_WIN32
 #define PHP_PDO_SNOWFLAKE_API __declspec(dllexport)
