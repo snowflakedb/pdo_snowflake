@@ -224,7 +224,7 @@ Run the following command to check if PHP PDO Driver for Snowflake is successful
 
     As the build requires a special link process, a simple sequence of :code:`phpize` followed by :code:`make` doesn't work. See the build script for the detail.
 
-Test
+Prepare for Test
 ----------------------------------------------------------------------
 
 Create a parameter file :code:`parameters.json` under :code:`pdo_snowflake` directory:
@@ -249,7 +249,26 @@ Call :code:`env.sh` script to set the test connection parametes in the environme
 
     source ./scripts/env.sh
 
-And run the test:
+Proxy
+^^^^^^^^^^
+
+PHP PDO Driver for Snowflake supports HTTP and HTTPS proxy connections using environment variables. To use a proxy server configure the following environment variables:
+
+- http_proxy
+- https_proxy
+- no_proxy
+
+.. code-block:: bash
+
+    export http_proxy="[protocol://][user:password@]machine[:port]"
+    export https_proxy="[protocol://][user:password@]machine[:port]"
+
+More info can be found on the `libcurl tutorial`__ page.
+
+.. __: https://curl.haxx.se/libcurl/c/libcurl-tutorial.html#Proxies
+
+Run Tests
+----------------------------------------------------------------------
 
 .. code-block:: bash
 
