@@ -9,6 +9,9 @@
 extern "C" {
 #endif
 
+#include <limits.h>
+#include <float.h>
+#include <math.h>
 #include "platform.h"
 
 /**
@@ -16,8 +19,8 @@ extern "C" {
  */
 typedef char int8;
 typedef unsigned char uint8;
-typedef unsigned long int uint32;
-typedef long int int32;
+typedef unsigned int uint32;
+typedef int int32;
 typedef unsigned long long int uint64;
 typedef long long int int64;
 typedef double float64;
@@ -27,6 +30,14 @@ typedef int8 sf_bool;
 extern const int8 SF_BOOLEAN_TRUE;
 extern const int8 SF_BOOLEAN_FALSE;
 
+#define SF_UINT32_MAX UINT_MAX
+#define SF_UINT64_MAX ULLONG_MAX
+#define SF_INT32_MIN INT_MIN
+#define SF_INT32_MAX INT_MAX
+#define SF_INT64_MIN LLONG_MIN
+#define SF_INT64_MAX LLONG_MAX
+#define SF_HUGE_VAL HUGE_VAL
+#define SF_HUGE_VALF HUGE_VALF
 /**
  * Boolean data type string representation for Snowflake
  */

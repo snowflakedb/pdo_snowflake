@@ -9,11 +9,28 @@
 #include "php_pdo_snowflake_int.h"
 #include "Zend/zend_exceptions.h"
 
-static void *_pdo_snowflake_user_realloc(void* org_ptr, size_t new_size) /* {{{ */
+void *_pdo_snowflake_user_realloc(void* org_ptr, size_t new_size) /* {{{ */
 {
     return erealloc(org_ptr, new_size);
 }
 /* }}} */
+
+void *_pdo_snowflake_user_calloc(size_t nitems, size_t size) /* {{{ */
+{
+    return ecalloc(nitems, size);
+}
+/* }}} */
+
+void *_pdo_snowflake_user_malloc(size_t size) /* {{{ */
+{
+    return emalloc(size);
+}
+/* }}} */
+
+void _pdo_snowflake_user_dealloc(void* ptr) /* {{{ */
+{
+    efree(ptr);
+}
 
 
 int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,

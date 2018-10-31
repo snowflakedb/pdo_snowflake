@@ -1,4 +1,4 @@
-prefix=/home/stakeda/git/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/openssl
+prefix=/home/vagrant/libsnowflakeclient/scripts/../deps-build/linux/openssl
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
@@ -6,7 +6,7 @@ enginesdir=${libdir}/engines-1.1
 
 Name: OpenSSL-libcrypto
 Description: OpenSSL cryptography library
-Version: 1.1.0f
+Version: 1.1.0g
 Libs: -L${libdir} -lcrypto
 Libs.private: -ldl 
 Cflags: -I${includedir}

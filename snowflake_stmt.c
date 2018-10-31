@@ -80,16 +80,11 @@ static int pdo_snowflake_stmt_dtor(pdo_stmt_t *stmt) /* {{{ */
         pdo_sf_array_list_deallocate(S->bound_params);
     }
 
-    PDO_LOG_DBG("number of columns: %d", stmt->column_count);
-    if (S->bound_result) {
-        int i;
-        for (i = 0; i < stmt->column_count; ++i) {
-            /* free individual value */
-            efree(S->bound_result[i].value);
-        }
-        /* free the array of results */
-        efree(S->bound_result);
+    if (S->bound_results) {
+        efree(S->bound_results);
     }
+
+    PDO_LOG_DBG("number of columns: %d", stmt->column_count);
     snowflake_stmt_term(S->stmt);
     efree(S);
     stmt->driver_data = NULL;
@@ -120,74 +115,10 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
     /* Bind Columns/Results before fetching */
     stmt->column_count = (int) snowflake_num_fields(S->stmt);
     PDO_LOG_DBG("number of columns: %d", stmt->column_count);
-    S->bound_result = ecalloc((size_t) stmt->column_count,
-                              sizeof(SF_BIND_OUTPUT));
-    for (i = 0; i < stmt->column_count; ++i) {
-        size_t len = 0;
-        SF_COLUMN_DESC *desc = &S->stmt->desc[i];
-        S->bound_result[i].idx = (size_t) i + 1;  /* 1 based index */
-        S->bound_result[i].c_type = SF_C_TYPE_STRING; /* string type */
-        PDO_LOG_DBG("name: %s, prec: %d, scale: %d, type: %s, c_type: %s, "
-                      "byte_size: %ld, internal_bytes: %ld, null_ok: %d",
-                    desc->name,
-                    desc->precision,
-                    desc->scale,
-                    snowflake_type_to_string(desc->type),
-                    snowflake_c_type_to_string(desc->c_type),
-                    desc->byte_size,
-                    desc->internal_size,
-                    desc->null_ok);
-        switch (desc->type) {
-            case SF_DB_TYPE_FIXED:
-                if (desc->scale == 0) {
-                    /* No decimal point but integer */
-                    len = (size_t) desc->precision;
-                } else {
-                    /* The total number of digits plus decimal point */
-                    len = (size_t) desc->precision + 1;
-                }
-                break;
-            case SF_DB_TYPE_TEXT:
-                len = (size_t) desc->byte_size;
-                if (len > 1) {
-                    len = 1;
-                }
-                break;
-            case SF_DB_TYPE_ARRAY:
-            case SF_DB_TYPE_VARIANT:
-            case SF_DB_TYPE_OBJECT:
-                /* No length is given from the server */
-                len = SF_MAX_OBJECT_SIZE;
-                break;
-            case SF_DB_TYPE_REAL:
-                len = (size_t) 256; /* TODO */
-                break;
-            case SF_DB_TYPE_BINARY:
-                len = SF_MAX_OBJECT_SIZE;
-                break;
-            case SF_DB_TYPE_BOOLEAN:
-                len =
-                  (sizeof(SF_BOOLEAN_TRUE_STR) > sizeof(SF_BOOLEAN_FALSE_STR)
-                   ? sizeof(SF_BOOLEAN_TRUE_STR)
-                   : sizeof(SF_BOOLEAN_FALSE_STR)) - 1;
-                break;
-            case SF_DB_TYPE_DATE:
-            case SF_DB_TYPE_TIMESTAMP_NTZ:
-            case SF_DB_TYPE_TIMESTAMP_LTZ:
-            case SF_DB_TYPE_TIMESTAMP_TZ:
-            case SF_DB_TYPE_TIME:
-                len = (size_t) 64; /* TODO: YYYY-MM-DD, MON DD, YYYY, etc */
-                break;
-            default:
-                break;
-        }
-        PDO_LOG_DBG("len: %ld", len);
-        S->bound_result[i].is_null = SF_BOOLEAN_FALSE;
-        S->bound_result[i].max_length = len; // change this
-        S->bound_result[i].value = ecalloc(len, sizeof(char));
-        S->bound_result[i].len = 0; // reset the actual value length
-        snowflake_bind_result(S->stmt, &S->bound_result[i]);
-    }
+
+    size_t num_results = stmt->column_count > 0 ? (size_t) stmt->column_count : 0;
+    // Create an array of string structs
+    S->bound_results = ecalloc(num_results, sizeof(pdo_snowflake_string));
 
     _pdo_snowflake_stmt_set_row_count(stmt);
     PDO_LOG_RETURN(1);
@@ -353,12 +284,16 @@ pdo_snowflake_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr, size_t *len,
         PDO_LOG_ERR("ERROR 3");
         PDO_LOG_RETURN(0);
     }
-    if (S->bound_result[colno].is_null) {
+    sf_bool is_null;
+    snowflake_column_is_null(S->stmt, colno + 1, &is_null);
+    if (is_null) {
         *ptr = NULL;
         *len = 0;
     } else {
-        *ptr = S->bound_result[colno].value;
-        *len = S->bound_result[colno].len;
+        pdo_snowflake_string *str = &(S->bound_results[colno]);
+        snowflake_column_as_str(S->stmt, colno + 1, &str->value, &str->size, NULL);
+        *ptr = str->value;
+        *len = str->size;
     }
     PDO_LOG_DBG("idx: %d, value: '%.*s', len: %d", colno, *len, *ptr, *len);
     PDO_LOG_RETURN(1);

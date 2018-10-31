@@ -61,7 +61,6 @@ namespace Snowflake {
             const char *asCString();
 
         private:
-            SF_BIND_OUTPUT m_column;
             SF_COLUMN_DESC *m_desc;
         };
     }

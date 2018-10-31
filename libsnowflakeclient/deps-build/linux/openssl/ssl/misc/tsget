@@ -47,7 +47,7 @@ sub create_curl {
     $curl->setopt(CURLOPT_VERBOSE, 1) if $options{d};
     $curl->setopt(CURLOPT_FAILONERROR, 1);
     $curl->setopt(CURLOPT_USERAGENT,
-        "OpenTSA tsget.pl/openssl-1.1.0f");
+        "OpenTSA tsget.pl/openssl-1.1.0g");
 
     # Options for POST method.
     $curl->setopt(CURLOPT_UPLOAD, 1);
@@ -198,4 +198,3 @@ REQUEST: foreach (@ARGV) {
     STDERR->printflush(", $output written.\n") if $options{v};
 }
 $curl->cleanup();
-WWW::Curl::Easy::global_cleanup();

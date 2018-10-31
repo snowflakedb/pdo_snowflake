@@ -1,11 +1,11 @@
-prefix=/home/stakeda/git/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/openssl
+prefix=/home/vagrant/libsnowflakeclient/scripts/../deps-build/linux/openssl
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
 Name: OpenSSL-libssl
 Description: Secure Sockets Layer and cryptography libraries
-Version: 1.1.0f
+Version: 1.1.0g
 Requires.private: libcrypto
 Libs: -L${libdir} -lssl
 Libs.private: -ldl 

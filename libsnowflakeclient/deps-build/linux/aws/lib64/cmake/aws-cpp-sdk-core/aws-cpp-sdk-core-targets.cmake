@@ -56,7 +56,7 @@ add_library(aws-cpp-sdk-core STATIC IMPORTED)
 set_target_properties(aws-cpp-sdk-core PROPERTIES
   INTERFACE_COMPILE_DEFINITIONS "AWS_SDK_VERSION_MAJOR=1;AWS_SDK_VERSION_MINOR=3;AWS_SDK_VERSION_PATCH=50"
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
-  INTERFACE_LINK_LIBRARIES "pthread;/home/stakeda/g/libsnowflakeclient/deps-build/linux/curl/lib;/home/stakeda/g/libsnowflakeclient/deps-build/linux/openssl/lib/libssl.a;/home/stakeda/g/libsnowflakeclient/deps-build/linux/openssl/lib/libcrypto.a;/usr/lib64/libz.so"
+  INTERFACE_LINK_LIBRARIES "pthread;/home/vagrant/libsnowflakeclient/deps-build/linux/curl/lib;/home/vagrant/libsnowflakeclient/deps-build/linux/openssl/lib/libssl.a;/home/vagrant/libsnowflakeclient/deps-build/linux/openssl/lib/libcrypto.a;/usr/lib64/libz.so"
 )
 
 if(CMAKE_VERSION VERSION_LESS 2.8.12)

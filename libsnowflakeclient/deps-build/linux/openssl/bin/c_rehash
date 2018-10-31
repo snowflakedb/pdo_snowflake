@@ -13,7 +13,7 @@
 # and add symbolic links to their hash values.
 
 my $dir = "";
-my $prefix = "/home/stakeda/git/pdo_snowflake/libsnowflakeclient/scripts/../deps-build/linux/openssl";
+my $prefix = "/home/vagrant/libsnowflakeclient/scripts/../deps-build/linux/openssl";
 
 my $errorcount = 0;
 my $openssl = $ENV{OPENSSL} || "openssl";
