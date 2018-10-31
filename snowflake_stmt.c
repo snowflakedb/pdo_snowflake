@@ -115,10 +115,13 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
     /* Bind Columns/Results before fetching */
     stmt->column_count = (int) snowflake_num_fields(S->stmt);
     PDO_LOG_DBG("number of columns: %d", stmt->column_count);
-
-    size_t num_results = stmt->column_count > 0 ? (size_t) stmt->column_count : 0;
     // Create an array of string structs
-    S->bound_results = ecalloc(num_results, sizeof(pdo_snowflake_string));
+    S->bound_results = ecalloc((size_t) stmt->column_count, sizeof(pdo_snowflake_string));
+
+    for(i = 0; i < stmt->column_count; i++) {
+        S->bound_results[i].value = NULL;
+        S->bound_results[i].size = 0;
+    }
 
     _pdo_snowflake_stmt_set_row_count(stmt);
     PDO_LOG_RETURN(1);
@@ -290,10 +293,11 @@ pdo_snowflake_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr, size_t *len,
         *ptr = NULL;
         *len = 0;
     } else {
+        size_t bytes_copied = 0;
         pdo_snowflake_string *str = &(S->bound_results[colno]);
-        snowflake_column_as_str(S->stmt, colno + 1, &str->value, &str->size, NULL);
+        snowflake_column_as_str(S->stmt, colno + 1, &str->value, &str->size, &bytes_copied);
         *ptr = str->value;
-        *len = str->size;
+        *len = bytes_copied;
     }
     PDO_LOG_DBG("idx: %d, value: '%.*s', len: %d", colno, *len, *ptr, *len);
     PDO_LOG_RETURN(1);
