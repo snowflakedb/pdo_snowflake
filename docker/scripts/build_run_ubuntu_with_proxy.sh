@@ -48,7 +48,7 @@ fi
 
 if [[ -z "$TRAVIS_JOB_ID" ]]; then
     cd
-    git clone --depth=50 --branch=proxy_support_documentation https://github.com/snowflakedb/pdo_snowflake.git
+    git clone --depth=50 --branch=master https://github.com/snowflakedb/pdo_snowflake.git
     cd pdo_snowflake
     cp $CONFIG_FILE parameters.json  # replicate a parameter file
 else

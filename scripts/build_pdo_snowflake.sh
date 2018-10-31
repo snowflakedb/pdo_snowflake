@@ -65,4 +65,3 @@ cc -shared \
 source $DIR/env.sh
 
 env | grep SNOWFLAKE_TEST > $DIR/../testenv.ini
-echo "max_execution_time = 0" >> $DIR/../testenv.ini
