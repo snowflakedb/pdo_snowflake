@@ -54,8 +54,6 @@ typedef struct {
 
     ARRAY_LIST *bound_params;
     pdo_snowflake_string *bound_results;
-    // TODO: Remove
-    //SF_BIND_OUTPUT *bound_result;
 } pdo_snowflake_stmt;
 
 extern pdo_driver_t pdo_snowflake_driver;

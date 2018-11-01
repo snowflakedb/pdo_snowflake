@@ -806,17 +806,21 @@ SF_STATUS STDCALL snowflake_column_as_timestamp(SF_STMT *sfstmt, int idx, SF_TIM
 SF_STATUS STDCALL snowflake_column_as_const_str(SF_STMT *sfstmt, int idx, const char **value_ptr);
 
 /**
- * Allocates a new string buffer to store the result and stores that buffer address in value_ptr.
- * The user must pass this buffer to free() once they are done using it, this memory is NOT freed by the library.
- * Buffer pointed to by value_ptr will not be free'd by the library.
+ * Converts a column into a string, copies to the buffer provided and stores that buffer address in value_ptr. If
+ * *value_ptr is not NULL and max_value_size_ptr is not NULL and greater than 0, then the library will copy the string
+ * data into the provided buffer. If the provided buffer if not large enough, the library will reallocate this string
+ * buffer and store the new buffer size in max_value_size_ptr.The user must pass this buffer to free() once they are
+ * done using it, this memory is NOT freed by the library. Buffer pointed to by value_ptr will not be free'd by the library.
  *
  * @param sfstmt SF_STMT context
  * @param idx Column index
  * @param value_ptr Copied Column data is stored in this pointer (if conversion was successful)
- * @param value_len_ptr The size of value. If 
- * @return
+ * @param value_len_ptr The length of the string value. This is what you would get if you were to call strlen(*value_ptr).
+ * @param max_value_size_ptr The size of the value buffer. If value_ptr is reallocated because the data to copy is too
+ *        large, then this ptr will hold the value of the new buffer size.
+ * @return 0 if success, otherwise an errno is returned
  */
-SF_STATUS STDCALL snowflake_column_as_str(SF_STMT *sfstmt, int idx, char **value_ptr, size_t *value_len_ptr, size_t *bytes_copied_ptr);
+SF_STATUS STDCALL snowflake_column_as_str(SF_STMT *sfstmt, int idx, char **value_ptr, size_t *value_len_ptr, size_t *max_value_size_ptr);
 
 /**
  * Returns the length of the raw column data

@@ -80,7 +80,11 @@ static int pdo_snowflake_stmt_dtor(pdo_stmt_t *stmt) /* {{{ */
         pdo_sf_array_list_deallocate(S->bound_params);
     }
 
+    // Release string bindings
     if (S->bound_results) {
+        for(int i = 0; i < stmt->column_count; i++) {
+            efree(S->bound_results[i].value);
+        }
         efree(S->bound_results);
     }
 
@@ -293,11 +297,11 @@ pdo_snowflake_stmt_get_col(pdo_stmt_t *stmt, int colno, char **ptr, size_t *len,
         *ptr = NULL;
         *len = 0;
     } else {
-        size_t bytes_copied = 0;
+        size_t value_len = 0;
         pdo_snowflake_string *str = &(S->bound_results[colno]);
-        snowflake_column_as_str(S->stmt, colno + 1, &str->value, &str->size, &bytes_copied);
+        snowflake_column_as_str(S->stmt, colno + 1, &str->value, &value_len, &str->size);
         *ptr = str->value;
-        *len = bytes_copied;
+        *len = value_len;
     }
     PDO_LOG_DBG("idx: %d, value: '%.*s', len: %d", colno, *len, *ptr, *len);
     PDO_LOG_RETURN(1);
