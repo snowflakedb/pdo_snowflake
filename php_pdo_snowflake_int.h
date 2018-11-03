@@ -40,6 +40,11 @@ typedef long zend_long;
 #endif /* PHP_VERSION_ID */
 
 typedef struct {
+    char *value;
+    size_t size;
+} pdo_snowflake_string;
+
+typedef struct {
     SF_CONNECT *server;
 } pdo_snowflake_db_handle;
 
@@ -48,7 +53,7 @@ typedef struct {
     SF_STMT *stmt;
 
     ARRAY_LIST *bound_params;
-    SF_BIND_OUTPUT *bound_result;
+    pdo_snowflake_string *bound_results;
 } pdo_snowflake_stmt;
 
 extern pdo_driver_t pdo_snowflake_driver;
@@ -57,6 +62,11 @@ extern struct pdo_stmt_methods snowflake_stmt_methods;
 extern int
 _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
                      int line);
+
+extern void *_pdo_snowflake_user_realloc(void* org_ptr, size_t new_size);
+extern void *_pdo_snowflake_user_calloc(size_t nitems, size_t size);
+extern void *_pdo_snowflake_user_malloc(size_t size);
+extern void _pdo_snowflake_user_dealloc(void* ptr);
 
 #define pdo_snowflake_error(d) _pdo_snowflake_error(d, NULL, __FILE__, __LINE__)
 #define pdo_snowflake_error_stmt(s) _pdo_snowflake_error(s->dbh, s, __FILE__, __LINE__)

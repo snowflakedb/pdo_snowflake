@@ -54,8 +54,14 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
     char *logdir = PDO_SNOWFLAKE_G(logdir);
     char* loglevel = PDO_SNOWFLAKE_G(loglevel);
     char* debug = PDO_SNOWFLAKE_G(debug);
+    SF_USER_MEM_HOOKS php_hooks = {
+        .alloc_fn = _pdo_snowflake_user_malloc,
+        .calloc_fn = _pdo_snowflake_user_calloc,
+        .realloc_fn = _pdo_snowflake_user_realloc,
+        .dealloc_fn = _pdo_snowflake_user_dealloc
+    };
 
-    snowflake_global_init(logdir, log_from_str_to_level(loglevel));
+    snowflake_global_init(logdir, log_from_str_to_level(loglevel), &php_hooks);
     snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, cacert);
     sf_bool debug_bool =
         (debug && strncasecmp(debug, "true", 4) == 0) ?

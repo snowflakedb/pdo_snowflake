@@ -10,7 +10,7 @@ PARAMETER_FILE=$( cd "$DIR/.." && pwd)/parameters.json
 
 [[ ! -e "$PARAMETER_FILE" ]] &&  echo "The parameter file doesn't exist: $PARAMETER_FILE" && exit 1
 
-eval $(jq -r '.testconnection | to_entries | map("export \(.key)=\(.value|tostring)")|.[]' $PARAMETER_FILE)
+eval $(jq -r '.testconnection | to_entries | map("export \(.key)=\"\(.value|tostring)\"")|.[]' $PARAMETER_FILE)
 
 if [[ -n "$TRAVIS_JOB_ID" ]]; then
     echo "==> Set the test schema to TRAVIS_JOB_${TRAVIS_JOB_ID}"
