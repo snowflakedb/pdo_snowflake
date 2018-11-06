@@ -294,9 +294,10 @@ typedef struct SF_CONNECT {
 } SF_CONNECT;
 
 /**
- * Column description context
+ * Column description context. idx is indexed from 1.
  */
 typedef struct SF_COLUMN_DESC {
+    size_t idx;
     char *name;
     SF_DB_TYPE type;
     SF_C_TYPE c_type;
