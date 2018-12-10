@@ -129,6 +129,7 @@ typedef enum SF_STATUS {
     SF_STATUS_ERROR_OUT_OF_RANGE = 240021,
     SF_STATUS_ERROR_NULL_POINTER = 240022,
     SF_STATUS_ERROR_BUFFER_TOO_SMALL = 240023,
+    SF_STATUS_ERROR_OTHER = 240024
 } SF_STATUS;
 
 /**
@@ -335,6 +336,8 @@ typedef struct SF_STMT {
     int64 total_fieldcount;
     int64 total_row_index;
     void *params;
+    void *name_list;
+    unsigned int params_len;
     SF_COLUMN_DESC *desc;
     void *stmt_attrs;
     sf_bool is_dml;
@@ -352,7 +355,8 @@ typedef struct SF_STMT {
  * Bind input parameter context
  */
 typedef struct {
-    size_t idx; /* One based index of the columns */
+    size_t idx; /* One based index of the columns, 0 if Named */
+    char * name; /* Named Parameter name, NULL if positional */
     SF_C_TYPE c_type; /* input data type in C */
     void *value; /* input value */
     size_t len; /* input value length. valid only for SF_C_TYPE_STRING */
@@ -633,6 +637,27 @@ SF_STATUS STDCALL snowflake_fetch(SF_STMT *sfstmt);
  * @return the number of binding parameters in the statement.
  */
 uint64 STDCALL snowflake_num_params(SF_STMT *sfstmt);
+
+
+/**
+ * Initializes a bind input.
+ *
+ * SF_BIND_INPUT needs to be properly initialized to
+ * avoid undefined behavior. Each SF_BIND_INPUT instance
+ * can either represent a named bind input or a positional
+ * bind input. The name or the idx member of the instance
+ * respectively would need to be initialized accordingly.
+ *
+ * For Named parameters:
+ * SF_BIND_INPUT idx = 0
+ *
+ * For Positional parameters:
+ * SF_BIND_INPUT name = NULL;
+ *
+ * @param input preallocated SF_BIND_INPUT instance
+ * @return void
+ */
+void STDCALL snowflake_bind_input_init(SF_BIND_INPUT * input);
 
 /**
  * Binds parameters with the statement for execution.

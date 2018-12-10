@@ -30,6 +30,11 @@ public:
    */
   virtual bool parsePutGetCommand(std::string *sql,
                                   PutGetParseResponse *putGetParseResponse) = 0;
+
+  virtual ~IStatementPutGet()
+  {
+
+  }
 };
 }
 }
