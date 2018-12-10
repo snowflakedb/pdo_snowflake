@@ -17,15 +17,14 @@ namespace Client
 
 struct EncryptionMaterial
 {
-  EncryptionMaterial(char * queryStageMasterKey,
-                     char * queryId,
-                     long long smkId)
+  EncryptionMaterial(char * queryStageMasterKey_,
+                     char * queryId_,
+                     long long smkId_)
   {
-    this->queryStageMasterKey = std::string(queryStageMasterKey);
-    this->queryId = std::string(queryId);
-    this->smkId = smkId;
+    this->queryStageMasterKey = std::string(queryStageMasterKey_);
+    this->queryId = std::string(queryId_);
+    this->smkId = smkId_;
   }
-
   /// master key to encrypt file key
   std::string queryStageMasterKey;
 
