@@ -132,6 +132,15 @@ For non-US-West region, specify :code:`region` parameter or append it to :code:`
     $dbh = new PDO("snowflake:account=testaccount.us-east-1", "user", "password");
     $dbh = new PDO("snowflake:account=testaccount;region=us-east-1", "user", "password");
 
+OCSP Checking
+----------------------------------------------------------------------
+
+OCSP (Online Certificate Status Protocol) checking is set per PDO connection and enabled by default. To disable OCSP checking, set :code:`insecure_mode=true` in the DSN connection string. Example shown here:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=testaccount;insecure_mode=true", "user", "password");
+
 Query
 ----------------------------------------------------------------------
 
