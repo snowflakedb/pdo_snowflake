@@ -1,5 +1,5 @@
 #
-# CMakeList for PHP PDO Driver for Snowflake on PHP 7.1.6
+# CMakeList for PHP PDO Driver for Snowflake
 #
 cmake_minimum_required(VERSION 2.8)
 project(pdo_snowflake)
