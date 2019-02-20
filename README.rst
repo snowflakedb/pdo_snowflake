@@ -219,7 +219,7 @@ Clone the this repository and run the build script.
 
 .. code-block:: bash
 
-    git clone git@github.com:snowflakedb/pdo_snowflake.git
+    git clone https://github.com/snowflakedb/pdo_snowflake.git
     cd pdo_snowflake
     ./scripts/build_pdo_snowflake.sh
 
