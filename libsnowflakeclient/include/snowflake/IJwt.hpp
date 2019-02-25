@@ -18,6 +18,10 @@ namespace Jwt
 
 /**
  * Type of algorithms
+ *
+ * Note - Any updates to this
+ * enum should be reflected in
+ * jwtWrapper to maintain interoperability.
  */
 enum class AlgorithmType
 {
@@ -92,9 +96,14 @@ public:
   virtual long getClaimInLong(const std::string &key) = 0;
 
   /**
+   * Get a claim from the claim set in double type
+   */
+  virtual double getClaimInDouble(const std::string &key) = 0;
+
+  /**
    * Serialize the claim set to base64url encoded format
    */
-  virtual std::string serialize() = 0;
+  virtual std::string serialize(bool format=true) = 0;
 
   /**
    * Remove a claim from the claim set with specified key
@@ -131,16 +140,31 @@ public:
   virtual void setAlgorithm(AlgorithmType type) = 0;
 
   /**
+   * Set custom header entry
+   * @param std::string header_type
+   * @param std::string header_value
+   */
+   virtual void setCustomHeaderEntry(std::string header_type, std::string header_value) = 0;
+
+  /**
    * Get the algorithm type of the header
    * @return the algorithm type
    */
   virtual AlgorithmType getAlgorithmType() = 0;
 
   /**
+   * Get value corresponding to a custom field in
+   * the JWT Token Header
+   * @return std::string value corresponding to
+   * header_type
+   */
+   virtual std::string getCustomHeaderEntry(const std::string header_type) = 0;
+
+  /**
    * Serialize the header
    * @return serialized string in base64urlencoded
    */
-  virtual std::string serialize() = 0;
+  virtual std::string serialize(bool format=true) = 0;
 
 protected:
   IHeader() = default;
@@ -189,7 +213,7 @@ public:
    * Verify the JWT is valid using the public key
    * @usedBy authenticator
    */
-  virtual bool verify(EVP_PKEY *key) = 0;
+  virtual bool verify(EVP_PKEY *key, bool format) = 0;
 
   /**
    * Setter and getter functions for header and claimset

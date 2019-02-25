@@ -49,16 +49,24 @@ if "%target_name%"=="" (
 )
 
 set cmake_generator=
+set vsdir=
+set vc_version=
 if "%vs_version%"=="VS15" (
     set cmake_generator=Visual Studio 15 2017
+    set vsdir=vs15
+    set vc_version=vc15
 )
 if "%vs_version%"=="VS14" (
     set cmake_generator=Visual Studio 14 2015
+    set vsdir=vs14
+    set vc_version=vc14
 )
 if "%cmake_generator%"=="" (
     echo Specify the visual studio version used. [VS15, VS14]
     goto :error
 )
+
+set build_dir=%arcdir%\%vsdir%
 
 echo "Building with platform: %platform%, build type: %build_type%, visual studio version: %vs_version%, cmake generator: %cmake_generator%"
 

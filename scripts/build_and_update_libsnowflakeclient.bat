@@ -9,10 +9,11 @@ set build_type=%2
 set vs_version=%3
 set libsf_path=%4
 
+set origdir=%cd%
 set scriptdir=%~dp0
 call "%scriptdir%\_init.bat" %platform% %build_type% %vs_version%
 if %ERRORLEVEL% NEQ 0 goto :error
-set origdir=%cd%
+set pdodir=%scriptdir%\..
 
 :: Lets go to libsnowflakeclient and build there first
 cd "%libsf_path%"
@@ -25,36 +26,36 @@ call "%curdir%\scripts\build_libsnowflakeclient.bat" %platform% %build_type% %vs
 if %ERRORLEVEL% NEQ 0 goto :error
 
 :: Remove the old files/directories
-rmdir /S /Q "%origdir%\libsnowflakeclient\deps-build\%arcdir%"
+rmdir /S /Q "%pdodir%\libsnowflakeclient\deps-build\%build_dir%"
 if %ERRORLEVEL% NEQ 0 goto :error
-rmdir /S /Q "%origdir%\libsnowflakeclient\lib\%arcdir%"
+rmdir /S /Q "%pdodir%\libsnowflakeclient\lib\%build_dir%"
 if %ERRORLEVEL% NEQ 0 goto :error
-rmdir /S /Q "%origdir%\libsnowflakeclient\include\snowflake"
+rmdir /S /Q "%pdodir%\libsnowflakeclient\include\snowflake"
 if %ERRORLEVEL% NEQ 0 goto :error
 
 :: Make sure proper directories are created
-mkdir "%origdir%\libsnowflakeclient\lib\%arcdir%"
+mkdir "%pdodir%\libsnowflakeclient\lib\%build_dir%"
 if %ERRORLEVEL% NEQ 0 goto :error
-mkdir "%origdir%\libsnowflakeclient\deps-build\%arcdir%"
+mkdir "%pdodir%\libsnowflakeclient\deps-build\%build_dir%"
 if %ERRORLEVEL% NEQ 0 goto :error
 
 :: Move the necessary files to PDO Snowflake
 :: Move build libsnowflakeclient
 xcopy ^
     "%curdir%\cmake-build-%arcdir%\%build_type%\*.lib" ^
-    "%origdir%\libsnowflakeclient\lib\%arcdir%\" ^
+    "%pdodir%\libsnowflakeclient\lib\%build_dir%\" ^
     /v /y
 if %ERRORLEVEL% NEQ 0 goto :error
 :: Move headers
 xcopy ^
     "%curdir%\include\snowflake" ^
-    "%origdir%\libsnowflakeclient\include\snowflake\" ^
+    "%pdodir%\libsnowflakeclient\include\snowflake\" ^
     /v /y /e
 if %ERRORLEVEL% NEQ 0 goto :error
 :: Move dependency libraries
 xcopy ^
-    "%curdir%\deps-build\%arcdir%\*" ^
-    "%origdir%\libsnowflakeclient\deps-build\%arcdir%\" ^
+    "%curdir%\deps-build\%build_dir%\*" ^
+    "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\" ^
     /v /y /e
 if %ERRORLEVEL% NEQ 0 goto :error
 
