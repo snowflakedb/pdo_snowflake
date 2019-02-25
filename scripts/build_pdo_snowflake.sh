@@ -49,7 +49,7 @@ cc -shared \
     .libs/pdo_snowflake.o \
     .libs/snowflake_driver.o \
     .libs/snowflake_stmt.o \
-    -L libsnowflakeclient/lib \
+    -L libsnowflakeclient/lib/linux \
     -L libsnowflakeclient/deps-build/linux/openssl/lib \
     -L libsnowflakeclient/deps-build/linux/curl/lib \
     -lsnowflakeclient \
