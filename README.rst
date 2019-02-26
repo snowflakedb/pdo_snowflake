@@ -68,8 +68,12 @@ Ensure it can run and the output includes both :code:`pdo` and :code:`json` exte
 
 Installing PDO driver for Snowflake
 ================================================================================
+Separate instructions exist for Windows, Linux, macOS
 
-Two files require to copy.
+Linux
+-----
+
+There are two required files for you to copy:
 
 - pdo_snowflake.so
 - cacert.pem
@@ -112,9 +116,40 @@ Ensure :code:`phpinfo()` function return the output including :code:`pdo_snowfla
 
     We have not finalized what package would be the best for binary distribution. So far I'm trying to get :code:`pecl` account but have not got one yet. Any suggestion is welcome.
 
+Windows
+-------
+
+There are two required files for you to copy:
+
+- php_pdo_snowflake.dll
+- cacert.pem
+
+Copy :code:`php_pdo_snowflake.dll` to the same location as :code:`php_pdo.dll` where all PHP extensions reside (usually the :code:`ext` folder in your PHP installation).
+
+Copy :code:`cacert.pem` to the PHP config directory. For example, PHP version 7.1 installed at :code:`C:\` on Windows 10 has :code:`C:\php\php.ini` for the extensions.
+
+.. note::
+
+    If you don't have :code:`php_pdo_snowflake.dll`, build it following the instruction below.
+
+Add the following lines to your :code:`php.ini` file:
+
+.. code-block:: text
+
+    extension=php_pdo_snowflake.dll
+    pdo_snowflake.cacert=C:\php\cacert.pem
+    # pdo_snowflake.logdir=C:\path\to\logdir     # location of log directory
+    # pdo_snowflake.loglevel=DEBUG  # log level
+
+Restart your PHP server and then you should see :code:`pdo_snowflake` as a PHP extension
 
 Usage
 ================================================================================
+
+Limitations
+-----------
+- Timestamp support on Windows is limited to values between the dates 1/1/1970 and 1/1/2038. Trying to fetch values outside of this range will result in an empty value being returned
+- Named placeholders (placeholders in SQL queries of the form :code:`first_name:`) are not supported at this time. Positional placeholders (placeholders in SQL queries of the form :code:`?`) are supported.
 
 Connection String
 ----------------------------------------------------------------------
@@ -163,10 +198,10 @@ Here is an example of fetch a row:
     $dbh = null;
     echo "OK\n";
 
-Build and Tests
+Build and Test
 ================================================================================
 
-Build and Install PHP (Optional)
+Build and Install PHP on Linux (Optional)
 ----------------------------------------------------------------------
 
 If PHP is not available, download and build from the PHP source code.
@@ -198,7 +233,7 @@ Extract and build PHP:
     make
     make install
 
-Build
+Build PDO Driver on Linux
 ----------------------------------------------------------------------
 
 Set :code:`PHP_HOME` to the base directory of the PHP. For example, if you built PHP, do this:
@@ -233,6 +268,49 @@ Run the following command to check if PHP PDO Driver for Snowflake is successful
 
     As the build requires a special link process, a simple sequence of :code:`phpize` followed by :code:`make` doesn't work. See the build script for the detail.
 
+Build and Install PHP on Windows (Optional)
+----------------------------------------------------------------------
+
+A set of scripts has been created in this repo to facilitate setting up PHP on Windows:
+
+- setup_php_sdk.bat <arch[x64,x86]> <build[Release,Debug]> <visual studio version[VS14,VS15]> <path to PHP SDK>
+- run_setup_php.bat <arch[x64,x86]> <build[Release,Debug]> <visual studio version[VS14,VS15]> <full PHP version> <path to PHP SDK>
+
+First, we are going to setup the PHP SDK tools:
+
+.. code-block:: batch
+
+    -- Clone and go to top level of repository
+    git clone https://github.com/snowflakedb/pdo_snowflake.git
+    cd pdo_snowflake
+    .\scripts\setup_php_sdk.bat x64 Release VS14 C:\php-sdk
+
+Now we are going to download (including dependencies) and build PHP:
+
+.. code-block:: batch
+
+    .\scripts\run_setup_php.bat x64 Release VS14 7.1.15 C:\php-sdk
+
+Build PDO Driver on Windows
+----------------------------------------------------------------------
+
+Run the following command in the top level of this repo to build the PDO driver on Windows:
+
+- run_build_pdo_snowflake.bat <arch[x64,x86]> <build[Release,Debug]> <visual studio version[VS14,VS15]> <full PHP version> <path to PHP SDK>
+
+Example:
+
+.. code-block:: batch
+
+  run_build_pdo_snowflake.bat x64 Release VS14 7.1.15 C:\php-sdk
+
+Run the following command to check if PHP PDO Driver for Snowflake is successfully loaded in memory.
+
+.. code-block:: bash
+
+    C:\php\php.exe -dextension=ext\php_pdo_snowflake.dll -m
+
+
 Prepare for Test
 ----------------------------------------------------------------------
 
@@ -252,7 +330,7 @@ Create a parameter file :code:`parameters.json` under :code:`pdo_snowflake` dire
         }
     }
 
-Call :code:`env.sh` script to set the test connection parametes in the environment variables.
+Call :code:`env.sh` script to set the test connection parameters in the environment variables.
 
 .. code-block:: bash
 
