@@ -35,7 +35,7 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
   dnl # the position of -Wl,--whole-archive is ignored by libtool
   LDFLAGS="$LDFLAGS -fPIC"
   LDFLAGS="$LDFLAGS -Wl,--whole-archive"
-  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/lib/libsnowflakeclient.a"
+  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/lib/linux/libsnowflakeclient.a"
   LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/openssl/lib/libcrypto.a"
   LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/openssl/lib/libssl.a"
   LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/curl/lib/libcurl.a"
