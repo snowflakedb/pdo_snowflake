@@ -24,7 +24,7 @@ mkdir -p "libsnowflakeclient/lib/${PLATFORM}"
 
 cd "${LIBSNOWFLAKECLIENT_HOME}"
 source scripts/build_libsnowflakeclient.sh
-cd "${DIR}"
+cd "${DIR}/.."
 
 # Move da files
 cp -r "${LIBSNOWFLAKECLIENT_HOME}/deps-build/${PLATFORM}" "libsnowflakeclient/deps-build/"
