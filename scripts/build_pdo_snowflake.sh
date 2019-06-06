@@ -53,8 +53,8 @@ if [[ "$PLATFORM" == "linux" ]]; then
         -L libsnowflakeclient/lib/linux \
         -L libsnowflakeclient/deps-build/linux/openssl/lib \
         -L libsnowflakeclient/deps-build/linux/curl/lib \
-        -L libsnowflakeclient/deps-build/darwin/aws/lib \
-        -L libsnowflakeclient/deps-build/darwin/azure/lib \
+        -L libsnowflakeclient/deps-build/linux/aws/lib64 \
+        -L libsnowflakeclient/deps-build/linux/azure/lib \
         -lsnowflakeclient \
         -Wl,--whole-archive \
         -lcrypto -lssl -lcurl -lpthread \
