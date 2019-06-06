@@ -23,7 +23,7 @@
 # This should most probably benefit from getting a "Requires:" field added
 # dynamically by configure.
 #
-prefix=/home/vagrant/libsnowflakeclient/scripts/../deps-build/linux/curl
+prefix=/home/stakeda/git/libsnowflakeclient/scripts/../deps-build/linux/curl
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
