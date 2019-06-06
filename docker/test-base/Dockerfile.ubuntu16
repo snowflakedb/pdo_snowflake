@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 
 # PHP version
-ARG PHP_VERSION=7.0
+ARG PHP_VERSION=7.1
 
 RUN apt-get update -q -y
 RUN apt-get upgrade -q -y
