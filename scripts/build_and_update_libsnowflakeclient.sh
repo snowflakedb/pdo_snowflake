@@ -10,8 +10,6 @@ target=Debug
 source $DIR/_init.sh $@
 cd $DIR/..
 
-echo $PLATFORM
-
 # Remove the old dependencies and libraries
 rm -rf "libsnowflakeclient/deps-build/${PLATFORM}"
 rm -rf "libsnowflakeclient/include/snowflake"
@@ -23,7 +21,7 @@ mkdir -p "libsnowflakeclient/include/snowflake"
 mkdir -p "libsnowflakeclient/lib/${PLATFORM}"
 
 cd "${LIBSNOWFLAKECLIENT_HOME}"
-source scripts/build_libsnowflakeclient.sh
+bash scripts/build_libsnowflakeclient.sh
 cd "${DIR}/.."
 
 # Move da files

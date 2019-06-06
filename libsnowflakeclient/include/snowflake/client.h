@@ -204,6 +204,7 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_LOGIN_TIMEOUT,
     SF_CON_NETWORK_TIMEOUT,
     SF_CON_TIMEZONE,
+    SF_CON_SERVICE_NAME,
     SF_CON_AUTOCOMMIT,
     SF_DIR_QUERY_URL,
     SF_DIR_QUERY_URL_PARAM,
@@ -262,6 +263,7 @@ typedef struct SF_CONNECT {
     sf_bool insecure_mode;
     sf_bool autocommit;
     char *timezone;
+    char *service_name;
 
     /* used when updating parameters */
     SF_MUTEX_HANDLE mutex_parameters;

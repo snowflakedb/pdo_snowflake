@@ -56,6 +56,10 @@ struct StageInfo
   // required by s3 client
   std::string region;
 
+  std::string storageAccount; //Required by Azure
+
+  std::string endPoint;       //Required by Azure
+
   std::unordered_map<std::string, char *> credentials;
 };
 
