@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 
 # PHP version
-ARG PHP_VERSION=7.0
+ARG PHP_VERSION=7.1
 
 RUN apt-get update -q -y
 RUN apt-get upgrade -q -y
@@ -9,6 +9,8 @@ RUN apt-get install -y valgrind git vim cmake pkg-config curl gcc g++ zlib1g-dev
 RUN apt-get install -y  language-pack-en-base software-properties-common
 
 # Install PHP 7 from the third party repository
+RUN LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
+RUN apt-get update -q -y
 RUN apt-get install -y php${PHP_VERSION}-dev php${PHP_VERSION}-cli php${PHP_VERSION}-fpm php${PHP_VERSION}-json php${PHP_VERSION}-mysql php${PHP_VERSION}-readline
 
 # Install Python Connector

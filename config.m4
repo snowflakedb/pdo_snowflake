@@ -1,6 +1,25 @@
 dnl $Id$
 dnl config.m4 for extension pdo_snowflake
 
+# AC_CANONICAL_HOST is needed to access the 'host_os' variable    
+AC_CANONICAL_HOST
+
+build_linux=no
+build_mac=no
+
+# Detect the target system
+case "${host_os}" in
+    linux*)
+        build_linux=yes
+        ;;
+    darwin*)
+        build_mac=yes
+        ;;
+    *)
+        AC_MSG_ERROR(["OS $host_os is not supported"])
+        ;;
+esac
+
 PHP_ARG_ENABLE(pdo_snowflake, for Snowflake DB support for PDO,
     [  --enable-pdo_snowflake           Enable pdo_snowflake support])
 PHP_ARG_ENABLE(coverage, whether to include code coverage symbols,
@@ -32,14 +51,29 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
   PHP_ADD_INCLUDE($SNOWFLAKE_CLIENT_DIR/include)
 
   dnl # link Snowflake client library, not working as
-  dnl # the position of -Wl,--whole-archive is ignored by libtool
+  dnl # the position of -Wl,--whole-archive 
+  dnl # (or -Wl,-force_load in OS X) is ignored by libtool
   LDFLAGS="$LDFLAGS -fPIC"
-  LDFLAGS="$LDFLAGS -Wl,--whole-archive"
-  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/lib/linux/libsnowflakeclient.a"
-  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/openssl/lib/libcrypto.a"
-  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/openssl/lib/libssl.a"
-  LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/curl/lib/libcurl.a"
-  LDFLAGS="$LDFLAGS -Wl,--no-whole-archive"
+  if test "$build_mac" == "yes"; then
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/lib/darwin/libsnowflakeclient.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/openssl/lib/libcrypto.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/openssl/lib/libssl.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/curl/lib/libcurl.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/aws/lib/libaws-cpp-sdk-core.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/aws/lib/libaws-cpp-sdk-s3.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/azure/lib/libazure-storage-lite.a"
+  fi
+  if test "$build_linux" == "yes"; then
+    LDFLAGS="$LDFLAGS -Wl,--whole-archive"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/lib/linux/libsnowflakeclient.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/openssl/lib/libcrypto.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/openssl/lib/libssl.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/curl/lib/libcurl.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/aws/lib64/libaws-cpp-sdk-core.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/aws/lib64/libaws-cpp-sdk-s3.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/azure/lib/libazure-storage-lite.a"
+    LDFLAGS="$LDFLAGS -Wl,--no-whole-archive"
+  fi
   dnl # IMPORTANT NOTE: Change scripts/build_pdo_snowflake.sh to update
   dnl # the actual link options for pdo_snowflake.so
 
