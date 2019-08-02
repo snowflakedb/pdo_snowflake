@@ -29,14 +29,6 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     } catch(PDOException $e) {
         echo sprintf("Expected error code: %d for missing password\n", $e->getCode());
     }
-
-    try {
-        $dsn = "snowflake:host=$host;port=$port;account=$account;database=neverexists;protocol=$protocol";
-        $dbh = new PDO($dsn, $user, $password);
-        echo "Fail. Must fail to connect.\n";
-    } catch(PDOException $e) {
-        echo sprintf("Expected error code: %d for wrong database\n", $e->getCode());
-    }
 ?>
 ===DONE===
 <?php exit(0); ?>
@@ -44,6 +36,5 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 Expected error code: 240005 for missing account
 Expected error code: 240005 for missing user
 Expected error code: 240005 for missing password
-Expected error code: 240014 for wrong database
 ===DONE===
 
