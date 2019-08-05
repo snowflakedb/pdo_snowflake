@@ -24,4 +24,6 @@
     }
 
     $dsn = "snowflake:host=$host;port=$port;account=$account;database=$database;schema=$schema;warehouse=$warehouse;role=$role;protocol=$protocol";
+
+    phpinfo();
 ?>
