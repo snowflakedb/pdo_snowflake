@@ -334,7 +334,7 @@ Call :code:`env.sh` script to set the test connection parameters in the environm
 
 .. code-block:: bash
 
-    source ./scripts/env.sh
+    ./scripts/env.sh && env | grep SNOWFLAKE_TEST > testenv.ini
 
 Proxy
 ^^^^^^^^^^

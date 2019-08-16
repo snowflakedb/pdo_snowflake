@@ -62,6 +62,7 @@ echo "PHP_HOME:   $PHP_HOME"
 echo "phpize:     $(which phpize)"
 echo "php-config: $(which php-config)"
 REPORT_COVERAGE=1 $DIR/build_pdo_snowflake.sh
+./scripts/env.sh && env | grep SNOWFLAKE_TEST > testenv.ini
 travis_fold_end
 
 travis_fold_start phptests "Tests PHP PDO"
