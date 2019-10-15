@@ -45,24 +45,28 @@ if [[ -n "$REPORT_COVERAGE" ]]; then
 fi
 if [[ "$PLATFORM" == "linux" ]]; then
     cc -shared \
-        -g \
-        .libs/snowflake_arraylist.o \
+        -fPIC \
+        -DPIC \
         .libs/pdo_snowflake.o \
         .libs/snowflake_driver.o \
         .libs/snowflake_stmt.o \
-        -L libsnowflakeclient/lib/linux \
-        -L libsnowflakeclient/deps-build/linux/openssl/lib \
-        -L libsnowflakeclient/deps-build/linux/curl/lib \
-        -L libsnowflakeclient/deps-build/linux/aws/lib64 \
-        -L libsnowflakeclient/deps-build/linux/azure/lib \
-        -lsnowflakeclient \
+        .libs/snowflake_arraylist.o \
+        libsnowflakeclient/lib/linux/libsnowflakeclient.a \
+        libsnowflakeclient/deps-build/linux/openssl/lib/libcrypto.a \
+        libsnowflakeclient/deps-build/linux/openssl/lib/libssl.a \
+        libsnowflakeclient/deps-build/linux/curl/lib/libcurl.a \
+        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-core.a \
+        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-s3.a \
+        libsnowflakeclient/deps-build/linux/azure/lib/libazure-storage-lite.a \
+        -O2 \
         -Wl,--whole-archive \
-        -lcrypto -lssl -lcurl -lpthread \
-        -laws-cpp-sdk-core -laws-cpp-sdk-s3 -lazure-storage-lite \
         -Wl,--no-whole-archive \
-        $LINK_OPTS \
-        -Wl,-soname -Wl,pdo_snowflake.so \
-        -o .libs/pdo_snowflake.so
+        -Wl,-soname \
+        -Wl,pdo_snowflake.so \
+        -o .libs/pdo_snowflake.so \
+        libsnowflakeclient/deps-build/linux/openssl/lib/libssl.a \
+        libsnowflakeclient/deps-build/linux/openssl/lib/libcrypto.a \
+        libsnowflakeclient/deps-build/linux/cmocka/lib/libcmocka.a
 elif [[ "$PLATFORM" == "darwin" ]]; then
     # Darwin uses -force_load instead
     cc -shared \
