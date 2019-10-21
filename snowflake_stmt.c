@@ -142,7 +142,6 @@ static int pdo_snowflake_stmt_execute(pdo_stmt_t *stmt) /* {{{ */
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     pdo_snowflake_db_handle *H = S->H;
     PDO_LOG_ENTER("pdo_snowflake_stmt_execute");
-    PDO_LOG_DBG("stmt=%p", S->stmt);
 
     if (S->stmt) {
         int ret = pdo_snowflake_stmt_execute_prepared(stmt);
