@@ -5,7 +5,7 @@
 
 #include <snowflake/client.h>
 #include <snowflake/logger.h>
-#include "snowflake_arraylist.h"
+#include "snowflake_paramstore.h"
 
 /**
  * PHP PDO Snowflake Driver name
@@ -52,7 +52,7 @@ typedef struct {
     pdo_snowflake_db_handle *H;
     SF_STMT *stmt;
 
-    ARRAY_LIST *bound_params;
+    void *bound_params;
     pdo_snowflake_string *bound_results;
 } pdo_snowflake_stmt;
 

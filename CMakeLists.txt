@@ -21,14 +21,19 @@ set(PHP_HOME $ENV{PHP_HOME})
 message("PHP is located at " $ENV{PHP_HOME})
 
 set(SOURCE_FILES
+        snowflake_rbtree.c
+        snowflake_rbtree.h
+        snowflake_treemap.c
+        snowflake_treemap.h
         snowflake_arraylist.c
         snowflake_arraylist.h
+        snowflake_paramstore.c
+        snowflake_paramstore.h
         snowflake_driver.c
         snowflake_stmt.c
         php_pdo_snowflake_int.h
         php_pdo_snowflake.h
-        pdo_snowflake.c
-        )
+        pdo_snowflake.c)
 
 # set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
 

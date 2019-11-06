@@ -50,7 +50,10 @@ if [[ "$PLATFORM" == "linux" ]]; then
         .libs/pdo_snowflake.o \
         .libs/snowflake_driver.o \
         .libs/snowflake_stmt.o \
+        .libs/snowflake_paramstore.o \
         .libs/snowflake_arraylist.o \
+        .libs/snowflake_treemap.o \
+        .libs/snowflake_rbtree.o \
         libsnowflakeclient/lib/linux/libsnowflakeclient.a \
         libsnowflakeclient/deps-build/linux/openssl/lib/libcrypto.a \
         libsnowflakeclient/deps-build/linux/openssl/lib/libssl.a \
@@ -71,7 +74,10 @@ elif [[ "$PLATFORM" == "darwin" ]]; then
     # Darwin uses -force_load instead
     cc -shared \
         -g \
+        .libs/snowflake_paramstore.o \
         .libs/snowflake_arraylist.o \
+        .libs/snowflake_treemap.o \
+        .libs/snowflake_rbtree.o \
         .libs/pdo_snowflake.o \
         .libs/snowflake_driver.o \
         .libs/snowflake_stmt.o \

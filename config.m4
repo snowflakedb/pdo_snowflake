@@ -81,7 +81,7 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
 
   PHP_NEW_EXTENSION(
     pdo_snowflake,
-    pdo_snowflake.c snowflake_driver.c snowflake_stmt.c snowflake_arraylist.c,
+    pdo_snowflake.c snowflake_driver.c snowflake_stmt.c snowflake_paramstore.c snowflake_arraylist.c snowflake_treemap.c snowflake_rbtree.c,
     $ext_shared,
     ,
     "-DZEND_ENABLE_STATIC_TSRMLS_CACHE=1")
