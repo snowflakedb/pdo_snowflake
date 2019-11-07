@@ -194,7 +194,7 @@ snowflake_handle_preparer(pdo_dbh_t *dbh, const char *sql, size_t sql_len,
     stmt->driver_data = S;
     stmt->methods = &snowflake_stmt_methods;
 
-    stmt->supports_placeholders = PDO_PLACEHOLDER_POSITIONAL;
+    stmt->supports_placeholders = PDO_PLACEHOLDER_POSITIONAL | PDO_PLACEHOLDER_NAMED;
 
     /* allocate Snowflake stmt. Must be freed in dtor */
     if (!(S->stmt = snowflake_stmt(H->server))) {

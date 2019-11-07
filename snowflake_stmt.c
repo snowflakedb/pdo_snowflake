@@ -77,7 +77,7 @@ static int pdo_snowflake_stmt_dtor(pdo_stmt_t *stmt) /* {{{ */
     pdo_snowflake_stmt *S = stmt->driver_data;
 
     if (S->bound_params) {
-        pdo_sf_array_list_deallocate(S->bound_params);
+        pdo_sf_param_store_deallocate(S->bound_params);
     }
 
     // Release string bindings
@@ -359,6 +359,7 @@ static int pdo_snowflake_stmt_param_hook(
     int ret = 1;
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     zval *parameter = NULL;
+    PARAM_STORE *pstore = NULL;
     PDO_LOG_ENTER("pdo_snowflake_stmt_param_hook");
     PDO_LOG_DBG("event = %s, paramno: %ld",
                 pdo_param_event_names[event_type], param->paramno);
@@ -371,12 +372,19 @@ static int pdo_snowflake_stmt_param_hook(
         /* nop if not binding parameter but column */
         PDO_LOG_RETURN(1);
     }
-    if (param->paramno == -1) {
-        // If paramno is -1, then this is a named parameter which is not supported yet
-        pdo_raise_impl_error(stmt->dbh, stmt, SF_SQLSTATE_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
-          "Named parameters are not supported yet in the Snowflake PDO Driver");
+
+    if (S->bound_params != NULL)
+    {
+      pstore = (PARAM_STORE *) S->bound_params;
+      if ((param->paramno > -1 && pstore->param_style == NAMED) ||
+          (param->paramno < 0 && pstore->param_style == POSITIONAL))
+      {
+        pdo_raise_impl_error(stmt->dbh, stmt, SF_SQLSTATE_INVALID_PARAMETER_TYPE,
+                             "Mixing Named and Positional parameter is not allowed in Snowflake PDO Driver");
         PDO_LOG_RETURN(0);
+      }
     }
+
     if (Z_ISREF(param->parameter)) {
         parameter = Z_REFVAL(param->parameter);
     } else {
@@ -388,29 +396,61 @@ static int pdo_snowflake_stmt_param_hook(
         case PDO_PARAM_EVT_ALLOC:
             PDO_LOG_DBG(
               "paramno: %ld, name: %s, max_len: %ld, type: %s, value: %p",
-              param->paramno, param->name,
+              param->paramno, ZSTR_VAL(param->name),
               param->max_value_len,
               pdo_param_type_names[param->param_type],
               parameter);
 
-            /* sanity check parameter number range */
-            if (param->paramno < 0) {
-                strcpy(stmt->error_code, "HY093");
-                ret = 0;
-                goto clean;
-            }
             if (S->bound_params == NULL) {
-                S->bound_params = pdo_sf_array_list_init();
+                pdo_sf_param_store_init(_pdo_sf_get_param_style(param->paramno), &S->bound_params);
             }
+
             v = ecalloc(1, sizeof(SF_BIND_INPUT));
-            /* TODO: check if already set in the array */
-            pdo_sf_array_list_set(S->bound_params, v,
-                                  (size_t) param->paramno + 1);
+            /* TODO: check if already set in the paramstore*/
+
+            pdo_sf_param_store_set(S->bound_params, v,
+                    (size_t) param->paramno+1,
+                    ZSTR_VAL(param->name));
             break;
         case PDO_PARAM_EVT_EXEC_PRE:
-            v = pdo_sf_array_list_get(S->bound_params,
-                                      (size_t) param->paramno + 1);
+            v = pdo_sf_param_store_get(S->bound_params,
+                    (size_t) param->paramno + 1,
+                    ZSTR_VAL(param->name));
+            if (v == NULL)
+            {
+              PDO_LOG_ERR("Could not retrieve param store.");
+              break;
+            }
+
+            /*
+             * Update the idx and name field for libsnowflakeclient
+             * to infer whether parameter style is positional or named.
+             *
+             * Note that if Named, paramno would be -1 making idx = 0
+             * which is the expected value for index by libsnowflakeclient
+             */
             v->idx = (size_t) param->paramno + 1;
+
+            if (param->name != NULL && ZSTR_VAL(param->name) != NULL)
+            {
+              char *name = ZSTR_VAL(param->name);
+              int len = ZSTR_LEN(param->name);
+              if (name[0] == ':')
+              {
+                name = name+1;
+              }
+              else
+              {
+                len++; // add the null terminator
+              }
+              v->name = ecalloc(len, sizeof(char));
+              strncpy(v->name, name, len);
+            }
+            else
+            {
+              v->name = NULL;
+            }
+
             snowflake_bind_param(S->stmt, v);
 
             PDO_LOG_DBG("%s", php_zval_type_names[Z_TYPE_P(parameter)]);
@@ -474,8 +514,8 @@ static int pdo_snowflake_stmt_param_hook(
             }
             break;
         case PDO_PARAM_EVT_FREE:
-            v = pdo_sf_array_list_get(S->bound_params,
-                                      (size_t) param->paramno + 1);
+            v = pdo_sf_param_store_get(S->bound_params,
+                                       (size_t) param->paramno + 1, ZSTR_VAL(param->name));
             if (Z_TYPE_P(parameter) != IS_NULL) {
                 switch (param->param_type) {
                     case PDO_PARAM_INT:
@@ -492,9 +532,10 @@ static int pdo_snowflake_stmt_param_hook(
                         break;
                 }
             }
+            efree(v->name);
             efree(v);
-            pdo_sf_array_list_set(S->bound_params, NULL,
-                                  (size_t) param->paramno + 1);
+            pdo_sf_param_store_set(S->bound_params, NULL,
+                    (size_t) param->paramno + 1, ZSTR_VAL(param->name));
         case PDO_PARAM_EVT_EXEC_POST:
         case PDO_PARAM_EVT_FETCH_PRE:
         case PDO_PARAM_EVT_FETCH_POST:

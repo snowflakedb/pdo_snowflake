@@ -14,19 +14,38 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         print_r($dbh->errorInfo());
     }
 
-    $sth = $dbh->prepare("insert into t(c1,c2) values(:number,:string)");
+    $sth = $dbh->prepare("insert into t(c1, c2) values(:v1,:v2)");
+    $v1 = 11;
+    $v2 = 'Hello';
+    $sth->bindParam(':v1', $v1);
+    $sth->bindParam(':v2', $v2);
+    $sth->execute();
 
-    // Binding a named parameter should throw an error
+    echo "==> fetch by default\n";
+    $sth = $dbh->query("select * from t order by 1");
+    while($row = $sth->fetch()) {
+        echo $row["C1"] . " " . $row["C2"] . "\n";
+    }
+
+    echo "==> Mixing parameters\n";
+    $v1 = 12;
+    $v2 = 'HelloAgain';
     try {
-        $i = 11;
-        $sth->bindParam(':number', $i);
-    } catch (Exception $e) {
-        echo 'Caught exception: ', $e->getMessage(), "\n";
+        $sth->bindParam(1, $v1);
+        $sth->bindParam(2, $v2);
+        $sth->bindParam(':v1', $v1);
+        $sth->bindParam(':v2', $v2);
+        $sth->execute();
+    } catch(Exception $e) {
+        echo sprintf("Caught Exception: ". $e->getMessage(). "\n");
     }
 ?>
 ===DONE===
 <?php exit(0); ?>
 --EXPECT--
 Connected to Snowflake
-Caught exception: SQLSTATE[HYC00]: Optional feature not implemented: Named parameters are not supported yet in the Snowflake PDO Driver
+==> fetch by default
+11 Hello
+==> Mixing parameters
+Caught Exception: SQLSTATE[HY105]: Invalid parameter type: Mixing Named and Positional parameter is not allowed in Snowflake PDO Driver
 ===DONE===
