@@ -302,7 +302,7 @@ Example:
 
 .. code-block:: batch
 
-  run_build_pdo_snowflake.bat x64 Release VS14 7.2.24 C:\php-sdk
+  run_build_pdo_snowflake.bat x64 Release VS15 7.2.24 C:\php-sdk
 
 Run the following command to check if PHP PDO Driver for Snowflake is successfully loaded in memory.
 
