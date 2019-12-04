@@ -11,7 +11,7 @@ PHP PDO driver for Snowflake
 .. image:: http://img.shields.io/:license-Apache%202-brightgreen.svg
     :target: http://www.apache.org/licenses/LICENSE-2.0.txt
 
-*Private Preview. Linux Only. No PHP 5 support. PHP 7+ only.*
+*Private Preview. Linux Only. No PHP 5 support. PHP 7.2+ only.*
 
 Configuring Environment
 ================================================================================
@@ -19,7 +19,7 @@ Configuring Environment
 PHP Versions and Extensions
 ----------------------------------------------------------------------
 
-PHP 7.0+ is supported. The following extensions are required:
+PHP 7.2+ is supported. The following extensions are required:
 
     * pdo
     * json
@@ -38,20 +38,20 @@ For example, Nginx enables the PHP handler by adding the following config in :co
             # PHP handler
             location ~ \.php$ {
                 fastcgi_split_path_info ^(.+\.php)(/.+)$;
-                fastcgi_pass unix:/var/run/php/php7.1-fpm.sock;
+                fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
                 fastcgi_index index.php;
                 include fastcgi_params;
             }
         }
 
-where PHP 7.1 and the corresponding PHP-FPM (https://php-fpm.org/) package are used, for example.
+where PHP 7.2 and the corresponding PHP-FPM (https://php-fpm.org/) package are used, for example.
 
 Restart Nginx and PHP-FPM services.
 
 .. code-block:: bash
 
     service nginx restart
-    service php7.1-fpm restart
+    service php7.2-fpm restart
 
 Add a PHP test code :code:`test.php` to the home location of an application server.
 
@@ -80,7 +80,7 @@ There are two required files for you to copy:
 
 Copy :code:`pdo_snowflake.so` to the same location as `pdo.so` where all PHP extentions reside.
 
-Copy :code:`cacert.pem` to the PHP config directory. For example, PHP-FPM version 7.1 on Ubuntu12 has :code:`/etc/php/7.1/fpm/conf.d/` for the extensions.
+Copy :code:`cacert.pem` to the PHP config directory. For example, PHP-FPM version 7.2 on Ubuntu12 has :code:`/etc/php/7.2/fpm/conf.d/` for the extensions.
 
 .. note::
 
@@ -88,14 +88,14 @@ Copy :code:`cacert.pem` to the PHP config directory. For example, PHP-FPM versio
 
 .. code-block:: bash
 
-    cp cacert.pem /etc/php/7.1/fpm/conf.d/
+    cp cacert.pem /etc/php/7.2/fpm/conf.d/
 
-Add a config file :code:`/etc/php/7.1/fpm/conf.d/20-pdo_snowflake.ini` including the following contents to the PHP config directory.
+Add a config file :code:`/etc/php/7.2/fpm/conf.d/20-pdo_snowflake.ini` including the following contents to the PHP config directory.
 
 .. code-block:: text
 
     extension=pdo_snowflake.so
-    pdo_snowflake.cacert=/etc/php/7.1/fpm/conf.d/cacert.pem
+    pdo_snowflake.cacert=/etc/php/7.2/fpm/conf.d/cacert.pem
     # pdo_snowflake.logdir=/tmp     # location of log directory
     # pdo_snowflake.loglevel=DEBUG  # log level
 
@@ -104,7 +104,7 @@ Restart Nginx and PHP-FPM services. For example:
 .. code-block:: bash
 
     service nginx restart
-    service php7.1-fpm restart
+    service php7.2-fpm restart
 
 Ensure :code:`phpinfo()` function return the output including :code:`pdo_snowflake`.
 
@@ -126,7 +126,7 @@ There are two required files for you to copy:
 
 Copy :code:`php_pdo_snowflake.dll` to the same location as :code:`php_pdo.dll` where all PHP extensions reside (usually the :code:`ext` folder in your PHP installation).
 
-Copy :code:`cacert.pem` to the PHP config directory. For example, PHP version 7.1 installed at :code:`C:\` on Windows 10 has :code:`C:\php\php.ini` for the extensions.
+Copy :code:`cacert.pem` to the PHP config directory. For example, PHP version 7.2 installed at :code:`C:\` on Windows 10 has :code:`C:\php\php.ini` for the extensions.
 
 .. note::
 
@@ -212,12 +212,12 @@ If PHP is not available, download and build from the PHP source code.
     # Download php source code and copy to $WORKSPACE, for example
     cd $WORKSPACE
 
-Set PHP version to the environment variable. For example, set :code:`SF_PHP_VERSION` to :code:`7.1.6`
-if the downloaded PHP version is 7.1.6.
+Set PHP version to the environment variable. For example, set :code:`SF_PHP_VERSION` to :code:`7.2.24`
+if the downloaded PHP version is 7.2.24.
 
 .. code-block:: bash
 
-    export SF_PHP_VERSION=7.1.6
+    export SF_PHP_VERSION=7.2.24
 
 Extract and build PHP:
 
@@ -283,13 +283,13 @@ First, we are going to setup the PHP SDK tools:
     -- Clone and go to top level of repository
     git clone https://github.com/snowflakedb/pdo_snowflake.git
     cd pdo_snowflake
-    .\scripts\setup_php_sdk.bat x64 Release VS14 C:\php-sdk
+    .\scripts\setup_php_sdk.bat x64 Release VS15 C:\php-sdk
 
 Now we are going to download (including dependencies) and build PHP:
 
 .. code-block:: batch
 
-    .\scripts\run_setup_php.bat x64 Release VS14 7.1.15 C:\php-sdk
+    .\scripts\run_setup_php.bat x64 Release VS15 7.2.24 C:\php-sdk
 
 Build PDO Driver on Windows
 ----------------------------------------------------------------------
@@ -302,7 +302,7 @@ Example:
 
 .. code-block:: batch
 
-  run_build_pdo_snowflake.bat x64 Release VS14 7.1.15 C:\php-sdk
+  run_build_pdo_snowflake.bat x64 Release VS15 7.2.24 C:\php-sdk
 
 Run the following command to check if PHP PDO Driver for Snowflake is successfully loaded in memory.
 
@@ -424,7 +424,7 @@ Locate :code:`pdo.so` under :code:`/usr/lib` and specify it in :code:`phpt` file
 .. code-block:: bash
 
     --INI--
-    extension=/usr/lib/php/20151012/pdo.so
+    extension=/usr/lib/php/20170718/pdo.so
     pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     pdo_snowflake.logdir=/tmp
     pdo_snowflake_loglevel=DEBUG
@@ -437,7 +437,7 @@ The location of log files are specified by the parameters in php.ini:
 .. code-block:: bash
 
     extension=pdo_snowflake.so
-    pdo_snowflake.cacert=/etc/php/7.1/fpm/conf.d/cacert.pem
+    pdo_snowflake.cacert=/etc/php/7.2/fpm/conf.d/cacert.pem
     pdo_snowflake.logdir=/tmp     # location of log directory
     pdo_snowflake.loglevel=DEBUG  # log level
 
