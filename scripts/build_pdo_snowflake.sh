@@ -10,6 +10,7 @@ set -o pipefail
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 [[ -z "$PHP_HOME" ]] && echo "Set PHP_HOME to the top directory of PHP directory" && exit 1
+source $DIR/_init.sh $@
 cd $DIR/..
 
 while getopts "h" opt; do
@@ -44,6 +45,7 @@ if [[ -n "$REPORT_COVERAGE" ]]; then
     LINK_OPTS="-fprofile-arcs -ftest-coverage"
 fi
 if [[ "$PLATFORM" == "linux" ]]; then
+    echo "Linking for Linux"
     cc -shared \
         -fPIC \
         -DPIC \
@@ -72,6 +74,7 @@ if [[ "$PLATFORM" == "linux" ]]; then
         libsnowflakeclient/deps-build/linux/cmocka/lib/libcmocka.a
 elif [[ "$PLATFORM" == "darwin" ]]; then
     # Darwin uses -force_load instead
+    echo "Linking for Darwin"
     cc -shared \
         -g \
         .libs/snowflake_paramstore.o \
