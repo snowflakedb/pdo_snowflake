@@ -24,7 +24,7 @@ PHP 7.2 is supported. The following extensions are required:
     * pdo
     * json
     
-If you're not building PHP from source, you will also need to install the corresponding development package for your environment
+If you're not building PHP from source, you will also need to install the corresponding PHP development package for your OS/environment
 
 Application Server (Optional)
 ----------------------------------------------------------------------
