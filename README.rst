@@ -11,7 +11,7 @@ PHP PDO driver for Snowflake
 .. image:: http://img.shields.io/:license-Apache%202-brightgreen.svg
     :target: http://www.apache.org/licenses/LICENSE-2.0.txt
 
-*Private Preview. Linux Only. No PHP 5 support. PHP 7.2+ only.*
+*Private Preview. Linux Only. No PHP 5 support. PHP 7.2 only.*
 
 Configuring Environment
 ================================================================================
@@ -19,10 +19,12 @@ Configuring Environment
 PHP Versions and Extensions
 ----------------------------------------------------------------------
 
-PHP 7.2+ is supported. The following extensions are required:
+PHP 7.2 is supported. The following extensions are required:
 
     * pdo
     * json
+    
+If you're not building PHP from source, you will also need to install the corresponding development package for your environment
 
 Application Server (Optional)
 ----------------------------------------------------------------------
@@ -201,7 +203,7 @@ Here is an example of fetch a row:
 Build and Test
 ================================================================================
 
-Build and Install PHP on Linux (Optional)
+Build and Install PHP from source on Linux (Optional)
 ----------------------------------------------------------------------
 
 If PHP is not available, download and build from the PHP source code.
