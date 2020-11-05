@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Snowflake Computing, Inc. All rights reserved.
+ * Copyright (c) 2018-2019 Snowflake Computing, Inc. All rights reserved.
  */
 
 #ifndef SNOWFLAKECLIENT_IFILETRANSFERAGENT_HPP
@@ -34,6 +34,13 @@ public:
   virtual ITransferResult *execute(std::string *command) = 0;
 
   /**
+  * Set upload stream to enable upload file from stream in memory.
+  * @param uploadStream The stream to be uploaded.
+  * @param dataSize The data size of the stream.
+  */
+  virtual void setUploadStream(std::basic_iostream<char>* uploadStream,
+                               size_t dataSize) = 0;
+  /**
    * Static method to instantiate a IFileTransferAgent class
    * @return a newly allocated IFileTransferAgent, caller need to delete instance
    */
@@ -47,6 +54,14 @@ public:
    * will be used.
    */
   static void injectExternalLogger(ISFLogger * logger);
+
+  /**
+   * Set useUrand to true to use /dev/urandom device
+   * Set it to false to use /dev/random device
+   * @param useUrand
+   */
+  virtual void setRandomDeviceAsUrand(bool useUrand){};
+
 };
 
 }

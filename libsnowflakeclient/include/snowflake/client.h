@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2018 Snowflake Computing, Inc. All rights reserved.
+ * Copyright (c) 2018-2019 Snowflake Computing, Inc. All rights reserved.
  */
 
 #ifndef SNOWFLAKE_CLIENT_H
@@ -79,7 +79,8 @@ typedef enum SF_DB_TYPE {
     SF_DB_TYPE_ARRAY,
     SF_DB_TYPE_BINARY,
     SF_DB_TYPE_TIME,
-    SF_DB_TYPE_BOOLEAN
+    SF_DB_TYPE_BOOLEAN,
+    SF_DB_TYPE_ANY
 } SF_DB_TYPE;
 
 /**
@@ -96,7 +97,8 @@ typedef enum SF_C_TYPE {
     SF_C_TYPE_STRING,
     SF_C_TYPE_TIMESTAMP,
     SF_C_TYPE_BOOLEAN,
-    SF_C_TYPE_BINARY
+    SF_C_TYPE_BINARY,
+    SF_C_TYPE_NULL
 } SF_C_TYPE;
 
 /**
@@ -311,6 +313,13 @@ typedef struct SF_COLUMN_DESC {
     sf_bool null_ok;
 } SF_COLUMN_DESC;
 
+typedef struct SF_STATS {
+    int64 num_rows_inserted;
+    int64 num_rows_updated;
+    int64 num_rows_deleted;
+    int64 num_duplicate_rows_updated;
+} SF_STATS;
+
 /**
  * Chunk downloader context
  */
@@ -341,6 +350,7 @@ typedef struct SF_STMT {
     void *name_list;
     unsigned int params_len;
     SF_COLUMN_DESC *desc;
+    SF_STATS *stats;
     void *stmt_attrs;
     sf_bool is_dml;
 
@@ -413,11 +423,12 @@ SF_STATUS STDCALL snowflake_global_set_attribute(
 /**
  * Get a global attribute
  * @param type a value of SF_GLOBAL_ATTRIBUTE
- * @param value a pointer to value
+ * @param value a pointer to value buffer
+ * @param buffer size
  * @return 0 if successful, errno otherise.
  */
 SF_STATUS STDCALL snowflake_global_get_attribute(
-    SF_GLOBAL_ATTRIBUTE type, void *value);
+    SF_GLOBAL_ATTRIBUTE type, void *value, size_t size);
 
 /**
  * Initializes a SNOWFLAKE connection context
@@ -930,7 +941,7 @@ SF_STATUS STDCALL snowflake_timestamp_to_string(SF_TIMESTAMP *ts, const char *fm
  * @param epoch_time Pointer to store the number of seconds since the epoch
  * @return 0 if success, otherwise an errno is returned
  */
-SF_STATUS STDCALL snowflake_timestamp_get_epoch_seconds(SF_TIMESTAMP *ts, int32 *epoch_time);
+SF_STATUS STDCALL snowflake_timestamp_get_epoch_seconds(SF_TIMESTAMP *ts, time_t *epoch_time);
 
 /**
  * Extracts the part of the timestamp that contains the number of nanoseconds

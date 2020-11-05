@@ -92,7 +92,7 @@ DAT(header_value_page_write_update, "update")
 DAT(header_value_page_write_clear, "clear")
 DAT(header_value_payload_format_nometadata, "application/json;odata=nometadata")
 DAT(header_value_payload_format_fullmetadata, "application/json;odata=fullmetadata")
-DAT(header_value_storage_version, "2017-04-17")
+DAT(header_value_storage_version, "2017-11-09")
 
 DAT(header_value_user_agent, "azure-storage-cpplite/0.1.0")
 
