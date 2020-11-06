@@ -37,6 +37,19 @@ xcopy ^
     /v /y /e
 if %ERRORLEVEL% NEQ 0 goto :error
 
+:: Move Azure
+xcopy ^
+    "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\azure\lib\*.lib" ^
+    "%depsdir%\lib\" ^
+    /v /y
+if %ERRORLEVEL% NEQ 0 goto :error
+:: No delete since no directory for azure headers
+xcopy ^
+    "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\azure\include\*" ^
+    "%depsdir%\include\" ^
+    /v /y /e
+if %ERRORLEVEL% NEQ 0 goto :error
+
 :: Move Curl
 xcopy ^
     "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\curl\lib\*.lib" ^
@@ -48,6 +61,19 @@ if %ERRORLEVEL% NEQ 0 goto :error
 xcopy ^
     "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\curl\include\curl" ^
     "%depsdir%\include\curl\" ^
+    /v /y /e
+if %ERRORLEVEL% NEQ 0 goto :error
+
+:: Move oob
+xcopy ^
+    "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\oob\lib\*.lib" ^
+    "%depsdir%\lib\" ^
+    /v /y
+if %ERRORLEVEL% NEQ 0 goto :error
+:: No delete since no directory for oob headers
+xcopy ^
+    "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\oob\include\*" ^
+    "%depsdir%\include\" ^
     /v /y /e
 if %ERRORLEVEL% NEQ 0 goto :error
 
