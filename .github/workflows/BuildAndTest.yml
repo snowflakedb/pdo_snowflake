@@ -1,0 +1,49 @@
+# This is a basic workflow to help you get started with Actions
+
+name: BuildandTest
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        SNOWFLAKE_CLOUD_ENV: [AWS, AZURE]
+    env:
+      DOCKER_NAME: snowflakedb/pdo-snowflake:php7.2-ubuntu18.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: setup php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.2
+      - name: Decrypt Parameters
+        shell: bash
+        env:
+           PARAMETER_SECRET: ${{ secrets.PARAMETER_SECRET }}
+        run: |
+           gpg --quiet --batch --yes --decrypt --passphrase="$PARAMETER_SECRET" \
+            ./.github/workflows/parameters/parameters_${{ matrix.SNOWFLAKE_CLOUD_ENV }}.json.gpg > parameters.json
+
+      # Runs a single command using the runners shell
+      - name: Build PDO Driver
+        run: |
+          export RUN_COVERAGE=1
+          export PHP_HOME=/usr
+          which php
+          pwd
+          ./scripts/build_pdo_snowflake.sh
+          $PHP_HOME/bin/php -dextension=modules/pdo_snowflake.so -m | grep pdo_snowflake
