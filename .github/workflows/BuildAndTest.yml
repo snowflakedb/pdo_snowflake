@@ -67,6 +67,14 @@ jobs:
         run: |
            gpg --quiet --batch --yes --decrypt --passphrase="$PARAMETER_SECRET" \
             ./.github/workflows/parameters/parameters_${{ matrix.SNOWFLAKE_CLOUD_ENV }}.json.gpg > parameters.json
+      - name: Build PDO Driver
+        run: |
+          export RUN_COVERAGE=1
+          export PHP_HOME=/usr
+          which php
+          pwd
+          ./scripts/build_pdo_snowflake.sh
+          $PHP_HOME/bin/php -dextension=modules/pdo_snowflake.so -m | grep pdo_snowflake
       - name: Run Tests
         run: |
           eval $(jq -r '.testconnection | to_entries | map("export \(.key)=\"\(.value|tostring)\"")|.[]' parameters.json)
