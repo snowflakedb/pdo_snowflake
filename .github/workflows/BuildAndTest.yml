@@ -50,4 +50,4 @@ jobs:
       - name: Test PDO Driver
         run: |
           ./scripts/env.sh && env | grep SNOWFLAKE_TEST > testenv.ini
-          REPORT_EXIT_STATUS=1 NO_INTERACTION=true make test
+          REPORT_EXIT_STATUS=1 NO_INTERACTION=true make test --debug=v
