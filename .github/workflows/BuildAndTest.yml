@@ -30,6 +30,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 7.2
+          extensions: pdo, json
       - name: Decrypt Parameters
         shell: bash
         env:
@@ -47,7 +48,43 @@ jobs:
           pwd
           ./scripts/build_pdo_snowflake.sh
           $PHP_HOME/bin/php -dextension=modules/pdo_snowflake.so -m | grep pdo_snowflake
-      - name: Test PDO Driver
+  test:
+    needs: build
+    name: Test PDO Driver
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        SNOWFLAKE_CLOUD_ENV: [AWS, AZURE]
+    steps:
+      - uses: actions/checkout@v2
+      - name: setup php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.2
+          extensions: pdo, json
+      - name: Decrypt Parameters
+        shell: bash
+        env:
+           PARAMETER_SECRET: ${{ secrets.PARAMETER_SECRET }}
         run: |
-          ./scripts/env.sh && env | grep SNOWFLAKE_TEST > testenv.ini
-          REPORT_EXIT_STATUS=1 NO_INTERACTION=true make test --debug=v
+           gpg --quiet --batch --yes --decrypt --passphrase="$PARAMETER_SECRET" \
+            ./.github/workflows/parameters/parameters_${{ matrix.SNOWFLAKE_CLOUD_ENV }}.json.gpg > parameters.json
+      - name: Build PDO Driver
+        run: |
+          export RUN_COVERAGE=1
+          export PHP_HOME=/usr
+          which php
+          which phpize
+          which php-config
+          pwd
+          ./scripts/build_pdo_snowflake.sh
+          $PHP_HOME/bin/php -dextension=modules/pdo_snowflake.so -m | grep pdo_snowflake
+      - name: Run Tests
+        run: |
+          export PHP_API_VER=$(php -i | grep "PHP API" | awk '{print $4}')
+          export PHP_EXT=$(find /usr/lib/php -name "pdo.so" | grep $PHP_API_VER) && for f in $(ls tests/*.phpt); do sed -i "/--INI--/a extension=$PHP_EXT" $f; done
+          export PHP_EXT=$(find /usr/lib/php -name "json.so" | grep $PHP_API_VER) && for f in $(ls tests/*.phpt); do sed -i "/--INI--/a extension=$PHP_EXT" $f; done
+          eval $(jq -r '.testconnection | to_entries | map("export \(.key)=\"\(.value|tostring)\"")|.[]' parameters.json)
+          echo "Test Connection Parameters:"
+          env | grep SNOWFLAKE | grep -v PASSWORD
+          ./scripts/run_tests.sh
