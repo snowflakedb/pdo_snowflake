@@ -47,7 +47,27 @@ jobs:
           pwd
           ./scripts/build_pdo_snowflake.sh
           $PHP_HOME/bin/php -dextension=modules/pdo_snowflake.so -m | grep pdo_snowflake
-      - name: Test PDO Driver
+  test:
+    needs: build
+    name: Test PDO Driver
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        SNOWFLAKE_CLOUD_ENV: [AWS, AZURE]
+    steps:
+      - uses: actions/checkout@v2
+      - name: setup php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.2
+      - name: Decrypt Parameters
+        shell: bash
+        env:
+           PARAMETER_SECRET: ${{ secrets.PARAMETER_SECRET }}
+        run: |
+           gpg --quiet --batch --yes --decrypt --passphrase="$PARAMETER_SECRET" \
+            ./.github/workflows/parameters/parameters_${{ matrix.SNOWFLAKE_CLOUD_ENV }}.json.gpg > parameters.json
+      - name: Run Tests
         run: |
           eval $(jq -r '.testconnection | to_entries | map("export \(.key)=\"\(.value|tostring)\"")|.[]' parameters.json)
           echo "Test Connection Parameters:"
