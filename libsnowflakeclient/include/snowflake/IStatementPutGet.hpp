@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2018 Snowflake Computing, Inc. All rights reserved.
+ * Copyright (c) 2018-2019 Snowflake Computing, Inc. All rights reserved.
  */
 
 #ifndef SNOWFLAKECLIENT_ISTATEMENT_HPP
 #define SNOWFLAKECLIENT_ISTATEMENT_HPP
 
 #include "PutGetParseResponse.hpp"
+#include <iostream>
 
 namespace Snowflake
 {
@@ -30,6 +31,45 @@ public:
    */
   virtual bool parsePutGetCommand(std::string *sql,
                                   PutGetParseResponse *putGetParseResponse) = 0;
+
+  /**
+  * PUT/GET on GCS use this interface to perform put request.
+  * Not implemented by default.
+  * @param url The url of the request.
+  * @param headers The headers of the request.
+  * @param payload The upload data.
+  * @param responseHeaders The headers of the response.
+  *
+  * return true if succeed otherwise false
+  */
+  virtual bool http_put(std::string const& url,
+                        std::vector<std::string> const& headers,
+                        std::basic_iostream<char>& payload,
+                        size_t payloadLen,
+                        std::string& responseHeaders)
+  {
+    return false;
+  }
+
+  /**
+  * PUT/GET on GCS use this interface to perform put request.
+  * Not implemented by default.
+  * @param url The url of the request.
+  * @param headers The headers of the request.
+  * @param payload The upload data.
+  * @param responseHeaders The headers of the response.
+  * @param headerOnly True if get response header only without payload body.
+  *
+  * return true if succeed otherwise false
+  */
+  virtual bool http_get(std::string const& url,
+                        std::vector<std::string> const& headers,
+                        std::basic_iostream<char>* payload,
+                        std::string& responseHeaders,
+                        bool headerOnly)
+  {
+    return false;
+  }
 
   virtual ~IStatementPutGet()
   {

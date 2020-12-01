@@ -14,7 +14,7 @@
 
 namespace azure {  namespace storage_lite {
 
-    class retry_info
+    class retry_info final
     {
     public:
         retry_info(bool should_retry, std::chrono::seconds interval)
@@ -36,7 +36,7 @@ namespace azure {  namespace storage_lite {
         std::chrono::seconds m_interval;
     };
 
-    class retry_context
+    class retry_context final
     {
     public:
         retry_context()
@@ -71,10 +71,11 @@ namespace azure {  namespace storage_lite {
     class retry_policy_base
     {
     public:
+        virtual ~retry_policy_base() {}
         virtual retry_info evaluate(const retry_context &context) const = 0;
     };
 
-    class retry_policy : public retry_policy_base
+    class retry_policy final : public retry_policy_base
     {
     public:
         retry_info evaluate(const retry_context &context) const override

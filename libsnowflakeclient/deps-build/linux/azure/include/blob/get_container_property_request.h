@@ -4,7 +4,7 @@
 
 namespace azure {  namespace storage_lite {
 
-    class get_container_property_request : public get_container_property_request_base
+    class get_container_property_request final : public get_container_property_request_base
     {
     public:
         get_container_property_request(const std::string &container)

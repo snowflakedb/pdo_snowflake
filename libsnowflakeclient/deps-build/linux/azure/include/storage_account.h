@@ -10,7 +10,7 @@
 
 namespace azure {  namespace storage_lite {
 
-    class storage_account
+    class storage_account final
     {
     public:
         enum class service
@@ -20,6 +20,8 @@ namespace azure {  namespace storage_lite {
             queue,
             file
         };
+
+        static std::shared_ptr<storage_account> development_storage_account();
 
         AZURE_STORAGE_API storage_account(const std::string &account_name, std::shared_ptr<storage_credential> credential, bool use_https = true, const std::string &blob_endpoint = std::string());
 

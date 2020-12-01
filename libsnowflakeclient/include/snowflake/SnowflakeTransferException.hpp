@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Snowflake Computing, Inc. All rights reserved.
+ * Copyright (c) 2018-2019 Snowflake Computing, Inc. All rights reserved.
  */
 
 #ifndef SNOWFLAKECLIENT_SNOWFLAKETRANSFEREXCEPTION_HPP
@@ -20,7 +20,9 @@ enum TransferError
   UNSUPPORTED_FEATURE,
   COLUMN_INDEX_OUT_OF_RANGE,
   DIR_OPEN_ERROR,
-  COMPRESSION_NOT_SUPPORTED
+  COMPRESSION_NOT_SUPPORTED,
+  FILE_OPEN_ERROR,
+  FAILED_TO_TRANSFER
 };
 
 class SnowflakeTransferException : public std::exception

@@ -4,7 +4,7 @@
 
 namespace azure {  namespace storage_lite {
 
-    class get_page_ranges_request : public get_page_ranges_request_base
+    class get_page_ranges_request final : public get_page_ranges_request_base
     {
     public:
         get_page_ranges_request(const std::string &container, const std::string &blob)

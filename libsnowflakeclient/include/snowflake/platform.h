@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2017-2018 Snowflake Computing, Inc. All rights reserved.
+* Copyright (c) 2018-2019 Snowflake Computing, Inc. All rights reserved.
 */
 
 #ifndef SNOWFLAKE_PLATFORM_H
@@ -24,6 +24,8 @@ typedef SRWLOCK SF_RWLOCK_HANDLE;
 typedef HANDLE SF_MUTEX_HANDLE;
 
 #define PATH_SEP '\\'
+#define ALTER_PATH_SEP '/'
+//On windows MAX_PATH is defined as 255
 
 #else
 #define STDCALL
@@ -40,8 +42,11 @@ typedef pthread_rwlock_t SF_RWLOCK_HANDLE;
 typedef pthread_mutex_t SF_MUTEX_HANDLE;
 
 #define PATH_SEP '/'
+#define MAX_PATH PATH_MAX
 
 #endif
+
+#include "Simba_CRTFunctionSafe.h"
 
 struct tm *STDCALL sf_gmtime(const time_t *timep, struct tm *result);
 
@@ -106,7 +111,7 @@ int STDCALL _mutex_term(SF_MUTEX_HANDLE *lock);
 
 const char *STDCALL sf_os_name();
 
-void STDCALL sf_os_version(char *ret);
+void STDCALL sf_os_version(char *ret, size_t size);
 
 int STDCALL sf_strncasecmp(const char *s1, const char *s2, size_t n);
 
@@ -119,6 +124,10 @@ int STDCALL sf_create_directory_if_not_exists(const char * directoryName);
 int STDCALL sf_delete_directory_if_exists(const char * directoryName);
 
 void STDCALL sf_get_tmp_dir(char * tmpDir);
+
+void STDCALL sf_get_uniq_tmp_dir(char * tmpDir);
+
+void STDCALL sf_delete_uniq_dir_if_exists(const char *tmpfile);
 
 #ifdef __cplusplus
 }

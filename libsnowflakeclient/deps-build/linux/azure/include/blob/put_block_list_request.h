@@ -4,7 +4,7 @@
 
 namespace azure {  namespace storage_lite {
 
-    class put_block_list_request : public put_block_list_request_base
+    class put_block_list_request final : public put_block_list_request_base
     {
     public:
         put_block_list_request(const std::string &container, const std::string &blob)

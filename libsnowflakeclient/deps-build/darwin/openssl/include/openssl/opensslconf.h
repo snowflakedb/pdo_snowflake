@@ -24,9 +24,6 @@ extern "C" {
  * OpenSSL was configured with the following options:
  */
 
-#ifndef OPENSSL_SYS_MACOSX
-# define OPENSSL_SYS_MACOSX 1
-#endif
 #ifndef OPENSSL_NO_MD2
 # define OPENSSL_NO_MD2
 #endif
@@ -38,6 +35,9 @@ extern "C" {
 #endif
 #ifndef OPENSSL_RAND_SEED_OS
 # define OPENSSL_RAND_SEED_OS
+#endif
+#ifndef OPENSSL_NO_AFALGENG
+# define OPENSSL_NO_AFALGENG
 #endif
 #ifndef OPENSSL_NO_ASAN
 # define OPENSSL_NO_ASAN
@@ -95,9 +95,6 @@ extern "C" {
 #endif
 #ifndef OPENSSL_NO_DYNAMIC_ENGINE
 # define OPENSSL_NO_DYNAMIC_ENGINE
-#endif
-#ifndef OPENSSL_NO_AFALGENG
-# define OPENSSL_NO_AFALGENG
 #endif
 
 

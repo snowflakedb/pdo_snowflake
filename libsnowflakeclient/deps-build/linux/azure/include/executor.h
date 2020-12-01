@@ -93,6 +93,7 @@ namespace azure {  namespace storage_lite {
                             retry->add_result(code == CURLE_OK ? result: 503);
                             http->reset_input_stream();
                             http->reset_output_stream();
+                            http->reset_input_buffer();
                             async_executor<RESPONSE_TYPE>::submit_helper(promise, outcome, account, request, http, context, retry);
                         }
                         else
@@ -139,6 +140,7 @@ namespace azure {  namespace storage_lite {
                             retry.add_result(code == CURLE_OK ? result : 503);
                             h.reset_input_stream();
                             h.reset_output_stream();
+                            h.reset_input_buffer();
                             async_executor<void>::submit_request(promise, a, r, h, context, retry);
                         }
                         else {
@@ -175,6 +177,7 @@ namespace azure {  namespace storage_lite {
                             retry->add_result(code == CURLE_OK ? result: 503);
                             http->reset_input_stream();
                             http->reset_output_stream();
+                            http->reset_input_buffer();
                             async_executor<void>::submit_helper(promise, outcome, account, request, http, context, retry);
                         }
                         else

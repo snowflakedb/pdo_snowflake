@@ -26,7 +26,7 @@ namespace azure {  namespace storage_lite {
 
     class CurlEasyClient;
 
-    class CurlEasyRequest : public http_base
+    class CurlEasyRequest final : public http_base
     {
 
         using REQUEST_TYPE = CurlEasyRequest;
@@ -81,7 +81,7 @@ namespace azure {  namespace storage_lite {
                 return "";
             }
         }
-        const std::map<std::string, std::string>& get_headers() const override
+        const std::map<std::string, std::string, case_insensitive_compare>& get_headers() const override
         {
             return m_headers;
         }
@@ -127,29 +127,37 @@ namespace azure {  namespace storage_lite {
             check_code(curl_easy_setopt(m_curl, CURLOPT_READDATA, this));
         }
 
-        void set_input_stream_length(unsigned long long streamlen)
+        void set_input_buffer(char* buff) override
         {
-            m_input_stream_len=streamlen;
+            m_input_buffer = buff;
+            check_code(curl_easy_setopt(m_curl, CURLOPT_READFUNCTION, read));
+            check_code(curl_easy_setopt(m_curl, CURLOPT_READDATA, this));
         }
 
-        unsigned long long get_input_stream_length(void)
+        void set_input_content_length(size_t content_length)
         {
-            return m_input_stream_len;
+            m_input_content_length = content_length;
         }
 
-        void set_is_stream_length(void)
+        void set_is_input_length_known(void)
         {
-            m_input_stream_len_known=true;
+            m_is_input_length_known = true;
         }
 
-        bool get_is_stream_length(void)
+        bool get_is_input_length_known(void)
         {
-            return m_input_stream_len_known;
+            return m_is_input_length_known;
         }
 
         void reset_input_stream() override
         {
             m_input_stream.reset();
+            m_input_read_pos = 0;
+        }
+
+        void reset_input_buffer() override
+        {
+            m_input_read_pos = 0;
         }
 
         void reset_output_stream() override
@@ -198,15 +206,17 @@ namespace azure {  namespace storage_lite {
 
         http_method m_method;
         std::string m_url;
+        const char *m_input_buffer = nullptr;
         storage_istream m_input_stream;
         storage_ostream m_output_stream;
         storage_iostream m_error_stream;
-        unsigned long long m_input_stream_len;
-        bool m_input_stream_len_known;
+        size_t m_input_content_length = 0;
+        size_t m_input_read_pos = 0;
+        bool m_is_input_length_known = false;
         std::function<bool(http_code)> m_switch_error_callback;
 
         http_code m_code;
-        std::map<std::string, std::string> m_headers;
+        std::map<std::string, std::string, case_insensitive_compare> m_headers;
 
         AZURE_STORAGE_API static size_t header_callback(char *buffer, size_t size, size_t nitems, void *userdata);
 
@@ -227,26 +237,36 @@ namespace azure {  namespace storage_lite {
         static size_t read(char *buffer, size_t size, size_t nitems, void *userdata)
         {
             REQUEST_TYPE *p = static_cast<REQUEST_TYPE *>(userdata);
-            auto &s = p->m_input_stream.istream();
-            unsigned long long streamlen = p->get_input_stream_length();
-            size_t actual_size = 0 ;
-            if( ! p->get_is_stream_length() ) {
-                auto cur = s.tellg();
-                s.seekg(0, std::ios_base::end);
-                auto end = s.tellg();
-                s.seekg(cur);
-                actual_size = std::min(static_cast<size_t>(end-cur), size * nitems);
-            }
-            else
+
+            size_t actual_size = 0;
+            if (p->m_input_stream.valid())
             {
-                actual_size = std::min(streamlen, (unsigned long long)size * nitems);
+                auto &s = p->m_input_stream.istream();
+                if (p->get_is_input_length_known())
+                {
+                    actual_size = std::min(size * nitems, p->m_input_content_length - p->m_input_read_pos);
+                }
+                else
+                {
+                    std::streampos cur_pos = s.tellg();
+                    s.seekg(0, std::ios_base::end);
+                    std::streampos end_pos = s.tellg();
+                    s.seekg(cur_pos, std::ios_base::beg);
+                    actual_size = std::min(size * nitems, static_cast<size_t>(end_pos - cur_pos));
+                }
+                s.read(buffer, actual_size);
+                if (s.fail())
+                {
+                    return CURL_READFUNC_ABORT;
+                }
+                actual_size = static_cast<size_t>(s.gcount());
+                p->m_input_read_pos += actual_size;
             }
-
-            s.read(buffer, actual_size);
-
-            if(p->get_is_stream_length()) {
-                streamlen -= actual_size;
-                p->set_input_stream_length(streamlen);
+            else if (p->m_input_buffer != nullptr)
+            {
+                actual_size = std::min(size * nitems, p->m_input_content_length - p->m_input_read_pos);
+                memcpy(buffer, p->m_input_buffer + p->m_input_read_pos, actual_size);
+                p->m_input_read_pos += actual_size;
             }
 
             return actual_size;
@@ -274,12 +294,13 @@ namespace azure {  namespace storage_lite {
         }
 
         //Sets CURL CA BUNDLE location for all the curl handlers.
-        CurlEasyClient(int size, const std::string& ca_path) : m_size(size)
+        CurlEasyClient(int size, const std::string& ca_path) : m_size(size), m_caPath(ca_path)
         {
             curl_global_init(CURL_GLOBAL_DEFAULT);
             for (int i = 0; i < m_size; i++) {
                 CURL *h = curl_easy_init();
-                curl_easy_setopt(h, CURLOPT_CAINFO, ca_path.c_str());
+                curl_easy_setopt(h, CURLOPT_CAINFO, m_caPath.c_str());
+                //curl_easy_setopt(h, CURLOPT_VERBOSE, 1L);
                 m_handles.push(h);
             }
         }
@@ -307,6 +328,11 @@ namespace azure {  namespace storage_lite {
             return res;
         }
 
+	 std::string getCaPath(void)
+	 {
+	     return m_caPath;
+	 }
+
         void release_handle(CURL *h)
         {
             std::lock_guard<std::mutex> lg(m_handles_mutex);
@@ -316,6 +342,7 @@ namespace azure {  namespace storage_lite {
 
     private:
         int m_size;
+	 std::string m_caPath;
         std::queue<CURL *> m_handles;
         std::mutex m_handles_mutex;
         std::condition_variable m_cv;
