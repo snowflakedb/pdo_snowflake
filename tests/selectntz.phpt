@@ -79,7 +79,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 ?>
 ===DONE===
 <?php exit(0); ?>
---EXPECT--
+--EXPECTF--
 Connected to Snowflake
 Array
 (
