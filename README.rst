@@ -119,7 +119,7 @@ Building the Driver on Windows
 
    .. code-block:: batch
 
-       setup_php_sdk.bat <arch> <build> <visual studio version> <path to PHP SDK>
+       .\scripts\setup_php_sdk.bat <arch> <build> <visual studio version> <path to PHP SDK>
 
    where:
 
@@ -141,7 +141,7 @@ Building the Driver on Windows
 
    .. code-block:: batch
 
-       run_setup_php.bat <arch> <build> <visual studio version> <full PHP version> <path to PHP SDK>
+       .\scripts\run_setup_php.bat <arch> <build> <visual studio version> <full PHP version> <path to PHP SDK>
 
    For :code:`<arch>`, :code:`<build>`, :code:`<visual studio version>`, and :code:`<path to PHP SDK>`, specify the same values
    that you used in the previous step.
@@ -158,13 +158,13 @@ Building the Driver on Windows
 
    .. code-block:: batch
 
-       run_build_pdo_snowflake.bat <arch> <build> <visual studio version> <full PHP version> <path to PHP SDK>
+       .\scripts\run_build_pdo_snowflake.bat <arch> <build> <visual studio version> <full PHP version> <path to PHP SDK>
 
    For example:
 
    .. code-block:: batch
 
-       run_build_pdo_snowflake.bat x64 Release VS15 7.2.24 C:\php-sdk
+       .\scripts\run_build_pdo_snowflake.bat x64 Release VS15 7.2.24 C:\php-sdk
 
 #. Run the following command to verify that the driver can be loaded into memory successfully:
 
