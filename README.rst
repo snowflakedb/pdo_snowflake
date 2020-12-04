@@ -29,10 +29,8 @@ In order to install and use the Snowflake PHP PDO Driver, you must have the foll
 - the :code:`php-pdo` extension
 - the :code:`php-json` extension
 
-.. note::
-
-  Some of the examples in the instructions refer to the ``php-fpm`` extension. This extension is not required. The driver also
-  works with regular PHP CGI.
+Note: Some of the examples in the instructions refer to the ``php-fpm`` extension. This extension is not required.
+The driver also works with regular PHP CGI.
 
 In addition, in order to build the driver, you must install the PHP development package for your operating system.
 
