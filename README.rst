@@ -19,9 +19,13 @@ Prerequisites
 
 In order to build the Snowflake PHP PDO Driver, you must have the following software installed:
 
-- (Windows) Visual Studio
-- (Linux) gcc 5.2 or higher
-- (macOS) clang
+- On Windows: Visual Studio
+- On Linux:
+
+  - gcc 5.2 or higher
+  - cmake
+
+- On macOS: clang
 
 In order to install and use the Snowflake PHP PDO Driver, you must have the following software installed:
 
@@ -45,53 +49,23 @@ The following sections explain how to build the PHP PDO Driver on Linux, macOS, 
 Building the Driver on Linux and macOS
 --------------------------------------
 
-#. Download and install the PHP binaries, or build PHP yourself.
+#. Download and install the PHP binaries, or build and install PHP from the source code.
 
-   If you need to build PHP yourself:
-
-   #. Download the tar file containing the source code from http://php.net/releases/.
-
-   #. In the terminal window where you plan to build the PHP and the driver, set the :code:`SF_PHP_VERSION` environment variable
-      to the version of PHP that you downloaded.
-
-      For example:
-
-      .. code-block:: bash
-
-          export SF_PHP_VERSION=7.2.24
-
-   #. Extract the source code from the tar file, and build and install PHP.
-
-      For example, if you downloaded the tar file to the directory ``$WORKSPACE``, run the following commands:
-
-      .. code-block:: bash
-
-          cd $WORKSPACE
-          rm -rf $WORKSPACE/php-$SF_PHP_VERSION-src
-          rm -rf $WORKSPACE/install-php-$SF_PHP_VERSION
-          tar xvfj php-$SF_PHP_VERSION.tar.bz2
-          cd php-$SF_PHP_VERSION
-          ./configure \
-              --prefix=$WORKSPACE/install-php-$SF_PHP_VERSION \
-          make
-          make install
+   If you need to build PHP from the source code, see
+   `Building PHP source code <https://github.com/php/php-src/blob/master/README.md#building-php-source-code>`_.
 
 #. Set the :code:`PHP_HOME` environment variable to the path to the :code:`bin` directory containing the :code:`phpize`
    executable.
 
-   If you built PHP in the previous step, run the following command:
-
-   .. code-block:: bash
-
-       export PHP_HOME=$WORKSPACE/install-php-$SF_PHP_VERSION
-
-   Otherwise, if the :code:`phpize` executable is in :code:`/usr/bin`, run the following command:
+   For example, if the :code:`phpize` executable is in :code:`/usr/bin`, run the following command:
 
    .. code-block:: bash
 
        export PHP_HOME=/usr
 
 #. Clone the :code:`pdo_snowflake` repository, and run the script to build the driver:
+
+   If you built PHP from the source code, run these commands from the directory containing the PHP source code.
 
    .. code-block:: bash
 
@@ -104,6 +78,8 @@ Building the Driver on Linux and macOS
    .. code-block:: bash
 
        $PHP_HOME/bin/php -dextension=modules/pdo_snowflake.so -m | grep pdo_snowflake
+
+   :code:`pdo_snowflake` should appear in the output from the command.
 
 Building the Driver on Windows
 ------------------------------
@@ -183,6 +159,12 @@ Installing the Driver on Linux and macOS
 #. Copy :code:`pdo_snowflake.so` from the directory where you built the driver to the PHP extension directory (the same directory
    that contains the :code:`pdo.so` file).
 
+   To find the PHP extension directory, run:
+
+   .. code-block:: bash
+
+       $PHP_HOME/bin/php -i | grep '^extension_dir'
+
 #. Copy :code:`cacert.pem` from the :code:`libsnowflakeclient` subdirectory in the repository to the directory containing the
    PHP configuration files (e.g. :code:`/etc/php/7.2/fpm/conf.d` for PHP-FPM version 7.2 on Ubuntu).
 
@@ -229,46 +211,58 @@ Installing the Driver on Windows
 Using the Driver
 ================================================================================
 
-Limitations
------------
-- Timestamp support on Windows is limited to values between the dates 1/1/1970 and 1/1/2038. Trying to fetch values outside of this range will result in an empty value being returned
-- Named placeholders (placeholders in SQL queries of the form :code:`first_name:`) are not supported at this time. Positional placeholders (placeholders in SQL queries of the form :code:`?`) are supported.
+The next sections explain how to use the driver in a PHP page.
 
-Connection String
+Connecting to the Snowflake Database
 ----------------------------------------------------------------------
 
-Create a database handle with connection parameters:
+To connect to the Snowflake database, create a new :code:`PDO` object, as explained in
+`the PHP PDO documentation <https://www.php.net/manual/en/pdo.connections.php>`_.
+Specify the data source name (:code:`dsn`) parameter as shown below:
 
 .. code-block:: php
 
-    $dbh = new PDO("snowflake:account=testaccount", "user", "password");
+    $dbh = new PDO("snowflake:account=<account_name>", "<user>", "<password>");
 
-For non-US-West region, specify :code:`region` parameter or append it to :code:`account` parameter.
+where:
+
+- :code:`<account_name>` is
+  `your Snowflake account name <https://docs.snowflake.com/en/user-guide/connecting.html#your-snowflake-account-name>`_.
+- :code:`<user>` is the login name of the user for the connection.
+- :code:`<password>` is the password for the specified user.
+
+For accounts in regions outside of US-West, use :code:`region` parameter to specify the region or append the region to the
+:code:`account` parameter.
 
 .. code-block:: php
 
     $dbh = new PDO("snowflake:account=testaccount.us-east-1", "user", "password");
     $dbh = new PDO("snowflake:account=testaccount;region=us-east-1", "user", "password");
 
-OCSP Checking
+Configuring OCSP Checking
 ----------------------------------------------------------------------
 
-OCSP (Online Certificate Status Protocol) checking is set per PDO connection and enabled by default. To disable OCSP checking, set :code:`insecure_mode=true` in the DSN connection string. Example shown here:
+By default, OCSP (Online Certificate Status Protocol) checking is enabled and is set per PDO connection.
+
+To disable OCSP checking for a PDO connection, set :code:`insecure_mode=true` in the DSN connection string. For example:
 
 .. code-block:: php
 
     $dbh = new PDO("snowflake:account=testaccount;insecure_mode=true", "user", "password");
 
-Query
+Performing a Simple Query
 ----------------------------------------------------------------------
 
-Here is an example of fetch a row:
+The following example connects to the Snowflake database and performs a simple query.
+Before using this example, set the :code:`$account`, :code:`$user`, and :code:`$password` variables to your account, login name,
+and password.
 
 .. code-block:: php
 
+  <$php
     $account = "<account_name>";
     $user = "<user_name>";
-    $password = "<password";
+    $password = "<password>";
 
     $dbh = new PDO("snowflake:account=$account", $user, $password);
     $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
@@ -280,6 +274,17 @@ Here is an example of fetch a row:
     }
     $dbh = null;
     echo "OK\n";
+  $>
+
+Limitations in the Driver
+-------------------------
+
+The Snowflake PHP PDO Driver has the following limitations:
+
+- Timestamp support on Windows is limited to values between the dates 1/1/1970 and 1/1/2038. Fetching values outside of this range
+  returns an empty value for the timestamp.
+- Named placeholders (placeholders in SQL queries of the form :code:`first_name:`) are not supported at this time.
+  Positional placeholders (placeholders in SQL queries of the form :code:`?`) are supported.
 
 Running Tests For the PHP PDO Driver
 ================================================================================
