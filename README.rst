@@ -25,7 +25,10 @@ In order to build the Snowflake PHP PDO Driver, you must have the following soft
   - gcc 5.2 or higher
   - cmake
 
-- On macOS: clang
+- On macOS:
+
+  - clang
+  - cmake
 
 In order to install and use the Snowflake PHP PDO Driver, you must have the following software installed:
 
