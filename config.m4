@@ -55,10 +55,12 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
   dnl # (or -Wl,-force_load in OS X) is ignored by libtool
   LDFLAGS="$LDFLAGS -fPIC"
   if test "$build_mac" == "yes"; then
+    LDFLAGS="$LDFLAGS -dynamiclib -undefined dynamic_lookup"
     LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/lib/darwin/libsnowflakeclient.a"
     LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/openssl/lib/libcrypto.a"
     LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/openssl/lib/libssl.a"
     LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/curl/lib/libcurl.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/oob/lib/libtelemetry.a"
     LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/aws/lib/libaws-cpp-sdk-core.a"
     LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/aws/lib/libaws-cpp-sdk-s3.a"
     LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/azure/lib/libazure-storage-lite.a"
@@ -69,6 +71,7 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
     LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/openssl/lib/libcrypto.a"
     LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/openssl/lib/libssl.a"
     LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/curl/lib/libcurl.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/oob/lib/libtelemetry.a"
     LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/aws/lib64/libaws-cpp-sdk-core.a"
     LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/aws/lib64/libaws-cpp-sdk-s3.a"
     LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/azure/lib/libazure-storage-lite.a"

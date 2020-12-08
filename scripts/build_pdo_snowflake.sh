@@ -60,6 +60,7 @@ if [[ "$PLATFORM" == "linux" ]]; then
         libsnowflakeclient/deps-build/linux/openssl/lib/libcrypto.a \
         libsnowflakeclient/deps-build/linux/openssl/lib/libssl.a \
         libsnowflakeclient/deps-build/linux/curl/lib/libcurl.a \
+        libsnowflakeclient/deps-build/linux/oob/lib/libtelemetry.a \
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-core.a \
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-s3.a \
         libsnowflakeclient/deps-build/linux/azure/lib/libazure-storage-lite.a \
@@ -75,7 +76,7 @@ if [[ "$PLATFORM" == "linux" ]]; then
 elif [[ "$PLATFORM" == "darwin" ]]; then
     # Darwin uses -force_load instead
     echo "Linking for Darwin"
-    cc -shared \
+    cc -dynamiclib -undefined dynamic_lookup \
         -g \
         .libs/snowflake_paramstore.o \
         .libs/snowflake_arraylist.o \
@@ -84,21 +85,15 @@ elif [[ "$PLATFORM" == "darwin" ]]; then
         .libs/pdo_snowflake.o \
         .libs/snowflake_driver.o \
         .libs/snowflake_stmt.o \
-        -L libsnowflakeclient/lib/darwin \
-        -L libsnowflakeclient/deps-build/darwin/openssl/lib \
-        -L libsnowflakeclient/deps-build/darwin/curl/lib \
-        -L libsnowflakeclient/deps-build/darwin/aws/lib \
-        -L libsnowflakeclient/deps-build/darwin/azure/lib \
-        -lsnowflakeclient \
-        -Wl,-force-load,crypto \
-        -Wl,-force-load,ssl \
-        -Wl,-force-load,curl \
-        -Wl,-force-load,pthread \
-        -Wl,-force-load,aws-cpp-sdk-core \
-        -Wl,-force-load,aws-cpp-sdk-s3 \
-        -Wl,-force-load,azure-storage-lite \
+        -Wl,-force_load,libsnowflakeclient/lib/darwin/libsnowflakeclient.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/openssl/lib/libcrypto.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/openssl/lib/libssl.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/curl/lib/libcurl.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/oob/lib/libtelemetry.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-cpp-sdk-core.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-cpp-sdk-s3.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/azure/lib/libazure-storage-lite.a \
         $LINK_OPTS \
-        -Wl,-soname -Wl,pdo_snowflake.so \
         -o .libs/pdo_snowflake.so
 fi
 (cd .libs && rm -f pdo_snowflake.la && ln -s ../pdo_snowflake.la pdo_snowflake.la)

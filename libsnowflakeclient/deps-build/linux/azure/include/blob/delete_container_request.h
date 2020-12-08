@@ -4,7 +4,7 @@
 
 namespace azure {  namespace storage_lite {
 
-    class delete_container_request : public delete_container_request_base
+    class delete_container_request final : public delete_container_request_base
     {
     public:
         delete_container_request(const std::string &container)

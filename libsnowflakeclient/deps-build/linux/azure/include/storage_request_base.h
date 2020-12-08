@@ -10,6 +10,7 @@ namespace azure {  namespace storage_lite {
         class storage_request_base
         {
         public:
+            virtual ~storage_request_base() = default;
             // TODO: create request ID for each request for future debugging purposes.
             virtual std::string ms_client_request_id() const { return std::string(); }
 

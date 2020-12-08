@@ -9,7 +9,7 @@
 
 namespace azure {  namespace storage_lite {
 
-    class tinyxml2_parser : public xml_parser_base
+    class tinyxml2_parser final : public xml_parser_base
     {
     public:
         AZURE_STORAGE_API storage_error parse_storage_error(const std::string &xml) const override;

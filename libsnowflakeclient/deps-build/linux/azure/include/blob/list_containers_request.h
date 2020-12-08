@@ -4,7 +4,7 @@
 
 namespace azure {  namespace storage_lite {
 
-    class list_containers_request : public list_containers_request_base
+    class list_containers_request final : public list_containers_request_base
     {
     public:
         list_containers_request(const std::string &prefix, bool include_metadata = false)

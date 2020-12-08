@@ -5,7 +5,7 @@
  * under the terms of the MIT license. See `log.c` for details.
  */
 /*
- * Copyright (c) 2017-2018 Snowflake Computing, Inc. All rights reserved.
+ * Copyright (c) 2018-2019 Snowflake Computing, Inc. All rights reserved.
  */
 
 #ifndef SNOWFLAKE_LOGGER_H

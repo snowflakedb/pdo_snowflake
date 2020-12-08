@@ -4,7 +4,7 @@
 
 namespace azure { namespace storage_lite {
 
-    class delete_blob_request : public delete_blob_request_base
+    class delete_blob_request final : public delete_blob_request_base
     {
     public:
         delete_blob_request(const std::string &container, const std::string &blob, bool delete_snapshots_only = false)

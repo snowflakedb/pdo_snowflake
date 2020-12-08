@@ -93,7 +93,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 ?>
 ===DONE===
 <?php exit(0); ?>
---EXPECT--
+--EXPECTF--
 Connected to Snowflake
 Expected ERR: testcase #6 -- 100040
 Expected ERR: testcase #7 -- 100040
@@ -126,8 +126,9 @@ Array
 Results in String
 C1: 1, C2: 1989-12-30
 C1: 2, C2: 1701-05-21
-C1: 3, C2: 1-01-01
-C1: 4, C2: 0-01-01
+
+C1: 3, C2: %r0{0,3}%r1-01-01
+C1: 4, C2: %r0{0,3}%r0-01-01
 C1: 5, C2: 
 C1: 8, C2: 9999-12-31
 ===DONE===

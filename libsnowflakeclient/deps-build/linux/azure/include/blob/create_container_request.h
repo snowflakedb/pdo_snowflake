@@ -4,7 +4,7 @@
 
 namespace azure { namespace storage_lite {
 
-    class create_container_request : public create_container_request_base
+    class create_container_request final : public create_container_request_base
     {
     public:
         create_container_request(const std::string &container, blob_public_access public_access = blob_public_access::unspecified)

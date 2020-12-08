@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Snowflake Computing, Inc. All rights reserved.
+ * Copyright (c) 2018-2019 Snowflake Computing, Inc. All rights reserved.
  */
 
 #ifndef SNOWFLAKECLIENT_ITRANSFERRESULT_HPP
@@ -34,7 +34,7 @@ public:
   /**
    * @return result size, a.k.a number of file that has been transferred
    */
-  virtual int getResultSize() = 0;
+  virtual size_t getResultSize() = 0;
 
   /**
    * @return number of column
@@ -44,12 +44,12 @@ public:
   /**
    * @return column name given a column index, index starts from 0
    */
-  virtual const char * getColumnName(int columnIndex) = 0;
+  virtual const char * getColumnName(unsigned int columnIndex) = 0;
 
   /**
    * @return column value as string
    */
-  virtual void getColumnAsString(int columnIndex, std::string & value) = 0;
+  virtual void getColumnAsString(unsigned int columnIndex, std::string & value) = 0;
 
   /**
    * @return command type (upload or download) for file transfer

@@ -4,7 +4,7 @@
 
 namespace azure {  namespace storage_lite {
 
-    class list_blobs_request : public list_blobs_request_base
+    class list_blobs_request final : public list_blobs_request_base
     {
     public:
         list_blobs_request(const std::string &container, const std::string &prefix)
@@ -50,7 +50,7 @@ namespace azure {  namespace storage_lite {
         int m_maxresults;
     };
 
-    class list_blobs_segmented_request : public list_blobs_segmented_request_base
+    class list_blobs_segmented_request final : public list_blobs_segmented_request_base
     {
     public:
         list_blobs_segmented_request(const std::string &container, const std::string &delimiter, const std::string &continuation_token, const std::string &prefix)
