@@ -66,6 +66,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.6'
+      - name: Setup Snowflake Python Connector
+        run:
+          pip install snowflake-python-connector
       - name: Decrypt Parameters
         shell: bash
         env:
