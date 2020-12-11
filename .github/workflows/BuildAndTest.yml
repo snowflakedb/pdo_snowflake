@@ -76,6 +76,9 @@ jobs:
         run: |
            gpg --quiet --batch --yes --decrypt --passphrase="$PARAMETER_SECRET" \
             ./.github/workflows/parameters/parameters_${{ matrix.SNOWFLAKE_CLOUD_ENV }}.json.gpg > parameters.json
+      - name: Setup Test Schema
+        run:
+         python3 ./.github/workflows/scripts/create_schema.py
       - name: Build PDO Driver
         run: |
           export RUN_COVERAGE=1
@@ -92,8 +95,9 @@ jobs:
           export PHP_EXT=$(find /usr/lib/php -name "pdo.so" | grep $PHP_API_VER) && for f in $(ls tests/*.phpt); do sed -i "/--INI--/a extension=$PHP_EXT" $f; done
           export PHP_EXT=$(find /usr/lib/php -name "json.so" | grep $PHP_API_VER) && for f in $(ls tests/*.phpt); do sed -i "/--INI--/a extension=$PHP_EXT" $f; done
           eval $(jq -r '.testconnection | to_entries | map("export \(.key)=\"\(.value|tostring)\"")|.[]' parameters.json)
-          python3 ./.github/workflows/scripts/create_schema.py
           echo "Test Connection Params:"
           env | grep SNOWFLAKE | grep -v PASSWORD
           ./scripts/run_tests.sh
-          python3 ./.github/workflows/scripts/drop_schema.py
+      - name: Drop Test Schema
+        run:
+         python3 ./.github/workflows/scripts/drop_schema.py
