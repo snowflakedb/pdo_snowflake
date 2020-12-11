@@ -62,6 +62,10 @@ jobs:
         with:
           php-version: 7.2
           extensions: pdo, json
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'
       - name: Decrypt Parameters
         shell: bash
         env:
@@ -85,6 +89,8 @@ jobs:
           export PHP_EXT=$(find /usr/lib/php -name "pdo.so" | grep $PHP_API_VER) && for f in $(ls tests/*.phpt); do sed -i "/--INI--/a extension=$PHP_EXT" $f; done
           export PHP_EXT=$(find /usr/lib/php -name "json.so" | grep $PHP_API_VER) && for f in $(ls tests/*.phpt); do sed -i "/--INI--/a extension=$PHP_EXT" $f; done
           eval $(jq -r '.testconnection | to_entries | map("export \(.key)=\"\(.value|tostring)\"")|.[]' parameters.json)
+          python3 ./.github/workflows/scripts/create_schema.py
           echo "Test Connection Params:"
           env | grep SNOWFLAKE | grep -v PASSWORD
           ./scripts/run_tests.sh
+          python3 ./.github/workflows/scripts/drop_schema.py
