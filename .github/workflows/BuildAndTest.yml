@@ -9,6 +9,14 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        default: warning
+        description: "Log level"
+        required: true
+      tags:
+        description: "Test scenario tags"
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
