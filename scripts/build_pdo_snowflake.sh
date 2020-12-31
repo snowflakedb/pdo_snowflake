@@ -64,6 +64,7 @@ if [[ "$PLATFORM" == "linux" ]]; then
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-core.a \
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-s3.a \
         libsnowflakeclient/deps-build/linux/azure/lib/libazure-storage-lite.a \
+        libsnowflakeclient/deps-build/linux/uuid/lib/libuuid.a \
         -O2 \
         -Wl,--whole-archive \
         -Wl,--no-whole-archive \
