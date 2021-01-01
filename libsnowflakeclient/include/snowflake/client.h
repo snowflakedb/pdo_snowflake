@@ -131,7 +131,8 @@ typedef enum SF_STATUS {
     SF_STATUS_ERROR_OUT_OF_RANGE = 240021,
     SF_STATUS_ERROR_NULL_POINTER = 240022,
     SF_STATUS_ERROR_BUFFER_TOO_SMALL = 240023,
-    SF_STATUS_ERROR_OTHER = 240024
+    SF_STATUS_ERROR_ATTEMPT_TO_RETRIEVE_FORCE_ARROW = 240024,
+    SF_STATUS_ERROR_OTHER = 240025
 } SF_STATUS;
 
 /**
@@ -210,7 +211,9 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_AUTOCOMMIT,
     SF_DIR_QUERY_URL,
     SF_DIR_QUERY_URL_PARAM,
-    SF_DIR_QUERY_TOKEN
+    SF_DIR_QUERY_TOKEN,
+    SF_RETRY_ON_CURLE_COULDNT_CONNECT_COUNT,
+    SF_QUERY_RESULT_TYPE
 } SF_ATTRIBUTE;
 
 /**
@@ -266,6 +269,7 @@ typedef struct SF_CONNECT {
     sf_bool autocommit;
     char *timezone;
     char *service_name;
+    char *query_result_format;
 
     /* used when updating parameters */
     SF_MUTEX_HANDLE mutex_parameters;
@@ -294,6 +298,8 @@ typedef struct SF_CONNECT {
 
     char *direct_query_token;
 
+    int8 retry_on_curle_couldnt_connect_count;
+
     // Error
     SF_ERROR_STRUCT error;
 } SF_CONNECT;
@@ -319,6 +325,23 @@ typedef struct SF_STATS {
     int64 num_rows_deleted;
     int64 num_duplicate_rows_updated;
 } SF_STATS;
+
+/**
+ * For certain applications, we may wish to capture
+ * the raw response after issuing a query to Snowflake.
+ * This is a structure used for capturing the results.
+ * Note that the caller is responsible for managing the memory
+ * used for this, and that these should always be constructed
+ * with snowflake_query_result_capture_init().
+ */
+typedef struct SF_QUERY_RESULT_CAPTURE {
+    // The buffer for storing the results
+    char* capture_buffer;
+    // Size of the buffer
+    size_t buffer_size;
+    // Actual response size
+    size_t actual_response_size;
+} SF_QUERY_RESULT_CAPTURE;
 
 /**
  * Chunk downloader context
@@ -395,6 +418,22 @@ typedef struct SF_TIMESTAMP {
     int32 scale;
     SF_DB_TYPE ts_type;
 } SF_TIMESTAMP;
+
+/**
+ * Initializes an SF_QUERY_RESPONSE_CAPTURE struct.
+ * Note that these need to be released by calling snowflake_query_result_capture_term().
+ *
+ * @param input pointer to an uninitialized SF_QUERY_RESULT_CAPTURE struct pointer.
+ */
+void STDCALL snowflake_query_result_capture_init(SF_QUERY_RESULT_CAPTURE **input);
+
+/**
+ * Checks whether the client is running in force_arrow mode.
+ *
+ * @param connection pointer to SF_CONNECT
+ * @return SF_BOOLEAN_TRUE if the connection is running in force_arrow mode, otherwise SF_BOOLEAN_FALSE
+ */
+sf_bool STDCALL snowflake_is_force_arrow_mode(const SF_CONNECT *connection);
 
 /**
  * Global Snowflake initialization.
@@ -481,6 +520,16 @@ SF_STATUS STDCALL snowflake_get_attribute(
  * @param sfstmt SNOWFLAKE_STMT context.
  */
 SF_STMT *STDCALL snowflake_stmt(SF_CONNECT *sf);
+
+/**
+ * Frees the memory used by a SF_QUERY_RESULT_CAPTURE struct.
+ * Note that this only frees the struct itself, and *not* the underlying
+ * capture buffer! The caller is responsible for managing that.
+ *
+ * @param capture SF_QUERY_RESULT_CAPTURE pointer whose memory to clear.
+ *
+ */
+ void STDCALL snowflake_query_result_capture_term(SF_QUERY_RESULT_CAPTURE *capture);
 
 /**
  * Closes and terminates a statement context
@@ -633,6 +682,15 @@ snowflake_stmt_get_attr(SF_STMT *sfstmt, SF_STMT_ATTRIBUTE type, void **value);
  * @return 0 if success, otherwise an errno is returned.
  */
 SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt);
+
+/**
+ * Executes a statement with capture.
+ * @param sfstmt SNOWFLAKE_STMT context.
+ * @param result_capture pointer to a SF_QUERY_RESULT_CAPTURE
+ * @return 0 if success, otherwise an errno is returned.
+ */
+SF_STATUS STDCALL snowflake_execute_with_capture(SF_STMT *sfstmt,
+        SF_QUERY_RESULT_CAPTURE* result_capture);
 
 /**
  * Fetches the next row for the statement and stores on the bound buffer
@@ -843,6 +901,32 @@ SF_STATUS STDCALL snowflake_column_as_timestamp(SF_STMT *sfstmt, int idx, SF_TIM
  * @return 0 if success, otherwise an errno is returned
  */
 SF_STATUS STDCALL snowflake_column_as_const_str(SF_STMT *sfstmt, int idx, const char **value_ptr);
+
+/**
+ * Given the raw value as a string, returns the string representation
+ *
+ * @param sfstmt (can be null) SF_STMT context to be used for extracting sfqid and error
+ * @param const_str_val the src raw value
+ * @param type the target type
+ *  (caller is responsible to make sure currect type is passed in for the raw value)
+ * @param connection_timezone to be used for extracting timestamp string values
+ * @param scale to be used for extracting timestamp string values
+ * @param isNull
+ * @param value_ptr Copied Column data is stored in this pointer (if conversion was successful)
+ * @param value_len_ptr The length of the string value. This is what you would get if you were to call strlen(*value_ptr).
+ * @param max_value_size_ptr The size of the value buffer. If value_ptr is reallocated because the data to copy is too
+ *        large, then this ptr will hold the value of the new buffer size.
+ * @return 0 if success, otherwise an errno is returned
+ * @return
+ */
+SF_STATUS STDCALL snowflake_raw_value_to_str_rep(SF_STMT *sfstmt,
+                                                 const char *const_str_val,
+                                                 const SF_DB_TYPE type,
+                                                 const char *connection_timezone,
+                                                 int32 scale, sf_bool isNull,
+                                                 char **value_ptr,
+                                                 size_t *value_len_ptr,
+                                                 size_t *max_value_size_ptr);
 
 /**
  * Converts a column into a string, copies to the buffer provided and stores that buffer address in value_ptr. If

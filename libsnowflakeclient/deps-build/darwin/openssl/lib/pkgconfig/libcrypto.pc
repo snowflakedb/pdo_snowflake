@@ -1,4 +1,4 @@
-prefix=/bamboo/NEW/libsnowflakeclient/scripts/../deps-build/linux/Release/openssl
+prefix=/Users/bamboo/Desktop/harry/libsnowflakeclient/scripts/../deps-build/darwin/Release/openssl
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
@@ -8,5 +8,5 @@ Name: OpenSSL-libcrypto
 Description: OpenSSL cryptography library
 Version: 1.1.1g
 Libs: -L${libdir} -lcrypto
-Libs.private: -ldl -pthread 
+Libs.private:  
 Cflags: -I${includedir}

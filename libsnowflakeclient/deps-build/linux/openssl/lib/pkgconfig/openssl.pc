@@ -1,4 +1,4 @@
-prefix=/bamboo/libsnowflakeclient/scripts/../deps-build/linux/Release/openssl
+prefix=/bamboo/snowflake/libsnowflakeclient/scripts/../deps-build/linux/Release/openssl
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include

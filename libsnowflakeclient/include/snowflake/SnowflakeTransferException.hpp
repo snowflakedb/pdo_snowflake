@@ -22,7 +22,8 @@ enum TransferError
   DIR_OPEN_ERROR,
   COMPRESSION_NOT_SUPPORTED,
   FILE_OPEN_ERROR,
-  FAILED_TO_TRANSFER
+  FAILED_TO_TRANSFER,
+  FAST_FAIL_ENABLED_SKIP_UPLOADS
 };
 
 class SnowflakeTransferException : public std::exception

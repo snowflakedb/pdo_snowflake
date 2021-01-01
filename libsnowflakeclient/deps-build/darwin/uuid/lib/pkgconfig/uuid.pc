@@ -1,11 +1,11 @@
-prefix=/Users/kristopherwagner/libsnowflakeclient/deps/../deps-build/darwin/uuid
-exec_prefix=/Users/kristopherwagner/libsnowflakeclient/deps/../deps-build/darwin/uuid
-libdir=/Users/kristopherwagner/libsnowflakeclient/deps/../deps-build/darwin/uuid/lib
-includedir=/Users/kristopherwagner/libsnowflakeclient/deps/../deps-build/darwin/uuid/include
+prefix=/Users/bamboo/Desktop/harry/libsnowflakeclient/scripts/../deps-build/darwin/Release/uuid
+exec_prefix=/Users/bamboo/Desktop/harry/libsnowflakeclient/scripts/../deps-build/darwin/Release/uuid
+libdir=/Users/bamboo/Desktop/harry/libsnowflakeclient/scripts/../deps-build/darwin/Release/uuid/lib
+includedir=/Users/bamboo/Desktop/harry/libsnowflakeclient/scripts/../deps-build/darwin/Release/uuid/include
 
 Name: uuid
 Description: Universally unique id library
-Version: UNKNOWN..0
+Version: 2.36.0
 Requires:
 Cflags: -I${includedir}/uuid
 Libs: -L${libdir} -luuid

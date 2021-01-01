@@ -4,7 +4,7 @@ if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" LESS 2.5)
    message(FATAL_ERROR "CMake >= 2.6.0 required")
 endif()
 cmake_policy(PUSH)
-cmake_policy(VERSION 2.6...3.17)
+cmake_policy(VERSION 2.6)
 #----------------------------------------------------------------
 # Generated CMake target import file.
 #----------------------------------------------------------------
@@ -56,7 +56,7 @@ add_library(aws-cpp-sdk-core STATIC IMPORTED)
 set_target_properties(aws-cpp-sdk-core PROPERTIES
   INTERFACE_COMPILE_DEFINITIONS "AWS_SDK_VERSION_MAJOR=1;AWS_SDK_VERSION_MINOR=3;AWS_SDK_VERSION_PATCH=50;USE_WINDOWS_DLL_SEMANTICS"
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
-  INTERFACE_LINK_LIBRARIES "Userenv;version;D:\\Snowflake\\ODBC\\libsnowflakeclient\\scripts\\..\\deps-build\\win64\\vs14\\Release\\curl\\lib\\libcurl_a.lib;Bcrypt"
+  INTERFACE_LINK_LIBRARIES "Userenv;version;C:\\Snowflake\\SourceCode\\gitrepo\\libsnowflakeclient\\scripts\\..\\deps-build\\win64\\vs14\\Release\\curl\\lib\\libcurl_a.lib;Bcrypt"
 )
 
 if(CMAKE_VERSION VERSION_LESS 2.8.12)

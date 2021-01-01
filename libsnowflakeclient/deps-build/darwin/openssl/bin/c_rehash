@@ -12,8 +12,8 @@
 # Perl c_rehash script, scan all files in a directory
 # and add symbolic links to their hash values.
 
-my $dir = "/bamboo/NEW/libsnowflakeclient/scripts/../deps-build/linux/Release/openssl";
-my $prefix = "/bamboo/NEW/libsnowflakeclient/scripts/../deps-build/linux/Release/openssl";
+my $dir = "/Users/bamboo/Desktop/harry/libsnowflakeclient/scripts/../deps-build/darwin/Release/openssl";
+my $prefix = "/Users/bamboo/Desktop/harry/libsnowflakeclient/scripts/../deps-build/darwin/Release/openssl";
 
 my $errorcount = 0;
 my $openssl = $ENV{OPENSSL} || "openssl";

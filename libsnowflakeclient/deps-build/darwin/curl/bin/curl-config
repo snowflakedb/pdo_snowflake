@@ -6,7 +6,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 2001 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) 2001 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -21,7 +21,7 @@
 #
 ###########################################################################
 
-prefix=/Users/kristopherwagner/libsnowflakeclient/scripts/../deps-build/darwin/curl
+prefix=/Users/bamboo/Desktop/harry/libsnowflakeclient/scripts/../deps-build/darwin/Release/curl
 exec_prefix=${prefix}
 includedir=${prefix}/include
 cppflag_curl_staticlib=-DCURL_STATICLIB
@@ -72,7 +72,7 @@ while test $# -gt 0; do
         ;;
 
     --ca)
-        echo "/etc/ssl/cert.pem"
+        echo 
         ;;
 
     --cc)
@@ -96,7 +96,7 @@ while test $# -gt 0; do
         ;;
 
     --version)
-        echo libcurl 7.58.0
+        echo libcurl 7.68.0
         exit 0
         ;;
 
@@ -107,21 +107,33 @@ while test $# -gt 0; do
         # when extracting the patch part we strip off everything after a
         # dash as that's used for things like version 1.2.3-CVS
         cpatch=`echo $checkfor | cut -d. -f3 | cut -d- -f1`
-        checknum=`echo "$cmajor*256*256 + $cminor*256 + ${cpatch:-0}" | bc`
-        numuppercase=`echo 073a00 | tr 'a-f' 'A-F'`
-        nownum=`echo "obase=10; ibase=16; $numuppercase" | bc`
 
-        if test "$nownum" -ge "$checknum"; then
-          # silent success
-          exit 0
-        else
-          echo "requested version $checkfor is newer than existing 7.58.0"
-          exit 1
+        vmajor=`echo 7.68.0 | cut -d. -f1`
+        vminor=`echo 7.68.0 | cut -d. -f2`
+        # when extracting the patch part we strip off everything after a
+        # dash as that's used for things like version 1.2.3-CVS
+        vpatch=`echo 7.68.0 | cut -d. -f3 | cut -d- -f1`
+
+        if test "$vmajor" -gt "$cmajor"; then
+            exit 0;
         fi
+        if test "$vmajor" -eq "$cmajor"; then
+            if test "$vminor" -gt "$cminor"; then
+                exit 0
+            fi
+            if test "$vminor" -eq "$cminor"; then
+                if test "$cpatch" -le "$vpatch"; then
+                    exit 0
+                fi
+            fi
+        fi
+
+        echo "requested version $checkfor is newer than existing 7.68.0"
+        exit 1
         ;;
 
     --vernum)
-        echo 073a00
+        echo 074400
         exit 0
         ;;
 
@@ -149,7 +161,7 @@ while test $# -gt 0; do
            CURLLIBDIR=""
         fi
         if test "Xyes" = "Xyes"; then
-          echo ${CURLLIBDIR}-lcurl -lssl -lcrypto -lz -ldl
+          echo ${CURLLIBDIR}-lcurl -lssl -lcrypto -lz -ltelemetry -ldl
         else
           echo ${CURLLIBDIR}-lcurl
         fi
@@ -160,7 +172,7 @@ while test $# -gt 0; do
 
     --static-libs)
         if test "Xyes" != "Xno" ; then
-          echo ${exec_prefix}/lib/libcurl.a -L/Users/kristopherwagner/libsnowflakeclient/scripts/../deps-build/darwin/openssl/lib -lssl -lcrypto -lz -ldl
+          echo ${exec_prefix}/lib/libcurl.a -L/Users/bamboo/Desktop/harry/libsnowflakeclient/scripts/../deps-build/darwin/Release/oob/lib -L/Users/bamboo/Desktop/harry/libsnowflakeclient/scripts/../deps-build/darwin/Release/openssl/lib -lssl -lcrypto -lz -ltelemetry -ldl
         else
           echo "curl was built with static libraries disabled" >&2
           exit 1
@@ -168,7 +180,7 @@ while test $# -gt 0; do
         ;;
 
     --configure)
-        echo " '--with-ssl=/Users/kristopherwagner/libsnowflakeclient/scripts/../deps-build/darwin/openssl' '--without-nss' '--enable-static' '--disable-shared' '--prefix=/Users/kristopherwagner/libsnowflakeclient/scripts/../deps-build/darwin/curl' '--without-libssh2' '--disable-rtsp' '--disable-ldap' '--disable-ldaps' '--disable-telnet' '--disable-tftp' '--disable-imap' '--disable-smb' '--disable-smtp' '--disable-gopher' '--disable-pop3' '--disable-ftp' '--disable-dict' '--disable-file' '--disable-manual' 'CC=clang' 'CFLAGS=-arch x86_64 -Xarch_x86_64 -DSIZEOF_LONG_INT=8 -mmacosx-version-min=10.12' 'LIBS=-ldl'"
+        echo " '--with-ssl=/Users/bamboo/Desktop/harry/libsnowflakeclient/scripts/../deps-build/darwin/Release/openssl' '--without-nss' '--enable-static' '--disable-shared' '--prefix=/Users/bamboo/Desktop/harry/libsnowflakeclient/scripts/../deps-build/darwin/Release/curl' '--without-libssh2' '--disable-rtsp' '--disable-ldap' '--disable-ldaps' '--disable-telnet' '--disable-tftp' '--disable-imap' '--disable-smb' '--disable-smtp' '--disable-gopher' '--disable-pop3' '--disable-ftp' '--disable-dict' '--disable-file' '--disable-manual' 'CC=clang' 'CFLAGS=-arch x86_64 -Xarch_x86_64 -DSIZEOF_LONG_INT=8 -mmacosx-version-min=10.12' 'LDFLAGS=-L/Users/bamboo/Desktop/harry/libsnowflakeclient/scripts/../deps-build/darwin/Release/oob/lib' 'LIBS=-ltelemetry -ldl' 'CPPFLAGS=-I/Users/bamboo/Desktop/harry/libsnowflakeclient/scripts/../deps-build/darwin/Release/oob/include'"
         ;;
 
     *)

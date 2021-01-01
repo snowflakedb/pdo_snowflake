@@ -56,7 +56,7 @@ add_library(aws-cpp-sdk-core STATIC IMPORTED)
 set_target_properties(aws-cpp-sdk-core PROPERTIES
   INTERFACE_COMPILE_DEFINITIONS "AWS_SDK_VERSION_MAJOR=1;AWS_SDK_VERSION_MINOR=3;AWS_SDK_VERSION_PATCH=50;USE_WINDOWS_DLL_SEMANTICS"
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
-  INTERFACE_LINK_LIBRARIES "Userenv;version;C:/projects/libsnowflakeclient/deps-build/win64/vs15/curl/lib/libcurl_a.lib;Bcrypt"
+  INTERFACE_LINK_LIBRARIES "Userenv;version;C:\\Snowflake\\SourceCode\\gitrepo\\libsnowflakeclient\\scripts\\..\\deps-build\\win64\\vs15\\Release\\curl\\lib\\libcurl_a.lib;Bcrypt"
 )
 
 if(CMAKE_VERSION VERSION_LESS 2.8.12)
