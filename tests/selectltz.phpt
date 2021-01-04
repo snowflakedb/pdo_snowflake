@@ -6,14 +6,6 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php
     include __DIR__ . "/common.php";
 
-    $tz="America/New_York";
-
-    // NOTE: you could set the default timezone but will impact other
-    // thread.
-    // date_default_timezone_set($tz);
-    // Instead, set timezone using setTimeZone method for DateTime object.
-
-    $dsn .=sprintf(";timezone=%s", $tz);
     $dbh = new PDO($dsn, $user, $password);
     $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
     echo "Connected to Snowflake\n";
@@ -27,32 +19,32 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 
     $tests = [
         [
-            "input" => [1, "2017-09-27 05:17:30.987654 -04:00"],
+            "input" => [1, "2017-09-27 05:17:30.987654"],
             "output" => [1, "2017-09-27 05:17:30.987654000"],
         ],
         [
-            "input" => [2, "1969-11-21 08:19:34.123 -05:00"],
+            "input" => [2, "1969-11-21 08:19:34.123"],
             "output" => [2, "1969-11-21 08:19:34.123000000"],
         ],
 /* Comment out inaccurate result around or before 1600 since the
    results are different on platforms.
         [
-            "input" => [3, "1600-01-01 00:00:00.000 -05:00"],
+            "input" => [3, "1600-01-01 00:00:00.000"],
             "output" => [3, "1600-01-01 00:03:58.000000000"],
         ],
         [
             // not accurate before 1600~
-            "input" => [4, "0001-01-01 00:00:00.000 -05:00"],
+            "input" => [4, "0001-01-01 00:00:00.000"],
             "output" => [4, "1-01-01 00:03:58.000000000"],
         ],
         [
             // not accurate before 1600~
-            "input" => [5, "0000-01-01 00:00:00.000 -05:00"],
+            "input" => [5, "0000-01-01 00:00:00.000"],
             "output" => [5, "0-01-01 00:03:58.000000000"],
         ],
 */
         [
-            "input" => [3, "9999-12-31 23:59:59.999999 -05:00"],
+            "input" => [3, "9999-12-31 23:59:59.999999"],
             "output" => [3, "9999-12-31 23:59:59.999999000"],
         ],
     ];

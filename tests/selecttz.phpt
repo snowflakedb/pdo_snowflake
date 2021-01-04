@@ -50,12 +50,10 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
             "input" => [6, "1969-11-21 08:19:34.123 -04:30"],
             "output" => [6, "1969-11-21 08:19:34.123000000 -04:30"],
         ],
-        /*
         [
             "input" => [7, "9999-12-31 23:59:59.999999 +12:00"],
             "output" => [7, "9999-12-31 23:59:59.999999000 +12:00"],
         ],
-        */
     ];
 
     foreach ($tests as $t) {
@@ -86,11 +84,6 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     while($row = $sth->fetch()) {
         $idx = $row[0];
         echo sprintf("C1: %s, C2: %s\n", $idx, $row[1]);
-        $expected = $tests[$idx-1]["output"];
-        if ($expected[1] != $row[1]) {
-            echo sprintf("ERR: testcase #%d -- expected: %s, got: %s\n",
-                $idx, $expected[1], $row[1]);
-        }
     }
     // $count = $dbh->exec("drop table if exists t");
 
@@ -133,4 +126,5 @@ C1: 3, C2: 1600-01-01 00:00:00.000000000 -05:00
 C1: 4, C2: %r0{0,3}%r1-01-01 00:00:00.000000000 -00:00
 C1: 5, C2: %r0{0,3}%r0-01-01 00:00:00.000000000 -00:00
 C1: 6, C2: 1969-11-21 08:19:34.123000000 -04:30
+C1: 7, C2: 9999-12-31 23:59:59.999999000 +12:00
 ===DONE===
