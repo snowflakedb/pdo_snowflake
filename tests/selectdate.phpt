@@ -81,11 +81,6 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     while($row = $sth->fetch()) {
         $idx = $row[0];
         echo sprintf("C1: %s, C2: %s\n", $idx, $row[1]);
-        $expected = $tests[$idx-1]["output"];
-        if ($expected[1] != $row[1]) {
-            echo sprintf("ERR: testcase #%d -- expected: %s, got: %s\n",
-                $idx, $expected[1], $row[1]);
-        }
     }
     $count = $dbh->exec("drop table if exists t");
 
@@ -126,7 +121,6 @@ Array
 Results in String
 C1: 1, C2: 1989-12-30
 C1: 2, C2: 1701-05-21
-
 C1: 3, C2: %r0{0,3}%r1-01-01
 C1: 4, C2: %r0{0,3}%r0-01-01
 C1: 5, C2: 

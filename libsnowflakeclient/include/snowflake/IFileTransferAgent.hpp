@@ -62,6 +62,22 @@ public:
    */
   virtual void setRandomDeviceAsUrand(bool useUrand){};
 
+  /**
+   * Enable fast fail by setting it to true.
+   * For wild char uploads, the put command will be marked as failed when the first file
+   * fails to upload and the rest of the files will not be uploaded.
+   * In multi thread case, if the parallel threads start uploading and one of the file fails to upload
+   * then the already started threads will continue and try to upload but no further files will be uploaded.
+   * @param putFastFail
+   */
+  virtual void setPutFastFail(bool putFastFail){};
+
+  /**
+   * Set max number of retries for put fails
+   * @param maxRetries: max number of retries.
+   */
+  virtual void setPutMaxRetries(int maxRetries){};
+
 };
 
 }

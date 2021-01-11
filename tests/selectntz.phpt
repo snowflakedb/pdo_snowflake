@@ -67,11 +67,6 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     while($row = $sth->fetch()) {
         $idx = $row[0];
         echo sprintf("C1: %s, C2: %s\n", $idx, $row[1]);
-        $expected = $tests[$idx-1]["output"];
-        if ($expected[1] != $row[1]) {
-            echo sprintf("ERR: testcase #%d -- expected: %s, got: %s\n",
-                $idx, $expected[1], $row[1]);
-        }
     }
     $count = $dbh->exec("drop table if exists t");
 
