@@ -279,15 +279,6 @@ and password.
     echo "OK\n";
   $>
 
-Limitations in the Driver
--------------------------
-
-The Snowflake PHP PDO Driver has the following limitations:
-
-- Timestamp support on Windows is limited to values between the dates 1/1/1970 and 1/1/2038. Fetching values outside of this range
-  returns an empty value for the timestamp.
-- Named placeholders (placeholders in SQL queries of the form :code:`first_name:`) are not supported at this time.
-  Positional placeholders (placeholders in SQL queries of the form :code:`?`) are supported.
 
 Running Tests For the PHP PDO Driver
 ================================================================================
