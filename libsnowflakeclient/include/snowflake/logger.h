@@ -92,6 +92,10 @@ log_log_va_list(int level, const char *file, int line, const char *ns,
 
 SF_LOG_LEVEL log_from_str_to_level(const char *level_in_str);
 
+void log_set_path(const char* path);
+
+void log_close();
+
 #if defined(__cplusplus)
 }
 #endif
