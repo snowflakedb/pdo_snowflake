@@ -46,5 +46,3 @@ jobs:
         
         - name: test driver
           run: python ./.github/workflows/scripts/test_driver.py
-          
-    
