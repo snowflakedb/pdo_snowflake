@@ -12,7 +12,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 
     /* INSERT very large numeric values in string */
     $count = $dbh->exec(
-        "create or replace table t (".
+        "create temporary table t (".
         "c1 int, ".
         "c2 number(38,4), ".
         "c3 number(38,0), ".

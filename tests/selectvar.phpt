@@ -9,7 +9,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
     echo "Connected to Snowflake\n";
 
-    $count = $dbh->exec("create or replace table t (c1 object, c2 array, c3 variant)");
+    $count = $dbh->exec("create temporary table t (c1 object, c2 array, c3 variant)");
     if ($count == 0) {
         print_r($dbh->errorInfo());
     }
