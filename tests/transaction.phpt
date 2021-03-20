@@ -13,7 +13,8 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
      */
     include __DIR__ . "/common.php";
 
-    $tablename = uniqid();
+    $unique_id = uniqid();
+    $tablename = "t" . unique_id;
     $dbh = new PDO($dsn, $user, $password);
     $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
     echo "Connected to Snowflake\n";
