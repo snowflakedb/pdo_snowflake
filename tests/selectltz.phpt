@@ -11,7 +11,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     echo "Connected to Snowflake\n";
 
     $count = $dbh->exec(
-        "create or replace table t (c1 int, c2 timestamp_ltz)");
+        "create temporary table t (c1 int, c2 timestamp_ltz)");
     if ($count == 0) {
         print_r($dbh->errorInfo());
     }
