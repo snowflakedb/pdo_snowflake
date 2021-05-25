@@ -44,16 +44,16 @@ int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
     PDO_LOG_ENTER("_pdo_snowflake_error");
     PDO_LOG_DBG("file=%s line=%d", file, line);
     if (stmt) {
-        PDO_LOG_DBG("stmt error");
+        PDO_LOG_ERR("stmt error");
         S = (pdo_snowflake_stmt *) stmt->driver_data;
         pdo_err = &stmt->error_code;
         einfo = &S->stmt->error;
     } else {
-        PDO_LOG_DBG("connection error");
+        PDO_LOG_ERR("connection error");
         pdo_err = &dbh->error_code;
         einfo = &H->server->error;
     }
-    PDO_LOG_DBG("error code: %ld", einfo->error_code);
+    PDO_LOG_ERR("error code: %ld", einfo->error_code);
 
     /* Adjust the file and line to reference to PDO source code instead of
      * Snowflake Client code. */
@@ -68,10 +68,10 @@ int _pdo_snowflake_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, const char *file,
 
     /* Set SQLSTATE */
     strcpy(*pdo_err, einfo->sqlstate);
-    PDO_LOG_DBG("sqlstate: %s, msg: %s", pdo_err, einfo->msg);
+    PDO_LOG_ERR("sqlstate: %s, msg: %s", pdo_err, einfo->msg);
 
     if (!dbh->methods) {
-        PDO_LOG_DBG("Failed to allocate DBH");
+        PDO_LOG_ERR("Failed to allocate DBH");
         // If the error occurs when intializing dbh, always raise an exception
         zend_throw_exception_ex(
             php_pdo_get_exception(),
