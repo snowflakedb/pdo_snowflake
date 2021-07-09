@@ -34,13 +34,19 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         # interesting behavior of PHP fetch in 7.x
         # When a numeric value N is taken as a column label,
         # No value is stored in the index 0 but the N+1 has.
-        # Fixed in 8.0 so skip this check
+        # Fixed in 8.0 so comment out weird checks
         # if (isset($row[0])) {
         #     echo "FAIL. row[0] should not be set.\n";
         # } else {
         #     echo "OK. row[0] is not set.\n";
         # }
-        echo "Result " . $row["5"] . "\n";
+        if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
+            echo "Result " . $row[0] . "\n";
+            echo "Result " . $row["4"] . "\n";
+        } else {
+            echo "Result " . $row["5"] . "\n";
+            echo "Result " . $row["5"] . "\n";
+        }
         echo "Count " . count($row) . "\n";
     }
 
@@ -57,6 +63,7 @@ Count 1
 Result 3
 OK. row["3"] is not set.
 Count 1
+Result 4
 Result 4
 Count 2
 ===DONE===
