@@ -63,7 +63,7 @@ Snowflake Error: 1003
 Connected to Snowflake
 
 Warning: PDO::query(): SQLSTATE[42000]: Syntax error or access violation: 1003 SQL compilation error:
-syntax error line 1 at position 16 unexpected 'dual'. in %s on line 20
+syntax error line 1 at position 16 unexpected 'dual'. in %s on line 21
 Connected to Snowflake
 sqlstate: 42000
 Snowflake Error: 1003
