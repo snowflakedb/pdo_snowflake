@@ -31,14 +31,15 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     }
     $sth = $dbh->query("select 4");
     while($row = $sth->fetch(PDO::FETCH_BOTH)) {
-        # interesting behavior of PHP fetch
+        # interesting behavior of PHP fetch in 7.x
         # When a numeric value N is taken as a column label,
         # No value is stored in the index 0 but the N+1 has.
-        if (isset($row[0])) {
-            echo "FAIL. row[0] should not be set.\n";
-        } else {
-            echo "OK. row[0] is not set.\n";
-        }
+        # Fixed in 8.0 so skip this check
+        # if (isset($row[0])) {
+        #     echo "FAIL. row[0] should not be set.\n";
+        # } else {
+        #     echo "OK. row[0] is not set.\n";
+        # }
         echo "Result " . $row["5"] . "\n";
         echo "Count " . count($row) . "\n";
     }
@@ -56,7 +57,6 @@ Count 1
 Result 3
 OK. row["3"] is not set.
 Count 1
-OK. row[0] is not set.
 Result 4
 Count 2
 ===DONE===

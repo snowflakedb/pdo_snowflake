@@ -7,6 +7,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     include __DIR__ . "/common.php";
 
     $dbh = new PDO($dsn, $user, $password);
+    $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT );
     echo 'Connected to Snowflake' . "\n";
     $sth = $dbh->query("select 1 frooom dual");
     $earr = $dbh->errorInfo();
