@@ -54,7 +54,7 @@ set vc_version=
 if "%vs_version%"=="VS16" (
     set cmake_generator=Visual Studio 16 2019
     set vsdir=vs16
-    set vc_version=vc16
+    set vc_version=vs16
 )
 if "%vs_version%"=="VS15" (
     set cmake_generator=Visual Studio 15 2017
