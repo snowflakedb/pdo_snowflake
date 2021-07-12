@@ -14,7 +14,7 @@ set scriptdir=%~dp0
 call "%scriptdir%\_init.bat" %platform% %build_type% %vs_version%
 if %ERRORLEVEL% NEQ 0 goto :error
 
-set php_sdk_version=php-sdk-2.1.10
+set php_sdk_version=php-sdk-2.2.0
 
 if not exist "%php_sdk_dir%" git clone https://github.com/Microsoft/php-sdk-binary-tools.git %php_sdk_dir%
 cd %php_sdk_dir%
