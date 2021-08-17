@@ -17,7 +17,7 @@ to connect to the Snowflake database.
 Prerequisites
 ================================================================================
 
-To build the Snowflake PHP PDO Driver, you must have the following software installed:
+In order to build the Snowflake PHP PDO Driver, you must have the following software installed:
 
 - On Windows: Visual Studio
 - On Linux:
@@ -30,18 +30,18 @@ To build the Snowflake PHP PDO Driver, you must have the following software inst
   - clang
   - cmake 2.8 or higher
 
-To install and use the Snowflake PHP PDO Driver, you must have the following software installed:
+In order to install and use the Snowflake PHP PDO Driver, you must have the following software installed:
 
-- PHP 7.3 or 7.4 (Note: support for PHP 7.2 is deprecated)
+- PHP 7.2
 - the :code:`php-pdo` extension
 - the :code:`php-json` extension
 
 Note: Some of the examples in the instructions refer to the ``php-fpm`` extension. This extension is not required.
 The driver also works with regular PHP CGI.
 
-To build the driver, you must install the PHP development package for your operating system.
+In addition, in order to build the driver, you must install the PHP development package for your operating system.
 
-If you are using PHP with an application server or web server (e.g. Apache or nginx), configure the server to handle
+Finally, if you are using PHP with an application server or web server (e.g. Apache or nginx), configure the server to handle
 requests for PHP pages. See the `PHP documentation <https://www.php.net/manual/en/install.php>`_ for details.
 
 Building the PHP PDO Driver
