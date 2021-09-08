@@ -65,6 +65,11 @@ if [[ "$PLATFORM" == "linux" ]]; then
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-s3.a \
         libsnowflakeclient/deps-build/linux/azure/lib/libazure-storage-lite.a \
         libsnowflakeclient/deps-build/linux/uuid/lib/libuuid.a \
+        libsnowflakeclient/deps-build/linux/arrow/lib/libarrow.a \
+        libsnowflakeclient/deps-build/linux/arrow_deps/lib/libjemalloc_pic.a \
+        libsnowflakeclient/deps-build/linux/boost/lib/libboost_filesystem.a \
+        libsnowflakeclient/deps-build/linux/boost/lib/libboost_regex.a \
+        libsnowflakeclient/deps-build/linux/boost/lib/libboost_system.a \
         -O2 \
         -Wl,--whole-archive \
         -Wl,--no-whole-archive \
@@ -94,6 +99,21 @@ elif [[ "$PLATFORM" == "darwin" ]]; then
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-cpp-sdk-core.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-cpp-sdk-s3.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/azure/lib/libazure-storage-lite.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow/lib/libarrow.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libflatbuffers.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libgflags.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libglog.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libjemalloc_pic.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/liblz4.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libsnappy.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libzstd.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libbrotlidec-static.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libbrotlienc-static.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libbrotlicommon-static.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/liblzo2.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/boost/lib/libboost_system.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/boost/lib/libboost_filesystem.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/boost/lib/libboost_regex.a \
         $LINK_OPTS \
         -o .libs/pdo_snowflake.so
 fi
