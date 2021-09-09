@@ -131,7 +131,7 @@ typedef enum SF_STATUS {
     SF_STATUS_ERROR_OUT_OF_RANGE = 240021,
     SF_STATUS_ERROR_NULL_POINTER = 240022,
     SF_STATUS_ERROR_BUFFER_TOO_SMALL = 240023,
-    SF_STATUS_ERROR_UNSUPPORTED_QUERY_RESULT_FORMAT = 240024,
+    SF_STATUS_ERROR_ATTEMPT_TO_RETRIEVE_FORCE_ARROW = 240024,
     SF_STATUS_ERROR_OTHER = 240025
 } SF_STATUS;
 
@@ -247,6 +247,7 @@ typedef struct SF_ERROR_STRUCT {
     char *file;
     int line;
 } SF_ERROR_STRUCT;
+
 /**
  * Snowflake database session context.
  */
@@ -333,13 +334,15 @@ typedef struct SF_STATS {
  * For certain applications, we may wish to capture
  * the raw response after issuing a query to Snowflake.
  * This is a structure used for capturing the results.
- * Note that these should always be constructed
- * with snowflake_query_result_capture_init(), and be
- * destructed with snowflake_query_result_capture_term().
+ * Note that the caller is responsible for managing the memory
+ * used for this, and that these should always be constructed
+ * with snowflake_query_result_capture_init().
  */
 typedef struct SF_QUERY_RESULT_CAPTURE {
     // The buffer for storing the results
     char* capture_buffer;
+    // Size of the buffer
+    size_t buffer_size;
     // Actual response size
     size_t actual_response_size;
 } SF_QUERY_RESULT_CAPTURE;
@@ -363,9 +366,9 @@ typedef struct SF_STMT {
     char request_id[SF_UUID4_LEN];
     SF_ERROR_STRUCT error;
     SF_CONNECT *connection;
-    void *qrf;
     char *sql_text;
-    void *result_set;
+    void *raw_results;
+    void *cur_row;
     int64 chunk_rowcount;
     int64 total_rowcount;
     int64 total_fieldcount;
@@ -427,6 +430,14 @@ typedef struct SF_TIMESTAMP {
  * @param input pointer to an uninitialized SF_QUERY_RESULT_CAPTURE struct pointer.
  */
 void STDCALL snowflake_query_result_capture_init(SF_QUERY_RESULT_CAPTURE **input);
+
+/**
+ * Checks whether the client is running in force_arrow mode.
+ *
+ * @param connection pointer to SF_CONNECT
+ * @return SF_BOOLEAN_TRUE if the connection is running in force_arrow mode, otherwise SF_BOOLEAN_FALSE
+ */
+sf_bool STDCALL snowflake_is_force_arrow_mode(const SF_CONNECT *connection);
 
 /**
  * Global Snowflake initialization.
@@ -686,15 +697,6 @@ SF_STATUS STDCALL snowflake_execute_with_capture(SF_STMT *sfstmt,
         SF_QUERY_RESULT_CAPTURE* result_capture);
 
 /**
- * Executes a statement with capture in describe only mode.
- * @param sfstmt SNOWFLAKE_STMT context.
- * @param result_capture pointer to a SF_QUERY_RESULT_CAPTURE
- * @return 0 if success, otherwise an errno is returned.
- */
-SF_STATUS STDCALL snowflake_describe_with_capture(SF_STMT *sfstmt,
-                                                  SF_QUERY_RESULT_CAPTURE *result_capture);
-
-/**
  * Fetches the next row for the statement and stores on the bound buffer
  * if any. Noop if no buffer is bound.
  *
@@ -779,22 +781,11 @@ const char *STDCALL snowflake_c_type_to_string(SF_C_TYPE type);
 
 /**
  * Internal: check connection parameters
-*
+ *
  * @param sf SF_CONNECT context
  * @return 0 if success, otherwise an errno is returned.
  */
 SF_STATUS STDCALL _snowflake_check_connection_parameters(SF_CONNECT *sf);
-
-/**
- * Internal: Advances the iterators of the result set object stored in sfstmt->result_set.
- *
- * If the query result format is ARROW, then advance to next column.
- * If the query result format is JSON, then advance to next row.
- *
- * @param sfstmt SF_STMT context
- * @return 0 if success, otherwise an errno is returned.
- */
-SF_STATUS STDCALL _snowflake_next(SF_STMT *sfstmt);
 
 /**
  * Converts a column in the current row into a boolean value (if a valid conversion exists).
