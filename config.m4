@@ -64,6 +64,21 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
     LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/aws/lib/libaws-cpp-sdk-core.a"
     LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/aws/lib/libaws-cpp-sdk-s3.a"
     LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/azure/lib/libazure-storage-lite.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/arrow/lib/libarrow.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/arrow_deps/lib/libflatbuffers.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/arrow_deps/lib/libgflags.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/arrow_deps/lib/libglog.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/arrow_deps/lib/libjemalloc_pic.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/arrow_deps/lib/liblz4.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/arrow_deps/lib/libsnappy.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/arrow_deps/lib/libzstd.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/arrow_deps/lib/libbrotlidec-static.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/arrow_deps/lib/libbrotlienc-static.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/arrow_deps/lib/libbrotlicommon-static.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/arrow_deps/lib/liblzo2.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/boost/lib/libboost_system.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/boost/lib/libboost_filesystem.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/boost/lib/libboost_regex.a"
   fi
   if test "$build_linux" == "yes"; then
     LDFLAGS="$LDFLAGS -Wl,--whole-archive"
@@ -75,6 +90,11 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
     LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/aws/lib64/libaws-cpp-sdk-core.a"
     LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/aws/lib64/libaws-cpp-sdk-s3.a"
     LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/azure/lib/libazure-storage-lite.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/arrow/lib/libarrow.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/arrow_deps/lib/libjemalloc_pic.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/boost/lib/libboost_filesystem.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/boost/lib/libboost_regex.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/boost/lib/libboost_system.a"
     LDFLAGS="$LDFLAGS -Wl,--no-whole-archive"
   fi
   dnl # IMPORTANT NOTE: Change scripts/build_pdo_snowflake.sh to update
