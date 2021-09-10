@@ -40,13 +40,6 @@ jobs:
             extensions: pdo, json
         
         
-        - uses: actions/checkout@v2
-        - name: setup python
-          uses: actions/setup-python@v2
-          with:
-            python-version: '2.x'
-
-
         - name: build driver
           run: python ./.github/workflows/scripts/build_driver.py
           
