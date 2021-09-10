@@ -23,6 +23,22 @@ set depsdir="%php_sdk_dir%\phpmaster\%vc_version%\%arch%\deps"
 
 :: Move libsnowflakeclient and dependency libraries to dependencies directory
 
+:: Move Arrow
+7z x "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\arrow\lib\arrow.zip" -o"%depsdir%\lib\" -y
+if %ERRORLEVEL% NEQ 0 goto :error
+xcopy ^
+    "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\arrow_deps\lib\*.lib" ^
+    "%depsdir%\lib\" ^
+    /v /y
+if %ERRORLEVEL% NEQ 0 goto :error
+
+:: Move Boost
+xcopy ^
+    "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\boost\lib\*.lib" ^
+    "%depsdir%\lib\" ^
+    /v /y
+if %ERRORLEVEL% NEQ 0 goto :error
+
 :: Move AWS
 xcopy ^
     "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\aws\lib\*.lib" ^

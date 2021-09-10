@@ -209,6 +209,7 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_TIMEZONE,
     SF_CON_SERVICE_NAME,
     SF_CON_AUTOCOMMIT,
+    SF_CON_APPLICATION,
     SF_DIR_QUERY_URL,
     SF_DIR_QUERY_URL_PARAM,
     SF_DIR_QUERY_TOKEN,
@@ -279,6 +280,9 @@ typedef struct SF_CONNECT {
     // Overrider application name and version
     char *application_name;
     char *application_version;
+
+    // Partner application name
+    char * application;
 
     // Session info
     char *token;

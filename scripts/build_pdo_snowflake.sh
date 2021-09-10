@@ -65,6 +65,11 @@ if [[ "$PLATFORM" == "linux" ]]; then
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-s3.a \
         libsnowflakeclient/deps-build/linux/azure/lib/libazure-storage-lite.a \
         libsnowflakeclient/deps-build/linux/uuid/lib/libuuid.a \
+        libsnowflakeclient/deps-build/linux/arrow/lib/libarrow.a \
+        libsnowflakeclient/deps-build/linux/arrow_deps/lib/libjemalloc_pic.a \
+        libsnowflakeclient/deps-build/linux/boost/lib/libboost_filesystem.a \
+        libsnowflakeclient/deps-build/linux/boost/lib/libboost_regex.a \
+        libsnowflakeclient/deps-build/linux/boost/lib/libboost_system.a \
         -O2 \
         -Wl,--whole-archive \
         -Wl,--no-whole-archive \
