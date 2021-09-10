@@ -7,7 +7,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     include __DIR__ . "/common.php";
 
     // full parameters
-    $dbh = new PDO($dsn, $user, $password);
+    $dbh = new PDO("$dsn;application=phptest", $user, $password);
     $dbh = null;
 
     if (!array_key_exists('SNOWFLAKE_TEST_HOST', $p)) {
