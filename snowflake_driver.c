@@ -483,7 +483,8 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"role",          NULL,      0},
         {"protocol",      "https",   0},
         {"insecure_mode", NULL,      0},
-        {"timezone",      NULL,      0}
+        {"timezone",      NULL,      0},
+        {"application",   NULL,      0}
     };
 
     // Parse the input data parameters
@@ -616,6 +617,15 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         "timezone: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_TIMEZONE_IDX].optval);
     PDO_LOG_DBG(
         "autocommit: %u", dbh->auto_commit);
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_APPLICATION_IDX].optval != NULL) {
+        /* applicaiton */
+        snowflake_set_attribute(
+            H->server, SF_CON_APPLICATION,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_APPLICATION_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "application: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_APPLICATION_IDX].optval);
 
     if (snowflake_connect(H->server) > 0) {
         pdo_snowflake_error(dbh);
