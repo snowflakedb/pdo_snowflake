@@ -17,7 +17,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: windows-2016
+    runs-on: windows-2019
     env:
       SNOWFLAKE_TEST_USER: ${{ secrets.SNOWFLAKE_TEST_USER }}
       SNOWFLAKE_TEST_PASSWORD: ${{ secrets.SNOWFLAKE_TEST_PASSWORD }}
