@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: build_test_windows_php7-4-21_vs16
+name: build_test_windows_php8-0-7_vs16
 
 # Controls when the action will run. 
 on:
