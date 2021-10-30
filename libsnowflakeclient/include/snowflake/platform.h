@@ -121,17 +121,11 @@ void STDCALL sf_log_timestamp(char* tsbuf, size_t tsbufsize);
 
 int STDCALL sf_create_directory_if_not_exists(const char * directoryName);
 
-int STDCALL sf_create_directory_if_not_exists_recursive(const char * directoryName);
-
-int STDCALL sf_is_directory_exist(const char * directoryName);
-
 int STDCALL sf_delete_directory_if_exists(const char * directoryName);
 
 void STDCALL sf_get_tmp_dir(char * tmpDir);
 
 void STDCALL sf_get_uniq_tmp_dir(char * tmpDir);
-
-void STDCALL sf_get_username(char * username, int bufLen);
 
 void STDCALL sf_delete_uniq_dir_if_exists(const char *tmpfile);
 
