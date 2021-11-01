@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: build_test_macos_php7-2-34
+name: build_test_macos_php8-0-7
 
 # Controls when the action will run. 
 on:
@@ -36,7 +36,7 @@ jobs:
         - name: setup php
           uses: shivammathur/setup-php@v2
           with:
-            php-version: 7.2.34
+            php-version: 8.0.7
             extensions: pdo, json
         
         
