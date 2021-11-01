@@ -59,7 +59,7 @@ struct StageInfo
 
   std::string storageAccount; //Required by Azure
 
-  std::string endPoint;       //Required by Azure
+  std::string endPoint;       //Required by Azure & for S3 FIPS
 
   std::string presignedUrl;   //Required by GCS for uploading
 
