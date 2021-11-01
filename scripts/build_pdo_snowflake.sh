@@ -91,21 +91,10 @@ elif [[ "$PLATFORM" == "darwin" ]]; then
         .libs/pdo_snowflake.o \
         .libs/snowflake_driver.o \
         .libs/snowflake_stmt.o \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow/lib/libarrow.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/boost/lib/libboost_system.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/boost/lib/libboost_filesystem.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/boost/lib/libboost_regex.a \
-        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow/lib/libarrow.a \
-        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libflatbuffers.a \
-        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libgflags.a \
-        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libglog.a \
-        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libjemalloc_pic.a \
-        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/liblz4.a \
-        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libsnappy.a \
-        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libzstd.a \
-        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libbrotlidec-static.a \
-        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libbrotlienc-static.a \
-        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/libbrotlicommon-static.a \
-        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow_deps/lib/liblzo2.a \
         -Wl,-force_load,libsnowflakeclient/lib/darwin/libsnowflakeclient.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/openssl/lib/libcrypto.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/openssl/lib/libssl.a \
