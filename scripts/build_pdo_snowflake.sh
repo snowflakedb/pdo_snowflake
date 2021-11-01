@@ -94,6 +94,7 @@ elif [[ "$PLATFORM" == "darwin" ]]; then
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/arrow/lib/libarrow.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/boost/lib/libboost_system.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/boost/lib/libboost_filesystem.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/boost/lib/libboost_regex.a \
         -Wl,-force_load,libsnowflakeclient/lib/darwin/libsnowflakeclient.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/openssl/lib/libcrypto.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/openssl/lib/libssl.a \
