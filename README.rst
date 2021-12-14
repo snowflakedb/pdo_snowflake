@@ -32,7 +32,7 @@ To build the Snowflake PHP PDO Driver, you must have the following software inst
 
 To install and use the Snowflake PHP PDO Driver, you must have the following software installed:
 
-- PHP 7.3 or 7.4 (Note: support for PHP 7.2 is deprecated)
+- PHP 8.0, 7.4 or 7.3 (Note: support for PHP 7.2 is deprecated)
 - the :code:`php-pdo` extension
 - the :code:`php-json` extension
 
