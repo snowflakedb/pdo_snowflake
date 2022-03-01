@@ -87,6 +87,14 @@ Building the Driver on Linux and macOS
 Building the Driver on Windows
 ------------------------------
 
+To build the PHP driver for Windows:
+
+#. Download and install the PHP software:
+
+    #. Download PHP 8.0.16 binaries from `https://windows.php.net/downloads/releases/php-8.0.16-Win32-vs16-x64.zip`_.
+
+    #. Unzip the file to :samp:`C:\php`.
+
 #. Clone the :code:`pdo_snowflake` repository:
 
    .. code-block:: batch
