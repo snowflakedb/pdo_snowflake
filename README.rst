@@ -89,6 +89,8 @@ Building the Driver on Windows
 
 .. |win-vs-version| replace:: VS16 8.0.16 
 
+.. note: Snowflake supports only thread-safe versions of PHP.
+
 To build the PHP driver for Windows:
 
 #. Download and install the PHP SDK software:
@@ -120,9 +122,9 @@ To build the PHP driver for Windows:
 
    For example:
 
-   .. code-block:: batch
+   .. parsed-literal::
 
-       .\scripts\setup_php_sdk.bat x64 Release |win-vs-version| C:\php-sdk
+       .\\scripts\\setup_php_sdk.bat x64 Release |win-vs-version| C:\\php-sdk
 
 #. Download and install the PHP binaries, or build PHP yourself.
 
@@ -151,11 +153,13 @@ To build the PHP driver for Windows:
 
    For example:
 
-   .. code-block:: batch
+   .. parsed-literal::
 
-       .\scripts\run_build_pdo_snowflake.bat x64 Release VS16 8.0.16 C:\php-sdk
+       .\\scripts\\run_build_pdo_snowflake.bat x64 Release |win-vs-version| C:\\php-sdk
 
-#. Copy the PHP
+#. Copy :code:`php_pdo_snowflake.dll` from the directory where you built the driver to the PHP extension 
+    directory (the same directory that contains the :code:`php_pdo.dll file`). Usually, the PHP extension 
+    directory is the :code:`ext` subdirectory in the directory where PHP is installed.
 
 #. Run the following command to verify that the driver can be loaded into memory successfully:
 
