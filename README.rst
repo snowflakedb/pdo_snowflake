@@ -89,7 +89,7 @@ Building the Driver on Windows
 
 .. |win-vs-version| replace:: VS16 8.0.16 
 
-To build the PHP driver for Windows:
+To build the |win-vs-version| PHP driver for Windows:
 
 #. Download and install the PHP SDK software:
 
@@ -122,7 +122,7 @@ To build the PHP driver for Windows:
 
    .. code-block:: batch
 
-       .\scripts\setup_php_sdk.bat x64 Release VS16 8.0.16 C:\php-sdk
+       .\scripts\setup_php_sdk.bat x64 Release |win-vs-version| C:\php-sdk
 
 #. Download and install the PHP binaries, or build PHP yourself.
 
@@ -139,7 +139,7 @@ To build the PHP driver for Windows:
 
    For example:
 
-   .. code-block:: batch
+   .. parsed-literal::
 
        .\scripts\run_setup_php.bat x64 Release |win-vs-version| C:\php-sdk
 
