@@ -87,13 +87,15 @@ Building the Driver on Linux and macOS
 Building the Driver on Windows
 ------------------------------
 
+.. |win-vs-version| replace:: VS16 8.0.16 
+
 To build the PHP driver for Windows:
 
-#. Download and install the PHP software:
+#. Download and install the PHP SDK software:
 
     #. Download PHP 8.0.16 binaries from `<https://windows.php.net/downloads/releases/php-8.0.16-Win32-vs16-x64.zip>`_.
 
-    #. Unzip the file to :code:`C:\php`.
+    #. Unzip the file to <path to PHP SDK>, such as :code:`C:\php`.
 
 #. Clone the :code:`pdo_snowflake` repository:
 
@@ -120,7 +122,7 @@ To build the PHP driver for Windows:
 
    .. code-block:: batch
 
-       .\scripts\setup_php_sdk.bat x64 Release VS15 C:\php-sdk
+       .\scripts\setup_php_sdk.bat x64 Release VS16 8.0.16 C:\php-sdk
 
 #. Download and install the PHP binaries, or build PHP yourself.
 
@@ -139,7 +141,7 @@ To build the PHP driver for Windows:
 
    .. code-block:: batch
 
-       .\scripts\run_setup_php.bat x64 Release VS15 7.2.24 C:\php-sdk
+       .\scripts\run_setup_php.bat x64 Release |win-vs-version| C:\php-sdk
 
 #. Run the script to build the driver:
 
@@ -151,7 +153,9 @@ To build the PHP driver for Windows:
 
    .. code-block:: batch
 
-       .\scripts\run_build_pdo_snowflake.bat x64 Release VS15 7.2.24 C:\php-sdk
+       .\scripts\run_build_pdo_snowflake.bat x64 Release VS16 8.0.16 C:\php-sdk
+
+#. Copy the PHP
 
 #. Run the following command to verify that the driver can be loaded into memory successfully:
 
