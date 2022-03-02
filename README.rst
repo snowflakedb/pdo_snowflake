@@ -89,8 +89,7 @@ Building the Driver on Windows
 
 .. |win-vs-version| replace:: VS16 8.0.16 
 
-.. note::
-    Snowflake supports only thread-safe versions of PHP.
+.. note:: Snowflake supports only thread-safe versions of PHP.
 
 To build the PHP driver for Windows:
 
