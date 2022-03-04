@@ -95,7 +95,7 @@ To build the PHP driver for Windows:
 
 #. Download and install the PHP SDK:
 
-    #. Download PHP |win-vs-version| binaries from `<https://windows.php.net/downloads/releases/php-8.0.16-Win32-vs16-x64.zip>`_.
+    #. Download PHP 8.0.16 binaries from `<https://windows.php.net/downloads/releases/php-8.0.16-Win32-vs16-x64.zip>`_.
 
     #. Unzip the file to <path to PHP SDK>, such as :code:`C:\php-sdk`.
 
