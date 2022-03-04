@@ -17,7 +17,7 @@ to connect to the Snowflake database.
 Prerequisites
 ================================================================================
 
-To build the Snowflake PHP PDO Driver, you must have the following software installed:
+To build the Snowflake PHP PDO Driver, the following software must be installed:
 
 - On Windows: Visual Studio
 - On Linux:
@@ -89,11 +89,11 @@ Building the Driver on Windows
 
 .. |win-vs-version| replace:: VS16 8.0.16 
 
-.. note:: Snowflake supports only thread-safe versions of PHP.
+**Note**: Snowflake supports only thread-safe versions of PHP.
 
 To build the PHP driver for Windows:
 
-#. Download and install the PHP SDK software:
+#. Download and install the PHP SDK:
 
     #. Download PHP 8.0.16 binaries from `<https://windows.php.net/downloads/releases/php-8.0.16-Win32-vs16-x64.zip>`_.
 
