@@ -149,9 +149,15 @@ static int pdo_snowflake_stmt_execute(pdo_stmt_t *stmt) /* {{{ */
     }
 
     // TODO: stmt->active_query_stringlen should be specified.
+#if (PHP_VERSION_ID >= 80100)
+    if (snowflake_query(S->stmt, ZSTR_VAL(stmt->active_query_string),
+                        ZSTR_LEN(stmt->active_query_string)) !=
+        SF_STATUS_SUCCESS) {
+#else
     if (snowflake_query(S->stmt, stmt->active_query_string,
                         stmt->active_query_stringlen) !=
         SF_STATUS_SUCCESS) {
+#endif
         PDO_LOG_RETURN(0);
     }
     PDO_LOG_RETURN(1);
@@ -254,7 +260,9 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
         }
         cols[i].name = zend_string_init(
           F[i].name, strlen(F[i].name), 0);
+#if (PHP_VERSION_ID < 80100)
         cols[i].param_type = PDO_PARAM_STR; /* Always string */
+#endif
     }
     PDO_LOG_RETURN(1);
 }
@@ -635,6 +643,7 @@ static int pdo_snowflake_stmt_cursor_closer(pdo_stmt_t *stmt) /* {{{ */
 
 /* }}} */
 
+#if (PHP_VERSION_ID < 80100)
 struct pdo_stmt_methods snowflake_stmt_methods = {
   pdo_snowflake_stmt_dtor,
   pdo_snowflake_stmt_execute,
@@ -648,3 +657,34 @@ struct pdo_stmt_methods snowflake_stmt_methods = {
   pdo_snowflake_stmt_next_rowset,
   pdo_snowflake_stmt_cursor_closer
 };
+#else
+static int pdo_snowflake_stmt_get_col_newif(
+    pdo_stmt_t *stmt, int colno, zval *result, enum pdo_param_type *type)
+{
+    char* str = NULL;
+    size_t len = 0;
+    int ret = pdo_snowflake_stmt_get_col(stmt, colno, &str, &len, NULL);
+    if (len > 0)
+    {
+        ZVAL_STRINGL(result, str, len);
+    }
+    else
+    {
+        ZVAL_EMPTY_STRING(result);
+    }
+    return ret;
+}
+struct pdo_stmt_methods snowflake_stmt_methods = {
+  pdo_snowflake_stmt_dtor,
+  pdo_snowflake_stmt_execute,
+  pdo_snowflake_stmt_fetch,
+  pdo_snowflake_stmt_describe,
+  pdo_snowflake_stmt_get_col_newif,
+  pdo_snowflake_stmt_param_hook,
+  NULL, /* set_attr */
+  NULL, /* get_attr */
+  pdo_snowflake_stmt_col_meta,
+  pdo_snowflake_stmt_next_rowset,
+  pdo_snowflake_stmt_cursor_closer
+};
+#endif
