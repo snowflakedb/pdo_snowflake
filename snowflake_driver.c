@@ -493,6 +493,10 @@ static zend_result pdo_snowflake_check_liveness_newif(pdo_dbh_t *dbh)
 {
     return (pdo_snowflake_check_liveness(dbh) == 0) ? FAILURE : SUCCESS;
 }
+static void pdo_snowflake_fetch_error_func_newif(pdo_dbh_t *dbh, pdo_stmt_t *stmt, zval *info)
+{
+    pdo_snowflake_fetch_error_func(dbh, stmt, info);
+}
 static struct pdo_dbh_methods snowflake_methods = {
     snowflake_handle_closer_newif,
     snowflake_handle_preparer_newif,
@@ -503,7 +507,7 @@ static struct pdo_dbh_methods snowflake_methods = {
     snowflake_handle_rollback_newif,
     pdo_snowflake_set_attribute_newif,
     pdo_snowflake_last_insert_id_newif,
-    pdo_snowflake_fetch_error_func,
+    pdo_snowflake_fetch_error_func_newif,
     pdo_snowflake_get_attribute,
     pdo_snowflake_check_liveness_newif,
     NULL, /* get_driver_methods */
