@@ -17,7 +17,7 @@ to connect to the Snowflake database.
 Prerequisites
 ================================================================================
 
-To build the Snowflake PHP PDO Driver, you must have the following software installed:
+To build the Snowflake PHP PDO Driver, the following software must be installed:
 
 - On Windows: Visual Studio
 - On Linux:
@@ -87,6 +87,18 @@ Building the Driver on Linux and macOS
 Building the Driver on Windows
 ------------------------------
 
+.. |win-vs-version| replace:: VS16 8.0.16 
+
+**Note**: Snowflake supports only thread-safe versions of PHP.
+
+To build the PHP driver for Windows:
+
+#. Download and install the PHP SDK:
+
+    #. Download PHP 8.0.16 binaries from `<https://windows.php.net/downloads/releases/php-8.0.16-Win32-vs16-x64.zip>`_.
+
+    #. Unzip the file to <path to PHP SDK>, such as :code:`C:\php-sdk`.
+
 #. Clone the :code:`pdo_snowflake` repository:
 
    .. code-block:: batch
@@ -110,9 +122,9 @@ Building the Driver on Windows
 
    For example:
 
-   .. code-block:: batch
+   .. parsed-literal::
 
-       .\scripts\setup_php_sdk.bat x64 Release VS15 C:\php-sdk
+       .\\scripts\\setup_php_sdk.bat x64 Release |win-vs-version| C:\\php-sdk
 
 #. Download and install the PHP binaries, or build PHP yourself.
 
@@ -129,9 +141,9 @@ Building the Driver on Windows
 
    For example:
 
-   .. code-block:: batch
+   .. parsed-literal::
 
-       .\scripts\run_setup_php.bat x64 Release VS15 7.2.24 C:\php-sdk
+       .\\scripts\\run_setup_php.bat x64 Release |win-vs-version| C:\\php-sdk
 
 #. Run the script to build the driver:
 
@@ -141,9 +153,13 @@ Building the Driver on Windows
 
    For example:
 
-   .. code-block:: batch
+   .. parsed-literal::
 
-       .\scripts\run_build_pdo_snowflake.bat x64 Release VS15 7.2.24 C:\php-sdk
+       .\\scripts\\run_build_pdo_snowflake.bat x64 Release |win-vs-version| C:\\php-sdk
+
+#.  Copy :code:`php_pdo_snowflake.dll` from the directory where you built the driver to the PHP extension 
+    directory (the same directory that contains the :code:`php_pdo.dll file`). Usually, the PHP extension 
+    directory is the :code:`ext` subdirectory in the directory where PHP is installed.
 
 #. Run the following command to verify that the driver can be loaded into memory successfully:
 
