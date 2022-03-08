@@ -23,11 +23,11 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     $sth->execute();
     $sth = $dbh->query("select * from t order by 1");
     $meta = $sth->getColumnMeta(0);
-    print_r($meta);
+    echo sprintf("name: %s, native_type: %s, scale: %s, precision: %s, len: %s\n", $meta["name"], $meta["native_type"], $meta["scale"], $meta["precision"], $meta["len"]);
     $meta = $sth->getColumnMeta(1);
-    print_r($meta);
+    echo sprintf("name: %s, native_type: %s, scale: %s, precision: %s, len: %s\n", $meta["name"], $meta["native_type"], $meta["scale"], $meta["precision"], $meta["len"]);
     $meta = $sth->getColumnMeta(2);
-    print_r($meta);
+    echo sprintf("name: %s, native_type: %s, scale: %s, precision: %s, len: %s\n", $meta["name"], $meta["native_type"], $meta["scale"], $meta["precision"], $meta["len"]);
     while($row = $sth->fetch()) {
         print_r(json_decode($row["C1"], true));
         print_r(json_decode($row["C2"], true));
@@ -42,45 +42,9 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php exit(0); ?>
 --EXPECT--
 Connected to Snowflake
-Array
-(
-    [scale] => 0
-    [native_type] => OBJECT
-    [flags] => Array
-        (
-        )
-
-    [name] => C1
-    [len] => 16777216
-    [precision] => 0
-    [pdo_type] => 2
-)
-Array
-(
-    [scale] => 0
-    [native_type] => ARRAY
-    [flags] => Array
-        (
-        )
-
-    [name] => C2
-    [len] => 16777216
-    [precision] => 0
-    [pdo_type] => 2
-)
-Array
-(
-    [scale] => 0
-    [native_type] => VARIANT
-    [flags] => Array
-        (
-        )
-
-    [name] => C3
-    [len] => 16777216
-    [precision] => 0
-    [pdo_type] => 2
-)
+name: C1, native_type: OBJECT, scale: 0, precision: 0, len: 16777216
+name: C2, native_type: ARRAY, scale: 0, precision: 0, len: 16777216
+name: C3, native_type: VARIANT, scale: 0, precision: 0, len: 16777216
 Array
 (
     [test1] => 1

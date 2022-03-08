@@ -77,15 +77,15 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     $sth = $dbh->query("select * from t order by 1");
 
     $meta = $sth->getColumnMeta(0);
-    print_r($meta);
+    echo sprintf("name: %s, native_type: %s, scale: %s, precision: %s, len: %s\n", $meta["name"], $meta["native_type"], $meta["scale"], $meta["precision"], $meta["len"]);
     $meta = $sth->getColumnMeta(1);
-    print_r($meta);
+    echo sprintf("name: %s, native_type: %s, scale: %s, precision: %s, len: %s\n", $meta["name"], $meta["native_type"], $meta["scale"], $meta["precision"], $meta["len"]);
     $meta = $sth->getColumnMeta(2);
-    print_r($meta);
+    echo sprintf("name: %s, native_type: %s, scale: %s, precision: %s, len: %s\n", $meta["name"], $meta["native_type"], $meta["scale"], $meta["precision"], $meta["len"]);
     $meta = $sth->getColumnMeta(3);
-    print_r($meta);
+    echo sprintf("name: %s, native_type: %s, scale: %s, precision: %s, len: %s\n", $meta["name"], $meta["native_type"], $meta["scale"], $meta["precision"], $meta["len"]);
     $meta = $sth->getColumnMeta(4);
-    print_r($meta);
+    echo sprintf("name: %s, native_type: %s, scale: %s, precision: %s, len: %s\n", $meta["name"], $meta["native_type"], $meta["scale"], $meta["precision"], $meta["len"]);
 
     echo "Results in String\n";
     while($row = $sth->fetch()) {
@@ -119,71 +119,11 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php exit(0); ?>
 --EXPECT--
 Connected to Snowflake
-Array
-(
-    [scale] => 0
-    [native_type] => FIXED
-    [flags] => Array
-        (
-        )
-
-    [name] => C1
-    [len] => 0
-    [precision] => 38
-    [pdo_type] => 2
-)
-Array
-(
-    [scale] => 4
-    [native_type] => FIXED
-    [flags] => Array
-        (
-        )
-
-    [name] => C2
-    [len] => 0
-    [precision] => 38
-    [pdo_type] => 2
-)
-Array
-(
-    [scale] => 0
-    [native_type] => FIXED
-    [flags] => Array
-        (
-        )
-
-    [name] => C3
-    [len] => 0
-    [precision] => 38
-    [pdo_type] => 2
-)
-Array
-(
-    [scale] => 0
-    [native_type] => FIXED
-    [flags] => Array
-        (
-        )
-
-    [name] => C4
-    [len] => 0
-    [precision] => 18
-    [pdo_type] => 2
-)
-Array
-(
-    [scale] => 2
-    [native_type] => FIXED
-    [flags] => Array
-        (
-        )
-
-    [name] => C5
-    [len] => 0
-    [precision] => 18
-    [pdo_type] => 2
-)
+name: C1, native_type: FIXED, scale: 0, precision: 38, len: 0
+name: C2, native_type: FIXED, scale: 4, precision: 38, len: 0
+name: C3, native_type: FIXED, scale: 0, precision: 38, len: 0
+name: C4, native_type: FIXED, scale: 0, precision: 18, len: 0
+name: C5, native_type: FIXED, scale: 2, precision: 18, len: 0
 Results in String
 C1: 1, C2: 1234567890123456789012345678901234.5678, C3: 98765432109876543210987654321098765432, C4: 123456789012345678, C5: 1234567890123456.78
 C1: 2, C2: 123.4560, C3: 10, C4: 10, C5: 0.00
