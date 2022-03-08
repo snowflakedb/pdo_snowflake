@@ -29,10 +29,19 @@ jobs:
       ARCH: x64
       TARGET: Release
       VS: VS16
-      PHP: 8.1
       TEST_PHP_EXECUTABLE: c:\tools\php\php.exe
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - uses: actions/checkout@v2
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: setup php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: pdo, json
+        env:
+          phpts: ts
+
       - name: build driver
         run: python .\.github\workflows\scripts\build_driver.py
         shell: cmd
