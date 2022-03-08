@@ -29,6 +29,7 @@ jobs:
       ARCH: x64
       TARGET: Release
       VS: VS16
+      PHP: 8.1
       TEST_PHP_EXECUTABLE: c:\tools\php\php.exe
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
