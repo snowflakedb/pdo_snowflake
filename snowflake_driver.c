@@ -430,6 +430,7 @@ static int pdo_snowflake_check_liveness(pdo_dbh_t *dbh) /* {{{ */
 /* }}} */
 
 /* {{{ snowflake_methods */
+#if (PHP_VERSION_ID < 80100)
 static struct pdo_dbh_methods snowflake_methods = {
     snowflake_handle_closer,
     snowflake_handle_preparer,
@@ -447,6 +448,73 @@ static struct pdo_dbh_methods snowflake_methods = {
     NULL, /* persistent_shutdown */
     NULL /* in_transaction*/
 };
+#else
+static void snowflake_handle_closer_newif(pdo_dbh_t *dbh)
+{
+    snowflake_handle_closer(dbh);
+}
+static bool snowflake_handle_preparer_newif(pdo_dbh_t *dbh, zend_string *sql, pdo_stmt_t *stmt, zval *driver_options)
+{
+    return (snowflake_handle_preparer(dbh, ZSTR_VAL(sql), ZSTR_LEN(sql), stmt, driver_options) != 0);
+}
+static zend_long snowflake_handle_doer_newif(pdo_dbh_t *dbh, const zend_string *sql)
+{
+    return snowflake_handle_doer(dbh, ZSTR_VAL(sql), ZSTR_LEN(sql));
+}
+static zend_string* snowflake_handle_quoter_newif(pdo_dbh_t *dbh, const zend_string *unquoted, enum pdo_param_type paramtype)
+{
+    PDO_LOG_ENTER("snowflake_handle_quoter");
+    /* NOT SUPPORTED */
+    PDO_LOG_RETURN(0);
+}
+static bool snowflake_handle_begin_newif(pdo_dbh_t *dbh)
+{
+    return (snowflake_handle_begin(dbh) != 0);
+}
+static bool snowflake_handle_commit_newif(pdo_dbh_t *dbh)
+{
+    return (snowflake_handle_commit(dbh) != 0);
+}
+static bool snowflake_handle_rollback_newif(pdo_dbh_t *dbh)
+{
+    return (snowflake_handle_rollback(dbh) != 0);
+}
+static bool pdo_snowflake_set_attribute_newif(pdo_dbh_t *dbh, zend_long attr, zval *val)
+{
+    return (pdo_snowflake_set_attribute(dbh, attr, val) != 0);
+}
+static zend_string * pdo_snowflake_last_insert_id_newif(pdo_dbh_t *dbh, const zend_string *name)
+{
+    PDO_LOG_ENTER("pdo_snowflake_last_insert_id");
+    /* NOT SUPPORTED */
+    PDO_LOG_RETURN(0);
+}
+static zend_result pdo_snowflake_check_liveness_newif(pdo_dbh_t *dbh)
+{
+    return (pdo_snowflake_check_liveness(dbh) == 0) ? FAILURE : SUCCESS;
+}
+static void pdo_snowflake_fetch_error_func_newif(pdo_dbh_t *dbh, pdo_stmt_t *stmt, zval *info)
+{
+    pdo_snowflake_fetch_error_func(dbh, stmt, info);
+}
+static struct pdo_dbh_methods snowflake_methods = {
+    snowflake_handle_closer_newif,
+    snowflake_handle_preparer_newif,
+    snowflake_handle_doer_newif,
+    snowflake_handle_quoter_newif,
+    snowflake_handle_begin_newif,
+    snowflake_handle_commit_newif,
+    snowflake_handle_rollback_newif,
+    pdo_snowflake_set_attribute_newif,
+    pdo_snowflake_last_insert_id_newif,
+    pdo_snowflake_fetch_error_func_newif,
+    pdo_snowflake_get_attribute,
+    pdo_snowflake_check_liveness_newif,
+    NULL, /* get_driver_methods */
+    NULL, /* persistent_shutdown */
+    NULL /* in_transaction*/
+};
+#endif
 /* }}} */
 
 /**

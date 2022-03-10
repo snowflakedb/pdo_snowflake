@@ -73,9 +73,9 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     $sth = $dbh->query("select * from t order by 1");
 
     $meta = $sth->getColumnMeta(0);
-    print_r($meta);
+    echo sprintf("name: %s, native_type: %s, scale: %s, precision: %s, len: %s\n", $meta["name"], $meta["native_type"], $meta["scale"], $meta["precision"], $meta["len"]);
     $meta = $sth->getColumnMeta(1);
-    print_r($meta);
+    echo sprintf("name: %s, native_type: %s, scale: %s, precision: %s, len: %s\n", $meta["name"], $meta["native_type"], $meta["scale"], $meta["precision"], $meta["len"]);
 
     echo "Results in String\n";
     while($row = $sth->fetch()) {
@@ -92,32 +92,8 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 Connected to Snowflake
 Expected ERR: testcase #6 -- 100040
 Expected ERR: testcase #7 -- 100040
-Array
-(
-    [scale] => 0
-    [native_type] => FIXED
-    [flags] => Array
-        (
-        )
-
-    [name] => C1
-    [len] => 0
-    [precision] => 38
-    [pdo_type] => 2
-)
-Array
-(
-    [scale] => 0
-    [native_type] => DATE
-    [flags] => Array
-        (
-        )
-
-    [name] => C2
-    [len] => 0
-    [precision] => 0
-    [pdo_type] => 2
-)
+name: C1, native_type: FIXED, scale: 0, precision: 38, len: 0
+name: C2, native_type: DATE, scale: 0, precision: 0, len: 0
 Results in String
 C1: 1, C2: 1989-12-30
 C1: 2, C2: 1701-05-21

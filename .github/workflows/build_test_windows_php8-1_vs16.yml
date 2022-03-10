@@ -1,8 +1,8 @@
 # This is a basic workflow to help you get started with Actions
 
-name: build_test_windows_php7-2-34_vs15
+name: build_test_windows_php8-1_vs16
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Allows you to run this workflow manually from the Actions tab
   push:
@@ -17,7 +17,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: windows-2016
+    runs-on: windows-2019
     env:
       SNOWFLAKE_TEST_USER: ${{ secrets.SNOWFLAKE_TEST_USER }}
       SNOWFLAKE_TEST_PASSWORD: ${{ secrets.SNOWFLAKE_TEST_PASSWORD }}
@@ -28,8 +28,8 @@ jobs:
       SNOWFLAKE_TEST_ROLE: ${{ secrets.SNOWFLAKE_TEST_ROLE }}
       ARCH: x64
       TARGET: Release
-      VS: VS15
-      PHP: 7.2.34
+      VS: VS16
+      PHP: 8.1
       TEST_PHP_EXECUTABLE: c:\tools\php\php.exe
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -38,16 +38,16 @@ jobs:
       - name: setup php
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.2.34
+          php-version: '8.1'
           extensions: pdo, json
         env:
           phpts: ts
-          
+
       - name: build driver
         run: python .\.github\workflows\scripts\build_driver.py
         shell: cmd
-      
-      
+
+
       - name: test driver
         run: python .\.github\workflows\scripts\test_driver.py
         shell: cmd
