@@ -47,7 +47,10 @@ jobs:
             version: ${{ matrix.php-versions }}
           run: |
             sudo apt-get install -y php$version-fpm
-            sudo service php$version-fpm start
+            sudo ls -l /usr/sbin/php*
+            sudo ls -l /usr/bin/php*
+            sudo ls -l /usr/local/bin/php*
+            sudo ls -l /usr/local/sbin/php*
 
         #- name: setup valgrind
         #  run: |
