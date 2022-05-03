@@ -49,8 +49,6 @@ def test_windows():
 def test_posix():
     print("====> Read Test config from env")
     use_valgrind = os.environ.get('USE_VALGRIND', 'false')
-    use_fpm = os.environ.get('USE_FPM', 'false')
-    fpm_path = os.environ.get('FPM_PATH', '')
     ropo = os.environ.get('GITHUB_WORKSPACE')
     print("====> testing snowflake driver")
     print("====> working directory: " + ropo)
@@ -65,10 +63,7 @@ def test_posix():
     run_test_options = ""
     if use_valgrind == 'true' or use_valgrind == '1':
         run_test_options = run_test_options + ' -m'
-    if use_fpm == 'true' or use_fpm == '1':
-        run_command(fpm_path + " -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' ./run-tests.php -d extension=modules/pdo_snowflake.so" + run_test_options)
-    else :
-        run_command("php -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' ./run-tests.php -d extension=modules/pdo_snowflake.so" + run_test_options)
+    run_command("php -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' ./run-tests.php -d extension=modules/pdo_snowflake.so" + run_test_options)
     print ("====> parse test results")
     run_command("python ./.github/workflows/scripts/check_result.py ./tests")
 
