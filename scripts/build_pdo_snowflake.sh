@@ -46,7 +46,7 @@ if [[ -n "$REPORT_COVERAGE" ]]; then
 fi
 if [[ "$PLATFORM" == "linux" ]]; then
     echo "Linking for Linux"
-    cc -shared \
+    g++ -shared \
         -fPIC \
         -DPIC \
         .libs/pdo_snowflake.o \
