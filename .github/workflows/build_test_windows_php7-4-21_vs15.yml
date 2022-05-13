@@ -28,7 +28,7 @@ jobs:
       SNOWFLAKE_TEST_ROLE: ${{ secrets.SNOWFLAKE_TEST_ROLE }}
       ARCH: x64
       TARGET: Release
-      VS: VS15
+      VS: VS16
       PHP: 7.4.21
       TEST_PHP_EXECUTABLE: c:\tools\php\php.exe
     # Steps represent a sequence of tasks that will be executed as part of the job
