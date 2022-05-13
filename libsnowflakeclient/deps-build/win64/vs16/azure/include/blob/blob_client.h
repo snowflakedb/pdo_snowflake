@@ -54,6 +54,33 @@ namespace azure { namespace storage_lite {
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="azure::storage_lite::blob_client" /> class.
+        /// </summary>
+        /// <param name="account">An existing <see cref="azure::storage_lite::storage_account" /> object.</param>
+        /// <param name="max_concurrency">An int value indicates the maximum concurrency expected during execute requests against the service.</param>
+        /// <param name="ca_path">A string value with absolute path to CA bundle location.</param>
+        /// <param name="proxy_host">A string value with proxy host in format http://host or https://host.</param>
+        /// <param name="proxy_port">A unsigned int value with proxy port number.</param>
+        /// <param name="proxy_user">A string value with proxy user name.</param>
+        /// <param name="proxy_password">A string value with proxy user password.</param>
+        /// <param name="no_proxy">A string value with a host list don't require proxy.</param>
+        blob_client(std::shared_ptr<storage_account> account,
+                    int max_concurrency,
+                    const std::string& ca_path,
+                    const std::string& proxy_host,
+                    unsigned proxy_port,
+                    const std::string& proxy_user,
+                    const std::string& proxy_password,
+                    const std::string& no_proxy)
+            : m_account(account)
+        {
+            m_context = std::make_shared<executor_context>(std::make_shared<tinyxml2_parser>(), std::make_shared<retry_policy>());
+            m_client = std::make_shared<CurlEasyClient>(
+                           max_concurrency, ca_path, proxy_host, proxy_port,
+                           proxy_user, proxy_password, no_proxy);
+        }
+
+        /// <summary>
         /// Gets the curl client used to execute requests.
         /// </summary>
         /// <returns>The <see cref="azure::storage_lite::CurlEasyClient"> object</returns>

@@ -8,6 +8,7 @@
 #include "ITransferResult.hpp"
 #include "ISFLogger.hpp"
 #include "IStatementPutGet.hpp"
+#include "Proxy.hpp"
 
 namespace Snowflake
 {
@@ -19,7 +20,17 @@ namespace Client
  */
 struct TransferConfig
 {
+  TransferConfig() :
+    caBundleFile(NULL),
+    tempDir(NULL),
+    useS3regionalUrl(false),
+    compressLevel(-1),
+    proxy(NULL) {}
   char * caBundleFile;
+  char * tempDir;
+  bool useS3regionalUrl;
+  int compressLevel;
+  Util::Proxy * proxy;
 };
 
 class IFileTransferAgent
@@ -77,6 +88,18 @@ public:
    * @param maxRetries: max number of retries.
    */
   virtual void setPutMaxRetries(int maxRetries){};
+
+  /**
+  * Enable fast fail for get by setting it to true.
+  * @param getFastFail
+  */
+  virtual void setGetFastFail(bool getFastFail) {};
+
+  /**
+  * Set max number of retries for get fails
+  * @param maxRetries: max number of retries.
+  */
+  virtual void setGetMaxRetries(int maxRetries) {};
 
 };
 
