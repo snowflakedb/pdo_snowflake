@@ -106,6 +106,11 @@ namespace Aws
             */
             Aws::String proxyPassword;
             /**
+            * If you have users going through a proxy, set the list of host
+            * names that do not require a proxy here.
+            */
+            Aws::String noProxy;
+            /**
             * Threading Executor implementation. Default uses std::thread::detach()
             */
             std::shared_ptr<Aws::Utils::Threading::Executor> executor;

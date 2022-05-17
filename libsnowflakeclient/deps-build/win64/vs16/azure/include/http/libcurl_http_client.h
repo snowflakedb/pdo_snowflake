@@ -305,6 +305,36 @@ namespace azure {  namespace storage_lite {
             }
         }
 
+        //Sets CURL CA BUNDLE location and proxy settings for all the curl handlers.
+        CurlEasyClient(int size,
+                       const std::string& ca_path,
+                       const std::string& proxy_host,
+                       unsigned proxy_port,
+                       const std::string& proxy_user,
+                       const std::string& proxy_password,
+                       const std::string& no_proxy
+                       ) : m_size(size), m_caPath(ca_path)
+        {
+            curl_global_init(CURL_GLOBAL_DEFAULT);
+            for (int i = 0; i < m_size; i++) {
+                CURL *h = curl_easy_init();
+                curl_easy_setopt(h, CURLOPT_CAINFO, m_caPath.c_str());
+                if (proxy_host.empty())
+                {
+                  curl_easy_setopt(h, CURLOPT_PROXY, "");
+                }
+                else
+                {
+                  curl_easy_setopt(h, CURLOPT_PROXY, proxy_host.c_str());
+                  curl_easy_setopt(h, CURLOPT_PROXYPORT, (long) proxy_port);
+                  curl_easy_setopt(h, CURLOPT_PROXYUSERNAME, proxy_user.c_str());
+                  curl_easy_setopt(h, CURLOPT_PROXYPASSWORD, proxy_password.c_str());
+                  curl_easy_setopt(h, CURLOPT_NOPROXY, no_proxy.c_str());
+                }
+                m_handles.push(h);
+            }
+        }
+
         ~CurlEasyClient() {
             while (!m_handles.empty())
             {

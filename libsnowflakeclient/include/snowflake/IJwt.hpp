@@ -91,6 +91,16 @@ public:
   virtual std::string getClaimInString(const std::string &key) = 0;
 
   /**
+   * Get a claim from the claim set with internal buffer for c interface
+   * in jwtWrapper
+   */
+  virtual const char* getClaimInStringConstBuf(const std::string &key)
+  {
+    m_claimString = getClaimInString(key);
+    return m_claimString.c_str();
+  }
+
+  /**
    * Get a claim from the claim set in long type
    */
   virtual long getClaimInLong(const std::string &key) = 0;
@@ -112,6 +122,12 @@ public:
 
 protected:
   IClaimSet() = default;
+
+private:
+  /**
+   * string buffer to hold string data returned from jwtWrapper
+   */
+  std::string m_claimString;
 };
 
 /**
@@ -161,6 +177,15 @@ public:
    virtual std::string getCustomHeaderEntry(const std::string header_type) = 0;
 
   /**
+   * Get custom field in header with interal buffer for c interface in jwtWrapper
+   */
+  virtual const char* getCustomHeaderEntryConstBuf(const std::string& header_type)
+  {
+    m_customHeaderEntry = getCustomHeaderEntry(header_type);
+    return m_customHeaderEntry.c_str();
+  }
+
+  /**
    * Serialize the header
    * @return serialized string in base64urlencoded
    */
@@ -168,6 +193,12 @@ public:
 
 protected:
   IHeader() = default;
+
+private:
+  /**
+   * string buffer to hold string data returned from jwtWrapper
+   */
+  std::string m_customHeaderEntry;
 };
 
 /**
@@ -210,6 +241,15 @@ public:
   virtual std::string serialize(EVP_PKEY *key) = 0;
 
   /**
+   * Get serialize string with interal buffer for c interface in jwtWrapper
+   */
+  virtual const char* serializeConstBuf(EVP_PKEY *key)
+  {
+    m_serializedString = serialize(key);
+    return m_serializedString.c_str();
+  }
+
+  /**
    * Verify the JWT is valid using the public key
    * @usedBy authenticator
    */
@@ -229,6 +269,12 @@ public:
 
 protected:
   IJwt() = default;
+
+private:
+  /**
+   * string buffer to hold string data returned from jwtWrapper
+   */
+  std::string m_serializedString;
 };
 
 } // namespace Jwt
