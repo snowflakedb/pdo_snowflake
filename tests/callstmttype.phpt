@@ -6,14 +6,11 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php
     include __DIR__ . "/common.php";
     $dbh = new PDO($dsn, $user, $password);
-    $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+    $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
     echo "Connected to Snowflake\n";
 
     $count = $dbh->exec(
 	    "ALTER SESSION SET USE_STATEMENT_TYPE_CALL_FOR_STORED_PROC_CALLS = true");
-    if ($count == 0) {
-        print_r($dbh->errorInfo());
-    }
 
     $count = $dbh->exec(
         "create or replace procedure " .
