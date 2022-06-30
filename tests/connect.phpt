@@ -9,7 +9,8 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     // full parameters
     $dbh = new PDO("$dsn;application=phptest", $user, $password);
     // create table for testing autocommit later
-    $count = $dbh->exec("create or replace table autocommittest(c1 int)");
+    $tablename = "autocommittest" . rand();
+    $count = $dbh->exec("create or replace table " . $tablename . "(c1 int)");
     if ($count == 0) {
         print_r($dbh->errorInfo());
     }
@@ -28,39 +29,39 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     // default to true
     $dbh = new PDO("$dsn;application=phptest", $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
     // insert a row and the result will be tested later
-    $dbh->exec("insert into autocommittest values (1)");
+    $dbh->exec("insert into " . $tablename . " values (1)");
     $dbh = null;
 
     // set to true
     $dbh = new PDO("$dsn;application=phptest", $user, $password, [PDO::ATTR_AUTOCOMMIT => true]);
     // check the result of previous test
-    $sth = $dbh->query("select count(*) from autocommittest");
+    $sth = $dbh->query("select count(*) from " . $tablename);
     while($row = $sth->fetch()) {
         echo $row[0] . "\n";
     }
     // insert a row and the result will be tested later
-    $dbh->exec("insert into autocommittest values (2)");
+    $dbh->exec("insert into " . $tablename . " values (2)");
     $dbh = null;
 
     // set to false
     $dbh = new PDO("$dsn;application=phptest", $user, $password, [PDO::ATTR_AUTOCOMMIT => false]);
     // check the result of previous test
-    $sth = $dbh->query("select count(*) from autocommittest");
+    $sth = $dbh->query("select count(*) from " . $tablename);
     while($row = $sth->fetch()) {
         echo $row[0] . "\n";
     }
     // insert a row and the result will be tested later
-    $dbh->exec("insert into autocommittest values (3)");
+    $dbh->exec("insert into " . $tablename . " values (3)");
     $dbh = null;
 
     $dbh = new PDO("$dsn;application=phptest", $user, $password);
     // check the result of previous test
-    $sth = $dbh->query("select count(*) from autocommittest");
+    $sth = $dbh->query("select count(*) from " . $tablename);
     while($row = $sth->fetch()) {
         echo $row[0] . "\n";
     }
     // clean up
-    $count = $dbh->exec("drop table if exists autocommittest");
+    $count = $dbh->exec("drop table if exists " . $tablename);
     if ($count == 0) {
         print_r($dbh->errorInfo());
     }
