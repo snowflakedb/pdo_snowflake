@@ -588,7 +588,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         /* auto commit */
         zend_long auto_commit = pdo_attr_lval(
             driver_options,
-            PDO_ATTR_AUTOCOMMIT, 1) ? 0 : 1;
+            PDO_ATTR_AUTOCOMMIT, 1);
 
         /*TODO: disable verify peer? do we need this option? */
         snowflake_global_set_attribute(
