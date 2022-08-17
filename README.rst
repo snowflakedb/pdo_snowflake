@@ -282,9 +282,7 @@ where:
 - :code:`<account_name>` is
   `your Snowflake account name <https://docs.snowflake.com/en/user-guide/connecting.html#your-snowflake-account-name>`_.
 - :code:`AUTHENTICATOR = SNOWFLAKE_JWT` Specifies to authenticate the Snowflake connection using key pair authentication with JSON Web Token (JWT).
-- :code:`JWT_TIME_OUT = <integer>` Optional. Specifies the length of time Snowflake waits to receive the JWT (in seconds) before timing out. 
-     If that happens, authentication fails and the driver returns an :code:`Invalid JWT token` error. 
-     To resolve repeated occurrences of the error, increase the parameter value. Default: ``30``
+- :code:`JWT_TIME_OUT = <integer>` Optional. Specifies the length of time Snowflake waits to receive the JWT (in seconds) before timing out.  If that happens, authentication fails and the driver returns an :code:`Invalid JWT token` error.  To resolve repeated occurrences of the error, increase the parameter value. Default: ``30``
 - :code:`PRIV_KEY_FILE = <path>/rsa_key.p8` Specifies the local path to the private key file you created (i.e. **rsa_key.p8**).
 - :code:`PRIV_KEY_FILE_PWD = <password>` Specifies the passcode to decode the private key file.
 
