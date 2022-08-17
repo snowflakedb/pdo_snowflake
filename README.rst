@@ -258,6 +258,46 @@ For accounts in regions outside of US-West, use :code:`region` parameter to spec
     $dbh = new PDO("snowflake:account=testaccount.us-east-1", "user", "password");
     $dbh = new PDO("snowflake:account=testaccount;region=us-east-1", "user", "password");
 
+Using Key Pair Authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PHP PDO driver supports key pair authentication and key rotation.
+
+You must first complete the initial configuration for key pair authentication as shown in :doc:`/user-guide/key-pair-auth`.
+
+To connect to the Snowflake database using key par authentication, create a new :code:`PDO` object, as explained in
+`the PHP PDO documentation <https://www.php.net/manual/en/pdo.connections.php>`_.
+Specify the data source name (:code:`dsn`) parameter as shown below:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=<account_name>", 
+                   "AUTHENTICATOR = SNOWFLAKE_JWT", 
+                   "JWT_TIME_OUT = <num_seconds>",
+                   "PRIV_KEY_FILE = <path>/rsa_key.p8`",
+                   "PRIV_KEY_FILE_PWD = <password>");
+
+where:
+
+- :samp:`<account_name>` is
+  `your Snowflake account name <https://docs.snowflake.com/en/user-guide/connecting.html#your-snowflake-account-name>`_.
+
+- :samp:`AUTHENTICATOR = SNOWFLAKE_JWT`
+     Specifies to authenticate the Snowflake connection using key pair authentication with JSON Web Token (JWT).
+
+- :samp:`JWT_TIME_OUT = {integer}`
+     Optional. Specifies the length of time Snowflake waits to receive the JWT (in seconds) before timing out. If that happens, authentication fails and the driver returns an :samp:`Invalid JWT token` error. To resolve repeated occurrences of the error, increase the parameter value. Default: ``30``
+
+- :samp:`PRIV_KEY_FILE = {path}/rsa_key.p8`
+     Specifies the local path to the private key file you created (i.e. :file:`rsa_key.p8`).
+
+     The value set in DSN can be overridden by calling the :code:`SQLSetConnectAttr()` function. For more details, see
+     :ref:`Snowflake-specific behavior of the SQLSetConnectAttr function <label-odbc_api_sqlsetconnectattr_specific_behavior>`.
+
+- :samp:`PRIV_KEY_FILE_PWD = <password>`
+     Specifies the passcode to decode the private key file.
+
+
 Configuring OCSP Checking
 ----------------------------------------------------------------------
 
