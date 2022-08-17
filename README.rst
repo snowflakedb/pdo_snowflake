@@ -263,7 +263,7 @@ Using Key Pair Authentication
 
 The PHP PDO driver supports key pair authentication and key rotation.
 
-You must first complete the initial configuration for key pair authentication as shown in `/user-guide/key-pair-auth`_.
+You must first complete the initial configuration for key pair authentication as shown in `Key Pair Authentication & Key Pair Rotation <https://docs.snowflake.com/en/user-guide/key-pair-auth.html#key-pair-authentication-key-pair-rotation>`_.
 
 To connect to the Snowflake database using key par authentication, create a new :code:`PDO` object, as explained in
 `the PHP PDO documentation <https://www.php.net/manual/en/pdo.connections.php>`_.
