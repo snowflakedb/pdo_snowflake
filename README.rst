@@ -279,22 +279,15 @@ Specify the data source name (:code:`dsn`) parameter as shown below:
 
 where:
 
-- :samp:`<account_name>` is
+- :code:`<account_name>` is
   `your Snowflake account name <https://docs.snowflake.com/en/user-guide/connecting.html#your-snowflake-account-name>`_.
-
-- :samp:`AUTHENTICATOR = SNOWFLAKE_JWT`
+- :code:`AUTHENTICATOR = SNOWFLAKE_JWT`
      Specifies to authenticate the Snowflake connection using key pair authentication with JSON Web Token (JWT).
-
-- :samp:`JWT_TIME_OUT = {integer}`
+- :code:`JWT_TIME_OUT = <integer>`
      Optional. Specifies the length of time Snowflake waits to receive the JWT (in seconds) before timing out. If that happens, authentication fails and the driver returns an :samp:`Invalid JWT token` error. To resolve repeated occurrences of the error, increase the parameter value. Default: ``30``
-
-- :samp:`PRIV_KEY_FILE = {path}/rsa_key.p8`
+- :code:`PRIV_KEY_FILE = <path>/rsa_key.p8`
      Specifies the local path to the private key file you created (i.e. :file:`rsa_key.p8`).
-
-     The value set in DSN can be overridden by calling the :code:`SQLSetConnectAttr()` function. For more details, see
-     :ref:`Snowflake-specific behavior of the SQLSetConnectAttr function <label-odbc_api_sqlsetconnectattr_specific_behavior>`.
-
-- :samp:`PRIV_KEY_FILE_PWD = <password>`
+- :code:`PRIV_KEY_FILE_PWD = <password>`
      Specifies the passcode to decode the private key file.
 
 
