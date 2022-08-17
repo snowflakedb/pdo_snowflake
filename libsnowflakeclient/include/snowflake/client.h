@@ -31,6 +31,11 @@ extern "C" {
 #define SF_AUTHENTICATOR_DEFAULT "snowflake"
 
 /**
+ * Authenticator, key pair (jwt)
+ */
+#define SF_AUTHENTICATOR_JWT "snowflake_jwt"
+
+ /**
  * Authenticator, external browser
  * TODO
  */
@@ -60,6 +65,16 @@ extern "C" {
  * Login timeout in seconds
  */
 #define SF_LOGIN_TIMEOUT 120
+
+/**
+ * Default JWT timeout in seconds
+ */
+#define SF_JWT_TIMEOUT 60
+
+/**
+ * Default JWT renew timeout in seconds
+ */
+#define SF_JWT_CNXN_WAIT_TIME 10
 
 /**
  * Snowflake Data types
@@ -210,6 +225,11 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_SERVICE_NAME,
     SF_CON_AUTOCOMMIT,
     SF_CON_APPLICATION,
+    SF_CON_PRIV_KEY_FILE,
+    SF_CON_PRIV_KEY_FILE_PWD,
+    SF_CON_JWT_TIMEOUT,
+    SF_CON_JWT_CNXN_WAIT_TIME,
+    SF_CON_MAX_CON_RETRY,
     SF_DIR_QUERY_URL,
     SF_DIR_QUERY_URL_PARAM,
     SF_DIR_QUERY_TOKEN,
@@ -276,6 +296,15 @@ typedef struct SF_CONNECT {
 
     char *authenticator;
 
+    // the instance of authenticator, if needed
+    void * auth_object;
+
+    // key pair authentication
+    char *priv_key_file;
+    char *priv_key_file_pwd;
+    int64 jwt_timeout;
+    int64 jwt_cnxn_wait_time;
+
     // Overrider application name and version
     char *application_name;
     char *application_version;
@@ -302,6 +331,8 @@ typedef struct SF_CONNECT {
     char *direct_query_token;
 
     int8 retry_on_curle_couldnt_connect_count;
+
+    int8 retry_on_connect_count;
 
     // Error
     SF_ERROR_STRUCT error;
