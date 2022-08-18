@@ -536,23 +536,27 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     pdo_snowflake_db_handle *H;
     size_t i;
     int ret = 0;
+	int64 int_attr_value = 0;
     /* NOTE: the parameters are referenced by index, so if you change
      * the order of parameters, ensure changing the index of vars
      * in php_pdo_snowflake_int.h
      */
     struct pdo_data_src_parser vars[] = {
-        {"host",          NULL,      0},
-        {"port",          "443",     0},
-        {"account",       NULL,      0},
-        {"region",        NULL,      0},
-        {"database",      NULL,      0},
-        {"schema",        NULL,      0},
-        {"warehouse",     NULL,      0},
-        {"role",          NULL,      0},
-        {"protocol",      "https",   0},
-        {"insecure_mode", NULL,      0},
-        {"timezone",      NULL,      0},
-        {"application",   NULL,      0}
+        {"host",                NULL,         0},
+        {"port",                "443",        0},
+        {"account",             NULL,         0},
+        {"region",              NULL,         0},
+        {"database",            NULL,         0},
+        {"schema",              NULL,         0},
+        {"warehouse",           NULL,         0},
+        {"role",                NULL,         0},
+        {"protocol",            "https",      0},
+        {"insecure_mode",       NULL,         0},
+        {"timezone",            NULL,         0},
+        {"application",         NULL,         0},
+        {"authenticator",       NULL,         0},
+        {"priv_key_file",       NULL,         0},
+        {"priv_key_file_pwd",   NULL,         0}
     };
 
     // Parse the input data parameters
@@ -694,6 +698,33 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     }
     PDO_LOG_DBG(
         "application: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_APPLICATION_IDX].optval);
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_AUTHENTICATOR_IDX].optval != NULL) {
+        /* authenticator */
+        snowflake_set_attribute(
+            H->server, SF_CON_AUTHENTICATOR,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_AUTHENTICATOR_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "authenticator: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_AUTHENTICATOR_IDX].optval);
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_PRIV_KEY_FILE_IDX].optval != NULL) {
+        /* priv_key_file */
+        snowflake_set_attribute(
+            H->server, SF_CON_PRIV_KEY_FILE,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_PRIV_KEY_FILE_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "priv_key_file: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_PRIV_KEY_FILE_IDX].optval);
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_PRIV_KEY_FILE_PWD_IDX].optval != NULL) {
+        /* priv_key_file_pwd */
+        snowflake_set_attribute(
+            H->server, SF_CON_PRIV_KEY_FILE_PWD,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_PRIV_KEY_FILE_PWD_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "priv_key_file_pwd: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_PRIV_KEY_FILE_PWD_IDX].optval);
 
     if (snowflake_connect(H->server) > 0) {
         pdo_snowflake_error(dbh);
