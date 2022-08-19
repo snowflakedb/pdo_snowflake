@@ -275,15 +275,15 @@ Specify the data source name (:code:`dsn`) parameter as shown below:
     $dbh = new PDO("snowflake:account=<account_name>", 
                    "AUTHENTICATOR = SNOWFLAKE_JWT", 
                    "PRIV_KEY_FILE = <path>/rsa_key.p8`",
-                   "PRIV_KEY_FILE_PWD = <password>");
+                   "PRIV_KEY_FILE_PWD = <private_key_passphrase>");
 
 where:
 
 - :code:`<account_name>` is
   `your Snowflake account name <https://docs.snowflake.com/en/user-guide/connecting.html#your-snowflake-account-name>`_.
 - :code:`AUTHENTICATOR = SNOWFLAKE_JWT` Specifies to authenticate the Snowflake connection using key pair authentication with JSON Web Token (JWT).
-- :code:`PRIV_KEY_FILE = <path>/rsa_key.p8` Specifies the local path to the private key file you created (i.e. **rsa_key.p8**).
-- :code:`PRIV_KEY_FILE_PWD = <password>` Specifies the passcode to decode the private key file.
+- :code:`PRIV_KEY_FILE = <path>/rsa_key.p8` Specifies the local path to the private key file you created (i.e. :code:`rsa_key.p8`).
+- :code:`PRIV_KEY_FILE_PWD = <private_key_passphrase>` Specifies the passphrase to decrypt the private key file.
 
 
 Configuring OCSP Checking
