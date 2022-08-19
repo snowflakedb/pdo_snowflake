@@ -263,17 +263,17 @@ Using Key Pair Authentication
 
 The PHP PDO driver supports key pair authentication and key rotation.
 
-You must first complete the initial configuration for key pair authentication as shown in `Key Pair Authentication & Key Pair Rotation <https://docs.snowflake.com/en/user-guide/key-pair-auth.html#key-pair-authentication-key-pair-rotation>`_.
+You must first complete the initial configuration for key pair authentication as shown in 
+`Key Pair Authentication & Key Pair Rotation <https://docs.snowflake.com/en/user-guide/key-pair-auth.html#key-pair-authentication-key-pair-rotation>`_.
 
-To connect to the Snowflake database using key par authentication, create a new :code:`PDO` object, as explained in
-`the PHP PDO documentation <https://www.php.net/manual/en/pdo.connections.php>`_.
+To connect to the Snowflake database using key par authentication, create a new :code:`PDO` object, as explained in the
+`PHP PDO documentation <https://www.php.net/manual/en/pdo.connections.php>`_.
 Specify the data source name (:code:`dsn`) parameter as shown below:
 
 .. code-block:: php
 
     $dbh = new PDO("snowflake:account=<account_name>", 
                    "AUTHENTICATOR = SNOWFLAKE_JWT", 
-                   "JWT_TIME_OUT = <num_seconds>",
                    "PRIV_KEY_FILE = <path>/rsa_key.p8`",
                    "PRIV_KEY_FILE_PWD = <password>");
 
@@ -282,7 +282,6 @@ where:
 - :code:`<account_name>` is
   `your Snowflake account name <https://docs.snowflake.com/en/user-guide/connecting.html#your-snowflake-account-name>`_.
 - :code:`AUTHENTICATOR = SNOWFLAKE_JWT` Specifies to authenticate the Snowflake connection using key pair authentication with JSON Web Token (JWT).
-- :code:`JWT_TIME_OUT = <integer>` Optional. Specifies the length of time Snowflake waits to receive the JWT (in seconds) before timing out.  If that happens, authentication fails and the driver returns an :code:`Invalid JWT token` error.  To resolve repeated occurrences of the error, increase the parameter value. Default: ``30``
 - :code:`PRIV_KEY_FILE = <path>/rsa_key.p8` Specifies the local path to the private key file you created (i.e. **rsa_key.p8**).
 - :code:`PRIV_KEY_FILE_PWD = <password>` Specifies the passcode to decode the private key file.
 
