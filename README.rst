@@ -277,8 +277,8 @@ Specify the data source name (:code:`dsn`) parameter as shown below:
 
 where:
 
-- :code:`<account_name>` is
-  `your Snowflake account name <https://docs.snowflake.com/en/user-guide/connecting.html#your-snowflake-account-name>`_.
+- :code:`<account_name>` is your
+  `Snowflake account name <https://docs.snowflake.com/en/user-guide/connecting.html#your-snowflake-account-name>`_.
 - :code:`authenticator = SNOWFLAKE_JWT` Specifies that you want to authenticate the Snowflake connection using key pair authentication with JSON Web Token (JWT).
 - :code:`priv_key_file = <path>/rsa_key.p8` Specifies the local path to the private key file you created (i.e. :code:`rsa_key.p8`).
 - :code:`priv_key_file_pwd = <private_key_passphrase>` Specifies the passphrase to decrypt the private key file. If you using an unecrypted private key file, omit this parameter.
