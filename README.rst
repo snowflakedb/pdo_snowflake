@@ -282,8 +282,8 @@ where:
 - :code:`authenticator = SNOWFLAKE_JWT` Specifies that you want to authenticate the Snowflake connection using key pair authentication with JSON Web Token (JWT).
 - :code:`priv_key_file = <path>/rsa_key.p8` Specifies the local path to the private key file you created (i.e. :code:`rsa_key.p8`).
 - :code:`priv_key_file_pwd = <private_key_passphrase>` Specifies the passphrase to decrypt the private key file. If you using an unecrypted private key file, omit this parameter.
-- :code:`<username>` is the login name of the user for the connection.
-- :code:`""` is the password for the specified user. The parameter is required. When using key-pair authentication, specify an empty string.
+- :code:`<username>` Specifies the login name of the user for the connection.
+- :code:`""` Specifies the password for the specified user. The parameter is required. When using key-pair authentication, specify an empty string.
 
 
 Configuring OCSP Checking
