@@ -258,6 +258,34 @@ For accounts in regions outside of US-West, use :code:`region` parameter to spec
     $dbh = new PDO("snowflake:account=testaccount.us-east-1", "user", "password");
     $dbh = new PDO("snowflake:account=testaccount;region=us-east-1", "user", "password");
 
+Using Key Pair Authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PHP PDO driver supports key pair authentication and key rotation.
+
+You must first complete the initial configuration for key pair authentication as shown in 
+`Key Pair Authentication & Key Pair Rotation <https://docs.snowflake.com/en/user-guide/key-pair-auth.html#key-pair-authentication-key-pair-rotation>`_.
+
+To connect to the Snowflake database using key pair authentication, create a new :code:`PDO` object, as explained in the
+`PHP PDO documentation <https://www.php.net/manual/en/pdo.connections.php>`_.
+Specify the data source name (:code:`dsn`) parameter as shown below:
+
+.. code-block:: php
+
+    $dbh = new PDO("account=<account name>;authenticator=SNOWFLAKE_JWT;priv_key_file=<path>/rsa_key.p8;priv_key_file_pwd=<private_key_passphrase>", 
+                    "<username>", "");
+
+where:
+
+- :code:`<account_name>` Specifies your
+  `Snowflake account name <https://docs.snowflake.com/en/user-guide/connecting.html#your-snowflake-account-name>`_.
+- :code:`authenticator = SNOWFLAKE_JWT` Specifies that you want to authenticate the Snowflake connection using key pair authentication with JSON Web Token (JWT).
+- :code:`priv_key_file = <path>/rsa_key.p8` Specifies the local path to the private key file you created (i.e. :code:`rsa_key.p8`).
+- :code:`priv_key_file_pwd = <private_key_passphrase>` Specifies the passphrase to decrypt the private key file. If you using an unecrypted private key file, omit this parameter.
+- :code:`<username>` Specifies the login name of the user for the connection.
+- :code:`""` Specifies the password for the specified user. The parameter is required. When using key-pair authentication, specify an empty string.
+
+
 Configuring OCSP Checking
 ----------------------------------------------------------------------
 
