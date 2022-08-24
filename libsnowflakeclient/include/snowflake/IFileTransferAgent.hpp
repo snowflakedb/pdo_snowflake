@@ -25,12 +25,14 @@ struct TransferConfig
     tempDir(NULL),
     useS3regionalUrl(false),
     compressLevel(-1),
-    proxy(NULL) {}
+    proxy(NULL),
+    getSizeThreshold(0) {}
   char * caBundleFile;
   char * tempDir;
   bool useS3regionalUrl;
   int compressLevel;
   Util::Proxy * proxy;
+  long getSizeThreshold;
 };
 
 class IFileTransferAgent

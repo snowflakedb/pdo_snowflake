@@ -37,6 +37,38 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     } catch(PDOException $e) {
         echo sprintf("Expected error code: %d for invalid application name\n", $e->getCode());
     }
+
+    // invalid authenticator
+    try {
+        $dbh = new PDO("snowflake:account=$account;authenticator=invalid_authenticator;", $user, $password);
+        echo "Fail. Must fail to connect.\n";
+    } catch(PDOException $e) {
+        echo sprintf("Expected error code: %d for invalid authenticator\n", $e->getCode());
+    }
+
+    // invalid key file
+    try {
+        $dbh = new PDO("snowflake:account=$account;authenticator=snowflake_jwt;priv_key_file=dummy;priv_key_file_pwd=dummy", $user, $password);
+        echo "Fail. Must fail to connect.\n";
+    } catch(PDOException $e) {
+        echo sprintf("Expected error code: %d for invalid key file\n", $e->getCode());
+    }
+
+    // invalid key file password
+    try {
+        $dbh = new PDO("snowflake:account=$account;authenticator=snowflake_jwt;tests/p8test.pem;priv_key_file_pwd=dummy", $user, $password);
+        echo "Fail. Must fail to connect.\n";
+    } catch(PDOException $e) {
+        echo sprintf("Expected error code: %d for invalid key file password\n", $e->getCode());
+    }
+
+    // invalid jwt token
+    try {
+        $dbh = new PDO("snowflake:account=$account;authenticator=snowflake_jwt;tests/p8test.pem;priv_key_file_pwd=test", $user, $password);
+        echo "Fail. Must fail to connect.\n";
+    } catch(PDOException $e) {
+        echo sprintf("Expected error code: %d for invalid jwt token\n", $e->getCode());
+    }
 ?>
 ===DONE===
 <?php exit(0); ?>
@@ -45,5 +77,9 @@ Expected error code: 240005 for missing account
 Expected error code: 240005 for missing user
 Expected error code: 240005 for missing password
 Expected error code: 240005 for invalid application name
+Expected error code: 240005 for invalid authenticator
+Expected error code: 240000 for invalid key file
+Expected error code: 240005 for invalid key file password
+Expected error code: 240005 for invalid jwt token
 ===DONE===
 

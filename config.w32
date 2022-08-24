@@ -11,11 +11,7 @@ if (PHP_PDO_SNOWFLAKE != "no") {
 
     if (CHECK_LIB('libsnowflakeclient_a.lib', 'pdo_snowflake') && CHECK_LIB('libcurl_a.lib', 'pdo_snowflake') && 
             CHECK_LIB('libssl_a.lib', 'pdo_snowflake') && CHECK_LIB('libcrypto_a.lib', 'pdo_snowflake') && CHECK_LIB('zlib_a.lib', 'pdo_snowflake') && CHECK_LIB('libtelemetry_a.lib', 'pdo_snowflake') &&
-            CHECK_LIB('arrow.lib', 'pdo_snowflake') && CHECK_LIB('boost_filesystem-vc140-mt.lib', 'pdo_snowflake') && CHECK_LIB('boost_regex-vc140-mt.lib', 'pdo_snowflake') && CHECK_LIB('boost_system-vc140-mt.lib', 'pdo_snowflake') &&
-            CHECK_LIB('brotlicommon-static.lib', 'pdo_snowflake') && CHECK_LIB('brotlidec-static.lib', 'pdo_snowflake') && CHECK_LIB('brotlienc-static.lib', 'pdo_snowflake') && CHECK_LIB('bz2.lib', 'pdo_snowflake') &&
-            CHECK_LIB('double-conversion.lib', 'pdo_snowflake') && CHECK_LIB('event.lib', 'pdo_snowflake') && CHECK_LIB('event_core.lib', 'pdo_snowflake') && CHECK_LIB('event_extra.lib', 'pdo_snowflake') &&
-            CHECK_LIB('flatbuffers.lib', 'pdo_snowflake') && CHECK_LIB('gflags_static.lib', 'pdo_snowflake') && CHECK_LIB('glog.lib', 'pdo_snowflake') && CHECK_LIB('lz4.lib', 'pdo_snowflake') &&
-            CHECK_LIB('snappy.lib', 'pdo_snowflake') && CHECK_LIB('zstd.lib', 'pdo_snowflake') &&
+            CHECK_LIB('arrow_static.lib', 'pdo_snowflake') && CHECK_LIB('libboost_filesystem.lib', 'pdo_snowflake') && CHECK_LIB('libboost_regex.lib', 'pdo_snowflake') && CHECK_LIB('libboost_system.lib', 'pdo_snowflake') &&
             CHECK_HEADER_ADD_INCLUDE('snowflake\\client.h', 'CFLAGS_PDO_SNOWFLAKE', configure_module_dirname + '\\libsnowflakeclient\\include')) {
         STDOUT.WriteLine("INFO: Snowflake PDO Configuration");
         ADD_EXTENSION_DEP('pdo_snowflake', 'pdo');
