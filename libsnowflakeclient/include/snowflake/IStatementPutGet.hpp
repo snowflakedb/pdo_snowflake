@@ -6,6 +6,7 @@
 #define SNOWFLAKECLIENT_ISTATEMENT_HPP
 
 #include "PutGetParseResponse.hpp"
+#include "Proxy.hpp"
 #include <iostream>
 
 namespace Snowflake
@@ -69,6 +70,11 @@ public:
                         bool headerOnly)
   {
     return false;
+  }
+
+  virtual Util::Proxy* get_proxy()
+  {
+    return NULL;
   }
 
   virtual ~IStatementPutGet()
