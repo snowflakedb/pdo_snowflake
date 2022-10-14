@@ -230,6 +230,8 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_JWT_TIMEOUT,
     SF_CON_JWT_CNXN_WAIT_TIME,
     SF_CON_MAX_CON_RETRY,
+    SF_CON_PROXY,
+    SF_CON_NO_PROXY,
     SF_DIR_QUERY_URL,
     SF_DIR_QUERY_URL_PARAM,
     SF_DIR_QUERY_TOKEN,
@@ -311,6 +313,10 @@ typedef struct SF_CONNECT {
 
     // Partner application name
     char * application;
+
+    // Proxy
+    char * proxy;
+    char * no_proxy;
 
     // Session info
     char *token;
