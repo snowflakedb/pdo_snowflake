@@ -556,7 +556,9 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"application",         NULL,         0},
         {"authenticator",       NULL,         0},
         {"priv_key_file",       NULL,         0},
-        {"priv_key_file_pwd",   NULL,         0}
+        {"priv_key_file_pwd",   NULL,         0},
+        {"proxy",               NULL,         0},
+        {"no_proxy",            NULL,         0}
     };
 
     // Parse the input data parameters
@@ -725,6 +727,24 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     }
     PDO_LOG_DBG(
         "priv_key_file_pwd: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_PRIV_KEY_FILE_PWD_IDX].optval);
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_PROXY_IDX].optval != NULL) {
+        /* proxy */
+        snowflake_set_attribute(
+            H->server, SF_CON_PROXY,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_PROXY_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "proxy: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_PROXY_IDX].optval != NULL ? "******" : "(NULL)");
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_NO_PROXY_IDX].optval != NULL) {
+        /* no_proxy */
+        snowflake_set_attribute(
+            H->server, SF_CON_NO_PROXY,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_NO_PROXY_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "no_proxy: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_NO_PROXY_IDX].optval);
 
     if (snowflake_connect(H->server) > 0) {
         pdo_snowflake_error(dbh);
