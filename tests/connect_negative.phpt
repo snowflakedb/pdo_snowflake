@@ -43,31 +43,38 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         $dbh = new PDO("snowflake:account=$account;authenticator=invalid_authenticator;", $user, $password);
         echo "Fail. Must fail to connect.\n";
     } catch(PDOException $e) {
-        echo sprintf("Expected error code: %d for invalid authenticator\n", $e->getCode());
+        // check the error message to be more specific for the expected error
+        echo sprintf("Expected error: %s\n", $e->getMessage());
     }
 
     // invalid key file
     try {
-        $dbh = new PDO("snowflake:account=$account;authenticator=snowflake_jwt;priv_key_file=dummy;priv_key_file_pwd=dummy", $user, $password);
+        $dbh = new PDO("snowflake:account=$account;authenticator=snowflake_jwt;priv_key_file=dummy;priv_key_file_pwd=dummy", $user, "");
         echo "Fail. Must fail to connect.\n";
     } catch(PDOException $e) {
-        echo sprintf("Expected error code: %d for invalid key file\n", $e->getCode());
+        // check the error message to be more specific for the expected error
+        echo sprintf("Expected error: %s\n", $e->getMessage());
     }
 
     // invalid key file password
     try {
-        $dbh = new PDO("snowflake:account=$account;authenticator=snowflake_jwt;tests/p8test.pem;priv_key_file_pwd=dummy", $user, $password);
+        $dbh = new PDO("snowflake:account=$account;authenticator=snowflake_jwt;priv_key_file=tests/p8test.pem;priv_key_file_pwd=dummy", $user, "");
         echo "Fail. Must fail to connect.\n";
     } catch(PDOException $e) {
-        echo sprintf("Expected error code: %d for invalid key file password\n", $e->getCode());
+        // check the error message to be more specific for the expected error
+        echo sprintf("Expected error: %s\n", $e->getMessage());
     }
 
     // invalid jwt token
+    // We don't test valid jwt authentication in PHP as such case is covered in
+    // libsnowflakeclient.
+    // use invalid jwt token and check the error message to ensure keypair auth
+    // is used and the invalid token is sent to server as expected
     try {
-        $dbh = new PDO("snowflake:account=$account;authenticator=snowflake_jwt;tests/p8test.pem;priv_key_file_pwd=test", $user, $password);
+        $dbh = new PDO("snowflake:account=$account;authenticator=snowflake_jwt;priv_key_file=tests/p8test.pem;priv_key_file_pwd=test", $user, "");
         echo "Fail. Must fail to connect.\n";
     } catch(PDOException $e) {
-        echo sprintf("Expected error code: %d for invalid jwt token\n", $e->getCode());
+        echo sprintf("Expected error: %s\n", $e->getMessage());
     }
 ?>
 ===DONE===
@@ -77,9 +84,9 @@ Expected error code: 240005 for missing account
 Expected error code: 240005 for missing user
 Expected error code: 240005 for missing password
 Expected error code: 240005 for invalid application name
-Expected error code: 240005 for invalid authenticator
-Expected error code: 240000 for invalid key file
-Expected error code: 240005 for invalid key file password
-Expected error code: 240005 for invalid jwt token
+Expected error: SQLSTATE[08001] [240005] unsupported authenticator
+Expected error: SQLSTATE[HY000] [240000] authenticator initialization failed
+Expected error: SQLSTATE[HY000] [240000] authenticator initialization failed
+Expected error: SQLSTATE[08001] [390144] JWT token is invalid.
 ===DONE===
 
