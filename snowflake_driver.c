@@ -735,10 +735,10 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
             vars[PDO_SNOWFLAKE_CONN_ATTR_PROXY_IDX].optval);
     }
     PDO_LOG_DBG(
-        "proxy: %s", "******");
+        "proxy: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_PROXY_IDX].optval != NULL ? "******" : "(NULL)");
 
     if (vars[PDO_SNOWFLAKE_CONN_ATTR_NO_PROXY_IDX].optval != NULL) {
-        /* priv_key_file_pwd */
+        /* no_proxy */
         snowflake_set_attribute(
             H->server, SF_CON_NO_PROXY,
             vars[PDO_SNOWFLAKE_CONN_ATTR_NO_PROXY_IDX].optval);

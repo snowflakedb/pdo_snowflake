@@ -11,7 +11,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         echo "OK\n";
     }
     // set invalid proxy in environment variables
-	putenv("https_proxy=a.b.c");
+    putenv("https_proxy=a.b.c");
     putenv("http_proxy=a.b.c");
     putenv("no_proxy");
 
@@ -24,7 +24,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     $dbh = null;
 
     // unset environment variables
-	putenv("https_proxy");
+    putenv("https_proxy");
     putenv("http_proxy");
     putenv("no_proxy");
 
