@@ -107,6 +107,13 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     $sth->bindColumn(2, $name, PDO::PARAM_STR);
     $sth->bindColumn(3, $flag, PDO::PARAM_BOOL);
     while($row = $sth->fetch(PDO::FETCH_BOUND)) {
+    if (version_compare(PHP_VERSION, '8.1.0') < 0) {
+        # php 8.0 or before have issue on binding with int type
+        # null data is returned as 0
+        if ($id == 0) {
+            $id = null;
+        }
+    }
         echo $id. " " . $name . " " . $flag . "\n";
     }
 
@@ -158,6 +165,6 @@ inserted rows: 1
 14 test113 1
 15 test115 
 16 test116 1
-0  
+  
 Expected ERR: 2049
 ===DONE===

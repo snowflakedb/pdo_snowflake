@@ -668,6 +668,10 @@ static int pdo_snowflake_stmt_get_col_newif(
     {
         ZVAL_STRINGL(result, str, len);
     }
+    else if (str == NULL)
+    {
+        ZVAL_NULL(result);
+    }
     else
     {
         ZVAL_EMPTY_STRING(result);
