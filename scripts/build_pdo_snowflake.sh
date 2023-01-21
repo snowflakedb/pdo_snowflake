@@ -46,6 +46,25 @@ if [[ -n "$REPORT_COVERAGE" ]]; then
 fi
 if [[ "$PLATFORM" == "linux" ]]; then
     echo "Linking for Linux"
+    # php build delete pdo_snowflake.gcno (IDK why)
+    # rebuild pdo_snowflake.c to generate it again
+    if [[ -n "$REPORT_COVERAGE" ]]; then
+    cc  -I. \
+        -I$PHP_HOME/include/php \
+        -I$PHP_HOME/include/php/main \
+        -I$PHP_HOME/include/php/TSRM \
+        -I$PHP_HOME/include/php/Zend \
+        -I$PHP_HOME/include/php/ext \
+        -I$PHP_HOME/include/php/ext/date/lib \
+        -I./libsnowflakeclient/include -DHAVE_CONFIG_H \
+        -std=c99 -Werror -g -O0 -ggdb -fprofile-arcs -ftest-coverage \
+        -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 -DZEND_COMPILE_DL_EXT=1 \
+        -c ./pdo_snowflake.c \
+        -MMD -MF pdo_snowflake.dep -MT pdo_snowflake.lo  \
+        -fPIC \
+        -DPIC \
+        -o .libs/pdo_snowflake.o
+    fi
     g++ -shared \
         -fPIC \
         -DPIC \
@@ -78,7 +97,8 @@ if [[ "$PLATFORM" == "linux" ]]; then
         -o .libs/pdo_snowflake.so \
         libsnowflakeclient/deps-build/linux/openssl/lib/libssl.a \
         libsnowflakeclient/deps-build/linux/openssl/lib/libcrypto.a \
-        libsnowflakeclient/deps-build/linux/cmocka/lib/libcmocka.a
+        libsnowflakeclient/deps-build/linux/cmocka/lib/libcmocka.a \
+        LINK_OPTS
 elif [[ "$PLATFORM" == "darwin" ]]; then
     # Darwin uses -force_load instead
     echo "Linking for Darwin"

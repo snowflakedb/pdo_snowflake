@@ -27,6 +27,7 @@ jobs:
       SNOWFLAKE_TEST_SCHEMA: ${{ secrets.SNOWFLAKE_TEST_SCHEMA }}
       SNOWFLAKE_TEST_ROLE: ${{ secrets.SNOWFLAKE_TEST_ROLE }}
       RUN_COVERAGE: 1
+      REPORT_COVERAGE: 1
       PHP_HOME: /usr
       TEST_PHP_EXECUTABLE: /usr/bin/php
       NO_INTERACTION: true
