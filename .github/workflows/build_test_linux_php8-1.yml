@@ -47,6 +47,8 @@ jobs:
         #  run: |
         #    sudo apt-get install valgrind
 
+        - name: Setup LCOV
+          uses: hrishikesh-kadam/setup-lcov@v1
 
         - name: build driver
           run: python ./.github/workflows/scripts/build_driver.py
