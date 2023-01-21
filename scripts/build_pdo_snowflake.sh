@@ -98,7 +98,7 @@ if [[ "$PLATFORM" == "linux" ]]; then
         libsnowflakeclient/deps-build/linux/openssl/lib/libssl.a \
         libsnowflakeclient/deps-build/linux/openssl/lib/libcrypto.a \
         libsnowflakeclient/deps-build/linux/cmocka/lib/libcmocka.a \
-        LINK_OPTS
+        $LINK_OPTS
 elif [[ "$PLATFORM" == "darwin" ]]; then
     # Darwin uses -force_load instead
     echo "Linking for Darwin"
