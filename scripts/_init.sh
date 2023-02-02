@@ -8,6 +8,16 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 PLATFORM=$(echo $(uname) | tr '[:upper:]' '[:lower:]')
 
+ARCH="$(uname -m)"
+
+if [[ "$PLATFORM" == "linux" ]]; then
+    case "$ARCH" in
+        aarch64) ;;
+        *) ARCH=x86_64 ;;
+    esac
+fi
+
+
 # Find cmake, gcc and g++ on target machine. Need cmake 3.0+, gcc/g++ 4.9+
 if [[ "$(which cmake3)" ]]; then
     CMAKE="$(which cmake3)"

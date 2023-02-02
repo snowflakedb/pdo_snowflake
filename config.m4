@@ -4,21 +4,22 @@ dnl config.m4 for extension pdo_snowflake
 # AC_CANONICAL_HOST is needed to access the 'host_os' variable    
 AC_CANONICAL_HOST
 
+arch=
 build_linux=no
 build_mac=no
 
 # Detect the target system
-case "${host_os}" in
-    linux*)
-        build_linux=yes
-        ;;
-    darwin*)
-        build_mac=yes
-        ;;
-    *)
-        AC_MSG_ERROR(["OS $host_os is not supported"])
-        ;;
-esac
+AS_CASE([$host_os],
+  [linux*], [
+    build_linux=yes
+    AS_CASE([$host_cpu],
+      [aarch64], [arch=aarch64],
+      [arch=x86_64]
+    )
+  ],
+  [darwin*], [build_mac=yes],
+  AC_MSG_ERROR(["OS $host_os is not supported"])
+)
 
 PHP_ARG_ENABLE(pdo_snowflake, for Snowflake DB support for PDO,
     [  --enable-pdo_snowflake           Enable pdo_snowflake support])
@@ -67,19 +68,19 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
   fi
   if test "$build_linux" == "yes"; then
     LDFLAGS="$LDFLAGS -Wl,--whole-archive"
-    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/lib/linux/libsnowflakeclient.a"
-    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/openssl/lib/libcrypto.a"
-    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/openssl/lib/libssl.a"
-    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/curl/lib/libcurl.a"
-    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/oob/lib/libtelemetry.a"
-    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/aws/lib64/libaws-cpp-sdk-core.a"
-    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/aws/lib64/libaws-cpp-sdk-s3.a"
-    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/azure/lib/libazure-storage-lite.a"
-    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/arrow/lib/libarrow.a"
-    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/arrow_deps/lib/libjemalloc_pic.a"
-    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/boost/lib/libboost_filesystem.a"
-    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/boost/lib/libboost_regex.a"
-    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/boost/lib/libboost_system.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/lib/linux/$arch/libsnowflakeclient.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/$arch/openssl/lib/libcrypto.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/$arch/openssl/lib/libssl.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/$arch/curl/lib/libcurl.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/$arch/oob/lib/libtelemetry.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/$arch/aws/lib64/libaws-cpp-sdk-core.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/$arch/aws/lib64/libaws-cpp-sdk-s3.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/$arch/azure/lib/libazure-storage-lite.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/$arch/arrow/lib/libarrow.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/$arch/arrow_deps/lib/libjemalloc_pic.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/$arch/boost/lib/libboost_filesystem.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/$arch/boost/lib/libboost_regex.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/$arch/boost/lib/libboost_system.a"
     LDFLAGS="$LDFLAGS -Wl,--no-whole-archive"
   fi
   dnl # IMPORTANT NOTE: Change scripts/build_pdo_snowflake.sh to update
