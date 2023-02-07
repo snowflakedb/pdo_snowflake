@@ -47,3 +47,4 @@ testenv.ini
 gmon.out
 callgrind.out.*
 configure.ac
+vendor/
