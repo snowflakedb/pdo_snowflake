@@ -1,0 +1,15 @@
+{
+    "name": "snowflakedb/pdo_snowflake",
+    "description": "PHP PDO driver for Snowflake",
+    "require": {
+        "php": ">=7.4"
+    },
+    "authors": [
+        {
+            "name": "Snowflake Computing, Inc.",
+            "email": "support@snowflake.com",
+            "homepage": "https://www.snowflake.com/"
+        }
+    ],
+    "license": "Apache-2.0"
+}
