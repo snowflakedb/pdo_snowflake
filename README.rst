@@ -116,7 +116,7 @@ To build the PHP driver for Windows:
        git clone https://github.com/snowflakedb/pdo_snowflake.git
        cd pdo_snowflake
 
-#. Run the script to download the PHP source code:
+#. Run the script to download the PHP SDK:
 
    .. code-block:: batch
 
@@ -136,7 +136,7 @@ To build the PHP driver for Windows:
 
        .\\scripts\\setup_php_sdk.bat x64 Release VS16 C:\\php-sdk
 
-#. Download and install the PHP binaries, or build PHP yourself.
+#. Download and install the PHP binaries, or build the PHP source code.
 
    If you want to build PHP yourself, run the script to download the PHP source and build PHP:
 
