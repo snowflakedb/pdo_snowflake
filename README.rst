@@ -99,7 +99,7 @@ To build the PHP driver for Windows:
 
 #. Download and install the PHP SDK:
 
-    #. Download the PHP version binaries from `<https://windows.php.net/downloads/releases/>`_, such as `<https://windows.php.net/downloads/releases/php-8.0.16-Win32-vs16-x64.zip>`_.
+    #. Download the PHP version binaries from `<https://windows.php.net/downloads/releases/>`_, such as `<https://windows.php.net/downloads/releases/php-8.1.18-Win32-vs16-x64.zip>`_.
 
     #. Unzip the file to the desired directory, such as :code:`C:\php`.
 
@@ -120,7 +120,7 @@ To build the PHP driver for Windows:
 
    - :code:`<arch>` is your CPU architecture (:code:`x64` or :code:`x86`).
    - :code:`<build>` is the type of binary that you want to build (:code:`Release` or :code:`Debug`).
-   - :code:`<visual studio version>` is the version of Visual Studio that you are using (:code:`VS14`, :code:`VS15` or :code:`VS16`).
+   - :code:`<visual studio version>` is the version of Visual Studio that you are using (:code:`VS14`, :code:`VS15`, or :code:`VS16`).
    - :code:`<path to PHP SDK>` is the path to the directory where the PHP SDK should be downloaded.
      **Do not create this directory.** The script creates this directory for you when downloading the PHP SDK.
 
@@ -141,13 +141,13 @@ To build the PHP driver for Windows:
    For :code:`<arch>`, :code:`<build>`, :code:`<visual studio version>`, and :code:`<path to PHP SDK>`, specify the same values
    that you used in the previous step.
 
-   For :code:`<full PHP version>`, specify the full version number of PHP that you want to install (e.g. :code:`|win-php-version|`).
+   For :code:`<full PHP version>`, specify the full version number of PHP that you want to install (e.g. :code:`8.1.18`).
 
    For example:
 
    .. parsed-literal::
 
-       .\\scripts\\run_setup_php.bat x64 Release |win-vs-version| C:\\php-sdk
+       .\\scripts\\run_setup_php.bat x64 Release |win-vs-version| |win-php-version| C:\\php-sdk
 
 #. Run the script to build the driver:
 
