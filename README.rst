@@ -138,7 +138,7 @@ To build the PHP driver for Windows:
 
 #. Download and install the PHP binaries, or build the PHP source code.
 
-   If you want to build PHP yourself, run the script to download the PHP source and build PHP:
+   Run the script to download the PHP source and build PHP:
 
    .. code-block:: batch
 
