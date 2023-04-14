@@ -97,9 +97,15 @@ You must install Microsoft Visual Studio 2019 (VS16) or earlier with the C++ dev
 
 To build the PHP driver for Windows:
 
-#. Download and install the PHP SDK:
+#. Download and install PHP:
 
-    #. Download the PHP version binaries from `<https://windows.php.net/downloads/releases/>`_, such as `<https://windows.php.net/downloads/releases/php-8.1.18-Win32-vs16-x64.zip>`_.
+    #. Download the PHP version binaries from `<https://windows.php.net/downloads/releases/>`_, 
+       such as `<https://windows.php.net/downloads/releases/php-8.1.18-Win32-vs16-x64.zip>`_.
+
+       .. note::
+
+        The Snowflake PHP driver does not support Windows NTS, so don't download packages that
+        include *nts* in the package name.
 
     #. Unzip the file to the desired directory, such as :code:`C:\php`.
 
@@ -110,7 +116,7 @@ To build the PHP driver for Windows:
        git clone https://github.com/snowflakedb/pdo_snowflake.git
        cd pdo_snowflake
 
-#. Run the script to download the PHP SDK:
+#. Run the script to download the PHP source code:
 
    .. code-block:: batch
 
@@ -141,7 +147,7 @@ To build the PHP driver for Windows:
    For :code:`<arch>`, :code:`<build>`, :code:`<visual studio version>`, and :code:`<path to PHP SDK>`, specify the same values
    that you used in the previous step.
 
-   For :code:`<full PHP version>`, specify the full version number of PHP that you want to install (e.g. :code:`8.1.18`).
+   For :code:`<full PHP version>`, specify the full version number of PHP binary you installed (e.g. :code:`8.1.18`).
 
    For example:
 
@@ -159,7 +165,7 @@ To build the PHP driver for Windows:
 
    .. parsed-literal::
 
-       .\\scripts\\run_build_pdo_snowflake.bat x64 Release |win-vs-version| C:\\php-sdk
+       .\\scripts\\run_build_pdo_snowflake.bat x64 Release |win-vs-version| |win-php-version| C:\\php-sdk
 
 #.  Copy :code:`php_pdo_snowflake.dll` from the directory where you built the driver to the PHP extension 
     directory (the same directory that contains the :code:`php_pdo.dll file`). Usually, the PHP extension 
