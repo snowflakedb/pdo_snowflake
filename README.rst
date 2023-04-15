@@ -136,7 +136,7 @@ To build the PHP driver for Windows:
 
        .\\scripts\\setup_php_sdk.bat x64 Release VS16 C:\\php-sdk
 
-#. Download and install the PHP binaries, or build the PHP source code.
+#. Download and build the PHP source code.
 
    Run the script to download the PHP source and build PHP:
 
