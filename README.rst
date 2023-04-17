@@ -105,7 +105,7 @@ To build the PHP driver for Windows:
        .. note::
 
         The Snowflake PHP driver does not support Windows NTS, so don't download packages that
-        include *nts* in the package name.
+        include ``nts`` in the package name.
 
     #. Unzip the file to the desired directory, such as :code:`C:\php`.
 
@@ -147,7 +147,7 @@ To build the PHP driver for Windows:
    For :code:`<arch>`, :code:`<build>`, :code:`<visual studio version>`, and :code:`<path to PHP SDK>`, specify the same values
    that you used in the previous step.
 
-   For :code:`<full PHP version>`, specify the full version number of PHP binary you installed (e.g. :code:`8.1.18`).
+   For :code:`<full PHP version>`, specify the full version number of the PHP binary you installed (e.g. :code:`8.1.18`).
 
    For example:
 
