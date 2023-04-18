@@ -56,29 +56,29 @@ if [[ "$PLATFORM" == "linux" ]]; then
         .libs/snowflake_arraylist.o \
         .libs/snowflake_treemap.o \
         .libs/snowflake_rbtree.o \
-        libsnowflakeclient/lib/linux/libsnowflakeclient.a \
-        libsnowflakeclient/deps-build/linux/openssl/lib/libcrypto.a \
-        libsnowflakeclient/deps-build/linux/openssl/lib/libssl.a \
-        libsnowflakeclient/deps-build/linux/curl/lib/libcurl.a \
-        libsnowflakeclient/deps-build/linux/oob/lib/libtelemetry.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-core.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-s3.a \
-        libsnowflakeclient/deps-build/linux/azure/lib/libazure-storage-lite.a \
-        libsnowflakeclient/deps-build/linux/uuid/lib/libuuid.a \
-        libsnowflakeclient/deps-build/linux/arrow/lib/libarrow.a \
-        libsnowflakeclient/deps-build/linux/arrow_deps/lib/libjemalloc_pic.a \
-        libsnowflakeclient/deps-build/linux/boost/lib/libboost_filesystem.a \
-        libsnowflakeclient/deps-build/linux/boost/lib/libboost_regex.a \
-        libsnowflakeclient/deps-build/linux/boost/lib/libboost_system.a \
+        libsnowflakeclient/lib/linux/$ARCH/libsnowflakeclient.a \
+        libsnowflakeclient/deps-build/linux/$ARCH/openssl/lib/libcrypto.a \
+        libsnowflakeclient/deps-build/linux/$ARCH/openssl/lib/libssl.a \
+        libsnowflakeclient/deps-build/linux/$ARCH/curl/lib/libcurl.a \
+        libsnowflakeclient/deps-build/linux/$ARCH/oob/lib/libtelemetry.a \
+        libsnowflakeclient/deps-build/linux/$ARCH/aws/lib64/libaws-cpp-sdk-core.a \
+        libsnowflakeclient/deps-build/linux/$ARCH/aws/lib64/libaws-cpp-sdk-s3.a \
+        libsnowflakeclient/deps-build/linux/$ARCH/azure/lib/libazure-storage-lite.a \
+        libsnowflakeclient/deps-build/linux/$ARCH/uuid/lib/libuuid.a \
+        libsnowflakeclient/deps-build/linux/$ARCH/arrow/lib/libarrow.a \
+        libsnowflakeclient/deps-build/linux/$ARCH/arrow_deps/lib/libjemalloc_pic.a \
+        libsnowflakeclient/deps-build/linux/$ARCH/boost/lib/libboost_filesystem.a \
+        libsnowflakeclient/deps-build/linux/$ARCH/boost/lib/libboost_regex.a \
+        libsnowflakeclient/deps-build/linux/$ARCH/boost/lib/libboost_system.a \
         -O2 \
         -Wl,--whole-archive \
         -Wl,--no-whole-archive \
         -Wl,-soname \
         -Wl,pdo_snowflake.so \
         -o .libs/pdo_snowflake.so \
-        libsnowflakeclient/deps-build/linux/openssl/lib/libssl.a \
-        libsnowflakeclient/deps-build/linux/openssl/lib/libcrypto.a \
-        libsnowflakeclient/deps-build/linux/cmocka/lib/libcmocka.a
+        libsnowflakeclient/deps-build/linux/$ARCH/openssl/lib/libssl.a \
+        libsnowflakeclient/deps-build/linux/$ARCH/openssl/lib/libcrypto.a \
+        libsnowflakeclient/deps-build/linux/$ARCH/cmocka/lib/libcmocka.a
 elif [[ "$PLATFORM" == "darwin" ]]; then
     # Darwin uses -force_load instead
     echo "Linking for Darwin"
