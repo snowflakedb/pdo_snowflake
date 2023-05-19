@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: build_test_windows_php8-0-7_vs16
+name: build_test_windows_php8-0_vs16
 
 # Controls when the action will run. 
 on:
@@ -29,7 +29,7 @@ jobs:
       ARCH: x64
       TARGET: Release
       VS: VS16
-      PHP: 8.0.7
+      PHP: 8.0.28
       TEST_PHP_EXECUTABLE: c:\tools\php\php.exe
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -38,7 +38,7 @@ jobs:
       - name: setup php
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0.7
+          php-version: '8.0'
           extensions: pdo, json
         env:
           phpts: ts
