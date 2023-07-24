@@ -107,7 +107,7 @@ if test "$PHP_COVERAGE" = "yes"; then
   if test "$gcc_ccache" = "yes" && (test -z "$CCACHE_DISABLE" || test "$CCACHE_DISABLE" != "1"); then
     AC_MSG_ERROR([ccache must be disabled when --enable-coverage option is used. You can disable ccache by setting environment variable CCACHE_DISABLE=1.])
   fi
-  lcov_version_list="1.5 1.6 1.7 1.9 1.10 1.11"
+  lcov_version_list="1.5 1.6 1.7 1.9 1.10 1.11 1.12 1.13 1.14 1.15 1.16"
   AC_CHECK_PROG(LCOV, lcov, lcov)
   AC_CHECK_PROG(GENHTML, genhtml, genhtml)
   PHP_SUBST(LCOV)

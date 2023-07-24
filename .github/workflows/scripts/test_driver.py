@@ -67,6 +67,11 @@ def test_posix():
     print ("====> parse test results")
     run_command("python ./.github/workflows/scripts/check_result.py ./tests")
 
+    coverage = os.environ.get('REPORT_COVERAGE', 'undef')
+    if coverage == 'true' or coverage == '1':
+        print ("====> run code coverage")
+        run_command("lcov -c -d .libs --output-file main_coverage.info")
+        run_command("genhtml main_coverage.info --output-directory php_coverage_report")
 
 def main():
     current_os = os.name

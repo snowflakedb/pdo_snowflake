@@ -27,18 +27,6 @@ RedBlackNode * STDCALL pdo_rbtree_new_node(void)
   return ((RedBlackNode *)ecalloc(1,sizeof(RedBlackNode)));
 }
 
-int STDCALL pdo_rbtree_is_left_child(RedBlackNode *node)
-{
-  if (!node->parent || node == node->parent->left)
-  {
-    return 1;
-  }
-  else
-  {
-    return 0;
-  }
-}
-
 RedBlackNode * STDCALL pdo_rbtree_get_uncle(RedBlackTree *target)
 {
   if (!target->parent->parent)

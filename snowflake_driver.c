@@ -401,7 +401,9 @@ pdo_snowflake_get_attribute(pdo_dbh_t *dbh, zend_long attr,
     PDO_LOG_DBG("attr=%l", attr);
     switch (attr) {
         /* TODO: add more attributes */
-        case PDO_ATTR_AUTOCOMMIT: ZVAL_LONG(return_value, dbh->auto_commit);
+        case PDO_ATTR_AUTOCOMMIT:
+            ZVAL_LONG(return_value, dbh->auto_commit);
+            PDO_LOG_RETURN(1);
             break;
         default:
             /**/

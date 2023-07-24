@@ -41,23 +41,48 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     }
 
     echo "==> Bind parameters more than 8\n";
-    $q = 'SELECT :id0, :id1, :id2, :id3, :id4, :id5, :id6, :id7 , :id8';
+    // use carefully choosed binding names having same hash code
+    // to test rbtree (C1 ~ bX)
+    $q = 'SELECT :id0, :id1, :id2, :id3, :C1, :Ao, :BP, :c9, :bX';
     $sth = $dbh->prepare($q);
     $sth->bindValue(":id0", 'a');
     $sth->bindValue(":id1", 'b');
     $sth->bindValue(":id2", 'c');
     $sth->bindValue(":id3", 'd');
-    $sth->bindValue(":id4", 'e');
-    $sth->bindValue(":id5", 'f');
-    $sth->bindValue(":id6", 'g');
-    $sth->bindValue(":id7", 'h');
-    $sth->bindValue(":id8", 'i');
+    $sth->bindValue(":C1", 'e');
+    // test named parameter overwrite
+    $sth->bindValue(":Ao", 'e');
+    $sth->bindValue(":Ao", 'f');
+    $sth->bindValue(":BP", 'g');
+    $sth->bindValue(":c9", 'h');
+    $sth->bindValue(":bX", 'i');
 
     $sth->execute();
     while($row = $sth->fetch()) {
         echo $row[0] . " " . $row[1] . " " . $row[2] . " " . $row[3] . " " . $row[4] . " " . $row[5] . " " . $row[6] . " " . $row[7] . " " . $row[8] . "\n";
     }
 
+    echo "==> Bind parameters with names all share same hash code\n";
+    // use carefully choosed binding names having same hash code
+    // to test rbtree
+    $q = 'SELECT :bX, :c9, :BP, :A41, :C1, :Ao, :A3P, :A2o, :B3w';
+    $sth = $dbh->prepare($q);
+    $sth->bindValue(":bX", 'a');
+    $sth->bindValue(":c9", 'b');
+    $sth->bindValue(":BP", 'c');
+    $sth->bindValue(":A41", 'd');
+    $sth->bindValue(":C1", 'e');
+    // test named parameter overwrite
+    $sth->bindValue(":Ao", 'e');
+    $sth->bindValue(":Ao", 'f');
+    $sth->bindValue(":A3P", 'g');
+    $sth->bindValue(":A2o", 'h');
+    $sth->bindValue(":B3w", 'i');
+
+    $sth->execute();
+    while($row = $sth->fetch()) {
+        echo $row[0] . " " . $row[1] . " " . $row[2] . " " . $row[3] . " " . $row[4] . " " . $row[5] . " " . $row[6] . " " . $row[7] . " " . $row[8] . "\n";
+    }
 ?>
 ===DONE===
 <?php exit(0); ?>
@@ -68,5 +93,7 @@ Connected to Snowflake
 ==> Mixing parameters
 Caught Exception: SQLSTATE[HY105]: Invalid parameter type: Mixing Named and Positional parameter is not allowed in Snowflake PDO Driver
 ==> Bind parameters more than 8
+a b c d e f g h i
+==> Bind parameters with names all share same hash code
 a b c d e f g h i
 ===DONE===
