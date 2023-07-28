@@ -13,12 +13,28 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT );
     }
     echo "Connected to Snowflake\n";
-    $attributes = array("ERRMODE", "CASE", "ORACLE_NULLS", "PERSISTENT");
+    $attributes = array("ERRMODE", "CASE", "ORACLE_NULLS", "PERSISTENT", "AUTOCOMMIT");
 
     foreach ($attributes as $val) {
         echo "PDO::ATTR_$val: ";
         echo $dbh->getAttribute(constant("PDO::ATTR_$val")) . "\n";
     }
+
+    $dbh->setAttribute( PDO::ATTR_AUTOCOMMIT, false );
+        echo "PDO::ATTR_AUTOCOMMIT: ";
+        echo $dbh->getAttribute(PDO::ATTR_AUTOCOMMIT) . "\n";
+
+    // test driver information returned from phpinfo()
+    ob_start();
+    phpinfo(INFO_MODULES) ;
+    $pinfo = ob_get_contents();
+    ob_end_clean();
+    $f1 = (strpos($pinfo, "PDO Driver for Snowflake => enabled") === false);
+    $f2 = (strpos($pinfo, "pdo_snowflake.cacert") === false);
+    $f3 = (strpos($pinfo, "pdo_snowflake.debug") === false);
+    $f4 = (strpos($pinfo, "pdo_snowflake.logdir") === false);
+    $f5 = (strpos($pinfo, "pdo_snowflake.loglevel") === false);
+    echo (int)$f1 . " " . (int)$f2 . " " . (int)$f3 . " " . (int)$f4 . " " . (int)$f5 . "\n";
 
 ?>
 ===DONE===
@@ -29,4 +45,7 @@ PDO::ATTR_ERRMODE: 0
 PDO::ATTR_CASE: 0
 PDO::ATTR_ORACLE_NULLS: 0
 PDO::ATTR_PERSISTENT: 
+PDO::ATTR_AUTOCOMMIT: 1
+PDO::ATTR_AUTOCOMMIT: 0
+0 0 0 0 0
 ===DONE===

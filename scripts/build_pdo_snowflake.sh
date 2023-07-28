@@ -75,6 +75,7 @@ if [[ "$PLATFORM" == "linux" ]]; then
         -Wl,--no-whole-archive \
         -Wl,-soname \
         -Wl,pdo_snowflake.so \
+        $LINK_OPTS \
         -o .libs/pdo_snowflake.so \
         libsnowflakeclient/deps-build/linux/openssl/lib/libssl.a \
         libsnowflakeclient/deps-build/linux/openssl/lib/libcrypto.a \
