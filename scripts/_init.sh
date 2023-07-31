@@ -9,10 +9,15 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PLATFORM=$(echo $(uname) | tr '[:upper:]' '[:lower:]')
 
 # Find cmake, gcc and g++ on target machine. Need cmake 3.0+, gcc/g++ 4.9+
-if [[ "$(which cmake3)" ]]; then
-    CMAKE="$(which cmake3)"
-else
-    CMAKE="$(which cmake)"
+if [[ -z "$CMAKE" ]]; then
+    if [[ "$(which cmake3)" ]]; then
+        CMAKE="$(which cmake3)"
+    elif [[ "$(which cmake)" ]]; then
+        CMAKE="$(which cmake)"
+    else
+        echo "[ERROR] cmake not found! Please install cmake."
+        exit 1
+    fi
 fi
 
 if [[ -z "$GCC" || -z "$GXX" ]]; then
