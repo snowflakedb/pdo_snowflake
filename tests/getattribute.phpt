@@ -36,6 +36,13 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     $f5 = (strpos($pinfo, "pdo_snowflake.loglevel") === false);
     echo (int)$f1 . " " . (int)$f2 . " " . (int)$f3 . " " . (int)$f4 . " " . (int)$f5 . "\n";
 
+    $driver_ver = $dbh->getAttribute(PDO::ATTR_CLIENT_VERSION);
+    if (strcmp($driver_ver, '1.2.7') >= 0) {
+        echo "Successfully get dirver version " . $driver_ver . "\n";
+    }
+    else {
+        echo "Failed get dirver version.\n";
+    }
 ?>
 ===DONE===
 <?php exit(0); ?>
@@ -48,4 +55,5 @@ PDO::ATTR_PERSISTENT:
 PDO::ATTR_AUTOCOMMIT: 1
 PDO::ATTR_AUTOCOMMIT: 0
 0 0 0 0 0
+Successfully get dirver version 1.2.7
 ===DONE===
