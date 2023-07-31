@@ -1,16 +1,14 @@
 name: Build and Test
 
 on:
-    push:
-        branches:
-            - master
-        tags:
-            - v*
-    pull_request:
-        branches:
-            - master
-            - prep-**
-    workflow_dispatch:
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  push:
+    branches: [ master, simba-driverbuildtest-workflow ]
+  pull_request:
+    branches: [ master, simba-driverbuildtest-workflow ]
+
+  workflow_dispatch:
 
 concurrency:
   # older builds for the same pull request numer or branch should be cancelled
