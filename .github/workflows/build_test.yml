@@ -28,7 +28,7 @@ jobs:
         # have to specify minor version for 8.1 on windows
         # otherwise could get version mismatch issue when running test on github
         # need to keep track on the latest version
-        php-version: ['7.4', '8.0', '8.1.21']
+        php-version: ['7.4', '8.0', '8.1.21', '8.2']
     # The type of runner that the job will run on
     runs-on: windows-2019
     env:
@@ -60,7 +60,7 @@ jobs:
   build_test_linux:
     strategy:
       matrix:
-        php-version: ['7.4', '8.0', '8.1']
+        php-version: ['7.4', '8.0', '8.1', '8.2']
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     env:
@@ -87,7 +87,7 @@ jobs:
   build_test_mac:
     strategy:
       matrix:
-        php-version: ['7.4', '8.0', '8.1']
+        php-version: ['7.4', '8.0', '8.1', '8.2']
     # The type of runner that the job will run on
     runs-on: macos-latest
     env: 
@@ -126,7 +126,7 @@ jobs:
         - name: setup php
           uses: shivammathur/setup-php@v2
           with:
-            php-version: '8.1'
+            php-version: '8.2'
             extensions: pdo, json
             coverage: xdebug2
 
