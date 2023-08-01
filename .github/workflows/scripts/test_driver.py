@@ -73,7 +73,7 @@ def test_posix():
         run_command("lcov -c -d .libs --output-file main_coverage.info")
         run_command("genhtml main_coverage.info --output-directory php_coverage_report")
         # Generate .gcov files for Codecov
-        run_command("gcov --object-directory .libs")
+        run_command("gcov --object-directory .libs .")
 
 def main():
     current_os = os.name
