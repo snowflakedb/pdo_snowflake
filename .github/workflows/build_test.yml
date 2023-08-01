@@ -140,9 +140,20 @@ jobs:
         - name: test driver
           run: python ./.github/workflows/scripts/test_driver.py
 
-        - name: Upload coverage reports to Codecov
+        # codecov action sometimes fails but retry works - until action provides retry let's retry on our own https://github.com/codecov/codecov-action/issues/926
+        - name: Upload coverage reports to Codecov with GitHub Action (take 1)
+          id: uploadToCodeCovTake1
           uses: codecov/codecov-action@v3
           continue-on-error: true
+          with:
+            gcov: true
+            verbose: true
+            fail_ci_if_error: true
+        - name: Upload coverage reports to Codecov with GitHub Action (take 2)
+          id: uploadToCodeCovTake2
+          # only run when take 1 failed
+          if: steps.uploadToCodeCovTake1.outcome == 'failure'
+          uses: codecov/codecov-action@v3
           with:
             gcov: true
             verbose: true
