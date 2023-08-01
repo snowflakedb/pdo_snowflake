@@ -141,10 +141,9 @@ jobs:
           run: python ./.github/workflows/scripts/test_driver.py
 
         - name: Upload coverage reports to Codecov
-              id: uploadToCodeCov
-              uses: codecov/codecov-action@v3
-              continue-on-error: true
-              with:
-                gcov: true
-                verbose: true
-                fail_ci_if_error: true
+          uses: codecov/codecov-action@v3
+          continue-on-error: true
+          with:
+            gcov: true
+            verbose: true
+            fail_ci_if_error: true
