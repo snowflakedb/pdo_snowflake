@@ -39,10 +39,10 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     $driver_ver = $dbh->getAttribute(PDO::ATTR_CLIENT_VERSION);
     if (strcmp($driver_ver, '1.2.7') >= 0) {
         // comment out driver version to avoid update test case for each release
-        echo "Successfully get dirver version " . /*$driver_ver .*/ "\n";
+        echo "Successfully get driver version " . /*$driver_ver .*/ "\n";
     }
     else {
-        echo "Failed get dirver version.\n";
+        echo "Failed get driver version.\n";
     }
 ?>
 ===DONE===
@@ -56,5 +56,5 @@ PDO::ATTR_PERSISTENT:
 PDO::ATTR_AUTOCOMMIT: 1
 PDO::ATTR_AUTOCOMMIT: 0
 0 0 0 0 0
-Successfully get dirver version 
+Successfully get driver version 
 ===DONE===
