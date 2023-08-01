@@ -405,6 +405,10 @@ pdo_snowflake_get_attribute(pdo_dbh_t *dbh, zend_long attr,
             ZVAL_LONG(return_value, dbh->auto_commit);
             PDO_LOG_RETURN(1);
             break;
+        case PDO_ATTR_CLIENT_VERSION:
+            ZVAL_STRINGL(return_value, PDO_SNOWFLAKE_VERSION, strlen(PDO_SNOWFLAKE_VERSION));
+            PDO_LOG_RETURN(1);
+            break;
         default:
             /**/
             PDO_LOG_RETURN(0);
