@@ -108,10 +108,22 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
 {
     PDO_LOG_ENTER("pdo_snowflake_stmt_execute_prepared");
     int i;
+    SF_STATUS query_status;
+    const char * qid;
     pdo_snowflake_stmt *S = stmt->driver_data;
+    pdo_snowflake_db_handle *H = S->H;
 
     /* execute */
-    if (snowflake_execute(S->stmt) != SF_STATUS_SUCCESS) {
+	query_status = snowflake_execute(S->stmt);
+
+    //save query id if available
+    qid = snowflake_sfqid(S->stmt);
+    if (qid && (strlen(qid) > 0))
+    {
+        strncpy(H->last_qid, qid, sizeof(H->last_qid) - 1);
+    }
+
+    if (query_status != SF_STATUS_SUCCESS) {
         pdo_snowflake_error_stmt(stmt);
         PDO_LOG_RETURN(0);
     }
@@ -141,6 +153,8 @@ static int pdo_snowflake_stmt_execute(pdo_stmt_t *stmt) /* {{{ */
 {
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     pdo_snowflake_db_handle *H = S->H;
+    SF_STATUS query_status;
+    const char * qid;
     PDO_LOG_ENTER("pdo_snowflake_stmt_execute");
 
     if (S->stmt) {
@@ -150,14 +164,21 @@ static int pdo_snowflake_stmt_execute(pdo_stmt_t *stmt) /* {{{ */
 
     // TODO: stmt->active_query_stringlen should be specified.
 #if (PHP_VERSION_ID >= 80100)
-    if (snowflake_query(S->stmt, ZSTR_VAL(stmt->active_query_string),
-                        ZSTR_LEN(stmt->active_query_string)) !=
-        SF_STATUS_SUCCESS) {
+    query_status = snowflake_query(S->stmt, ZSTR_VAL(stmt->active_query_string),
+                                   ZSTR_LEN(stmt->active_query_string));
 #else
-    if (snowflake_query(S->stmt, stmt->active_query_string,
-                        stmt->active_query_stringlen) !=
-        SF_STATUS_SUCCESS) {
+    query_status = snowflake_query(S->stmt, stmt->active_query_string,
+                                   stmt->active_query_stringlen);
 #endif
+
+    //save query id if available
+    qid = snowflake_sfqid(S->stmt);
+    if (qid && (strlen(qid) > 0))
+    {
+        strncpy(H->last_qid, qid, sizeof(H->last_qid) - 1);
+    }
+
+    if (query_status != SF_STATUS_SUCCESS) {
         PDO_LOG_RETURN(0);
     }
     PDO_LOG_RETURN(1);
@@ -643,6 +664,38 @@ static int pdo_snowflake_stmt_cursor_closer(pdo_stmt_t *stmt) /* {{{ */
 
 /* }}} */
 
+/**
+ * Maps to the PDOStatement::getAttribute. Gets the value of a given attribute on a statement.
+ *
+ * @param stmt Current statement for which the attribute value is requested.
+ * @param attr Represents any valid set of attribute constants supported by this driver.
+ * @param return_value Attribute value.
+ * @return 1 if success or 0 if error occurs
+ */
+int pdo_snowflake_stmt_get_attr(pdo_stmt_t *stmt, zend_long attr, zval *return_value )
+{
+    PDO_LOG_ENTER("pdo_snowflake_stmt_get_attr");
+
+    if (!stmt) {
+        PDO_LOG_RETURN(0);
+    }
+    pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
+    PDO_LOG_RETURN(1);
+
+    PDO_LOG_DBG("stmt=%p", stmt);
+    PDO_LOG_DBG("attr=%l", attr);
+    switch (attr) {
+        case PDO_SNOWFLAKE_ATTR_QUERY_ID:
+            ZVAL_STRINGL(return_value, snowflake_sfqid(S->stmt), strlen(snowflake_sfqid(S->stmt)));
+            PDO_LOG_RETURN(1);
+            break;
+        default:
+            /**/
+            PDO_LOG_RETURN(0);
+    }
+    PDO_LOG_RETURN(0);
+}
+
 #if (PHP_VERSION_ID < 80100)
 struct pdo_stmt_methods snowflake_stmt_methods = {
   pdo_snowflake_stmt_dtor,
@@ -686,7 +739,7 @@ struct pdo_stmt_methods snowflake_stmt_methods = {
   pdo_snowflake_stmt_get_col_newif,
   pdo_snowflake_stmt_param_hook,
   NULL, /* set_attr */
-  NULL, /* get_attr */
+  pdo_snowflake_stmt_get_attr,
   pdo_snowflake_stmt_col_meta,
   pdo_snowflake_stmt_next_rowset,
   pdo_snowflake_stmt_cursor_closer
