@@ -680,7 +680,6 @@ int pdo_snowflake_stmt_get_attr(pdo_stmt_t *stmt, zend_long attr, zval *return_v
         PDO_LOG_RETURN(0);
     }
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
-    PDO_LOG_RETURN(1);
 
     PDO_LOG_DBG("stmt=%p", stmt);
     PDO_LOG_DBG("attr=%l", attr);
@@ -705,7 +704,7 @@ struct pdo_stmt_methods snowflake_stmt_methods = {
   pdo_snowflake_stmt_get_col,
   pdo_snowflake_stmt_param_hook,
   NULL, /* set_attr */
-  NULL, /* get_attr */
+  pdo_snowflake_stmt_get_attr,
   pdo_snowflake_stmt_col_meta,
   pdo_snowflake_stmt_next_rowset,
   pdo_snowflake_stmt_cursor_closer
