@@ -25,10 +25,10 @@ jobs:
   build_test_windows:
     strategy:
       matrix:
-        # have to specify minor version for 8.1 on windows
+        # have to specify minor version on windows
         # otherwise could get version mismatch issue when running test on github
         # need to keep track on the latest version
-        php-version: ['7.4', '8.0', '8.1.21', '8.2']
+        php-version: ['8.0.30', '8.1.23', '8.2.10']
     # The type of runner that the job will run on
     runs-on: windows-2019
     env:
