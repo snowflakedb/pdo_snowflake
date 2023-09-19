@@ -46,6 +46,7 @@ typedef struct {
 
 typedef struct {
     SF_CONNECT *server;
+    char last_qid[SF_UUID4_LEN];
 } pdo_snowflake_db_handle;
 
 typedef struct {
@@ -74,7 +75,8 @@ extern void _pdo_snowflake_user_dealloc(void* ptr);
 enum {
     PDO_SNOWFLAKE_ATTR_SSL_CAPATH = PDO_ATTR_DRIVER_SPECIFIC,
     PDO_SNOWFLAKE_ATTR_SSL_VERSION,
-    PDO_SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS
+    PDO_SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS,
+    PDO_SNOWFLAKE_ATTR_QUERY_ID
 };
 
 #define PDO_SNOWFLAKE_CONN_ATTR_HOST_IDX 0

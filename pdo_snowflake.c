@@ -74,6 +74,10 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
       "SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS",
       (zend_long) PDO_SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS);
 
+    REGISTER_PDO_CLASS_CONST_LONG(
+      "SNOWFLAKE_ATTR_QUERY_ID",
+      (zend_long) PDO_SNOWFLAKE_ATTR_QUERY_ID);
+
     return php_pdo_register_driver(&pdo_snowflake_driver);
 }
 /* }}} */
