@@ -34,11 +34,12 @@
 #endif
 
 /* Compile-time deprecation macros. */
-#if defined(__GNUC__) && (__GNUC__ >= 6) &&                             \
+#if defined(__GNUC__) &&                                                \
+  ((__GNUC__ > 12) || ((__GNUC__ == 12) && (__GNUC_MINOR__ >= 1 ))) &&  \
   !defined(__INTEL_COMPILER) &&                                         \
   !defined(CURL_DISABLE_DEPRECATION) && !defined(BUILDING_LIBCURL)
-#define CURL_DEPRECATED(version, message) \
-    __attribute__((deprecated("since " # version ". " message)))
+#define CURL_DEPRECATED(version, message)                       \
+  __attribute__((deprecated("since " # version ". " message)))
 #define CURL_IGNORE_DEPRECATION(statements) \
       _Pragma("GCC diagnostic push") \
       _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"") \
@@ -177,8 +178,9 @@ typedef enum {
 } curl_sslbackend;
 
 /* aliases for library clones and renames */
-#define CURLSSLBACKEND_LIBRESSL CURLSSLBACKEND_OPENSSL
+#define CURLSSLBACKEND_AWSLC CURLSSLBACKEND_OPENSSL
 #define CURLSSLBACKEND_BORINGSSL CURLSSLBACKEND_OPENSSL
+#define CURLSSLBACKEND_LIBRESSL CURLSSLBACKEND_OPENSSL
 
 /* deprecated names: */
 #define CURLSSLBACKEND_CYASSL CURLSSLBACKEND_WOLFSSL
@@ -334,7 +336,8 @@ struct curl_fileinfo {
 
   unsigned int flags;
 
-  /* used internally */
+  /* These are libcurl private struct fields. Previously used by libcurl, so
+     they must never be interfered with. */
   char *b_data;
   size_t b_size;
   size_t b_used;
@@ -781,7 +784,8 @@ typedef enum {
                            CONNECT HTTP/1.1 */
   CURLPROXY_HTTP_1_0 = 1,   /* added in 7.19.4, force to use CONNECT
                                HTTP/1.0  */
-  CURLPROXY_HTTPS = 2, /* added in 7.52.0 */
+  CURLPROXY_HTTPS = 2,  /* HTTPS but stick to HTTP/1 added in 7.52.0 */
+  CURLPROXY_HTTPS2 = 3, /* HTTPS and attempt HTTP/2 added in 8.1.0 */
   CURLPROXY_SOCKS4 = 4, /* support added in 7.15.2, enum existed already
                            in 7.10 */
   CURLPROXY_SOCKS5 = 5, /* added in 7.10 */
@@ -2212,6 +2216,9 @@ typedef enum {
 
   /* Snowflake options. True if soft fail is enabled */
   CURLOPT(CURLOPT_SSL_SF_OCSP_FAIL_OPEN, CURLOPTTYPE_LONG, 324),
+
+  /* Snowflake options. True if OOB telemetry is enabled. Defaults to false */
+  CURLOPT(CURLOPT_SSL_SF_OOB_ENABLE, CURLOPTTYPE_LONG, 325),
 
   CURLOPT_LASTENTRY /* the last unused */
 } CURLoption;
