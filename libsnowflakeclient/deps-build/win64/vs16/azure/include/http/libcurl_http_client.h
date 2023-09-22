@@ -327,7 +327,12 @@ namespace azure {  namespace storage_lite {
                 {
                   curl_easy_setopt(h, CURLOPT_PROXY, proxy_host.c_str());
                   curl_easy_setopt(h, CURLOPT_PROXYPORT, (long) proxy_port);
-                  if (!proxy_user.empty() || !proxy_password.empty())
+                  // guard against Proxy-Authorization Header being send in
+                  // case both username and password are empty
+                  // send it anyway when either one of them is not empty as
+                  // in such case it's the customer's responsibility to make
+                  // the correct settings
+                  if (!(proxy_user.empty() && proxy_password.empty()))
                   {
                     curl_easy_setopt(h, CURLOPT_PROXYUSERNAME, proxy_user.c_str());
                     curl_easy_setopt(h, CURLOPT_PROXYPASSWORD, proxy_password.c_str());
