@@ -579,7 +579,9 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"priv_key_file",       NULL,         0},
         {"priv_key_file_pwd",   NULL,         0},
         {"proxy",               NULL,         0},
-        {"no_proxy",            NULL,         0}
+        {"no_proxy",            NULL,         0},
+        {"disablequerycontextcache", "false", 0},
+        {"includeretryreason",  "true",       0}
     };
 
     // Parse the input data parameters
@@ -767,6 +769,22 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     }
     PDO_LOG_DBG(
         "no_proxy: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_NO_PROXY_IDX].optval);
+
+    snowflake_set_attribute(
+        H->server, SF_CON_DISABLE_QUERY_CONTEXT_CACHE,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_DISABLE_QUERY_CONTEXT_CACHE_IDX].optval, "true") == 0) ?
+            &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG(
+        "disablequerycontextcache: %s",
+        vars[PDO_SNOWFLAKE_CONN_ATTR_DISABLE_QUERY_CONTEXT_CACHE_IDX].optval);
+
+    snowflake_set_attribute(
+        H->server, SF_CON_INCLUDE_RETRY_REASON,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_INCLUDE_RETRY_REASON_IDX].optval, "true") == 0) ?
+            &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG(
+        "includeretryreason: %s",
+        vars[PDO_SNOWFLAKE_CONN_ATTR_INCLUDE_RETRY_REASON_IDX].optval);
 
     if (snowflake_connect(H->server) > 0) {
         pdo_snowflake_error(dbh);
