@@ -231,6 +231,8 @@ snowflake_handle_doer(pdo_dbh_t *dbh, const char *sql, size_t sql_len) /* {{{ */
 {
     PDO_LOG_ENTER("snowflake_handle_doer");
     int ret = 0;
+    SF_STATUS query_status;
+    const char * qid;
     pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
     PDO_LOG_DBG("sql: %.*s, len: %d", sql_len, sql, sql_len);
     SF_STMT *sfstmt = snowflake_stmt(H->server);
@@ -239,7 +241,16 @@ snowflake_handle_doer(pdo_dbh_t *dbh, const char *sql, size_t sql_len) /* {{{ */
     snowflake_stmt_set_attr(sfstmt, SF_STMT_USER_REALLOC_FUNC,
                             _pdo_snowflake_user_realloc);
 
-    if (snowflake_query(sfstmt, sql, sql_len) == SF_STATUS_SUCCESS) {
+    query_status = snowflake_query(sfstmt, sql, sql_len);
+
+    //save query id if available
+    qid = snowflake_sfqid(sfstmt);
+    if (qid && (strlen(qid) > 0))
+    {
+        strncpy(H->last_qid, qid, sizeof(H->last_qid) - 1);
+    }
+
+    if (query_status == SF_STATUS_SUCCESS) {
         int64 rows = snowflake_affected_rows(sfstmt);
         if (rows == -1) {
             snowflake_propagate_error(H->server, sfstmt);
@@ -409,6 +420,10 @@ pdo_snowflake_get_attribute(pdo_dbh_t *dbh, zend_long attr,
             ZVAL_STRINGL(return_value, PDO_SNOWFLAKE_VERSION, strlen(PDO_SNOWFLAKE_VERSION));
             PDO_LOG_RETURN(1);
             break;
+        case PDO_SNOWFLAKE_ATTR_QUERY_ID:
+            ZVAL_STRINGL(return_value, H->last_qid, strlen(H->last_qid));
+            PDO_LOG_RETURN(1);
+            break;
         default:
             /**/
             PDO_LOG_RETURN(0);
@@ -564,7 +579,9 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"priv_key_file",       NULL,         0},
         {"priv_key_file_pwd",   NULL,         0},
         {"proxy",               NULL,         0},
-        {"no_proxy",            NULL,         0}
+        {"no_proxy",            NULL,         0},
+        {"disablequerycontextcache", "false", 0},
+        {"includeretryreason",  "true",       0}
     };
 
     // Parse the input data parameters
@@ -573,6 +590,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
                               sizeof(struct pdo_data_src_parser));
 
     H = pecalloc(1, sizeof(pdo_snowflake_db_handle), dbh->is_persistent);
+    H->last_qid[0] = '\0';
 
     //TODO set error stuff
 
@@ -751,6 +769,22 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     }
     PDO_LOG_DBG(
         "no_proxy: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_NO_PROXY_IDX].optval);
+
+    snowflake_set_attribute(
+        H->server, SF_CON_DISABLE_QUERY_CONTEXT_CACHE,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_DISABLE_QUERY_CONTEXT_CACHE_IDX].optval, "true") == 0) ?
+            &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG(
+        "disablequerycontextcache: %s",
+        vars[PDO_SNOWFLAKE_CONN_ATTR_DISABLE_QUERY_CONTEXT_CACHE_IDX].optval);
+
+    snowflake_set_attribute(
+        H->server, SF_CON_INCLUDE_RETRY_REASON,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_INCLUDE_RETRY_REASON_IDX].optval, "true") == 0) ?
+            &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG(
+        "includeretryreason: %s",
+        vars[PDO_SNOWFLAKE_CONN_ATTR_INCLUDE_RETRY_REASON_IDX].optval);
 
     if (snowflake_connect(H->server) > 0) {
         pdo_snowflake_error(dbh);
