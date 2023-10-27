@@ -64,7 +64,17 @@ extern "C" {
 /**
  * Login timeout in seconds
  */
-#define SF_LOGIN_TIMEOUT 120
+#define SF_LOGIN_TIMEOUT 300
+
+ /**
+ * network timeout other than login requests
+ */
+#define SF_NETWORK_TIMEOUT 120
+
+ /**
+ * max retry number for login reuests (login/authenticator/token)
+ */
+#define SF_LOGIN_MAX_RETRY 7
 
 /**
  * Default JWT timeout in seconds
