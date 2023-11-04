@@ -62,6 +62,7 @@ int STDCALL sf_unsetenv(const char *name);
 
 int STDCALL sf_mkdir(const char *path);
 
+char* STDCALL sf_strerror(int errnum);
 
 int STDCALL
 _thread_init(SF_THREAD_HANDLE *thread, void *(*proc)(void *), void *arg);
