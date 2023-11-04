@@ -815,6 +815,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
             &int_attr_value);
         PDO_LOG_DBG(
             "retryimeout: %d", int_attr_value);
+    }
 
     if (snowflake_connect(H->server) > 0) {
         pdo_snowflake_error(dbh);
