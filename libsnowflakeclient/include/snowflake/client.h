@@ -64,17 +64,19 @@ extern "C" {
 /**
  * Login timeout in seconds
  */
+// make the login timetout defaults to 300 to be inline with retry timeout
+// while customer can reduce it as needed
 #define SF_LOGIN_TIMEOUT 300
 
  /**
- * network timeout other than login requests
+ * retry timeout in seconds
  */
-#define SF_NETWORK_TIMEOUT 120
+#define SF_RETRY_TIMEOUT 300
 
  /**
- * max retry number for login reuests (login/authenticator/token)
+ * max retry number
  */
-#define SF_LOGIN_MAX_RETRY 7
+#define SF_MAX_RETRY 7
 
 /**
  * Default JWT timeout in seconds
@@ -244,6 +246,8 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_NO_PROXY,
     SF_CON_DISABLE_QUERY_CONTEXT_CACHE,
     SF_CON_INCLUDE_RETRY_REASON,
+    SF_CON_RETRY_TIMEOUT,
+    SF_CON_MAX_RETRY,
     SF_DIR_QUERY_URL,
     SF_DIR_QUERY_URL_PARAM,
     SF_DIR_QUERY_TOKEN,
@@ -347,6 +351,8 @@ typedef struct SF_CONNECT {
 
     int64 login_timeout;
     int64 network_timeout;
+    // retry timeout for new retry strategy
+    int64 retry_timeout;
 
     // Session specific fields
     int64 sequence_counter;
@@ -362,6 +368,9 @@ typedef struct SF_CONNECT {
     int8 retry_on_curle_couldnt_connect_count;
 
     int8 retry_on_connect_count;
+
+    // max retry number for new retry strategy
+    int8 retry_count;
 
     // Error
     SF_ERROR_STRUCT error;

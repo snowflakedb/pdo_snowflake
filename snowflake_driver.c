@@ -583,8 +583,9 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"no_proxy",            NULL,         0},
         {"disablequerycontextcache", "false", 0},
         {"includeretryreason",  "true",       0},
-        {"login_timeout",       "300",        0},
-        {"max_login_retries",   "7",          0}
+        {"logintimeout",        "300",        0},
+        {"maxhttpretries",      "7",          0},
+        {"retrytimeout",        "300",        0}
     };
 
     // Parse the input data parameters
@@ -795,16 +796,25 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
             H->server, SF_CON_LOGIN_TIMEOUT,
             &int_attr_value);
         PDO_LOG_DBG(
-            "login_timeout: %d", int_attr_value);
+            "logintimeout: %d", int_attr_value);
     }
 
-    if (vars[PDO_SNOWFLAKE_CONN_ATTR_MAX_LOGIN_RETRIES_IDX].optval != NULL) {
-        int8_attr_value = strtol(vars[PDO_SNOWFLAKE_CONN_ATTR_MAX_LOGIN_RETRIES_IDX].optval, NULL, 10);
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_MAX_RETRIES_IDX].optval != NULL) {
+        int8_attr_value = strtol(vars[PDO_SNOWFLAKE_CONN_ATTR_MAX_RETRIES_IDX].optval, NULL, 10);
         snowflake_set_attribute(
-            H->server, SF_CON_MAX_CON_RETRY,
+            H->server, SF_CON_MAX_RETRY,
             &int8_attr_value);
         PDO_LOG_DBG(
-            "max_login_retries: %d", int8_attr_value);
+            "maxhttpretries: %d", int8_attr_value);
+    }
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_RETRY_TIMEOUT_IDX].optval != NULL) {
+        int_attr_value = strtoll(vars[PDO_SNOWFLAKE_CONN_ATTR_RETRY_TIMEOUT_IDX].optval, NULL, 10);
+        snowflake_set_attribute(
+            H->server, SF_CON_RETRY_TIMEOUT,
+            &int_attr_value);
+        PDO_LOG_DBG(
+            "retryimeout: %d", int_attr_value);
     }
 
     if (snowflake_connect(H->server) > 0) {

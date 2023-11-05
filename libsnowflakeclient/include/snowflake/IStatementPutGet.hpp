@@ -81,12 +81,12 @@ public:
   // from system locale. No coversion by default.
   virtual std::string UTF8ToPlatformString(const std::string& utf8_str)
   {
-    return utf8_str;
+    return std::string(utf8_str);
   }
 
   virtual std::string platformStringToUTF8(const std::string& platform_str)
   {
-    return platform_str;
+    return std::string(platform_str);
   }
 
   virtual ~IStatementPutGet()

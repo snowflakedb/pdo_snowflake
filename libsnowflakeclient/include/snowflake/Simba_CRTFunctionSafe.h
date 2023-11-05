@@ -9,11 +9,29 @@
 #ifndef _SIMBA_CRTFUNCTIONSAFE_H_
 #define _SIMBA_CRTFUNCTIONSAFE_H_
 
+#define __STDC_WANT_LIB_EXT1__ 1
+
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifndef STDCALL
+    // match snowflake define in platform.h
+    #ifdef _WIN32
+        #define STDCALL __stdcall
+    #else
+        #define STDCALL
+    #endif
+#endif
+
+extern char* STDCALL sf_getenv(const char *name);
+extern char* STDCALL sf_strerror(int);
 
 #if defined(WIN32) || defined(_WIN64)   // For Windows
 
@@ -193,6 +211,42 @@
         return ret;
     }
 
+    /// @brief Write formatted string to a FILE*. (See the standard C fprintf for details).
+    /// 
+    /// @param in_stream        Stream to write to. (NOT OWN)
+    /// @param in_format        Format control string. (NOT OWN)
+    /// 
+    /// @return The number of bytes written to the stream, or a negative value if an error occurred.
+    static inline int sb_fprintf(FILE* in_stream, const char* in_format, ...)
+    {
+        va_list vlist;
+        va_start(vlist, in_format);
+        int bytesWritten = vfprintf_s(in_stream, in_format, vlist);
+        va_end(vlist);
+
+        return bytesWritten;
+    }
+
+
+    /// @brief Write formatted string to a stdout*. (See the standard C fprintf for details).
+    /// 
+    /// @param in_format        Format control string. (NOT OWN)
+    /// 
+    /// @return The number of bytes written to the stream, or a negative value if an error occurred.
+    static inline int sb_printf(const char* in_format, ...)
+    {
+        va_list vlist;
+        va_start(vlist, in_format);
+        int bytesWritten = vfprintf_s(stdout, in_format, vlist);
+        va_end(vlist);
+
+        return bytesWritten;
+    }
+
+
+#define sb_getenv   sf_getenv
+#define sb_strerror sf_strerror
+
 #else   // For all other platforms except Windows
 
     /// @brief Copy a string.
@@ -331,7 +385,37 @@
     }
 
 #define sb_sscanf sscanf
+#define sb_fprintf fprintf
+#define sb_printf printf
+#define sb_strerror strerror
+
+#define sb_getenv getenv
 
 #endif
+
+    /// @brief Open a file.
+    /// 
+    /// @param out_file         A pointer to the file pointer that will receive the pointer to the
+    ///                         opened file. (NOT OWN)
+    /// @param in_filename      The name of the file to open. (NOT OWN)
+    /// @param in_mode          Type of access permitted. (NOT OWN)
+    /// 
+    /// @return A pointer to the opened file; a NULL pointer if an error occurred. (OWN)
+    static inline FILE* sb_fopen(FILE** out_file, const char* in_filename, const char* in_mode)
+    {
+#if defined(_WIN32) || defined(WIN32) || defined(_WIN64)
+        return fopen_s(out_file, in_filename, in_mode) ? NULL : *out_file;
+#else
+        return *out_file = fopen(in_filename, in_mode);
+#endif
+    }
+
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
 
 #endif
