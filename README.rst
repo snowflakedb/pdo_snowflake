@@ -260,13 +260,20 @@ where:
 - :code:`<user>` is the login name of the user for the connection.
 - :code:`<password>` is the password for the specified user.
 
-For accounts in regions outside of US-West, use :code:`region` parameter to specify the region or append the region to the
-:code:`account` parameter.
+Dependes on the region where your account being hosted, you might need to use :code:`region` parameter to specify the region
+or append the region to the :code:`account` parameter.
+You might also need to append :code:`cloud` in :code:`region` parameter in the format of :code:`<region>.<cloud>`, or do the
+same when you append it to the :code:`account` parameter.
+
+where:
+
+- :code:`<region>` is the identifier for the cloud region.
+- :code:`<cloud>` is the identifier for the cloud platform (aws, azure, or gcp).
 
 .. code-block:: php
 
-    $dbh = new PDO("snowflake:account=testaccount.us-east-1", "user", "password");
-    $dbh = new PDO("snowflake:account=testaccount;region=us-east-1", "user", "password");
+    $dbh = new PDO("snowflake:account=testaccount.us-east-2.aws", "user", "password");
+    $dbh = new PDO("snowflake:account=testaccount;region=us-east-2.aws", "user", "password");
 
 Using Key Pair Authentication
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
