@@ -22,7 +22,7 @@ To build the Snowflake PHP PDO Driver, the following software must be installed:
 - On Windows: Visual Studio
 - On Linux:
 
-  - gcc 5.2 or higher
+  - gcc 5.2 or higher. **Note**: on certain OS (e.g. Centos 7) the preinstalled gcc/libstdc++ version is below the required minimum. For Centos 7, this is 4.8.5, which is below the requirement. Building and using the PHP PDO driver might be unsuccessful on such OS's until the prerequisite is fulfilled, i.e. libraries upgraded to at least the minimum version.
   - cmake 2.8 or higher
 
 - On macOS:
