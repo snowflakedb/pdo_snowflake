@@ -74,7 +74,8 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         $dbh = new PDO("snowflake:account=$account;authenticator=snowflake_jwt;priv_key_file=tests/p8test.pem;priv_key_file_pwd=test", $user, "");
         echo "Fail. Must fail to connect.\n";
     } catch(PDOException $e) {
-        echo sprintf("Expected error: %s\n", $e->getMessage());
+        // Ignore the extra part server added at the end (request id?)
+        echo sprintf("Expected error: %s\n", substr($e->getMessage(), 0, 46));
     }
 ?>
 ===DONE===
