@@ -49,8 +49,8 @@ Building the PHP PDO Driver
 
 The following sections explain how to build the PHP PDO Driver on Linux, macOS, and Windows.
 
-:Warning: Snowflake PHP PDO driver does not yet support ARM/AARCH64 architecture on Linux.
-While this feature is implemented, you can consider using [Snowflake ODBC driver](https://developers.snowflake.com/odbc/) for PHP which supports multiple architectures.
+:Note: Snowflake PHP PDO driver does not yet support ARM/AARCH64 architecture on Linux.
+While this feature is implemented, you can consider using the Snowflake ODBC driver https://developers.snowflake.com/odbc/ for PHP which supports multiple architectures.
 
 Building the Driver on Linux and macOS
 --------------------------------------
