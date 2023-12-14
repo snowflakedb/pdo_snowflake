@@ -95,8 +95,6 @@ jobs:
       TEST_PHP_EXECUTABLE: /usr/local/bin/php
       NO_INTERACTION: true
     steps:
-        - name: Sync clock
-          run: sudo sntp -sS time.windows.com
         # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
         - uses: actions/checkout@v2
         - name: setup php
