@@ -10,7 +10,7 @@
 /**
  * PHP PDO Snowflake Driver name
  */
-#define PHP_PDO_SNOWFLAKE_NAME "PDO"
+#define PHP_PDO_SNOWFLAKE_NAME "PHP"
 
 #define PDO_LOG_INF(...) sf_log_info(PHP_PDO_SNOWFLAKE_NAME, __VA_ARGS__)
 #define PDO_LOG_DBG(...) sf_log_debug(PHP_PDO_SNOWFLAKE_NAME, __VA_ARGS__)
