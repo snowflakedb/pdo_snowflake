@@ -60,6 +60,20 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     }
     echo "inserted rows with bindValue: " . $sth->rowCount() . "\n";
 
+    // named binding
+    $sth = $dbh->prepare("insert into t(c1,c2,c3) values(:v1,:v2, :v3)");
+
+    $c1 = 5;
+    $c3 = TRUE;
+    $sth->bindParam(':v1', $c1, PDO::PARAM_INT);
+    $sth->bindParam(':v2', $stringData, PDO::PARAM_STR);
+    $sth->bindParam(':v3', $c3, PDO::PARAM_BOOL);
+    $ret = $sth->execute();
+    if (!$ret) {
+        echo "Execution with named binding failed.\n";
+    }
+    echo "inserted rows with named binding: " . $sth->rowCount() . "\n";
+
     echo "==> verify insert result\n";
     $sth = $dbh->query("select * from t order by 1");
     $sth->bindColumn(1, $id, PDO::PARAM_INT);
@@ -104,6 +118,7 @@ inserted rows with literal: 1
 inserted rows with array binding: 1
 inserted rows with bindParam: 1
 inserted rows with bindValue: 1
+inserted rows with named binding: 1
 ==> verify insert result
-rows verified: 4
+rows verified: 5
 ===DONE===
