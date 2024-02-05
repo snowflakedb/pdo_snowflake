@@ -465,7 +465,7 @@ Locate :code:`pdo.so` under :code:`/usr/lib` and specify it in :code:`phpt` file
     extension=/usr/lib/php/20170718/pdo.so
     pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     pdo_snowflake.logdir=/tmp
-    pdo_snowflake_loglevel=DEBUG
+    pdo_snowflake.loglevel=DEBUG
 
 Where is the log files?
 ----------------------------------------------------------------------
