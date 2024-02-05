@@ -132,6 +132,25 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     if ($count == 0) {
         print_r($dbh->errorInfo());
     }
+
+    echo "==> Bind parameters more than 8\n";
+    $q = 'SELECT ?,?,?,?,?,?,?,?,?';
+    $sth = $dbh->prepare($q);
+    $sth->bindValue(1, 'a');
+    $sth->bindValue(2, 'b');
+    $sth->bindValue(3, 'c');
+    $sth->bindValue(4, 'd');
+    $sth->bindValue(5, 'e');
+    $sth->bindValue(6, 'f');
+    $sth->bindValue(7, 'g');
+    $sth->bindValue(8, 'h');
+    $sth->bindValue(9, 'i');
+
+    $sth->execute();
+    while($row = $sth->fetch()) {
+        echo $row[0] . " " . $row[1] . " " . $row[2] . " " . $row[3] . " " . $row[4] . " " . $row[5] . " " . $row[6] . " " . $row[7] . " " . $row[8] . "\n";
+    }
+
 ?>
 ===DONE===
 <?php exit(0); ?>
@@ -167,4 +186,6 @@ inserted rows: 1
 16 test116 1
   
 Expected ERR: 2049
+==> Bind parameters more than 8
+a b c d e f g h i
 ===DONE===

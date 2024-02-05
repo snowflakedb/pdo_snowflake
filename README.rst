@@ -22,7 +22,7 @@ To build the Snowflake PHP PDO Driver, the following software must be installed:
 - On Windows: Visual Studio
 - On Linux:
 
-  - gcc 5.2 or higher
+  - gcc 5.2 or higher. **Note**: on certain OS (e.g. Centos 7) the preinstalled gcc/libstdc++ version is below the required minimum. For Centos 7, this is 4.8.5, which is below the requirement. Building and using the PHP PDO driver might be unsuccessful on such OS's until the prerequisite is fulfilled, i.e. libraries upgraded to at least the minimum version.
   - cmake 2.8 or higher
 
 - On macOS:
@@ -32,7 +32,7 @@ To build the Snowflake PHP PDO Driver, the following software must be installed:
 
 To install and use the Snowflake PHP PDO Driver, you must have the following software installed:
 
-- PHP 8.1, 8.0, 7.4 or 7.3 (Note: support for PHP 7.2 is deprecated)
+- PHP 8.2, 8.1 or 8.0 (Note: support for PHP 7.4 or lower is deprecated)
 - the :code:`php-pdo` extension
 - the :code:`php-json` extension
 
@@ -48,6 +48,9 @@ Building the PHP PDO Driver
 ================================================================================
 
 The following sections explain how to build the PHP PDO Driver on Linux, macOS, and Windows.
+
+:Note: Snowflake PHP PDO driver does not yet support ARM/AARCH64 architecture on Linux.
+While this feature is implemented, you can consider using the Snowflake ODBC driver https://developers.snowflake.com/odbc/ for PHP which supports multiple architectures.
 
 Building the Driver on Linux and macOS
 --------------------------------------
@@ -260,13 +263,20 @@ where:
 - :code:`<user>` is the login name of the user for the connection.
 - :code:`<password>` is the password for the specified user.
 
-For accounts in regions outside of US-West, use :code:`region` parameter to specify the region or append the region to the
-:code:`account` parameter.
+Dependes on the region where your account being hosted, you might need to use :code:`region` parameter to specify the region
+or append the region to the :code:`account` parameter.
+You might also need to append :code:`cloud` in :code:`region` parameter in the format of :code:`<region>.<cloud>`, or do the
+same when you append it to the :code:`account` parameter.
+
+where:
+
+- :code:`<region>` is the identifier for the cloud region.
+- :code:`<cloud>` is the identifier for the cloud platform (aws, azure, or gcp).
 
 .. code-block:: php
 
-    $dbh = new PDO("snowflake:account=testaccount.us-east-1", "user", "password");
-    $dbh = new PDO("snowflake:account=testaccount;region=us-east-1", "user", "password");
+    $dbh = new PDO("snowflake:account=testaccount.us-east-2.aws", "user", "password");
+    $dbh = new PDO("snowflake:account=testaccount;region=us-east-2.aws", "user", "password");
 
 Using Key Pair Authentication
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
