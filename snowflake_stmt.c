@@ -425,7 +425,7 @@ static int pdo_snowflake_stmt_param_hook(
         case PDO_PARAM_EVT_ALLOC:
             PDO_LOG_DBG(
               "paramno: %ld, name: %s, max_len: %ld, type: %s, value: %p",
-              param->paramno, ZSTR_VAL(param->name),
+              param->paramno, param->name,
               param->max_value_len,
               pdo_param_type_names[param->param_type],
               parameter);
