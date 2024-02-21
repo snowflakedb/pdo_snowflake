@@ -39,7 +39,7 @@ def test_windows():
 
 
     print ("====> run test")
-    run_tests_file = os.path.join("D:\\php-sdk\\phpmaster", vs.replace("VS", "vc"), arch, "php-src", "run-tests.php")
+    run_tests_file = os.path.join("D:\\php-sdk\\phpmaster", vs, arch, "php-src", "run-tests.php")
     run_command("php.exe " + run_tests_file + " .\\tests -d extension=pdo_snowflake || ver>null")
     print ("====> parse test results")
     run_command("python .\\.github\\workflows\\scripts\\check_result.py .\\tests")

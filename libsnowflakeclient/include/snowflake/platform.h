@@ -46,7 +46,7 @@ typedef pthread_mutex_t SF_MUTEX_HANDLE;
 
 #endif
 
-#include "Simba_CRTFunctionSafe.h"
+#include "SF_CRTFunctionSafe.h"
 
 struct tm *STDCALL sf_gmtime(const time_t *timep, struct tm *result);
 
@@ -56,13 +56,14 @@ void STDCALL sf_tzset(void);
 
 int STDCALL sf_setenv(const char *name, const char *value);
 
-char *STDCALL sf_getenv(const char *name);
+char *STDCALL sf_getenv_s(const char *name, char *outbuf, size_t bufsize);
 
 int STDCALL sf_unsetenv(const char *name);
 
 int STDCALL sf_mkdir(const char *path);
 
-char* STDCALL sf_strerror(int errnum);
+#define SF_ERROR_BUFSIZE  1024
+char* STDCALL sf_strerror_s(int errnum, char* outbuf, size_t bufsize);
 
 int STDCALL
 _thread_init(SF_THREAD_HANDLE *thread, void *(*proc)(void *), void *arg);
@@ -135,6 +136,11 @@ void STDCALL sf_get_uniq_tmp_dir(char * tmpDir);
 void STDCALL sf_get_username(char * username, int bufLen);
 
 void STDCALL sf_delete_uniq_dir_if_exists(const char *tmpfile);
+
+void STDCALL sf_memory_error_handler();
+
+// this should be called by application before any calls of sfclient
+void STDCALL sf_exception_on_memory_failure();
 
 #ifdef __cplusplus
 }
