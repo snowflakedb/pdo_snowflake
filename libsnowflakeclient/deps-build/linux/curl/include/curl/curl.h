@@ -113,6 +113,10 @@ typedef void CURL;
 typedef void CURLSH;
 #endif
 
+#ifdef __linux__
+extern char sf_enable_getaddrinfo_lock;
+#endif
+
 /*
  * libcurl external API function linkage decorations.
  */
