@@ -375,6 +375,7 @@ and password.
     echo "OK\n";
   $>
 
+**Note**: `PUT` and `GET` queries are not supported in the driver.
 
 Running Tests For the PHP PDO Driver
 ================================================================================
