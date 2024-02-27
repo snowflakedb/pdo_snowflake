@@ -317,6 +317,38 @@ To disable OCSP checking for a PDO connection, set :code:`insecure_mode=true` in
 
     $dbh = new PDO("snowflake:account=testaccount;insecure_mode=true", "user", "password");
 
+Proxy
+----------------------------------------------------------------------
+
+PHP PDO Driver for Snowflake supports HTTP and HTTPS proxy connections using environment variables. To use a proxy server configure the following environment variables:
+
+- http_proxy
+- https_proxy
+- no_proxy
+
+.. code-block:: bash
+
+    export http_proxy="[protocol://][user:password@]machine[:port]"
+    export https_proxy="[protocol://][user:password@]machine[:port]"
+
+More info can be found on the `libcurl tutorial`__ page.
+
+.. __: https://curl.haxx.se/libcurl/c/libcurl-tutorial.html#Proxies
+
+Since version 1.2.5 of the driver, you can set individual proxy settings which are only valid for the PDO Snowflake driver. Use the:
+
+- proxy
+- no_proxy
+
+directives on the connection string. Example:
+
+.. code-block:: php
+
+   $dbh = new PDO("snowflake:account=<account_name>;proxy=my.pro.xy;no_proxy=.mycompany.com", "<username>", "<password>");
+
+Syntax is the same as is documented for the `Snowflake ODBC driver <https://docs.snowflake.com/en/user-guide/odbc-parameters.html#using-connection-parameters>`_
+
+
 Performing a Simple Query
 ----------------------------------------------------------------------
 
@@ -343,6 +375,7 @@ and password.
     echo "OK\n";
   $>
 
+**Note**: `PUT` and `GET` queries are not supported in the driver.
 
 Running Tests For the PHP PDO Driver
 ================================================================================
@@ -374,23 +407,6 @@ Call :code:`env.sh` script to set the test connection parameters in the environm
 
     ./scripts/env.sh && env | grep SNOWFLAKE_TEST > testenv.ini
 
-Proxy
-^^^^^^^^^^
-
-PHP PDO Driver for Snowflake supports HTTP and HTTPS proxy connections using environment variables. To use a proxy server configure the following environment variables:
-
-- http_proxy
-- https_proxy
-- no_proxy
-
-.. code-block:: bash
-
-    export http_proxy="[protocol://][user:password@]machine[:port]"
-    export https_proxy="[protocol://][user:password@]machine[:port]"
-
-More info can be found on the `libcurl tutorial`__ page.
-
-.. __: https://curl.haxx.se/libcurl/c/libcurl-tutorial.html#Proxies
 
 Run Tests
 ----------------------------------------------------------------------
