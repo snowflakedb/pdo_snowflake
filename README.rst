@@ -355,6 +355,8 @@ Performing a Simple Query
 The following example connects to the Snowflake database and performs a simple query.
 Before using this example, set the :code:`$account`, :code:`$user`, and :code:`$password` variables to your account, login name,
 and password.
+The warehouse, database, schema parameters are optional, but can be specified to determine the context of the connection in which the query will be run.
+In this example, we'll use those too.
 
 .. code-block:: php
 
@@ -362,8 +364,11 @@ and password.
     $account = "<account_name>";
     $user = "<user_name>";
     $password = "<password>";
+    $warehouse = "<warehouse_name>";
+    $database = "<database_name>";
+    $schema = "<schema_name>";
 
-    $dbh = new PDO("snowflake:account=$account", $user, $password);
+    $dbh = new PDO("snowflake:account=$account;warehouse=$warehouse;database=$database;schema=$schema", $user, $password);
     $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
     echo "Connected\n";
 
