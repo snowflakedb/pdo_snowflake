@@ -382,6 +382,22 @@ In this example, we'll use those too.
 
 **Note**: `PUT` and `GET` queries are not supported in the driver.
 
+Setting timeouts
+----------------------------------------------------------------------
+
+The following parameters are exposed in the PHP PDO Driver to affect the behaviour regarding various timeouts:
+
+- :code:`logintimeout` : The timeout for login requests. Defaults to 300 seconds
+- :code:`retrytimeout`: The timeout for query requests, large query result chunk download actions, and request retries, . Defaults to 300 seconds; cannot be decreased, only set higher than 300.
+- :code:`maxhttpretries`: The maximum number of retry attempts. Defaults to 7; cannot be decreased, only set higher than 7.
+
+Example usage:
+
+.. code-block:: php
+
+   $dbh = new PDO("$dsn;application=phptest;authenticator=snowflake;priv_key_file=tests/p8test.pem;priv_key_file_pwd=password;disablequerycontext=true;includeretryreason=false;logintimeout=250;maxhttpretries=8;retrytimeout=350", $user, $password);
+
+
 Running Tests For the PHP PDO Driver
 ================================================================================
 
