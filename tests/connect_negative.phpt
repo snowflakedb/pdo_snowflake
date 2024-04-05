@@ -77,6 +77,24 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         // Ignore the error detail that server changed serveral times
         echo sprintf("Expected error: %s\n", substr($e->getMessage(), 0, 15));
     }
+
+    // login timeout
+    // use an invalid(unreachable) proxy to trigger login timeout
+    $starttime = time();
+    try {
+        $dbh = new PDO("$dsn;proxy=172.123.111.222;logintimeout=4", $user, $password);
+        echo "Fail. Must fail to connect.\n";
+    } catch(PDOException $e) {
+        $spendtime = time() - $starttime;
+        if (($spendtime > 6) || ($spendtime < 2))
+        {
+            echo "Fail. connection failed after $spendtime seconds\n";
+        }
+        else
+        {
+            echo "Test for logintimeout passed\n";
+        }
+    }
 ?>
 ===DONE===
 <?php exit(0); ?>
@@ -89,4 +107,5 @@ Expected error: SQLSTATE[08001] [240005] unsupported authenticator
 Expected error: SQLSTATE[HY000] [240000] authenticator initialization failed
 Expected error: SQLSTATE[HY000] [240000] authenticator initialization failed
 Expected error: SQLSTATE[08001]
+Test for logintimeout passed
 ===DONE===
