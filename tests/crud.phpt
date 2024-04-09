@@ -1,7 +1,8 @@
 --TEST--
 pdo_snowflake - CRUD
 --INI--
-pdo_snowflake.logdir=/tmp/sflog
+pdo_snowflake.logdir=sflog
+pdo_snowflake.loglevel=DEBUG
 pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 --FILE--
 <?php

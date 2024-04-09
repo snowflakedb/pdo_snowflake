@@ -1,6 +1,8 @@
 --TEST--
 pdo_snowflake - insert and select numeric data types
 --INI--
+pdo_snowflake.logdir=sflog
+pdo_snowflake.loglevel=DEBUG
 pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 --FILE--
 <?php
