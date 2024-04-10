@@ -1,6 +1,8 @@
 --TEST--
 pdo_snowflake - procedure call statement type
 --INI--
+pdo_snowflake.logdir=sflog
+pdo_snowflake.loglevel=DEBUG
 pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 --FILE--
 <?php

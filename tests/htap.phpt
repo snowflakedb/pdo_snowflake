@@ -1,6 +1,8 @@
 --TEST--
 pdo_snowflake - htap test
 --INI--
+pdo_snowflake.logdir=sflog
+pdo_snowflake.loglevel=DEBUG
 pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 pdo_snowflake.logdir=logs
 pdo_snowflake.loglevel=TRACE
