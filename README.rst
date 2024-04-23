@@ -19,7 +19,7 @@ Prerequisites
 
 To build the Snowflake PHP PDO Driver, the following software must be installed:
 
-- On Windows: Visual Studio
+- On Windows: Visual Studio 2019
 - On Linux:
 
   - gcc 5.2 or higher. **Note**: on certain OS (e.g. Centos 7) the preinstalled gcc/libstdc++ version is below the required minimum. For Centos 7, this is 4.8.5, which is below the requirement. Building and using the PHP PDO driver might be unsuccessful on such OS's until the prerequisite is fulfilled, i.e. libraries upgraded to at least the minimum version.
@@ -96,7 +96,7 @@ Building the Driver on Windows
 
 **Note**: Snowflake supports only thread-safe versions of PHP.
 
-You must install Microsoft Visual Studio 2019 (VS16) or earlier with the C++ development installer option.
+You must install Microsoft Visual Studio 2019 (VS16) with the C++ development installer option.
 
 To build the PHP driver for Windows:
 
@@ -129,7 +129,7 @@ To build the PHP driver for Windows:
 
    - :code:`<arch>` is your CPU architecture (:code:`x64` or :code:`x86`).
    - :code:`<build>` is the type of binary that you want to build (:code:`Release` or :code:`Debug`).
-   - :code:`<visual studio version>` is the version of Visual Studio that you are using (:code:`VS14`, :code:`VS15`, or :code:`VS16`).
+   - :code:`<visual studio version>` is the version of Visual Studio that you are using (:code:`VS16`).
    - :code:`<path to PHP SDK>` is the path to the directory where the PHP SDK should be downloaded.
      **Do not create this directory.** The script creates this directory for you when downloading the PHP SDK.
 

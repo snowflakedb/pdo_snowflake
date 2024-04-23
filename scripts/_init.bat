@@ -51,23 +51,18 @@ if "%target_name%"=="" (
 set cmake_generator=
 set vsdir=
 set vc_version=
+:: set vs_version to VS16 by default as it the only VS version supported for now
+if "%vs_version%"=="" (
+    set vs_version=VS16
+)
+
 if "%vs_version%"=="VS16" (
     set cmake_generator=Visual Studio 16 2019
     set vsdir=vs16
     set vc_version=vs16
 )
-if "%vs_version%"=="VS15" (
-    set cmake_generator=Visual Studio 15 2017
-    set vsdir=vs15
-    set vc_version=vc15
-)
-if "%vs_version%"=="VS14" (
-    set cmake_generator=Visual Studio 14 2015
-    set vsdir=vs14
-    set vc_version=vc14
-)
 if "%cmake_generator%"=="" (
-    echo Specify the visual studio version used. [VS16, VS15, VS14]
+    echo Specify the visual studio version used. [VS16]
     goto :error
 )
 
