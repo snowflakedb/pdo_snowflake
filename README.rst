@@ -428,7 +428,7 @@ Running Tests For the PHP PDO Driver on Linux and macOS
 
 In order to run the test scripts, you must have :code:`jq` installed.
 
-Prepare for Test
+Prepare Tests
 ----------------------------------------------------------------------
 
 #. Create a parameter file :code:`parameters.json` under :code:`pdo_snowflake` directory:
@@ -495,7 +495,7 @@ Running Tests For the PHP PDO Driver on Windows
 
 In order to run the test scripts, you must have :code:`jq` installed.
 
-Prepare for Test
+Prepare Tests
 ----------------------------------------------------------------------
 
 #. Create a parameter file :code:`parameters.json` under :code:`pdo_snowflake` directory:
