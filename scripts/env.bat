@@ -17,4 +17,4 @@ if defined TRAVIS_JOB_ID (
 
 set | findstr SNOWFLAKE_TEST_ >> .\testenv.ini
 echo "==> Test Connection Parameters"
-type testenv.ini
+type testenv.ini | findstr /V PASSWORD

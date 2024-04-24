@@ -36,9 +36,6 @@ To install and use the Snowflake PHP PDO Driver, you must have the following sof
 - the :code:`php-pdo` extension
 - the :code:`php-json` extension
 
-Note: Some of the examples in the instructions refer to the ``php-fpm`` extension. This extension is not required.
-The driver also works with regular PHP CGI.
-
 To build the driver, you must install the PHP development package for your operating system.
 
 If you are using PHP with an application server or web server (e.g. Apache or nginx), configure the server to handle
@@ -71,8 +68,6 @@ Building the Driver on Linux and macOS
 
 #. Clone the :code:`pdo_snowflake` repository, and run the script to build the driver:
 
-   If you built PHP from the source code, run these commands from the directory containing the PHP source code.
-
    .. code-block:: bash
 
        git clone https://github.com/snowflakedb/pdo_snowflake.git
@@ -91,7 +86,7 @@ Building the Driver on Windows
 ------------------------------
 
 .. |win-vs-version| replace:: VS16 
-.. |win-php-version| replace:: 8.1.18 
+.. |win-php-version| replace:: 8.1.28
 
 
 **Note**: Snowflake supports only thread-safe versions of PHP.
@@ -102,15 +97,15 @@ To build the PHP driver for Windows:
 
 #. Download and install PHP:
 
-    #. Download the PHP version binaries from `<https://windows.php.net/downloads/releases/>`_, 
-       such as `<https://windows.php.net/downloads/releases/php-8.1.18-Win32-vs16-x64.zip>`_.
+   #. Download the PHP version binaries from `<https://windows.php.net/downloads/releases/>`_,
+      such as `<https://windows.php.net/downloads/releases/php-8.1.28-Win32-vs16-x64.zip>`_.
 
-       .. note::
+      .. note::
 
-        The Snowflake PHP driver does not support Windows NTS, so don't download packages that
-        include ``nts`` in the package name.
+       The Snowflake PHP driver does not support Windows NTS or x86 architecture, so don't download packages that
+       include ``nts`` or ``x86`` in the package name.
 
-    #. Unzip the file to the desired directory, such as :code:`C:\php`.
+   #. Unzip the file to the desired directory, such as :code:`C:\php`.
 
 #. Clone the :code:`pdo_snowflake` repository:
 
@@ -127,9 +122,9 @@ To build the PHP driver for Windows:
 
    where:
 
-   - :code:`<arch>` is your CPU architecture (:code:`x64` or :code:`x86`).
+   - :code:`<arch>` is your CPU architecture (Currently :code:`x64` is the only supported one).
    - :code:`<build>` is the type of binary that you want to build (:code:`Release` or :code:`Debug`).
-   - :code:`<visual studio version>` is the version of Visual Studio that you are using (:code:`VS16`).
+   - :code:`<visual studio version>` is the version of Visual Studio that you are using (Currently :code:`VS16` is the only supported one).
    - :code:`<path to PHP SDK>` is the path to the directory where the PHP SDK should be downloaded.
      **Do not create this directory.** The script creates this directory for you when downloading the PHP SDK.
 
@@ -150,7 +145,7 @@ To build the PHP driver for Windows:
    For :code:`<arch>`, :code:`<build>`, :code:`<visual studio version>`, and :code:`<path to PHP SDK>`, specify the same values
    that you used in the previous step.
 
-   For :code:`<full PHP version>`, specify the full version number of the PHP binary you installed (e.g. :code:`8.1.18`).
+   For :code:`<full PHP version>`, specify the full version number of the PHP binary you installed (e.g. :code:`8.1.28`).
 
    For example:
 
@@ -170,15 +165,27 @@ To build the PHP driver for Windows:
 
        .\\scripts\\run_build_pdo_snowflake.bat x64 Release |win-vs-version| |win-php-version| C:\\php-sdk
 
-#.  Copy :code:`php_pdo_snowflake.dll` from the directory where you built the driver to the PHP extension 
-    directory (the same directory that contains the :code:`php_pdo.dll file`). Usually, the PHP extension 
-    directory is the :code:`ext` subdirectory in the directory where PHP is installed.
+#. Copy :code:`php_pdo_snowflake.dll` from the directory where you built the driver under the path to PHP SDK
+   For example:
+
+   .. parsed-literal::
+
+       C:\\php-sdk\\phpmaster\\vs16\\x64\\php-src\\x64\\Release_TS
+
+   to the PHP extension directory. Usually, the PHP extension directory is the :code:`ext` subdirectory in the
+   directory where PHP is installed. To find the PHP extension directory, run:
+
+   .. code-block:: bash
+
+       C:\php\php.exe -i | findstr "extension_dir"
 
 #. Run the following command to verify that the driver can be loaded into memory successfully:
 
    .. code-block:: batch
 
        C:\php\php.exe -dextension=ext\php_pdo_snowflake.dll -m
+
+   :code:`pdo_snowflake` should appear in the output from the command.
 
 Installing the PHP PDO Driver
 ================================================================================
@@ -188,8 +195,7 @@ The following sections explain how to install the PHP PDO Driver on Linux, macOS
 Installing the Driver on Linux and macOS
 ----------------------------------------
 
-#. Copy :code:`pdo_snowflake.so` from the directory where you built the driver to the PHP extension directory (the same directory
-   that contains the :code:`pdo.so` file).
+#. Copy :code:`pdo_snowflake.so` from the :code:`modules` subdirectory in the repository to the PHP extension directory.
 
    To find the PHP extension directory, run:
 
@@ -197,11 +203,20 @@ Installing the Driver on Linux and macOS
 
        $PHP_HOME/bin/php -i | grep '^extension_dir'
 
-#. Copy :code:`cacert.pem` from the :code:`libsnowflakeclient` subdirectory in the repository to the directory containing the
-   PHP configuration files (e.g. :code:`/etc/php/7.2/fpm/conf.d` for PHP-FPM version 7.2 on Ubuntu).
+#. Copy :code:`cacert.pem` from the :code:`libsnowflakeclient` subdirectory in the repository to the PHP configuration directory
+   containing the PHP configuration files.
+
+   To find the PHP configuration directory, run:
+
+   .. code-block:: bash
+
+       $PHP_HOME/bin/php -ini
+
+   In the output if the item of :code:`Scan for additional .ini files in` is not :code:`(none)`, use that as the PHP configuration
+   directory so we can have separated configuration file for Snowflake, otherwise use :code:`Configuration File (php.ini) Path:`.
 
 #. In the same directory that contains the PHP configuration files, create a config file named :code:`20-pdo_snowflake.ini` that
-   contains the following settings:
+   contains the following settings (or in case using :code:`Configuration File (php.ini) Path:`, add following lines to :code:`php.ini`):
 
    .. code-block:: ini
 
@@ -219,9 +234,19 @@ Installing the Driver on Linux and macOS
 Installing the Driver on Windows
 --------------------------------
 
-#. Copy :code:`php_pdo_snowflake.dll` from the directory where you built the driver to the PHP extension directory (the same
-   directory that contains the :code:`php_pdo.dll` file). Usually, the PHP extension directory is the :code:`ext` subdirectory
-   in the directory where PHP is installed.
+#. Copy :code:`php_pdo_snowflake.dll` from the directory where you built the driver under the path to PHP SDK
+   For example:
+
+   .. parsed-literal::
+
+       C:\\php-sdk\\phpmaster\\vs16\\x64\\php-src\\x64\\Release_TS
+
+   to the PHP extension directory. Usually, the PHP extension directory is the :code:`ext` subdirectory in the
+   directory where PHP is installed. To find the PHP extension directory, run:
+
+   .. code-block:: bash
+
+       C:\php\php.exe -i | findstr "extension_dir"
 
 #. Copy :code:`cacert.pem` from the :code:`libsnowflakeclient` subdirectory in the repository to the directory containing the
    PHP configuration files (e.g. :code:`C:\php` if PHP is installed in that directory).
@@ -232,8 +257,8 @@ Installing the Driver on Windows
 
        extension=php_pdo_snowflake.dll
        pdo_snowflake.cacert=<path to PHP config directory>\cacert.pem
-       # pdo_snowflake.logdir=C:\path\to\logdir     # location of log directory
-       # pdo_snowflake.loglevel=DEBUG  # log level
+       ; pdo_snowflake.logdir=C:\path\to\logdir     ; location of log directory
+       ; pdo_snowflake.loglevel=DEBUG  ; log level
 
    where :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the
    previous step.
@@ -398,7 +423,7 @@ Example usage:
    $dbh = new PDO("$dsn;application=phptest;authenticator=snowflake;priv_key_file=tests/p8test.pem;priv_key_file_pwd=password;disablequerycontext=true;includeretryreason=false;logintimeout=250;maxhttpretries=8;retrytimeout=350", $user, $password);
 
 
-Running Tests For the PHP PDO Driver
+Running Tests For the PHP PDO Driver on Linux and macOS
 ================================================================================
 
 In order to run the test scripts, you must have jq installed.
@@ -422,11 +447,13 @@ Create a parameter file :code:`parameters.json` under :code:`pdo_snowflake` dire
         }
     }
 
+Set the workfolder to :code:`pdo_snowflake` repository. .e.g Call :code:`cd pdo_snowflake`.
+
 Call :code:`env.sh` script to set the test connection parameters in the environment variables.
 
 .. code-block:: bash
 
-    ./scripts/env.sh && env | grep SNOWFLAKE_TEST > testenv.ini
+    /bin/bash -c "source ./scripts/env.sh && env | grep SNOWFLAKE_TEST > testenv.ini"
 
 
 Run Tests
@@ -460,6 +487,56 @@ and verify no error in the output:
 .. code-block:: bash
 
      ERROR SUMMARY: 0 errors from 0 contexts ...
+
+Running Tests For the PHP PDO Driver on Windows
+================================================================================
+
+In order to run the test scripts, you must have jq installed.
+
+Prepare for Test
+----------------------------------------------------------------------
+
+Create a parameter file :code:`parameters.json` under :code:`pdo_snowflake` directory:
+
+.. code-block:: none
+
+    {
+        "testconnection": {
+            "SNOWFLAKE_TEST_USER":      "<your_user>",
+            "SNOWFLAKE_TEST_PASSWORD":  "<your_password>",
+            "SNOWFLAKE_TEST_ACCOUNT":   "<your_account>",
+            "SNOWFLAKE_TEST_WAREHOUSE": "<your_warehouse>",
+            "SNOWFLAKE_TEST_DATABASE":  "<your_database>",
+            "SNOWFLAKE_TEST_SCHEMA":    "<your_schema>",
+            "SNOWFLAKE_TEST_ROLE":      "<your_role>"
+        }
+    }
+
+Set the workfolder to :code:`pdo_snowflake` repository. .e.g Call :code:`cd pdo_snowflake`.
+
+Set the :code:`PHP_HOME` environment variable to the php install directory, such as :code:`C:\php`.
+
+Install the driver following the instructions above.
+
+Call :code:`env.bat` script to set the test connection parameters.
+
+.. code-block:: batch
+
+    .\scripts\env.bat
+
+
+Run Tests
+----------------------------------------------------------------------
+
+.. code-block:: bash
+
+    %PHP_HOME%\php.exe <path to PHP SDK>\phpmaster\<visual studio version>\<arch>\php-src\run-tests.php .\tests
+
+where:
+
+- :code:`<arch>` is your CPU architecture (Currently :code:`x64` is the only supported one).
+- :code:`<visual studio version>` is the version of Visual Studio that you are using (Currently :code:`VS16` is the only supported one).
+- :code:`<path to PHP SDK>` is the path to the directory where the PHP SDK should be downloaded.
 
 Additional Notes
 ================================================================================
@@ -512,8 +589,8 @@ The location of log files are specified by the parameters in php.ini:
 .. code-block:: bash
 
     extension=pdo_snowflake.so
-    pdo_snowflake.cacert=/etc/php/7.2/fpm/conf.d/cacert.pem
-    pdo_snowflake.logdir=/tmp     # location of log directory
-    pdo_snowflake.loglevel=DEBUG  # log level
+    pdo_snowflake.cacert=/etc/php/8.1/conf.d/cacert.pem
+    pdo_snowflake.logdir=/tmp     ; location of log directory
+    pdo_snowflake.loglevel=DEBUG  ; log level
 
 where :code:`pdo_snowflake.loglevel` can be :code:`TRACE`, :code:`DEBUG`, :code:`INFO`, :code:`WARN`, :code:`ERROR` and :code:`FATAL`.
