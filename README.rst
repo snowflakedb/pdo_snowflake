@@ -102,7 +102,7 @@ To build the PHP driver for Windows:
 
       .. note::
 
-       The Snowflake PHP driver does not support Windows NTS or x86 architecture, so don't download packages that
+       The Snowflake PHP driver does not support x86 architecture or Windows NTS, so don't download packages that
        include ``nts`` or ``x86`` in the package name.
 
    #. Unzip the file to the desired directory, such as :code:`C:\php`.
@@ -122,9 +122,9 @@ To build the PHP driver for Windows:
 
    where:
 
-   - :code:`<arch>` is your CPU architecture (Currently :code:`x64` is the only supported one).
+   - :code:`<arch>` is your CPU architecture (Currently, the driver only supports :code:`x64`).
    - :code:`<build>` is the type of binary that you want to build (:code:`Release` or :code:`Debug`).
-   - :code:`<visual studio version>` is the version of Visual Studio that you are using (Currently :code:`VS16` is the only supported one).
+   - :code:`<visual studio version>` is the version of Visual Studio that you are using (Currently, the driver only supports :code:`VS16`).
    - :code:`<path to PHP SDK>` is the path to the directory where the PHP SDK should be downloaded.
      **Do not create this directory.** The script creates this directory for you when downloading the PHP SDK.
 
@@ -426,38 +426,40 @@ Example usage:
 Running Tests For the PHP PDO Driver on Linux and macOS
 ================================================================================
 
-In order to run the test scripts, you must have jq installed.
+In order to run the test scripts, you must have :code:`jq` installed.
 
 Prepare for Test
 ----------------------------------------------------------------------
 
-Create a parameter file :code:`parameters.json` under :code:`pdo_snowflake` directory:
+#. Create a parameter file :code:`parameters.json` under :code:`pdo_snowflake` directory:
 
-.. code-block:: none
+   .. code-block:: none
 
-    {
-        "testconnection": {
-            "SNOWFLAKE_TEST_USER":      "<your_user>",
-            "SNOWFLAKE_TEST_PASSWORD":  "<your_password>",
-            "SNOWFLAKE_TEST_ACCOUNT":   "<your_account>",
-            "SNOWFLAKE_TEST_WAREHOUSE": "<your_warehouse>",
-            "SNOWFLAKE_TEST_DATABASE":  "<your_database>",
-            "SNOWFLAKE_TEST_SCHEMA":    "<your_schema>",
-            "SNOWFLAKE_TEST_ROLE":      "<your_role>"
-        }
-    }
+       {
+           "testconnection": {
+               "SNOWFLAKE_TEST_USER":      "<your_user>",
+               "SNOWFLAKE_TEST_PASSWORD":  "<your_password>",
+               "SNOWFLAKE_TEST_ACCOUNT":   "<your_account>",
+               "SNOWFLAKE_TEST_WAREHOUSE": "<your_warehouse>",
+               "SNOWFLAKE_TEST_DATABASE":  "<your_database>",
+               "SNOWFLAKE_TEST_SCHEMA":    "<your_schema>",
+               "SNOWFLAKE_TEST_ROLE":      "<your_role>"
+           }
+       }
 
-Set the workfolder to :code:`pdo_snowflake` repository. .e.g Call :code:`cd pdo_snowflake`.
+#. Set the workfolder to :code:`pdo_snowflake` repository. .e.g Call :code:`cd pdo_snowflake`.
 
-Call :code:`env.sh` script to set the test connection parameters in the environment variables.
+#. Call :code:`env.sh` script to set the test connection parameters in the environment variables.
 
-.. code-block:: bash
-
-    /bin/bash -c "source ./scripts/env.sh && env | grep SNOWFLAKE_TEST > testenv.ini"
+   .. code-block:: bash
+   
+       /bin/bash -c "source ./scripts/env.sh && env | grep SNOWFLAKE_TEST > testenv.ini"
 
 
 Run Tests
 ----------------------------------------------------------------------
+
+To run the tests, do the following:
 
 .. code-block:: bash
 
@@ -491,42 +493,44 @@ and verify no error in the output:
 Running Tests For the PHP PDO Driver on Windows
 ================================================================================
 
-In order to run the test scripts, you must have jq installed.
+In order to run the test scripts, you must have :code:`jq` installed.
 
 Prepare for Test
 ----------------------------------------------------------------------
 
-Create a parameter file :code:`parameters.json` under :code:`pdo_snowflake` directory:
+#. Create a parameter file :code:`parameters.json` under :code:`pdo_snowflake` directory:
 
-.. code-block:: none
+   .. code-block:: none
+   
+       {
+           "testconnection": {
+               "SNOWFLAKE_TEST_USER":      "<your_user>",
+               "SNOWFLAKE_TEST_PASSWORD":  "<your_password>",
+               "SNOWFLAKE_TEST_ACCOUNT":   "<your_account>",
+               "SNOWFLAKE_TEST_WAREHOUSE": "<your_warehouse>",
+               "SNOWFLAKE_TEST_DATABASE":  "<your_database>",
+               "SNOWFLAKE_TEST_SCHEMA":    "<your_schema>",
+               "SNOWFLAKE_TEST_ROLE":      "<your_role>"
+           }
+       }
 
-    {
-        "testconnection": {
-            "SNOWFLAKE_TEST_USER":      "<your_user>",
-            "SNOWFLAKE_TEST_PASSWORD":  "<your_password>",
-            "SNOWFLAKE_TEST_ACCOUNT":   "<your_account>",
-            "SNOWFLAKE_TEST_WAREHOUSE": "<your_warehouse>",
-            "SNOWFLAKE_TEST_DATABASE":  "<your_database>",
-            "SNOWFLAKE_TEST_SCHEMA":    "<your_schema>",
-            "SNOWFLAKE_TEST_ROLE":      "<your_role>"
-        }
-    }
+#. Set the workfolder to :code:`pdo_snowflake` repository. .e.g Call :code:`cd pdo_snowflake`.
 
-Set the workfolder to :code:`pdo_snowflake` repository. .e.g Call :code:`cd pdo_snowflake`.
+#. Set the :code:`PHP_HOME` environment variable to the php install directory, such as :code:`C:\php`.
 
-Set the :code:`PHP_HOME` environment variable to the php install directory, such as :code:`C:\php`.
+#. Install the driver following the instructions above.
 
-Install the driver following the instructions above.
+#. Call :code:`env.bat` script to set the test connection parameters.
 
-Call :code:`env.bat` script to set the test connection parameters.
-
-.. code-block:: batch
-
-    .\scripts\env.bat
+   .. code-block:: batch
+   
+       .\scripts\env.bat
 
 
 Run Tests
 ----------------------------------------------------------------------
+
+To run the tests, do the following:
 
 .. code-block:: bash
 
