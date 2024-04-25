@@ -447,7 +447,7 @@ Prepare Tests
            }
        }
 
-#. Set the workfolder to :code:`pdo_snowflake` repository. .e.g Call :code:`cd pdo_snowflake`.
+#. Set the workfolder to :code:`pdo_snowflake` repository. e.g. Call :code:`cd pdo_snowflake`.
 
 #. Call :code:`env.sh` script to set the test connection parameters in the environment variables.
 
@@ -514,7 +514,7 @@ Prepare Tests
            }
        }
 
-#. Set the workfolder to :code:`pdo_snowflake` repository. .e.g Call :code:`cd pdo_snowflake`.
+#. Set the workfolder to :code:`pdo_snowflake` repository. e.g. Call :code:`cd pdo_snowflake`.
 
 #. Set the :code:`PHP_HOME` environment variable to the php install directory, such as :code:`C:\php`.
 
