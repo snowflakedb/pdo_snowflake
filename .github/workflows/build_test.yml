@@ -92,7 +92,7 @@ jobs:
       matrix:
         php-version: ['8.0', '8.1', '8.2']
     # The type of runner that the job will run on
-    runs-on: macos-latest
+    runs-on: macos-13
     env: 
       PHP_HOME: /usr/local
       TEST_PHP_EXECUTABLE: /usr/local/bin/php
