@@ -1,22 +1,13 @@
-/*
-  * Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License").
-  * You may not use this file except in compliance with the License.
-  * A copy of the License is located at
-  *
-  *  http://aws.amazon.com/apache2.0
-  *
-  * or in the "license" file accompanying this file. This file is distributed
-  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-  * express or implied. See the License for the specific language governing
-  * permissions and limitations under the License.
-  */
+/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 
 #include <aws/core/Core_EXPORTS.h>
 
+#include <cassert>
 #include <utility>
 
 namespace Aws
@@ -35,25 +26,71 @@ namespace Aws
         {
         public:
 
-            Outcome() : success(false)
+            Outcome() : result(), error(), success(false)
             {
-            } // Default constructor
-            Outcome(const R& r) : result(r), success(true)
+            }
+            Outcome(const R& r) : result(r), error(), success(true)
             {
-            } // Result copy constructor
-            Outcome(const E& e) : error(e), success(false)
+            }
+            Outcome(const E& e) : result(), error(e), success(false)
             {
-            } // Error copy constructor
-            Outcome(R&& r) : result(std::forward<R>(r)), success(true)
+            }
+            Outcome(R&& r) : result(std::forward<R>(r)), error(), success(true)
             {
-            } // Result move constructor
-            Outcome(E&& e) : error(std::forward<E>(e)), success(false)
+            }
+            Outcome(E&& e) : result(), error(std::forward<E>(e)), success(false)
             {
-            } // Error move constructor
+            }
             Outcome(const Outcome& o) :
                 result(o.result),
                 error(o.error),
                 success(o.success)
+            {
+            }
+
+            template<typename RT, typename ET>
+            friend class Outcome;
+
+#if defined (__cplusplus) && __cplusplus > 201103L
+            template< bool B, class T = void >
+            using enable_if_t = std::enable_if_t<B, T>;
+#else
+            template< bool B, class T = void >
+            using enable_if_t = typename std::enable_if<B,T>::type;
+#endif
+
+            // Move both result and error from other type of outcome
+            template<typename RT, typename ET, enable_if_t<std::is_convertible<RT, R>::value &&
+                                                           std::is_convertible<ET, E>::value, int> = 0>
+            Outcome(Outcome<RT, ET>&& o) :
+                result(std::move(o.result)),
+                error(std::move(o.error)),
+                success(o.success)
+            {
+            }
+
+            // Move result from other type of outcome
+            template<typename RT, typename ET, enable_if_t<std::is_convertible<RT, R>::value &&
+                                                          !std::is_convertible<ET, E>::value, int> = 0>
+            Outcome(Outcome<RT, ET>&& o) :
+                result(std::move(o.result)),
+                success(o.success)
+            {
+                assert(o.success);
+            }
+
+            // Move error from other type of outcome
+            template<typename RT, typename ET, enable_if_t<!std::is_convertible<RT, R>::value &&
+                                                            std::is_convertible<ET, E>::value, int> = 0>
+            Outcome(Outcome<RT, ET>&& o) :
+                error(std::move(o.error)),
+                success(o.success)
+            {
+                assert(!o.success);
+            }
+
+            template<typename ET, enable_if_t<std::is_convertible<ET, E>::value, int> = 0>
+            Outcome(ET&& e) : error(std::forward<ET>(e)), success(false)
             {
             }
 
@@ -64,6 +101,7 @@ namespace Aws
                     result = o.result;
                     error = o.error;
                     success = o.success;
+                    retryCount = o.retryCount;
                 }
 
                 return *this;
@@ -72,7 +110,8 @@ namespace Aws
             Outcome(Outcome&& o) : // Required to force Move Constructor
                 result(std::move(o.result)),
                 error(std::move(o.error)),
-                success(o.success)
+                success(o.success),
+                retryCount(std::move(o.retryCount))
             {
             }
 
@@ -83,6 +122,7 @@ namespace Aws
                     result = std::move(o.result);
                     error = std::move(o.error);
                     success = o.success;
+                    retryCount = std::move(o.retryCount);
                 }
 
                 return *this;
@@ -112,15 +152,31 @@ namespace Aws
                 return error;
             }
 
+            template<typename T>
+            inline T GetError()
+            {
+                return error.template GetModeledError<T>();
+            }
+
             inline bool IsSuccess() const
             {
                 return this->success;
             }
 
+            /**
+             * Returns how many times the retry happened before getting this outcome.
+             */
+            inline unsigned int GetRetryCount() const { return retryCount; }
+            /**
+             * Sets the retry count.
+             */
+            inline void SetRetryCount(const unsigned int iRetryCount) { retryCount = iRetryCount; }
+
         private:
             R result;
             E error;
-            bool success;
+            bool success = false;
+            unsigned int retryCount = 0;
         };
 
     } // namespace Utils

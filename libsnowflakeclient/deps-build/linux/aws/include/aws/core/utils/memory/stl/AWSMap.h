@@ -1,16 +1,6 @@
-/*
- * Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- * 
- *  http://aws.amazon.com/apache2.0
- * 
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
+/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
  */
 
 #pragma once
@@ -39,5 +29,14 @@ struct CompareStrings
 };
 
 template<typename V> using CStringMap = std::map<const char*, V, CompareStrings, Aws::Allocator<std::pair<const char*, V> > >;
+
+template<typename K, typename V>
+V GetWithDefault(const Aws::Map<K,V> &map, const K &key, V &&defaultValue) {
+    typename Aws::Map<K,V>::const_iterator it = map.find(key);
+    if ( it == map.end() ) {
+        return std::forward<V>(defaultValue);
+    }
+    return it->second;
+}
 
 } // namespace Aws

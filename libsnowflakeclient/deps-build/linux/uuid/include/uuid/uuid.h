@@ -32,8 +32,8 @@
  * %End-Header%
  */
 
-#ifndef _UUID_UUID_H
-#define _UUID_UUID_H
+#ifndef _UL_LIBUUID_UUID_H
+#define _UL_LIBUUID_UUID_H
 
 #include <sys/types.h>
 #ifndef _WIN32
@@ -53,6 +53,7 @@ typedef unsigned char uuid_t[16];
 #define UUID_VARIANT_MASK     0x7
 
 /* UUID Type definitions */
+#define UUID_TYPE_DCE_NIL    0
 #define UUID_TYPE_DCE_TIME   1
 #define UUID_TYPE_DCE_SECURITY 2
 #define UUID_TYPE_DCE_MD5    3
@@ -119,4 +120,4 @@ extern const uuid_t *uuid_get_template(const char *alias);
 }
 #endif
 
-#endif /* _UUID_UUID_H */
+#endif /* _UL_LIBUUID_UUID_H */

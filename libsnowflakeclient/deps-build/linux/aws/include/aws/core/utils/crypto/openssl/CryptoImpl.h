@@ -1,17 +1,7 @@
-/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 #pragma once
 
 #include <aws/core/utils/crypto/Hash.h>
@@ -47,9 +37,9 @@ namespace Aws
 
             /**
              * OpenSSL implementation for SecureRandomBytes.
-             * Incidently, this implementation is thread safe, though it is not
+             * Incidentally, this implementation is thread safe, though it is not
              * on other platforms. You should treat an instance of SecureRandomBytes
-             * as needed to be memory fenced if you will be using accross multiple threads
+             * as needed to be memory fenced if you will be using across multiple threads
              */
             class SecureRandomBytes_OpenSSLImpl : public SecureRandomBytes
             {
@@ -69,28 +59,59 @@ namespace Aws
             {
             public:
 
-                MD5OpenSSLImpl()
-                { }
+                MD5OpenSSLImpl();
 
-                virtual ~MD5OpenSSLImpl() = default;
+                virtual ~MD5OpenSSLImpl();
 
                 virtual HashResult Calculate(const Aws::String& str) override;
 
                 virtual HashResult Calculate(Aws::IStream& stream) override;
 
+                virtual void Update(unsigned char* buffer, size_t bufferSize) override;
+
+                virtual HashResult GetHash() override;
+
+            private:
+                EVP_MD_CTX *m_ctx;
+            };
+
+            class Sha1OpenSSLImpl : public Hash
+            {
+            public:
+
+                Sha1OpenSSLImpl();
+
+                virtual ~Sha1OpenSSLImpl();
+
+                virtual HashResult Calculate(const Aws::String& str) override;
+
+                virtual HashResult Calculate(Aws::IStream& stream) override;
+
+                virtual void Update(unsigned char* buffer, size_t bufferSize) override;
+
+                virtual HashResult GetHash() override;
+
+            private:
+                EVP_MD_CTX *m_ctx;
             };
 
             class Sha256OpenSSLImpl : public Hash
             {
             public:
-                Sha256OpenSSLImpl()
-                { }
+                Sha256OpenSSLImpl();
 
-                virtual ~Sha256OpenSSLImpl() = default;
+                virtual ~Sha256OpenSSLImpl();
 
                 virtual HashResult Calculate(const Aws::String& str) override;
 
                 virtual HashResult Calculate(Aws::IStream& stream) override;
+
+                virtual void Update(unsigned char* buffer, size_t bufferSize) override;
+
+                virtual HashResult GetHash() override;
+
+            private:
+                EVP_MD_CTX *m_ctx;
             };
 
             class Sha256HMACOpenSSLImpl : public HMAC
@@ -161,7 +182,7 @@ namespace Aws
 
                 /**
                 * Decrypt a buffer of data. Part of the contract for this interface is that intention that
-                * a user call this function multiple times for a large stream. As such, mutliple calls to this function
+                * a user call this function multiple times for a large stream. As such, multiple calls to this function
                 * on the same instance should produce valid sequential output from an encrypted stream.
                 */
                 CryptoBuffer DecryptBuffer(const CryptoBuffer& encryptedData) override;
@@ -174,32 +195,18 @@ namespace Aws
                 void Reset() override;
 
             protected:
-                /**
-                 * Algorithm/Mode level config for the EVP_CIPHER_CTX
-                 */
-                virtual void InitEncryptor_Internal() = 0;
-
-                /**
-                 * Algorithm/Mode level config for the EVP_CIPHER_CTX
-                 */
-                virtual void InitDecryptor_Internal() = 0;
-
                 virtual size_t GetBlockSizeBytes() const = 0;
-
                 virtual size_t GetKeyLengthBits() const = 0;
+                bool CheckKeyAndIVLength(size_t expectedKeyLength, size_t expectedIVLength);
 
-                EVP_CIPHER_CTX* m_ctx;
-
-                void CheckInitEncryptor();
-                void CheckInitDecryptor();
-
+                EVP_CIPHER_CTX* m_encryptor_ctx;
+                EVP_CIPHER_CTX* m_decryptor_ctx;
             private:
                 void Init();
                 void Cleanup();
 
-                bool m_encDecInitialized;
-                bool m_encryptionMode;
-                bool m_decryptionMode;
+                /* openssl has bug finalize decryption of an empty string */
+                bool m_emptyPlaintext = false;
             };
 
             /**
@@ -229,16 +236,16 @@ namespace Aws
 
                 AES_CBC_Cipher_OpenSSL(AES_CBC_Cipher_OpenSSL&& toMove) = default;
 
+                void Reset() override;
+
             protected:
-                void InitEncryptor_Internal() override;
-
-                void InitDecryptor_Internal() override;
-
                 size_t GetBlockSizeBytes() const override;
 
                 size_t GetKeyLengthBits() const override;
 
             private:
+                void InitCipher();
+
                 static size_t BlockSizeBytes;
                 static size_t KeyLengthBits;
             };
@@ -271,16 +278,16 @@ namespace Aws
 
                 AES_CTR_Cipher_OpenSSL(AES_CTR_Cipher_OpenSSL&& toMove) = default;
 
+                void Reset() override;
+
             protected:
-                void InitEncryptor_Internal() override;
-
-                void InitDecryptor_Internal() override;
-
                 size_t GetBlockSizeBytes() const override;
 
                 size_t GetKeyLengthBits() const override;
 
             private:
+                void InitCipher();
+
                 static size_t BlockSizeBytes;
                 static size_t KeyLengthBits;
             };
@@ -292,23 +299,30 @@ namespace Aws
             {
             public:
                 /**
-                 * Create AES in GCM mode off of a 256 bit key. Auto Generates a 16 byte secure random IV.
+                 * Create AES in GCM mode off of a 256 bit key. Auto Generates a 12 byte secure random IV.
                  */
                 AES_GCM_Cipher_OpenSSL(const CryptoBuffer& key);
 
                 /**
-                 * Create AES in GCM mode off of a 256 bit key, a 16 byte secure random IV, and an optional 16 byte Tag. If you are using this
-                 * cipher to decrypt an encrypted payload, you must set the tag here.
-                 */
-                AES_GCM_Cipher_OpenSSL(CryptoBuffer&& key, CryptoBuffer&& initializationVector,
-                                       CryptoBuffer&& tag = CryptoBuffer(0));
+                * Create AES in GCM mode off of a 256 bit key and AAD. Auto Generates a 12 byte IV in the format
+                */
+                AES_GCM_Cipher_OpenSSL(const CryptoBuffer& key, const CryptoBuffer* aad);
 
                 /**
-                 * Create AES in GCM mode off of a 256 bit key, a 16 byte secure random IV, and an optional 16 byte Tag. If you are using this
-                 * cipher to decrypt an encrypted payload, you must set the tag here.
+                 * Create AES in GCM mode off of a 256 bit key, a 12 byte secure random IV, and an optional 16 byte Tag and additional authentication data (AAD).
+                 * Note that tag could be acquired from encrypt mode and should only be set for decrypt mode.
+                 * If you are using this cipher to decrypt an encrypted payload, you must set the tag here.
+                 */
+                AES_GCM_Cipher_OpenSSL(CryptoBuffer&& key, CryptoBuffer&& initializationVector,
+                                       CryptoBuffer&& tag = CryptoBuffer(0), CryptoBuffer&& aad = CryptoBuffer(0));
+
+                /**
+                 * Create AES in GCM mode off of a 256 bit key, a 12 byte secure random IV, and an optional 16 byte Tag and additional authentication data (AAD).
+                 * Note that tag could be acquired from encrypt mode and should only be set for decrypt mode.
+                 * If you are using this cipher to decrypt an encrypted payload, you must set the tag here.
                  */
                 AES_GCM_Cipher_OpenSSL(const CryptoBuffer& key, const CryptoBuffer& initializationVector,
-                                       const CryptoBuffer& tag = CryptoBuffer(0));
+                                       const CryptoBuffer& tag = CryptoBuffer(0), const CryptoBuffer& aad = CryptoBuffer(0));
 
                 AES_GCM_Cipher_OpenSSL(const AES_GCM_Cipher_OpenSSL& other) = delete;
 
@@ -323,11 +337,9 @@ namespace Aws
                  */
                 CryptoBuffer FinalizeEncryption() override;
 
+                void Reset() override;
+
             protected:
-                void InitEncryptor_Internal() override;
-
-                void InitDecryptor_Internal() override;
-
                 size_t GetBlockSizeBytes() const override;
 
                 size_t GetKeyLengthBits() const override;
@@ -335,6 +347,9 @@ namespace Aws
                 size_t GetTagLengthBytes() const;
 
             private:
+                void InitCipher();
+
+                CryptoBuffer m_aad;
                 static size_t BlockSizeBytes;
                 static size_t IVLengthBytes;
                 static size_t KeyLengthBits;
@@ -366,16 +381,16 @@ namespace Aws
                 CryptoBuffer DecryptBuffer(const CryptoBuffer&) override;
                 CryptoBuffer FinalizeDecryption() override;
 
+                void Reset() override;
+
             protected:
-                void InitEncryptor_Internal() override;
-
-                void InitDecryptor_Internal() override;
-
                 inline size_t GetBlockSizeBytes() const override { return BlockSizeBytes; }
 
                 inline size_t GetKeyLengthBits() const override { return KeyLengthBits; }
 
             private:
+                void InitCipher();
+
                 static size_t BlockSizeBytes;
                 static size_t KeyLengthBits;
 

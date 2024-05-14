@@ -1,0 +1,2639 @@
+2023-10-27 21:08:25.555 TRACE PDO   snowflake_driver.c  556: Entering: pdo_snowflake_handle_factory
+2023-10-27 21:08:25.556 INFO  PDO   snowflake_driver.c  648: Snowflake PHP PDO Driver: 8.1.2-2.0.0
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  655: user: harry
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  658: password: ****
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  662: host: simbapartner.snowflakecomputing.com
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  666: port: 443
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  671: account: simbapartner
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  676: region: (null)
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  681: database: testdb
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  686: schema: testschema
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  691: warehouse: SIMBA_WH_TEST
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  695: role: sysadmin
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  700: protocol: https
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  706: insecureMode: (null)
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  718: timezone: (null)
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  720: autocommit: 1
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  729: application: phptest
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  738: authenticator: snowflake
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  747: priv_key_file: tests/p8test.pem
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  756: priv_key_file_pwd: test
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  765: proxy: (NULL)
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  774: no_proxy: (null)
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  782: disablequerycontextcache: false
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  790: includeretryreason: false
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  798: login_timeout: 350
+2023-10-27 21:08:25.556 DEBUG PDO   snowflake_driver.c  807: max_login_retries: 8
+2023-10-27 21:08:25.556 INFO  C     client.c          800: Snowflake C/C++ API: 1.0.3, OS: Linux, OS Version: 3.10.0-1127.13.1.el7.x86_64
+2023-10-27 21:08:25.556 DEBUG C     client.c          494: application name: PDO
+2023-10-27 21:08:25.556 DEBUG C     client.c          495: application version: 8.1.2-2.0.0
+2023-10-27 21:08:25.556 DEBUG C     client.c          496: authenticator: snowflake
+2023-10-27 21:08:25.556 DEBUG C     client.c          497: user: harry
+2023-10-27 21:08:25.556 DEBUG C     client.c          498: password: ****
+2023-10-27 21:08:25.556 DEBUG C     client.c          504: host: simbapartner.snowflakecomputing.com
+2023-10-27 21:08:25.556 DEBUG C     client.c          505: port: 443
+2023-10-27 21:08:25.556 DEBUG C     client.c          506: account: simbapartner
+2023-10-27 21:08:25.556 DEBUG C     client.c          507: region: (null)
+2023-10-27 21:08:25.556 DEBUG C     client.c          508: database: testdb
+2023-10-27 21:08:25.556 DEBUG C     client.c          509: schema: testschema
+2023-10-27 21:08:25.556 DEBUG C     client.c          510: warehouse: SIMBA_WH_TEST
+2023-10-27 21:08:25.556 DEBUG C     client.c          511: role: sysadmin
+2023-10-27 21:08:25.556 DEBUG C     client.c          512: protocol: https
+2023-10-27 21:08:25.556 DEBUG C     client.c          513: autocommit: true
+2023-10-27 21:08:25.556 DEBUG C     client.c          514: insecure_mode: false
+2023-10-27 21:08:25.556 DEBUG C     client.c          515: timezone: (null)
+2023-10-27 21:08:25.556 DEBUG C     client.c          516: login_timeout: 350
+2023-10-27 21:08:25.556 DEBUG C     client.c          517: network_timeout: 120
+2023-10-27 21:08:25.556 DEBUG C     client.c          518: qcc_disable: false
+2023-10-27 21:08:25.556 DEBUG C     client.c          519: include_retry_reason: false
+2023-10-27 21:08:25.556 TRACE C     client.c          853: Created body
+2023-10-27 21:08:25.556 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:25.556 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/session/v1/login-request?request_id=c80f4061-f16f-42ad-ac44-2db250bd5603&databaseName=testdb&schemaName=testschema&warehouse=SIMBA_WH_TEST&roleName=sysadmin&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:25.556 TRACE C     connection.c     1275: Added application infor header
+2023-10-27 21:08:25.556 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:25.915 DEBUG C     connection.c      880: Curl response size: 3889
+2023-10-27 21:08:25.916 TRACE C     client.c          880: Here is JSON response:
+{
+	"data":	{
+		"masterToken":	"ver:3-hint:92019682442222-ETMsDgAAAYty94R2ABRBRVMvQ0JDL1BLQ1M1UGFkZGluZwEAABAAEFiPYjEKWAWrbkD1gBLS9hEAAACwlXWSLg/xwtZ6gw4UADrYDYnHIzs4zZHbiUijbS2C7sEJZqn8c7CZdMijv4ABaTe6/jwHm45Ue6jWjnOwZtfvaVti5O3jdNWRKHZcg83c84BwmkmekjyGPdh7dki8zMZfgQ/Swa2uhxP3iPZAvTW3NlBxXkcw+pragx97BZKR3CYl+Pk+ubzojTl4XWFtxE7QxN8HyMs5Mf492HCds7tqJdZRUD9Z29kQUdQ15bis7jAAFM7PDo2jJu3+GbqzkdRnB2HpFtP5",
+		"token":	"ver:3-hint:92019682442222-ETMsDgAAAYty94SpABRBRVMvQ0JDL1BLQ1M1UGFkZGluZwEAABAAEKlIyV12VTUTxwprp3KWHeAAAACADX7XE8933zFu3nNCs7Zgtk2R12k9HQIeacvbYm307Rr4m4bFaNic39XYlal0JkHzyK4nCwNGWJXPL02Btr8SCzH20ca9yWUM2iFkP/6/itlf9xGod6sFbkUTGgUlZRrs5WuhSdVzEJahPetg11WzcYGaZH6z7Grvuz52B14Mh1EAFLrV2VID3U5F4OQOmquLYbQ1fkl2",
+		"validityInSeconds":	3600,
+		"masterValidityInSeconds":	14400,
+		"displayUserName":	"HARRY",
+		"serverVersion":	"7.38.2",
+		"firstLogin":	true,
+		"remMeToken":	null,
+		"remMeValidityInSeconds":	0,
+		"healthCheckInterval":	45,
+		"newClientForUpgrade":	null,
+		"sessionId":	92019724970006,
+		"parameters":	[{
+				"name":	"TIMESTAMP_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3 TZHTZM"
+			}, {
+				"name":	"CLIENT_PREFETCH_THREADS",
+				"value":	4
+			}, {
+				"name":	"TIME_OUTPUT_FORMAT",
+				"value":	"HH24:MI:SS"
+			}, {
+				"name":	"TIMESTAMP_TZ_OUTPUT_FORMAT",
+				"value":	""
+			}, {
+				"name":	"CLIENT_RESULT_CHUNK_SIZE",
+				"value":	48
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE",
+				"value":	false
+			}, {
+				"name":	"CLIENT_METADATA_USE_SESSION_DATABASE",
+				"value":	false
+			}, {
+				"name":	"QUERY_CONTEXT_CACHE_SIZE",
+				"value":	5
+			}, {
+				"name":	"CLIENT_OUT_OF_BAND_TELEMETRY_ENABLED",
+				"value":	false
+			}, {
+				"name":	"ENABLE_STAGE_S3_PRIVATELINK_FOR_US_EAST_1",
+				"value":	true
+			}, {
+				"name":	"TIMESTAMP_NTZ_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_THREADS",
+				"value":	1
+			}, {
+				"name":	"CLIENT_METADATA_REQUEST_USE_CONNECTION_CTX",
+				"value":	false
+			}, {
+				"name":	"CLIENT_HONOR_CLIENT_TZ_FOR_TIMESTAMP_NTZ",
+				"value":	true
+			}, {
+				"name":	"CLIENT_MEMORY_LIMIT",
+				"value":	1536
+			}, {
+				"name":	"CLIENT_TIMESTAMP_TYPE_MAPPING",
+				"value":	"TIMESTAMP_LTZ"
+			}, {
+				"name":	"TIMEZONE",
+				"value":	"America/Los_Angeles"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_SLOTS",
+				"value":	2
+			}, {
+				"name":	"CLIENT_TELEMETRY_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_DISABLE_INCIDENTS",
+				"value":	true
+			}, {
+				"name":	"CLIENT_USE_V1_QUERY_API",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_COLUMN_CASE_INSENSITIVE",
+				"value":	false
+			}, {
+				"name":	"CSV_TIMESTAMP_FORMAT",
+				"value":	""
+			}, {
+				"name":	"BINARY_OUTPUT_FORMAT",
+				"value":	"HEX"
+			}, {
+				"name":	"CLIENT_ENABLE_LOG_INFO_STATEMENT_PARAMETERS",
+				"value":	false
+			}, {
+				"name":	"CLIENT_TELEMETRY_SESSIONLESS_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_FORCE_PROTECT_ID_TOKEN",
+				"value":	true
+			}, {
+				"name":	"DATE_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD"
+			}, {
+				"name":	"CLIENT_CONSENT_CACHE_ID_TOKEN",
+				"value":	false
+			}, {
+				"name":	"CLIENT_STAGE_ARRAY_BINDING_THRESHOLD",
+				"value":	65280
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE_HEARTBEAT_FREQUENCY",
+				"value":	3600
+			}, {
+				"name":	"AUTOCOMMIT",
+				"value":	true
+			}, {
+				"name":	"CLIENT_SESSION_CLONE",
+				"value":	false
+			}, {
+				"name":	"TIMESTAMP_LTZ_OUTPUT_FORMAT",
+				"value":	""
+			}],
+		"sessionInfo":	{
+			"databaseName":	"TESTDB",
+			"schemaName":	"TESTSCHEMA",
+			"warehouseName":	"SIMBA_WH_TEST",
+			"roleName":	"SYSADMIN"
+		},
+		"idToken":	null,
+		"idTokenValidityInSeconds":	0,
+		"responseData":	null,
+		"mfaToken":	null,
+		"mfaTokenValidityInSeconds":	0
+	},
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:25.917 DEBUG C     connection.c      772: Item and Value; success: 1
+2023-10-27 21:08:25.917 DEBUG C     connection.c      730: Item and Value; token: ******
+2023-10-27 21:08:25.917 DEBUG C     connection.c      730: Item and Value; masterToken: ******
+2023-10-27 21:08:25.917 TRACE C++   QueryContextCache.cpp   83: QueryContextCache: clearCache called
+2023-10-27 21:08:25.917 TRACE PDO   snowflake_driver.c  825: Leaving: 1
+2023-10-27 21:08:25.917 TRACE PDO   snowflake_driver.c  232: Entering: snowflake_handle_doer
+2023-10-27 21:08:25.917 DEBUG PDO   snowflake_driver.c  237: sql: create or replace table autocommittest421000158(c1 int), len: 55
+2023-10-27 21:08:25.917 DEBUG C     client.c         1867: Command size non-zero, setting as sql text size.
+2023-10-27 21:08:25.917 DEBUG C     client.c         2015: Created body
+2023-10-27 21:08:25.917 TRACE C     client.c         2016: Here is constructed body:
+{
+	"sqlText":	"create or replace table autocommittest421000158(c1 int)",
+	"asyncExec":	false,
+	"sequenceId":	1,
+	"querySubmissionTime":	1698440905000,
+	"describeOnly":	false,
+	"queryContextDTO":	{
+		"entries":	[]
+	}
+}
+2023-10-27 21:08:25.917 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:25.917 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/queries/v1/query-request?requestId=40d5b5a4-3fb6-4c72-ada5-2c3fe8c4562d&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:25.917 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:26.313 DEBUG C     connection.c      880: Curl response size: 2842
+2023-10-27 21:08:26.314 TRACE C     client.c         2028: Here is JSON response:
+{
+	"data":	{
+		"parameters":	[{
+				"name":	"TIMESTAMP_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3 TZHTZM"
+			}, {
+				"name":	"CLIENT_PREFETCH_THREADS",
+				"value":	4
+			}, {
+				"name":	"TIME_OUTPUT_FORMAT",
+				"value":	"HH24:MI:SS"
+			}, {
+				"name":	"TIMESTAMP_TZ_OUTPUT_FORMAT",
+				"value":	""
+			}, {
+				"name":	"CLIENT_RESULT_CHUNK_SIZE",
+				"value":	48
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE",
+				"value":	false
+			}, {
+				"name":	"CLIENT_METADATA_USE_SESSION_DATABASE",
+				"value":	false
+			}, {
+				"name":	"QUERY_CONTEXT_CACHE_SIZE",
+				"value":	5
+			}, {
+				"name":	"CLIENT_OUT_OF_BAND_TELEMETRY_ENABLED",
+				"value":	false
+			}, {
+				"name":	"ENABLE_STAGE_S3_PRIVATELINK_FOR_US_EAST_1",
+				"value":	true
+			}, {
+				"name":	"TIMESTAMP_NTZ_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_THREADS",
+				"value":	1
+			}, {
+				"name":	"CLIENT_METADATA_REQUEST_USE_CONNECTION_CTX",
+				"value":	false
+			}, {
+				"name":	"CLIENT_HONOR_CLIENT_TZ_FOR_TIMESTAMP_NTZ",
+				"value":	true
+			}, {
+				"name":	"CLIENT_MEMORY_LIMIT",
+				"value":	1536
+			}, {
+				"name":	"CLIENT_TIMESTAMP_TYPE_MAPPING",
+				"value":	"TIMESTAMP_LTZ"
+			}, {
+				"name":	"TIMEZONE",
+				"value":	"America/Los_Angeles"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_SLOTS",
+				"value":	2
+			}, {
+				"name":	"CLIENT_TELEMETRY_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_DISABLE_INCIDENTS",
+				"value":	true
+			}, {
+				"name":	"CLIENT_USE_V1_QUERY_API",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_COLUMN_CASE_INSENSITIVE",
+				"value":	false
+			}, {
+				"name":	"CSV_TIMESTAMP_FORMAT",
+				"value":	""
+			}, {
+				"name":	"BINARY_OUTPUT_FORMAT",
+				"value":	"HEX"
+			}, {
+				"name":	"CLIENT_ENABLE_LOG_INFO_STATEMENT_PARAMETERS",
+				"value":	false
+			}, {
+				"name":	"CLIENT_TELEMETRY_SESSIONLESS_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_FORCE_PROTECT_ID_TOKEN",
+				"value":	true
+			}, {
+				"name":	"DATE_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD"
+			}, {
+				"name":	"CLIENT_CONSENT_CACHE_ID_TOKEN",
+				"value":	false
+			}, {
+				"name":	"CLIENT_STAGE_ARRAY_BINDING_THRESHOLD",
+				"value":	65280
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE_HEARTBEAT_FREQUENCY",
+				"value":	3600
+			}, {
+				"name":	"AUTOCOMMIT",
+				"value":	true
+			}, {
+				"name":	"CLIENT_SESSION_CLONE",
+				"value":	false
+			}, {
+				"name":	"TIMESTAMP_LTZ_OUTPUT_FORMAT",
+				"value":	""
+			}],
+		"rowtype":	[{
+				"name":	"status",
+				"database":	"",
+				"schema":	"",
+				"table":	"",
+				"byteLength":	16777216,
+				"precision":	null,
+				"type":	"text",
+				"scale":	null,
+				"nullable":	true,
+				"collation":	null,
+				"length":	16777216
+			}],
+		"rowset":	[["Table AUTOCOMMITTEST421000158 successfully created."]],
+		"total":	1,
+		"returned":	1,
+		"queryId":	"01afef94-0507-0915-0000-53b1072cdc1e",
+		"databaseProvider":	null,
+		"finalDatabaseName":	"TESTDB",
+		"finalSchemaName":	"TESTSCHEMA",
+		"finalWarehouseName":	"SIMBA_WH_TEST",
+		"finalRoleName":	"SYSADMIN",
+		"numberOfBinds":	0,
+		"arrayBindSupported":	false,
+		"statementTypeId":	24833,
+		"version":	1,
+		"sendResultTime":	1698440906285,
+		"queryResultFormat":	"json",
+		"queryContext":	{
+			"entries":	[{
+					"id":	0,
+					"timestamp":	265200321318233,
+					"priority":	0
+				}]
+		}
+	},
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:26.315 DEBUG C     connection.c      755: Item and Value; queryId: 01afef94-0507-0915-0000-53b1072cdc1e
+2023-10-27 21:08:26.315 DEBUG C     connection.c      772: Item and Value; success: 1
+2023-10-27 21:08:26.315 DEBUG C     connection.c      732: Item and Value; finalDatabaseName: TESTDB
+2023-10-27 21:08:26.315 DEBUG C     connection.c      732: Item and Value; finalSchemaName: TESTSCHEMA
+2023-10-27 21:08:26.315 DEBUG C     connection.c      732: Item and Value; finalWarehouseName: SIMBA_WH_TEST
+2023-10-27 21:08:26.315 DEBUG C     connection.c      732: Item and Value; finalRoleName: SYSADMIN
+2023-10-27 21:08:26.315 TRACE C++   QueryContextCache.cpp  297: QueryContextCache: add new item id: 0, priority: 0
+2023-10-27 21:08:26.315 TRACE C++   QueryContextCache.cpp  307: QueryContextCache::syncPriorityMap called priorityMap size = 0, newPrioirtyMap size = 1
+2023-10-27 21:08:26.315 TRACE C++   QueryContextCache.cpp  316: QueryContextCache::checkCacheCapacity called. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:26.315 TRACE C++   QueryContextCache.cpp  327: QueryContextCache::checkCacheCapacity returns. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:26.315 DEBUG C     connection.c      789: Item and Value; statementTypeId: 24833
+2023-10-27 21:08:26.315 DEBUG C     connection.c      732: Item and Value; name: status
+2023-10-27 21:08:26.315 DEBUG C     connection.c      789: Item and Value; byteLength: 16777216
+2023-10-27 21:08:26.315 DEBUG C     connection.c      789: Item and Value; length: 16777216
+2023-10-27 21:08:26.315 DEBUG C     connection.c      772: Item and Value; nullable: 1
+2023-10-27 21:08:26.315 DEBUG C     results.c         292: Found type and ctype; 2: 5
+2023-10-27 21:08:26.315 DEBUG C     connection.c      809: Array: rowset
+2023-10-27 21:08:26.315 DEBUG C++   ResultSetJson.cpp   84: appendChunk -- Appended chunk of size 1.
+2023-10-27 21:08:26.315 DEBUG C     connection.c      789: Item and Value; total: 1
+2023-10-27 21:08:26.315 TRACE PDO   snowflake_driver.c  273: Leaving: 1
+2023-10-27 21:08:26.315 TRACE PDO   snowflake_driver.c  133: Entering: snowflake_handle_closer
+2023-10-27 21:08:26.315 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:26.315 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/session?delete=true&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:26.315 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:26.451 DEBUG C     connection.c      880: Curl response size: 76
+2023-10-27 21:08:26.452 TRACE C     client.c          727: JSON response:
+{
+	"data":	null,
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:26.452 TRACE PDO   snowflake_driver.c  144: Leaving: 1
+2023-10-27 21:08:26.452 TRACE PDO   snowflake_driver.c  556: Entering: pdo_snowflake_handle_factory
+2023-10-27 21:08:26.452 INFO  PDO   snowflake_driver.c  648: Snowflake PHP PDO Driver: 8.1.2-2.0.0
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  655: user: harry
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  658: password: ****
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  662: host: simbapartner.snowflakecomputing.com
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  666: port: 443
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  671: account: simbapartner
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  676: region: (null)
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  681: database: testdb
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  686: schema: testschema
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  691: warehouse: SIMBA_WH_TEST
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  695: role: sysadmin
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  700: protocol: https
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  706: insecureMode: (null)
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  718: timezone: (null)
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  720: autocommit: 1
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  729: application: phptest
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  738: authenticator: (null)
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  747: priv_key_file: (null)
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  756: priv_key_file_pwd: ****
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  765: proxy: (NULL)
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  774: no_proxy: (null)
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  782: disablequerycontextcache: false
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  790: includeretryreason: true
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  798: login_timeout: 300
+2023-10-27 21:08:26.452 DEBUG PDO   snowflake_driver.c  807: max_login_retries: 7
+2023-10-27 21:08:26.452 INFO  C     client.c          800: Snowflake C/C++ API: 1.0.3, OS: Linux, OS Version: 3.10.0-1127.13.1.el7.x86_64
+2023-10-27 21:08:26.452 DEBUG C     client.c          494: application name: PDO
+2023-10-27 21:08:26.452 DEBUG C     client.c          495: application version: 8.1.2-2.0.0
+2023-10-27 21:08:26.452 DEBUG C     client.c          496: authenticator: snowflake
+2023-10-27 21:08:26.452 DEBUG C     client.c          497: user: harry
+2023-10-27 21:08:26.452 DEBUG C     client.c          498: password: ****
+2023-10-27 21:08:26.452 DEBUG C     client.c          504: host: simbapartner.snowflakecomputing.com
+2023-10-27 21:08:26.452 DEBUG C     client.c          505: port: 443
+2023-10-27 21:08:26.452 DEBUG C     client.c          506: account: simbapartner
+2023-10-27 21:08:26.452 DEBUG C     client.c          507: region: (null)
+2023-10-27 21:08:26.452 DEBUG C     client.c          508: database: testdb
+2023-10-27 21:08:26.452 DEBUG C     client.c          509: schema: testschema
+2023-10-27 21:08:26.452 DEBUG C     client.c          510: warehouse: SIMBA_WH_TEST
+2023-10-27 21:08:26.452 DEBUG C     client.c          511: role: sysadmin
+2023-10-27 21:08:26.452 DEBUG C     client.c          512: protocol: https
+2023-10-27 21:08:26.452 DEBUG C     client.c          513: autocommit: true
+2023-10-27 21:08:26.452 DEBUG C     client.c          514: insecure_mode: false
+2023-10-27 21:08:26.452 DEBUG C     client.c          515: timezone: (null)
+2023-10-27 21:08:26.452 DEBUG C     client.c          516: login_timeout: 300
+2023-10-27 21:08:26.452 DEBUG C     client.c          517: network_timeout: 120
+2023-10-27 21:08:26.452 DEBUG C     client.c          518: qcc_disable: false
+2023-10-27 21:08:26.452 DEBUG C     client.c          519: include_retry_reason: true
+2023-10-27 21:08:26.453 TRACE C     client.c          853: Created body
+2023-10-27 21:08:26.453 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:26.453 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/session/v1/login-request?request_id=47c3f466-de71-4889-a0d7-9d48bbe63c4a&databaseName=testdb&schemaName=testschema&warehouse=SIMBA_WH_TEST&roleName=sysadmin&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:26.453 TRACE C     connection.c     1275: Added application infor header
+2023-10-27 21:08:26.453 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:26.709 DEBUG C     connection.c      880: Curl response size: 3889
+2023-10-27 21:08:26.710 TRACE C     client.c          880: Here is JSON response:
+{
+	"data":	{
+		"masterToken":	"ver:3-hint:92019682442222-ETMsDgAAAYty94ebABRBRVMvQ0JDL1BLQ1M1UGFkZGluZwEAABAAEHvt+tuxL0P7ievW30AcWswAAACwlRJUMsXBySY9N5cviWxZ+EBn2cyxSZzlSBg/qzC2WBBGlqV40TH03mxaC6SXloaZ0IY1sXwKV7MItGgMTjT86ykzISF0Q9z0lpphyVs0mPMqeAK5n2REFZdp3K7gVTbQyN+DwcSNz7DrBXIBteI/cVkwFafBr1cDEpJfkPVUopZkNbPiGOhT5sJfCRibPzdUUrXuw6F8MmmnJlrDbt2TUMVGr/qKGe4loSjcdSoMme0AFCsJj0sdmkx1XKoXM2VH7/58HJtV",
+		"token":	"ver:3-hint:92019682442222-ETMsDgAAAYty94fEABRBRVMvQ0JDL1BLQ1M1UGFkZGluZwEAABAAEJh2o4w+1eYYhbzbfRSJE2wAAACAQVTIHpET4TdTrbMAn7E/0o4LEmfixn1aaFna9TIM6/1gf6alhyaP1PEWaFBb0f0qt7BtB+Oiij8pUqkzILqrHxBrGkYnKdEl+PMVmmGBDvdlZTVhzj2eQP8gqHMqQ8eeN9mby4xglp1FpvbLSrYz7TtfYuVlWbN23UGBGvrtRSYAFIPjfLTcUJut5vQ3dLAxA1ShX41E",
+		"validityInSeconds":	3600,
+		"masterValidityInSeconds":	14400,
+		"displayUserName":	"HARRY",
+		"serverVersion":	"7.38.2",
+		"firstLogin":	true,
+		"remMeToken":	null,
+		"remMeValidityInSeconds":	0,
+		"healthCheckInterval":	45,
+		"newClientForUpgrade":	null,
+		"sessionId":	92019724967834,
+		"parameters":	[{
+				"name":	"TIMESTAMP_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3 TZHTZM"
+			}, {
+				"name":	"CLIENT_PREFETCH_THREADS",
+				"value":	4
+			}, {
+				"name":	"TIME_OUTPUT_FORMAT",
+				"value":	"HH24:MI:SS"
+			}, {
+				"name":	"TIMESTAMP_TZ_OUTPUT_FORMAT",
+				"value":	""
+			}, {
+				"name":	"CLIENT_RESULT_CHUNK_SIZE",
+				"value":	48
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE",
+				"value":	false
+			}, {
+				"name":	"CLIENT_OUT_OF_BAND_TELEMETRY_ENABLED",
+				"value":	false
+			}, {
+				"name":	"CLIENT_METADATA_USE_SESSION_DATABASE",
+				"value":	false
+			}, {
+				"name":	"QUERY_CONTEXT_CACHE_SIZE",
+				"value":	5
+			}, {
+				"name":	"ENABLE_STAGE_S3_PRIVATELINK_FOR_US_EAST_1",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_THREADS",
+				"value":	1
+			}, {
+				"name":	"TIMESTAMP_NTZ_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3"
+			}, {
+				"name":	"CLIENT_METADATA_REQUEST_USE_CONNECTION_CTX",
+				"value":	false
+			}, {
+				"name":	"CLIENT_HONOR_CLIENT_TZ_FOR_TIMESTAMP_NTZ",
+				"value":	true
+			}, {
+				"name":	"CLIENT_MEMORY_LIMIT",
+				"value":	1536
+			}, {
+				"name":	"CLIENT_TIMESTAMP_TYPE_MAPPING",
+				"value":	"TIMESTAMP_LTZ"
+			}, {
+				"name":	"TIMEZONE",
+				"value":	"America/Los_Angeles"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_SLOTS",
+				"value":	2
+			}, {
+				"name":	"CLIENT_TELEMETRY_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_USE_V1_QUERY_API",
+				"value":	true
+			}, {
+				"name":	"CLIENT_DISABLE_INCIDENTS",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_COLUMN_CASE_INSENSITIVE",
+				"value":	false
+			}, {
+				"name":	"CSV_TIMESTAMP_FORMAT",
+				"value":	""
+			}, {
+				"name":	"BINARY_OUTPUT_FORMAT",
+				"value":	"HEX"
+			}, {
+				"name":	"CLIENT_ENABLE_LOG_INFO_STATEMENT_PARAMETERS",
+				"value":	false
+			}, {
+				"name":	"CLIENT_TELEMETRY_SESSIONLESS_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_CONSENT_CACHE_ID_TOKEN",
+				"value":	false
+			}, {
+				"name":	"DATE_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD"
+			}, {
+				"name":	"CLIENT_FORCE_PROTECT_ID_TOKEN",
+				"value":	true
+			}, {
+				"name":	"CLIENT_STAGE_ARRAY_BINDING_THRESHOLD",
+				"value":	65280
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE_HEARTBEAT_FREQUENCY",
+				"value":	3600
+			}, {
+				"name":	"CLIENT_SESSION_CLONE",
+				"value":	false
+			}, {
+				"name":	"AUTOCOMMIT",
+				"value":	true
+			}, {
+				"name":	"TIMESTAMP_LTZ_OUTPUT_FORMAT",
+				"value":	""
+			}],
+		"sessionInfo":	{
+			"databaseName":	"TESTDB",
+			"schemaName":	"TESTSCHEMA",
+			"warehouseName":	"SIMBA_WH_TEST",
+			"roleName":	"SYSADMIN"
+		},
+		"idToken":	null,
+		"idTokenValidityInSeconds":	0,
+		"responseData":	null,
+		"mfaToken":	null,
+		"mfaTokenValidityInSeconds":	0
+	},
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:26.710 DEBUG C     connection.c      772: Item and Value; success: 1
+2023-10-27 21:08:26.710 DEBUG C     connection.c      730: Item and Value; token: ******
+2023-10-27 21:08:26.710 DEBUG C     connection.c      730: Item and Value; masterToken: ******
+2023-10-27 21:08:26.710 TRACE C++   QueryContextCache.cpp   83: QueryContextCache: clearCache called
+2023-10-27 21:08:26.710 TRACE PDO   snowflake_driver.c  825: Leaving: 1
+2023-10-27 21:08:26.710 TRACE PDO   snowflake_driver.c  232: Entering: snowflake_handle_doer
+2023-10-27 21:08:26.710 DEBUG PDO   snowflake_driver.c  237: sql: insert into autocommittest421000158 values (1), len: 46
+2023-10-27 21:08:26.710 DEBUG C     client.c         1867: Command size non-zero, setting as sql text size.
+2023-10-27 21:08:26.710 DEBUG C     client.c         2015: Created body
+2023-10-27 21:08:26.710 TRACE C     client.c         2016: Here is constructed body:
+{
+	"sqlText":	"insert into autocommittest421000158 values (1)",
+	"asyncExec":	false,
+	"sequenceId":	1,
+	"querySubmissionTime":	1698440906000,
+	"describeOnly":	false,
+	"queryContextDTO":	{
+		"entries":	[]
+	}
+}
+2023-10-27 21:08:26.710 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:26.710 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/queries/v1/query-request?requestId=d5f86cdb-312f-44b7-97c4-58145f12a890&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:26.710 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:27.733 DEBUG C     connection.c      880: Curl response size: 2935
+2023-10-27 21:08:27.734 TRACE C     client.c         2028: Here is JSON response:
+{
+	"data":	{
+		"parameters":	[{
+				"name":	"TIMESTAMP_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3 TZHTZM"
+			}, {
+				"name":	"CLIENT_PREFETCH_THREADS",
+				"value":	4
+			}, {
+				"name":	"TIME_OUTPUT_FORMAT",
+				"value":	"HH24:MI:SS"
+			}, {
+				"name":	"TIMESTAMP_TZ_OUTPUT_FORMAT",
+				"value":	""
+			}, {
+				"name":	"CLIENT_RESULT_CHUNK_SIZE",
+				"value":	48
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE",
+				"value":	false
+			}, {
+				"name":	"CLIENT_METADATA_USE_SESSION_DATABASE",
+				"value":	false
+			}, {
+				"name":	"QUERY_CONTEXT_CACHE_SIZE",
+				"value":	5
+			}, {
+				"name":	"CLIENT_OUT_OF_BAND_TELEMETRY_ENABLED",
+				"value":	false
+			}, {
+				"name":	"ENABLE_STAGE_S3_PRIVATELINK_FOR_US_EAST_1",
+				"value":	true
+			}, {
+				"name":	"TIMESTAMP_NTZ_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_THREADS",
+				"value":	1
+			}, {
+				"name":	"CLIENT_METADATA_REQUEST_USE_CONNECTION_CTX",
+				"value":	false
+			}, {
+				"name":	"CLIENT_HONOR_CLIENT_TZ_FOR_TIMESTAMP_NTZ",
+				"value":	true
+			}, {
+				"name":	"CLIENT_MEMORY_LIMIT",
+				"value":	1536
+			}, {
+				"name":	"CLIENT_TIMESTAMP_TYPE_MAPPING",
+				"value":	"TIMESTAMP_LTZ"
+			}, {
+				"name":	"TIMEZONE",
+				"value":	"America/Los_Angeles"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_SLOTS",
+				"value":	2
+			}, {
+				"name":	"CLIENT_TELEMETRY_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_DISABLE_INCIDENTS",
+				"value":	true
+			}, {
+				"name":	"CLIENT_USE_V1_QUERY_API",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_COLUMN_CASE_INSENSITIVE",
+				"value":	false
+			}, {
+				"name":	"CSV_TIMESTAMP_FORMAT",
+				"value":	""
+			}, {
+				"name":	"BINARY_OUTPUT_FORMAT",
+				"value":	"HEX"
+			}, {
+				"name":	"CLIENT_ENABLE_LOG_INFO_STATEMENT_PARAMETERS",
+				"value":	false
+			}, {
+				"name":	"CLIENT_TELEMETRY_SESSIONLESS_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_FORCE_PROTECT_ID_TOKEN",
+				"value":	true
+			}, {
+				"name":	"DATE_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD"
+			}, {
+				"name":	"CLIENT_CONSENT_CACHE_ID_TOKEN",
+				"value":	false
+			}, {
+				"name":	"CLIENT_STAGE_ARRAY_BINDING_THRESHOLD",
+				"value":	65280
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE_HEARTBEAT_FREQUENCY",
+				"value":	3600
+			}, {
+				"name":	"AUTOCOMMIT",
+				"value":	true
+			}, {
+				"name":	"CLIENT_SESSION_CLONE",
+				"value":	false
+			}, {
+				"name":	"TIMESTAMP_LTZ_OUTPUT_FORMAT",
+				"value":	""
+			}],
+		"rowtype":	[{
+				"name":	"number of rows inserted",
+				"database":	"",
+				"schema":	"",
+				"table":	"",
+				"byteLength":	null,
+				"precision":	19,
+				"type":	"fixed",
+				"scale":	0,
+				"nullable":	false,
+				"collation":	null,
+				"length":	null
+			}],
+		"rowset":	[["1"]],
+		"total":	1,
+		"returned":	1,
+		"queryId":	"01afef94-0507-0915-0000-53b1072cdc22",
+		"databaseProvider":	null,
+		"finalDatabaseName":	"TESTDB",
+		"finalSchemaName":	"TESTSCHEMA",
+		"finalWarehouseName":	"SIMBA_WH_TEST",
+		"finalRoleName":	"SYSADMIN",
+		"numberOfBinds":	0,
+		"stats":	{
+			"numRowsInserted":	1,
+			"numRowsDeleted":	0,
+			"numRowsUpdated":	0,
+			"numDmlDuplicates":	0
+		},
+		"arrayBindSupported":	false,
+		"statementTypeId":	12544,
+		"version":	1,
+		"sendResultTime":	1698440907728,
+		"queryResultFormat":	"json",
+		"queryContext":	{
+			"entries":	[{
+					"id":	0,
+					"timestamp":	265200322760049,
+					"priority":	0
+				}]
+		}
+	},
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:27.734 DEBUG C     connection.c      755: Item and Value; queryId: 01afef94-0507-0915-0000-53b1072cdc22
+2023-10-27 21:08:27.734 DEBUG C     connection.c      772: Item and Value; success: 1
+2023-10-27 21:08:27.734 DEBUG C     connection.c      732: Item and Value; finalDatabaseName: TESTDB
+2023-10-27 21:08:27.734 DEBUG C     connection.c      732: Item and Value; finalSchemaName: TESTSCHEMA
+2023-10-27 21:08:27.735 DEBUG C     connection.c      732: Item and Value; finalWarehouseName: SIMBA_WH_TEST
+2023-10-27 21:08:27.735 DEBUG C     connection.c      732: Item and Value; finalRoleName: SYSADMIN
+2023-10-27 21:08:27.735 TRACE C++   QueryContextCache.cpp  297: QueryContextCache: add new item id: 0, priority: 0
+2023-10-27 21:08:27.735 TRACE C++   QueryContextCache.cpp  307: QueryContextCache::syncPriorityMap called priorityMap size = 0, newPrioirtyMap size = 1
+2023-10-27 21:08:27.735 TRACE C++   QueryContextCache.cpp  316: QueryContextCache::checkCacheCapacity called. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:27.735 TRACE C++   QueryContextCache.cpp  327: QueryContextCache::checkCacheCapacity returns. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:27.735 DEBUG C     connection.c      789: Item and Value; statementTypeId: 12544
+2023-10-27 21:08:27.735 DEBUG C     connection.c      732: Item and Value; name: number of rows inserted
+2023-10-27 21:08:27.735 DEBUG C     connection.c      789: Item and Value; precision: 19
+2023-10-27 21:08:27.735 DEBUG C     connection.c      789: Item and Value; scale: 0
+2023-10-27 21:08:27.735 DEBUG C     connection.c      772: Item and Value; nullable: 0
+2023-10-27 21:08:27.735 DEBUG C     results.c         292: Found type and ctype; 0: 2
+2023-10-27 21:08:27.735 DEBUG C     connection.c      789: Item and Value; numRowsInserted: 1
+2023-10-27 21:08:27.735 DEBUG C     connection.c      789: Item and Value; numRowsUpdated: 0
+2023-10-27 21:08:27.735 DEBUG C     connection.c      789: Item and Value; numRowsDeleted: 0
+2023-10-27 21:08:27.735 DEBUG C     connection.c      789: Item and Value; numDmlDuplicates: 0
+2023-10-27 21:08:27.735 DEBUG C     connection.c      809: Array: rowset
+2023-10-27 21:08:27.735 DEBUG C++   ResultSetJson.cpp   84: appendChunk -- Appended chunk of size 1.
+2023-10-27 21:08:27.735 DEBUG C     connection.c      789: Item and Value; total: 1
+2023-10-27 21:08:27.735 TRACE PDO   snowflake_driver.c  273: Leaving: 1
+2023-10-27 21:08:27.735 TRACE PDO   snowflake_driver.c  133: Entering: snowflake_handle_closer
+2023-10-27 21:08:27.735 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:27.735 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/session?delete=true&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:27.735 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:27.852 DEBUG C     connection.c      880: Curl response size: 76
+2023-10-27 21:08:27.853 TRACE C     client.c          727: JSON response:
+{
+	"data":	null,
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:27.853 TRACE PDO   snowflake_driver.c  144: Leaving: 1
+2023-10-27 21:08:27.853 TRACE PDO   snowflake_driver.c  556: Entering: pdo_snowflake_handle_factory
+2023-10-27 21:08:27.853 INFO  PDO   snowflake_driver.c  648: Snowflake PHP PDO Driver: 8.1.2-2.0.0
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  655: user: harry
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  658: password: ****
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  662: host: simbapartner.snowflakecomputing.com
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  666: port: 443
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  671: account: simbapartner
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  676: region: (null)
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  681: database: testdb
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  686: schema: testschema
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  691: warehouse: SIMBA_WH_TEST
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  695: role: sysadmin
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  700: protocol: https
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  706: insecureMode: (null)
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  718: timezone: (null)
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  720: autocommit: 1
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  729: application: phptest
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  738: authenticator: (null)
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  747: priv_key_file: (null)
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  756: priv_key_file_pwd: ****
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  765: proxy: (NULL)
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  774: no_proxy: (null)
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  782: disablequerycontextcache: false
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  790: includeretryreason: true
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  798: login_timeout: 300
+2023-10-27 21:08:27.853 DEBUG PDO   snowflake_driver.c  807: max_login_retries: 7
+2023-10-27 21:08:27.854 INFO  C     client.c          800: Snowflake C/C++ API: 1.0.3, OS: Linux, OS Version: 3.10.0-1127.13.1.el7.x86_64
+2023-10-27 21:08:27.854 DEBUG C     client.c          494: application name: PDO
+2023-10-27 21:08:27.854 DEBUG C     client.c          495: application version: 8.1.2-2.0.0
+2023-10-27 21:08:27.854 DEBUG C     client.c          496: authenticator: snowflake
+2023-10-27 21:08:27.854 DEBUG C     client.c          497: user: harry
+2023-10-27 21:08:27.854 DEBUG C     client.c          498: password: ****
+2023-10-27 21:08:27.854 DEBUG C     client.c          504: host: simbapartner.snowflakecomputing.com
+2023-10-27 21:08:27.854 DEBUG C     client.c          505: port: 443
+2023-10-27 21:08:27.854 DEBUG C     client.c          506: account: simbapartner
+2023-10-27 21:08:27.854 DEBUG C     client.c          507: region: (null)
+2023-10-27 21:08:27.854 DEBUG C     client.c          508: database: testdb
+2023-10-27 21:08:27.854 DEBUG C     client.c          509: schema: testschema
+2023-10-27 21:08:27.854 DEBUG C     client.c          510: warehouse: SIMBA_WH_TEST
+2023-10-27 21:08:27.854 DEBUG C     client.c          511: role: sysadmin
+2023-10-27 21:08:27.854 DEBUG C     client.c          512: protocol: https
+2023-10-27 21:08:27.854 DEBUG C     client.c          513: autocommit: true
+2023-10-27 21:08:27.854 DEBUG C     client.c          514: insecure_mode: false
+2023-10-27 21:08:27.854 DEBUG C     client.c          515: timezone: (null)
+2023-10-27 21:08:27.854 DEBUG C     client.c          516: login_timeout: 300
+2023-10-27 21:08:27.854 DEBUG C     client.c          517: network_timeout: 120
+2023-10-27 21:08:27.854 DEBUG C     client.c          518: qcc_disable: false
+2023-10-27 21:08:27.854 DEBUG C     client.c          519: include_retry_reason: true
+2023-10-27 21:08:27.854 TRACE C     client.c          853: Created body
+2023-10-27 21:08:27.854 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:27.854 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/session/v1/login-request?request_id=f0aac0a0-37d6-4396-ab4e-b70a6e89432b&databaseName=testdb&schemaName=testschema&warehouse=SIMBA_WH_TEST&roleName=sysadmin&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:27.854 TRACE C     connection.c     1275: Added application infor header
+2023-10-27 21:08:27.854 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:28.072 DEBUG C     connection.c      880: Curl response size: 3889
+2023-10-27 21:08:28.073 TRACE C     client.c          880: Here is JSON response:
+{
+	"data":	{
+		"masterToken":	"ver:3-hint:92019682442222-ETMsDgAAAYty94ziABRBRVMvQ0JDL1BLQ1M1UGFkZGluZwEAABAAEAJcYuSPSWPEoLnkSUrylOAAAACwRmKshb2DHXh3JKqYziU0bGj3JB3msviQtAFdmJ52l+Yid/FuJzak0SBIgPKD69yXIpnmFjLMv2kx4EXlxgx3JykCdy1IBFk/gk9JP/4RQurAfH2OvyaNXCsBlCbkL/K4VmIWBuIJ850oa3vhuyCP2Qjcr0p2+Y0MCPxLoP+FlzSpW1DD549z2+gaXaBxs4Z91ofLyO7MQofsEkMdwWGrE08wUEnZCbzDlDyDpTIk6tAAFFxg480Ca1sCuoL9zImVGVTWlKJM",
+		"token":	"ver:3-hint:92019682442222-ETMsDgAAAYty940TABRBRVMvQ0JDL1BLQ1M1UGFkZGluZwEAABAAEKGcrl9ahoO8zoozv3m5TBkAAACAxX/XxXrTQbnkLo+8DXEVYpdQgpBbRaeCuPbuKo2yoskgTjPoj3PSHSTDIBjt4gell0PJBP/PWq3yk5dA9Va2o4S2X1YMz63WQYfcy0U5CWqXKwGwbet/BRzX4dIF8jH1sukvDfX+CNEUUPHIoxbLXg/YJDvXcYvLk8Inie3ZcRcAFJIEXiaqE/WC4vKERvM1ivOPFeak",
+		"validityInSeconds":	3600,
+		"masterValidityInSeconds":	14400,
+		"displayUserName":	"HARRY",
+		"serverVersion":	"7.38.2",
+		"firstLogin":	true,
+		"remMeToken":	null,
+		"remMeValidityInSeconds":	0,
+		"healthCheckInterval":	45,
+		"newClientForUpgrade":	null,
+		"sessionId":	92019724967838,
+		"parameters":	[{
+				"name":	"TIMESTAMP_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3 TZHTZM"
+			}, {
+				"name":	"CLIENT_PREFETCH_THREADS",
+				"value":	4
+			}, {
+				"name":	"TIME_OUTPUT_FORMAT",
+				"value":	"HH24:MI:SS"
+			}, {
+				"name":	"TIMESTAMP_TZ_OUTPUT_FORMAT",
+				"value":	""
+			}, {
+				"name":	"CLIENT_RESULT_CHUNK_SIZE",
+				"value":	48
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE",
+				"value":	false
+			}, {
+				"name":	"CLIENT_OUT_OF_BAND_TELEMETRY_ENABLED",
+				"value":	false
+			}, {
+				"name":	"CLIENT_METADATA_USE_SESSION_DATABASE",
+				"value":	false
+			}, {
+				"name":	"QUERY_CONTEXT_CACHE_SIZE",
+				"value":	5
+			}, {
+				"name":	"ENABLE_STAGE_S3_PRIVATELINK_FOR_US_EAST_1",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_THREADS",
+				"value":	1
+			}, {
+				"name":	"TIMESTAMP_NTZ_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3"
+			}, {
+				"name":	"CLIENT_METADATA_REQUEST_USE_CONNECTION_CTX",
+				"value":	false
+			}, {
+				"name":	"CLIENT_HONOR_CLIENT_TZ_FOR_TIMESTAMP_NTZ",
+				"value":	true
+			}, {
+				"name":	"CLIENT_MEMORY_LIMIT",
+				"value":	1536
+			}, {
+				"name":	"CLIENT_TIMESTAMP_TYPE_MAPPING",
+				"value":	"TIMESTAMP_LTZ"
+			}, {
+				"name":	"TIMEZONE",
+				"value":	"America/Los_Angeles"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_SLOTS",
+				"value":	2
+			}, {
+				"name":	"CLIENT_TELEMETRY_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_USE_V1_QUERY_API",
+				"value":	true
+			}, {
+				"name":	"CLIENT_DISABLE_INCIDENTS",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_COLUMN_CASE_INSENSITIVE",
+				"value":	false
+			}, {
+				"name":	"CSV_TIMESTAMP_FORMAT",
+				"value":	""
+			}, {
+				"name":	"BINARY_OUTPUT_FORMAT",
+				"value":	"HEX"
+			}, {
+				"name":	"CLIENT_ENABLE_LOG_INFO_STATEMENT_PARAMETERS",
+				"value":	false
+			}, {
+				"name":	"CLIENT_TELEMETRY_SESSIONLESS_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_CONSENT_CACHE_ID_TOKEN",
+				"value":	false
+			}, {
+				"name":	"DATE_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD"
+			}, {
+				"name":	"CLIENT_FORCE_PROTECT_ID_TOKEN",
+				"value":	true
+			}, {
+				"name":	"CLIENT_STAGE_ARRAY_BINDING_THRESHOLD",
+				"value":	65280
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE_HEARTBEAT_FREQUENCY",
+				"value":	3600
+			}, {
+				"name":	"CLIENT_SESSION_CLONE",
+				"value":	false
+			}, {
+				"name":	"AUTOCOMMIT",
+				"value":	true
+			}, {
+				"name":	"TIMESTAMP_LTZ_OUTPUT_FORMAT",
+				"value":	""
+			}],
+		"sessionInfo":	{
+			"databaseName":	"TESTDB",
+			"schemaName":	"TESTSCHEMA",
+			"warehouseName":	"SIMBA_WH_TEST",
+			"roleName":	"SYSADMIN"
+		},
+		"idToken":	null,
+		"idTokenValidityInSeconds":	0,
+		"responseData":	null,
+		"mfaToken":	null,
+		"mfaTokenValidityInSeconds":	0
+	},
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:28.074 DEBUG C     connection.c      772: Item and Value; success: 1
+2023-10-27 21:08:28.074 DEBUG C     connection.c      730: Item and Value; token: ******
+2023-10-27 21:08:28.074 DEBUG C     connection.c      730: Item and Value; masterToken: ******
+2023-10-27 21:08:28.074 TRACE C++   QueryContextCache.cpp   83: QueryContextCache: clearCache called
+2023-10-27 21:08:28.074 TRACE PDO   snowflake_driver.c  825: Leaving: 1
+2023-10-27 21:08:28.074 TRACE PDO   snowflake_driver.c  381: Entering: pdo_snowflake_set_attribute
+2023-10-27 21:08:28.074 DEBUG PDO   snowflake_driver.c  382: dbh=0x7f5a0fa81480, attr=
+2023-10-27 21:08:28.089 TRACE PDO   snowflake_driver.c  393: Leaving: 1
+2023-10-27 21:08:28.089 TRACE PDO   snowflake_driver.c  185: Entering: snowflake_handle_preparer
+2023-10-27 21:08:28.089 DEBUG PDO   snowflake_driver.c  186: dbh=0x7f5a0fa81480
+2023-10-27 21:08:28.089 DEBUG PDO   snowflake_driver.c  187: sql=select count(*) from autocommittest421000158, len=44
+2023-10-27 21:08:28.089 DEBUG C     client.c         1867: Command size non-zero, setting as sql text size.
+2023-10-27 21:08:28.089 TRACE PDO   snowflake_driver.c  217: Leaving: 1
+2023-10-27 21:08:28.089 TRACE PDO   snowflake_stmt.c  158: Entering: pdo_snowflake_stmt_execute
+2023-10-27 21:08:28.089 TRACE PDO   snowflake_stmt.c  109: Entering: pdo_snowflake_stmt_execute_prepared
+2023-10-27 21:08:28.089 DEBUG C     client.c         2015: Created body
+2023-10-27 21:08:28.089 TRACE C     client.c         2016: Here is constructed body:
+{
+	"sqlText":	"select count(*) from autocommittest421000158",
+	"asyncExec":	false,
+	"sequenceId":	1,
+	"querySubmissionTime":	1698440908000,
+	"describeOnly":	false,
+	"queryContextDTO":	{
+		"entries":	[]
+	}
+}
+2023-10-27 21:08:28.089 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:28.089 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/queries/v1/query-request?requestId=6776f410-3e43-40bd-b637-6b782a67555f&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:28.089 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:28.249 DEBUG C     connection.c      880: Curl response size: 2782
+2023-10-27 21:08:28.250 TRACE C     client.c         2028: Here is JSON response:
+{
+	"data":	{
+		"parameters":	[{
+				"name":	"TIMESTAMP_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3 TZHTZM"
+			}, {
+				"name":	"CLIENT_PREFETCH_THREADS",
+				"value":	4
+			}, {
+				"name":	"TIME_OUTPUT_FORMAT",
+				"value":	"HH24:MI:SS"
+			}, {
+				"name":	"TIMESTAMP_TZ_OUTPUT_FORMAT",
+				"value":	""
+			}, {
+				"name":	"CLIENT_RESULT_CHUNK_SIZE",
+				"value":	48
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE",
+				"value":	false
+			}, {
+				"name":	"CLIENT_METADATA_USE_SESSION_DATABASE",
+				"value":	false
+			}, {
+				"name":	"QUERY_CONTEXT_CACHE_SIZE",
+				"value":	5
+			}, {
+				"name":	"CLIENT_OUT_OF_BAND_TELEMETRY_ENABLED",
+				"value":	false
+			}, {
+				"name":	"ENABLE_STAGE_S3_PRIVATELINK_FOR_US_EAST_1",
+				"value":	true
+			}, {
+				"name":	"TIMESTAMP_NTZ_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_THREADS",
+				"value":	1
+			}, {
+				"name":	"CLIENT_METADATA_REQUEST_USE_CONNECTION_CTX",
+				"value":	false
+			}, {
+				"name":	"CLIENT_HONOR_CLIENT_TZ_FOR_TIMESTAMP_NTZ",
+				"value":	true
+			}, {
+				"name":	"CLIENT_MEMORY_LIMIT",
+				"value":	1536
+			}, {
+				"name":	"CLIENT_TIMESTAMP_TYPE_MAPPING",
+				"value":	"TIMESTAMP_LTZ"
+			}, {
+				"name":	"TIMEZONE",
+				"value":	"America/Los_Angeles"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_SLOTS",
+				"value":	2
+			}, {
+				"name":	"CLIENT_TELEMETRY_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_DISABLE_INCIDENTS",
+				"value":	true
+			}, {
+				"name":	"CLIENT_USE_V1_QUERY_API",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_COLUMN_CASE_INSENSITIVE",
+				"value":	false
+			}, {
+				"name":	"CSV_TIMESTAMP_FORMAT",
+				"value":	""
+			}, {
+				"name":	"BINARY_OUTPUT_FORMAT",
+				"value":	"HEX"
+			}, {
+				"name":	"CLIENT_ENABLE_LOG_INFO_STATEMENT_PARAMETERS",
+				"value":	false
+			}, {
+				"name":	"CLIENT_TELEMETRY_SESSIONLESS_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_FORCE_PROTECT_ID_TOKEN",
+				"value":	true
+			}, {
+				"name":	"DATE_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD"
+			}, {
+				"name":	"CLIENT_CONSENT_CACHE_ID_TOKEN",
+				"value":	false
+			}, {
+				"name":	"CLIENT_STAGE_ARRAY_BINDING_THRESHOLD",
+				"value":	65280
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE_HEARTBEAT_FREQUENCY",
+				"value":	3600
+			}, {
+				"name":	"AUTOCOMMIT",
+				"value":	true
+			}, {
+				"name":	"CLIENT_SESSION_CLONE",
+				"value":	false
+			}, {
+				"name":	"TIMESTAMP_LTZ_OUTPUT_FORMAT",
+				"value":	""
+			}],
+		"rowtype":	[{
+				"name":	"COUNT(*)",
+				"database":	"",
+				"schema":	"",
+				"table":	"",
+				"byteLength":	null,
+				"precision":	18,
+				"type":	"fixed",
+				"scale":	0,
+				"nullable":	false,
+				"collation":	null,
+				"length":	null
+			}],
+		"rowset":	[["1"]],
+		"total":	1,
+		"returned":	1,
+		"queryId":	"01afef94-0507-0915-0000-53b1072cdc26",
+		"databaseProvider":	null,
+		"finalDatabaseName":	"TESTDB",
+		"finalSchemaName":	"TESTSCHEMA",
+		"finalWarehouseName":	"SIMBA_WH_TEST",
+		"finalRoleName":	"SYSADMIN",
+		"numberOfBinds":	0,
+		"arrayBindSupported":	false,
+		"statementTypeId":	4096,
+		"version":	1,
+		"sendResultTime":	1698440908243,
+		"queryResultFormat":	"json",
+		"queryContext":	{
+			"entries":	[{
+					"id":	0,
+					"timestamp":	265200323257730,
+					"priority":	0
+				}]
+		}
+	},
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:28.250 DEBUG C     connection.c      755: Item and Value; queryId: 01afef94-0507-0915-0000-53b1072cdc26
+2023-10-27 21:08:28.250 DEBUG C     connection.c      772: Item and Value; success: 1
+2023-10-27 21:08:28.250 DEBUG C     connection.c      732: Item and Value; finalDatabaseName: TESTDB
+2023-10-27 21:08:28.250 DEBUG C     connection.c      732: Item and Value; finalSchemaName: TESTSCHEMA
+2023-10-27 21:08:28.250 DEBUG C     connection.c      732: Item and Value; finalWarehouseName: SIMBA_WH_TEST
+2023-10-27 21:08:28.250 DEBUG C     connection.c      732: Item and Value; finalRoleName: SYSADMIN
+2023-10-27 21:08:28.250 TRACE C++   QueryContextCache.cpp  297: QueryContextCache: add new item id: 0, priority: 0
+2023-10-27 21:08:28.250 TRACE C++   QueryContextCache.cpp  307: QueryContextCache::syncPriorityMap called priorityMap size = 0, newPrioirtyMap size = 1
+2023-10-27 21:08:28.250 TRACE C++   QueryContextCache.cpp  316: QueryContextCache::checkCacheCapacity called. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:28.250 TRACE C++   QueryContextCache.cpp  327: QueryContextCache::checkCacheCapacity returns. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:28.250 DEBUG C     connection.c      789: Item and Value; statementTypeId: 4096
+2023-10-27 21:08:28.250 DEBUG C     connection.c      732: Item and Value; name: COUNT(*)
+2023-10-27 21:08:28.250 DEBUG C     connection.c      789: Item and Value; precision: 18
+2023-10-27 21:08:28.250 DEBUG C     connection.c      789: Item and Value; scale: 0
+2023-10-27 21:08:28.250 DEBUG C     connection.c      772: Item and Value; nullable: 0
+2023-10-27 21:08:28.250 DEBUG C     results.c         292: Found type and ctype; 0: 2
+2023-10-27 21:08:28.250 DEBUG C     connection.c      809: Array: rowset
+2023-10-27 21:08:28.250 DEBUG C++   ResultSetJson.cpp   84: appendChunk -- Appended chunk of size 1.
+2023-10-27 21:08:28.250 DEBUG C     connection.c      789: Item and Value; total: 1
+2023-10-27 21:08:28.250 DEBUG PDO   snowflake_stmt.c  133: number of columns: 1
+2023-10-27 21:08:28.250 TRACE PDO   snowflake_stmt.c   54: Entering: _pdo_snowflake_stmt_set_row_count
+2023-10-27 21:08:28.250 DEBUG PDO   snowflake_stmt.c   57: row count: 1
+2023-10-27 21:08:28.250 TRACE PDO   snowflake_stmt.c  143: Leaving: 1
+2023-10-27 21:08:28.250 TRACE PDO   snowflake_stmt.c  162: Leaving: 1
+2023-10-27 21:08:28.250 TRACE PDO   snowflake_stmt.c  243: Entering: pdo_snowflake_stmt_describe
+2023-10-27 21:08:28.250 DEBUG PDO   snowflake_stmt.c  244: colno 0
+2023-10-27 21:08:28.250 TRACE PDO   snowflake_stmt.c  288: Leaving: 1
+2023-10-27 21:08:28.250 TRACE PDO   snowflake_stmt.c  209: Entering: pdo_snowflake_stmt_fetch
+2023-10-27 21:08:28.250 DEBUG PDO   snowflake_stmt.c  210: ori: 0, offset: 0
+2023-10-27 21:08:28.250 TRACE PDO   snowflake_stmt.c  223: Leaving: 1
+2023-10-27 21:08:28.250 TRACE PDO   snowflake_stmt.c  314: Entering: pdo_snowflake_stmt_get_col
+2023-10-27 21:08:28.250 DEBUG PDO   snowflake_stmt.c  334: idx: 0, value: '1', len: 1
+2023-10-27 21:08:28.250 TRACE PDO   snowflake_stmt.c  335: Leaving: 1
+2023-10-27 21:08:28.250 TRACE PDO   snowflake_stmt.c  209: Entering: pdo_snowflake_stmt_fetch
+2023-10-27 21:08:28.250 DEBUG PDO   snowflake_stmt.c  210: ori: 0, offset: 0
+2023-10-27 21:08:28.250 DEBUG C     client.c         1759: No chunk downloader set, end of results.
+2023-10-27 21:08:28.250 DEBUG PDO   snowflake_stmt.c  217: EOL
+2023-10-27 21:08:28.250 TRACE PDO   snowflake_stmt.c  218: Leaving: 0
+2023-10-27 21:08:28.250 TRACE PDO   snowflake_driver.c  232: Entering: snowflake_handle_doer
+2023-10-27 21:08:28.250 DEBUG PDO   snowflake_driver.c  237: sql: insert into autocommittest421000158 values (2), len: 46
+2023-10-27 21:08:28.250 DEBUG C     client.c         1867: Command size non-zero, setting as sql text size.
+2023-10-27 21:08:28.251 DEBUG C     client.c         2015: Created body
+2023-10-27 21:08:28.251 TRACE C     client.c         2016: Here is constructed body:
+{
+	"sqlText":	"insert into autocommittest421000158 values (2)",
+	"asyncExec":	false,
+	"sequenceId":	2,
+	"querySubmissionTime":	1698440908000,
+	"describeOnly":	false,
+	"queryContextDTO":	{
+		"entries":	[{
+				"id":	0,
+				"priority":	0,
+				"timestamp":	265200323257730,
+				"context":	{
+				}
+			}]
+	}
+}
+2023-10-27 21:08:28.251 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:28.251 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/queries/v1/query-request?requestId=6e733b5c-f308-448b-8dd8-3d8b0a18369b&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:28.251 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:28.645 DEBUG C     connection.c      880: Curl response size: 2935
+2023-10-27 21:08:28.646 TRACE C     client.c         2028: Here is JSON response:
+{
+	"data":	{
+		"parameters":	[{
+				"name":	"TIMESTAMP_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3 TZHTZM"
+			}, {
+				"name":	"CLIENT_PREFETCH_THREADS",
+				"value":	4
+			}, {
+				"name":	"TIME_OUTPUT_FORMAT",
+				"value":	"HH24:MI:SS"
+			}, {
+				"name":	"TIMESTAMP_TZ_OUTPUT_FORMAT",
+				"value":	""
+			}, {
+				"name":	"CLIENT_RESULT_CHUNK_SIZE",
+				"value":	48
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE",
+				"value":	false
+			}, {
+				"name":	"CLIENT_METADATA_USE_SESSION_DATABASE",
+				"value":	false
+			}, {
+				"name":	"QUERY_CONTEXT_CACHE_SIZE",
+				"value":	5
+			}, {
+				"name":	"CLIENT_OUT_OF_BAND_TELEMETRY_ENABLED",
+				"value":	false
+			}, {
+				"name":	"ENABLE_STAGE_S3_PRIVATELINK_FOR_US_EAST_1",
+				"value":	true
+			}, {
+				"name":	"TIMESTAMP_NTZ_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_THREADS",
+				"value":	1
+			}, {
+				"name":	"CLIENT_METADATA_REQUEST_USE_CONNECTION_CTX",
+				"value":	false
+			}, {
+				"name":	"CLIENT_HONOR_CLIENT_TZ_FOR_TIMESTAMP_NTZ",
+				"value":	true
+			}, {
+				"name":	"CLIENT_MEMORY_LIMIT",
+				"value":	1536
+			}, {
+				"name":	"CLIENT_TIMESTAMP_TYPE_MAPPING",
+				"value":	"TIMESTAMP_LTZ"
+			}, {
+				"name":	"TIMEZONE",
+				"value":	"America/Los_Angeles"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_SLOTS",
+				"value":	2
+			}, {
+				"name":	"CLIENT_TELEMETRY_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_DISABLE_INCIDENTS",
+				"value":	true
+			}, {
+				"name":	"CLIENT_USE_V1_QUERY_API",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_COLUMN_CASE_INSENSITIVE",
+				"value":	false
+			}, {
+				"name":	"CSV_TIMESTAMP_FORMAT",
+				"value":	""
+			}, {
+				"name":	"BINARY_OUTPUT_FORMAT",
+				"value":	"HEX"
+			}, {
+				"name":	"CLIENT_ENABLE_LOG_INFO_STATEMENT_PARAMETERS",
+				"value":	false
+			}, {
+				"name":	"CLIENT_TELEMETRY_SESSIONLESS_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_FORCE_PROTECT_ID_TOKEN",
+				"value":	true
+			}, {
+				"name":	"DATE_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD"
+			}, {
+				"name":	"CLIENT_CONSENT_CACHE_ID_TOKEN",
+				"value":	false
+			}, {
+				"name":	"CLIENT_STAGE_ARRAY_BINDING_THRESHOLD",
+				"value":	65280
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE_HEARTBEAT_FREQUENCY",
+				"value":	3600
+			}, {
+				"name":	"AUTOCOMMIT",
+				"value":	true
+			}, {
+				"name":	"CLIENT_SESSION_CLONE",
+				"value":	false
+			}, {
+				"name":	"TIMESTAMP_LTZ_OUTPUT_FORMAT",
+				"value":	""
+			}],
+		"rowtype":	[{
+				"name":	"number of rows inserted",
+				"database":	"",
+				"schema":	"",
+				"table":	"",
+				"byteLength":	null,
+				"precision":	19,
+				"type":	"fixed",
+				"scale":	0,
+				"nullable":	false,
+				"collation":	null,
+				"length":	null
+			}],
+		"rowset":	[["1"]],
+		"total":	1,
+		"returned":	1,
+		"queryId":	"01afef94-0507-0915-0000-53b1072cdc2a",
+		"databaseProvider":	null,
+		"finalDatabaseName":	"TESTDB",
+		"finalSchemaName":	"TESTSCHEMA",
+		"finalWarehouseName":	"SIMBA_WH_TEST",
+		"finalRoleName":	"SYSADMIN",
+		"numberOfBinds":	0,
+		"stats":	{
+			"numRowsInserted":	1,
+			"numRowsDeleted":	0,
+			"numRowsUpdated":	0,
+			"numDmlDuplicates":	0
+		},
+		"arrayBindSupported":	false,
+		"statementTypeId":	12544,
+		"version":	1,
+		"sendResultTime":	1698440908635,
+		"queryResultFormat":	"json",
+		"queryContext":	{
+			"entries":	[{
+					"id":	0,
+					"timestamp":	265200323661480,
+					"priority":	0
+				}]
+		}
+	},
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:28.646 DEBUG C     connection.c      755: Item and Value; queryId: 01afef94-0507-0915-0000-53b1072cdc2a
+2023-10-27 21:08:28.646 DEBUG C     connection.c      772: Item and Value; success: 1
+2023-10-27 21:08:28.646 DEBUG C     connection.c      732: Item and Value; finalDatabaseName: TESTDB
+2023-10-27 21:08:28.646 DEBUG C     connection.c      732: Item and Value; finalSchemaName: TESTSCHEMA
+2023-10-27 21:08:28.646 DEBUG C     connection.c      732: Item and Value; finalWarehouseName: SIMBA_WH_TEST
+2023-10-27 21:08:28.646 DEBUG C     connection.c      732: Item and Value; finalRoleName: SYSADMIN
+2023-10-27 21:08:28.646 TRACE C++   QueryContextCache.cpp  256: QueryContextCache: merge existing id: 0 with priority: 0
+2023-10-27 21:08:28.646 TRACE C++   QueryContextCache.cpp  307: QueryContextCache::syncPriorityMap called priorityMap size = 1, newPrioirtyMap size = 0
+2023-10-27 21:08:28.646 TRACE C++   QueryContextCache.cpp  316: QueryContextCache::checkCacheCapacity called. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:28.646 TRACE C++   QueryContextCache.cpp  327: QueryContextCache::checkCacheCapacity returns. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:28.646 DEBUG C     connection.c      789: Item and Value; statementTypeId: 12544
+2023-10-27 21:08:28.646 DEBUG C     connection.c      732: Item and Value; name: number of rows inserted
+2023-10-27 21:08:28.646 DEBUG C     connection.c      789: Item and Value; precision: 19
+2023-10-27 21:08:28.646 DEBUG C     connection.c      789: Item and Value; scale: 0
+2023-10-27 21:08:28.646 DEBUG C     connection.c      772: Item and Value; nullable: 0
+2023-10-27 21:08:28.646 DEBUG C     results.c         292: Found type and ctype; 0: 2
+2023-10-27 21:08:28.646 DEBUG C     connection.c      789: Item and Value; numRowsInserted: 1
+2023-10-27 21:08:28.646 DEBUG C     connection.c      789: Item and Value; numRowsUpdated: 0
+2023-10-27 21:08:28.646 DEBUG C     connection.c      789: Item and Value; numRowsDeleted: 0
+2023-10-27 21:08:28.646 DEBUG C     connection.c      789: Item and Value; numDmlDuplicates: 0
+2023-10-27 21:08:28.646 DEBUG C     connection.c      809: Array: rowset
+2023-10-27 21:08:28.646 DEBUG C++   ResultSetJson.cpp   84: appendChunk -- Appended chunk of size 1.
+2023-10-27 21:08:28.646 DEBUG C     connection.c      789: Item and Value; total: 1
+2023-10-27 21:08:28.646 TRACE PDO   snowflake_driver.c  273: Leaving: 1
+2023-10-27 21:08:28.646 TRACE PDO   snowflake_driver.c  556: Entering: pdo_snowflake_handle_factory
+2023-10-27 21:08:28.646 INFO  PDO   snowflake_driver.c  648: Snowflake PHP PDO Driver: 8.1.2-2.0.0
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  655: user: harry
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  658: password: ****
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  662: host: simbapartner.snowflakecomputing.com
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  666: port: 443
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  671: account: simbapartner
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  676: region: (null)
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  681: database: testdb
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  686: schema: testschema
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  691: warehouse: SIMBA_WH_TEST
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  695: role: sysadmin
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  700: protocol: https
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  706: insecureMode: (null)
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  718: timezone: (null)
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  720: autocommit: 0
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  729: application: phptest
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  738: authenticator: (null)
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  747: priv_key_file: (null)
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  756: priv_key_file_pwd: ****
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  765: proxy: (NULL)
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  774: no_proxy: (null)
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  782: disablequerycontextcache: false
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  790: includeretryreason: true
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  798: login_timeout: 300
+2023-10-27 21:08:28.646 DEBUG PDO   snowflake_driver.c  807: max_login_retries: 7
+2023-10-27 21:08:28.646 INFO  C     client.c          800: Snowflake C/C++ API: 1.0.3, OS: Linux, OS Version: 3.10.0-1127.13.1.el7.x86_64
+2023-10-27 21:08:28.647 DEBUG C     client.c          494: application name: PDO
+2023-10-27 21:08:28.647 DEBUG C     client.c          495: application version: 8.1.2-2.0.0
+2023-10-27 21:08:28.647 DEBUG C     client.c          496: authenticator: snowflake
+2023-10-27 21:08:28.647 DEBUG C     client.c          497: user: harry
+2023-10-27 21:08:28.647 DEBUG C     client.c          498: password: ****
+2023-10-27 21:08:28.647 DEBUG C     client.c          504: host: simbapartner.snowflakecomputing.com
+2023-10-27 21:08:28.647 DEBUG C     client.c          505: port: 443
+2023-10-27 21:08:28.647 DEBUG C     client.c          506: account: simbapartner
+2023-10-27 21:08:28.647 DEBUG C     client.c          507: region: (null)
+2023-10-27 21:08:28.647 DEBUG C     client.c          508: database: testdb
+2023-10-27 21:08:28.647 DEBUG C     client.c          509: schema: testschema
+2023-10-27 21:08:28.647 DEBUG C     client.c          510: warehouse: SIMBA_WH_TEST
+2023-10-27 21:08:28.647 DEBUG C     client.c          511: role: sysadmin
+2023-10-27 21:08:28.647 DEBUG C     client.c          512: protocol: https
+2023-10-27 21:08:28.647 DEBUG C     client.c          513: autocommit: false
+2023-10-27 21:08:28.647 DEBUG C     client.c          514: insecure_mode: false
+2023-10-27 21:08:28.647 DEBUG C     client.c          515: timezone: (null)
+2023-10-27 21:08:28.647 DEBUG C     client.c          516: login_timeout: 300
+2023-10-27 21:08:28.647 DEBUG C     client.c          517: network_timeout: 120
+2023-10-27 21:08:28.647 DEBUG C     client.c          518: qcc_disable: false
+2023-10-27 21:08:28.647 DEBUG C     client.c          519: include_retry_reason: true
+2023-10-27 21:08:28.647 TRACE C     client.c          853: Created body
+2023-10-27 21:08:28.647 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:28.647 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/session/v1/login-request?request_id=078e4d99-ed57-479c-b23c-b3a4a3093e4b&databaseName=testdb&schemaName=testschema&warehouse=SIMBA_WH_TEST&roleName=sysadmin&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:28.647 TRACE C     connection.c     1275: Added application infor header
+2023-10-27 21:08:28.647 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:28.866 DEBUG C     connection.c      880: Curl response size: 3890
+2023-10-27 21:08:28.867 TRACE C     client.c          880: Here is JSON response:
+{
+	"data":	{
+		"masterToken":	"ver:3-hint:92019682442222-ETMsDgAAAYty94/+ABRBRVMvQ0JDL1BLQ1M1UGFkZGluZwEAABAAEAr1CZ0QCiFyPmEG05dRfrUAAACwB/J0gHZlJsgqT08yf6GTI24jmeS2qKgceodmUWCtv1hlW5UYUbpbTlZkxl40ZMxlMQitP0cyq1Tx9Wn0JIbBjTE+lsk2l1UniZJ9s0i69zKdGBxQTE1tvGFvm+SGrW1+S1UOb+75oClsRoBur1takA5o0Ir/fbzb0duMuDEYDCkwg5F7yLkbrQ2iO0JV3C0cPVj4NUOOKuwtlsZzWDXC7e65fCLJgSCo8qqlSgWXa0oAFDk0K4R6Q/YMgLeJ2R0Kkxgo4p+i",
+		"token":	"ver:3-hint:92019682442222-ETMsDgAAAYty95AyABRBRVMvQ0JDL1BLQ1M1UGFkZGluZwEAABAAEFgPTYMu/FTs635Mps9PUfcAAACA4WcWpMJ2AfD5JBM470Us8AMSC/2OrlrfG5Ltd6mL5F22XKtoNyz8uPpN0d6bM0LfYVJzSYBTsr+VZgZdVkwlwzvdBeYwUfuzT7E3DNf1cKVwnX0Hsk+okUmu25vV2QKq9flTQ/oa1vs8JLM39rKejzc0RE7JbGsCPvzgCffY75kAFGWXnev/9vxW/Y42eqz0y4RkEVIu",
+		"validityInSeconds":	3600,
+		"masterValidityInSeconds":	14400,
+		"displayUserName":	"HARRY",
+		"serverVersion":	"7.38.2",
+		"firstLogin":	true,
+		"remMeToken":	null,
+		"remMeValidityInSeconds":	0,
+		"healthCheckInterval":	45,
+		"newClientForUpgrade":	null,
+		"sessionId":	92019724970010,
+		"parameters":	[{
+				"name":	"TIMESTAMP_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3 TZHTZM"
+			}, {
+				"name":	"CLIENT_PREFETCH_THREADS",
+				"value":	4
+			}, {
+				"name":	"TIME_OUTPUT_FORMAT",
+				"value":	"HH24:MI:SS"
+			}, {
+				"name":	"TIMESTAMP_TZ_OUTPUT_FORMAT",
+				"value":	""
+			}, {
+				"name":	"CLIENT_RESULT_CHUNK_SIZE",
+				"value":	48
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE",
+				"value":	false
+			}, {
+				"name":	"CLIENT_METADATA_USE_SESSION_DATABASE",
+				"value":	false
+			}, {
+				"name":	"QUERY_CONTEXT_CACHE_SIZE",
+				"value":	5
+			}, {
+				"name":	"CLIENT_OUT_OF_BAND_TELEMETRY_ENABLED",
+				"value":	false
+			}, {
+				"name":	"ENABLE_STAGE_S3_PRIVATELINK_FOR_US_EAST_1",
+				"value":	true
+			}, {
+				"name":	"TIMESTAMP_NTZ_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_THREADS",
+				"value":	1
+			}, {
+				"name":	"CLIENT_METADATA_REQUEST_USE_CONNECTION_CTX",
+				"value":	false
+			}, {
+				"name":	"CLIENT_HONOR_CLIENT_TZ_FOR_TIMESTAMP_NTZ",
+				"value":	true
+			}, {
+				"name":	"CLIENT_MEMORY_LIMIT",
+				"value":	1536
+			}, {
+				"name":	"CLIENT_TIMESTAMP_TYPE_MAPPING",
+				"value":	"TIMESTAMP_LTZ"
+			}, {
+				"name":	"TIMEZONE",
+				"value":	"America/Los_Angeles"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_SLOTS",
+				"value":	2
+			}, {
+				"name":	"CLIENT_TELEMETRY_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_DISABLE_INCIDENTS",
+				"value":	true
+			}, {
+				"name":	"CLIENT_USE_V1_QUERY_API",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_COLUMN_CASE_INSENSITIVE",
+				"value":	false
+			}, {
+				"name":	"CSV_TIMESTAMP_FORMAT",
+				"value":	""
+			}, {
+				"name":	"BINARY_OUTPUT_FORMAT",
+				"value":	"HEX"
+			}, {
+				"name":	"CLIENT_ENABLE_LOG_INFO_STATEMENT_PARAMETERS",
+				"value":	false
+			}, {
+				"name":	"CLIENT_TELEMETRY_SESSIONLESS_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_FORCE_PROTECT_ID_TOKEN",
+				"value":	true
+			}, {
+				"name":	"DATE_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD"
+			}, {
+				"name":	"CLIENT_CONSENT_CACHE_ID_TOKEN",
+				"value":	false
+			}, {
+				"name":	"CLIENT_STAGE_ARRAY_BINDING_THRESHOLD",
+				"value":	65280
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE_HEARTBEAT_FREQUENCY",
+				"value":	3600
+			}, {
+				"name":	"AUTOCOMMIT",
+				"value":	false
+			}, {
+				"name":	"CLIENT_SESSION_CLONE",
+				"value":	false
+			}, {
+				"name":	"TIMESTAMP_LTZ_OUTPUT_FORMAT",
+				"value":	""
+			}],
+		"sessionInfo":	{
+			"databaseName":	"TESTDB",
+			"schemaName":	"TESTSCHEMA",
+			"warehouseName":	"SIMBA_WH_TEST",
+			"roleName":	"SYSADMIN"
+		},
+		"idToken":	null,
+		"idTokenValidityInSeconds":	0,
+		"responseData":	null,
+		"mfaToken":	null,
+		"mfaTokenValidityInSeconds":	0
+	},
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:28.868 DEBUG C     connection.c      772: Item and Value; success: 1
+2023-10-27 21:08:28.868 DEBUG C     connection.c      730: Item and Value; token: ******
+2023-10-27 21:08:28.868 DEBUG C     connection.c      730: Item and Value; masterToken: ******
+2023-10-27 21:08:28.868 TRACE C++   QueryContextCache.cpp   83: QueryContextCache: clearCache called
+2023-10-27 21:08:28.868 TRACE PDO   snowflake_driver.c  825: Leaving: 1
+2023-10-27 21:08:28.868 TRACE PDO   snowflake_driver.c  381: Entering: pdo_snowflake_set_attribute
+2023-10-27 21:08:28.868 DEBUG PDO   snowflake_driver.c  382: dbh=0x7f5a0fa81600, attr=
+2023-10-27 21:08:28.879 TRACE PDO   snowflake_driver.c  393: Leaving: 1
+2023-10-27 21:08:28.879 TRACE PDO   snowflake_driver.c  185: Entering: snowflake_handle_preparer
+2023-10-27 21:08:28.879 DEBUG PDO   snowflake_driver.c  186: dbh=0x7f5a0fa81600
+2023-10-27 21:08:28.879 DEBUG PDO   snowflake_driver.c  187: sql=select count(*) from autocommittest421000158, len=44
+2023-10-27 21:08:28.879 DEBUG C     client.c         1867: Command size non-zero, setting as sql text size.
+2023-10-27 21:08:28.879 TRACE PDO   snowflake_driver.c  217: Leaving: 1
+2023-10-27 21:08:28.879 TRACE PDO   snowflake_stmt.c  158: Entering: pdo_snowflake_stmt_execute
+2023-10-27 21:08:28.879 TRACE PDO   snowflake_stmt.c  109: Entering: pdo_snowflake_stmt_execute_prepared
+2023-10-27 21:08:28.879 DEBUG C     client.c         2015: Created body
+2023-10-27 21:08:28.879 TRACE C     client.c         2016: Here is constructed body:
+{
+	"sqlText":	"select count(*) from autocommittest421000158",
+	"asyncExec":	false,
+	"sequenceId":	1,
+	"querySubmissionTime":	1698440908000,
+	"describeOnly":	false,
+	"queryContextDTO":	{
+		"entries":	[]
+	}
+}
+2023-10-27 21:08:28.879 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:28.879 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/queries/v1/query-request?requestId=09b387e2-778d-4bd4-85e5-c73439f0681f&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:28.879 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:29.040 DEBUG C     connection.c      880: Curl response size: 2783
+2023-10-27 21:08:29.041 TRACE C     client.c         2028: Here is JSON response:
+{
+	"data":	{
+		"parameters":	[{
+				"name":	"TIMESTAMP_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3 TZHTZM"
+			}, {
+				"name":	"CLIENT_PREFETCH_THREADS",
+				"value":	4
+			}, {
+				"name":	"TIME_OUTPUT_FORMAT",
+				"value":	"HH24:MI:SS"
+			}, {
+				"name":	"TIMESTAMP_TZ_OUTPUT_FORMAT",
+				"value":	""
+			}, {
+				"name":	"CLIENT_RESULT_CHUNK_SIZE",
+				"value":	48
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE",
+				"value":	false
+			}, {
+				"name":	"CLIENT_METADATA_USE_SESSION_DATABASE",
+				"value":	false
+			}, {
+				"name":	"QUERY_CONTEXT_CACHE_SIZE",
+				"value":	5
+			}, {
+				"name":	"CLIENT_OUT_OF_BAND_TELEMETRY_ENABLED",
+				"value":	false
+			}, {
+				"name":	"ENABLE_STAGE_S3_PRIVATELINK_FOR_US_EAST_1",
+				"value":	true
+			}, {
+				"name":	"TIMESTAMP_NTZ_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_THREADS",
+				"value":	1
+			}, {
+				"name":	"CLIENT_METADATA_REQUEST_USE_CONNECTION_CTX",
+				"value":	false
+			}, {
+				"name":	"CLIENT_HONOR_CLIENT_TZ_FOR_TIMESTAMP_NTZ",
+				"value":	true
+			}, {
+				"name":	"CLIENT_MEMORY_LIMIT",
+				"value":	1536
+			}, {
+				"name":	"CLIENT_TIMESTAMP_TYPE_MAPPING",
+				"value":	"TIMESTAMP_LTZ"
+			}, {
+				"name":	"TIMEZONE",
+				"value":	"America/Los_Angeles"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_SLOTS",
+				"value":	2
+			}, {
+				"name":	"CLIENT_TELEMETRY_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_DISABLE_INCIDENTS",
+				"value":	true
+			}, {
+				"name":	"CLIENT_USE_V1_QUERY_API",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_COLUMN_CASE_INSENSITIVE",
+				"value":	false
+			}, {
+				"name":	"CSV_TIMESTAMP_FORMAT",
+				"value":	""
+			}, {
+				"name":	"BINARY_OUTPUT_FORMAT",
+				"value":	"HEX"
+			}, {
+				"name":	"CLIENT_ENABLE_LOG_INFO_STATEMENT_PARAMETERS",
+				"value":	false
+			}, {
+				"name":	"CLIENT_TELEMETRY_SESSIONLESS_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_FORCE_PROTECT_ID_TOKEN",
+				"value":	true
+			}, {
+				"name":	"DATE_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD"
+			}, {
+				"name":	"CLIENT_CONSENT_CACHE_ID_TOKEN",
+				"value":	false
+			}, {
+				"name":	"CLIENT_STAGE_ARRAY_BINDING_THRESHOLD",
+				"value":	65280
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE_HEARTBEAT_FREQUENCY",
+				"value":	3600
+			}, {
+				"name":	"AUTOCOMMIT",
+				"value":	false
+			}, {
+				"name":	"CLIENT_SESSION_CLONE",
+				"value":	false
+			}, {
+				"name":	"TIMESTAMP_LTZ_OUTPUT_FORMAT",
+				"value":	""
+			}],
+		"rowtype":	[{
+				"name":	"COUNT(*)",
+				"database":	"",
+				"schema":	"",
+				"table":	"",
+				"byteLength":	null,
+				"precision":	18,
+				"type":	"fixed",
+				"scale":	0,
+				"nullable":	false,
+				"collation":	null,
+				"length":	null
+			}],
+		"rowset":	[["2"]],
+		"total":	1,
+		"returned":	1,
+		"queryId":	"01afef94-0507-0915-0000-53b1072cdc2e",
+		"databaseProvider":	null,
+		"finalDatabaseName":	"TESTDB",
+		"finalSchemaName":	"TESTSCHEMA",
+		"finalWarehouseName":	"SIMBA_WH_TEST",
+		"finalRoleName":	"SYSADMIN",
+		"numberOfBinds":	0,
+		"arrayBindSupported":	false,
+		"statementTypeId":	4096,
+		"version":	1,
+		"sendResultTime":	1698440909034,
+		"queryResultFormat":	"json",
+		"queryContext":	{
+			"entries":	[{
+					"id":	0,
+					"timestamp":	265200324062492,
+					"priority":	0
+				}]
+		}
+	},
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:29.041 DEBUG C     connection.c      755: Item and Value; queryId: 01afef94-0507-0915-0000-53b1072cdc2e
+2023-10-27 21:08:29.041 DEBUG C     connection.c      772: Item and Value; success: 1
+2023-10-27 21:08:29.041 DEBUG C     connection.c      732: Item and Value; finalDatabaseName: TESTDB
+2023-10-27 21:08:29.041 DEBUG C     connection.c      732: Item and Value; finalSchemaName: TESTSCHEMA
+2023-10-27 21:08:29.041 DEBUG C     connection.c      732: Item and Value; finalWarehouseName: SIMBA_WH_TEST
+2023-10-27 21:08:29.041 DEBUG C     connection.c      732: Item and Value; finalRoleName: SYSADMIN
+2023-10-27 21:08:29.041 TRACE C++   QueryContextCache.cpp  297: QueryContextCache: add new item id: 0, priority: 0
+2023-10-27 21:08:29.041 TRACE C++   QueryContextCache.cpp  307: QueryContextCache::syncPriorityMap called priorityMap size = 0, newPrioirtyMap size = 1
+2023-10-27 21:08:29.041 TRACE C++   QueryContextCache.cpp  316: QueryContextCache::checkCacheCapacity called. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:29.041 TRACE C++   QueryContextCache.cpp  327: QueryContextCache::checkCacheCapacity returns. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:29.041 DEBUG C     connection.c      789: Item and Value; statementTypeId: 4096
+2023-10-27 21:08:29.041 DEBUG C     connection.c      732: Item and Value; name: COUNT(*)
+2023-10-27 21:08:29.042 DEBUG C     connection.c      789: Item and Value; precision: 18
+2023-10-27 21:08:29.042 DEBUG C     connection.c      789: Item and Value; scale: 0
+2023-10-27 21:08:29.042 DEBUG C     connection.c      772: Item and Value; nullable: 0
+2023-10-27 21:08:29.042 DEBUG C     results.c         292: Found type and ctype; 0: 2
+2023-10-27 21:08:29.042 DEBUG C     connection.c      809: Array: rowset
+2023-10-27 21:08:29.042 DEBUG C++   ResultSetJson.cpp   84: appendChunk -- Appended chunk of size 1.
+2023-10-27 21:08:29.042 DEBUG C     connection.c      789: Item and Value; total: 1
+2023-10-27 21:08:29.042 DEBUG PDO   snowflake_stmt.c  133: number of columns: 1
+2023-10-27 21:08:29.042 TRACE PDO   snowflake_stmt.c   54: Entering: _pdo_snowflake_stmt_set_row_count
+2023-10-27 21:08:29.042 DEBUG PDO   snowflake_stmt.c   57: row count: 1
+2023-10-27 21:08:29.042 TRACE PDO   snowflake_stmt.c  143: Leaving: 1
+2023-10-27 21:08:29.042 TRACE PDO   snowflake_stmt.c  162: Leaving: 1
+2023-10-27 21:08:29.042 TRACE PDO   snowflake_stmt.c  243: Entering: pdo_snowflake_stmt_describe
+2023-10-27 21:08:29.042 DEBUG PDO   snowflake_stmt.c  244: colno 0
+2023-10-27 21:08:29.042 TRACE PDO   snowflake_stmt.c  288: Leaving: 1
+2023-10-27 21:08:29.042 TRACE PDO   snowflake_stmt.c   76: Entering: pdo_snowflake_stmt_dtor
+2023-10-27 21:08:29.042 DEBUG PDO   snowflake_stmt.c   91: number of columns: 1
+2023-10-27 21:08:29.042 TRACE PDO   snowflake_stmt.c   95: Leaving: 1
+2023-10-27 21:08:29.042 TRACE PDO   snowflake_driver.c  133: Entering: snowflake_handle_closer
+2023-10-27 21:08:29.042 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:29.042 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/session?delete=true&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:29.042 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:29.158 DEBUG C     connection.c      880: Curl response size: 76
+2023-10-27 21:08:29.159 TRACE C     client.c          727: JSON response:
+{
+	"data":	null,
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:29.159 TRACE PDO   snowflake_driver.c  144: Leaving: 1
+2023-10-27 21:08:29.159 TRACE PDO   snowflake_stmt.c  209: Entering: pdo_snowflake_stmt_fetch
+2023-10-27 21:08:29.159 DEBUG PDO   snowflake_stmt.c  210: ori: 0, offset: 0
+2023-10-27 21:08:29.159 TRACE PDO   snowflake_stmt.c  223: Leaving: 1
+2023-10-27 21:08:29.159 TRACE PDO   snowflake_stmt.c  314: Entering: pdo_snowflake_stmt_get_col
+2023-10-27 21:08:29.159 DEBUG PDO   snowflake_stmt.c  334: idx: 0, value: '2', len: 1
+2023-10-27 21:08:29.159 TRACE PDO   snowflake_stmt.c  335: Leaving: 1
+2023-10-27 21:08:29.159 TRACE PDO   snowflake_stmt.c  209: Entering: pdo_snowflake_stmt_fetch
+2023-10-27 21:08:29.159 DEBUG PDO   snowflake_stmt.c  210: ori: 0, offset: 0
+2023-10-27 21:08:29.159 DEBUG C     client.c         1759: No chunk downloader set, end of results.
+2023-10-27 21:08:29.159 DEBUG PDO   snowflake_stmt.c  217: EOL
+2023-10-27 21:08:29.159 TRACE PDO   snowflake_stmt.c  218: Leaving: 0
+2023-10-27 21:08:29.159 TRACE PDO   snowflake_driver.c  232: Entering: snowflake_handle_doer
+2023-10-27 21:08:29.159 DEBUG PDO   snowflake_driver.c  237: sql: insert into autocommittest421000158 values (3), len: 46
+2023-10-27 21:08:29.159 DEBUG C     client.c         1867: Command size non-zero, setting as sql text size.
+2023-10-27 21:08:29.159 DEBUG C     client.c         2015: Created body
+2023-10-27 21:08:29.159 TRACE C     client.c         2016: Here is constructed body:
+{
+	"sqlText":	"insert into autocommittest421000158 values (3)",
+	"asyncExec":	false,
+	"sequenceId":	2,
+	"querySubmissionTime":	1698440909000,
+	"describeOnly":	false,
+	"queryContextDTO":	{
+		"entries":	[{
+				"id":	0,
+				"priority":	0,
+				"timestamp":	265200324062492,
+				"context":	{
+				}
+			}]
+	}
+}
+2023-10-27 21:08:29.159 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:29.159 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/queries/v1/query-request?requestId=1496519f-73d6-4b74-a8a7-f7967df6d4ec&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:29.159 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:30.023 DEBUG C     connection.c      880: Curl response size: 2936
+2023-10-27 21:08:30.025 TRACE C     client.c         2028: Here is JSON response:
+{
+	"data":	{
+		"parameters":	[{
+				"name":	"TIMESTAMP_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3 TZHTZM"
+			}, {
+				"name":	"CLIENT_PREFETCH_THREADS",
+				"value":	4
+			}, {
+				"name":	"TIME_OUTPUT_FORMAT",
+				"value":	"HH24:MI:SS"
+			}, {
+				"name":	"TIMESTAMP_TZ_OUTPUT_FORMAT",
+				"value":	""
+			}, {
+				"name":	"CLIENT_RESULT_CHUNK_SIZE",
+				"value":	48
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE",
+				"value":	false
+			}, {
+				"name":	"CLIENT_OUT_OF_BAND_TELEMETRY_ENABLED",
+				"value":	false
+			}, {
+				"name":	"CLIENT_METADATA_USE_SESSION_DATABASE",
+				"value":	false
+			}, {
+				"name":	"QUERY_CONTEXT_CACHE_SIZE",
+				"value":	5
+			}, {
+				"name":	"ENABLE_STAGE_S3_PRIVATELINK_FOR_US_EAST_1",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_THREADS",
+				"value":	1
+			}, {
+				"name":	"TIMESTAMP_NTZ_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3"
+			}, {
+				"name":	"CLIENT_METADATA_REQUEST_USE_CONNECTION_CTX",
+				"value":	false
+			}, {
+				"name":	"CLIENT_HONOR_CLIENT_TZ_FOR_TIMESTAMP_NTZ",
+				"value":	true
+			}, {
+				"name":	"CLIENT_MEMORY_LIMIT",
+				"value":	1536
+			}, {
+				"name":	"CLIENT_TIMESTAMP_TYPE_MAPPING",
+				"value":	"TIMESTAMP_LTZ"
+			}, {
+				"name":	"TIMEZONE",
+				"value":	"America/Los_Angeles"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_SLOTS",
+				"value":	2
+			}, {
+				"name":	"CLIENT_TELEMETRY_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_USE_V1_QUERY_API",
+				"value":	true
+			}, {
+				"name":	"CLIENT_DISABLE_INCIDENTS",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_COLUMN_CASE_INSENSITIVE",
+				"value":	false
+			}, {
+				"name":	"CSV_TIMESTAMP_FORMAT",
+				"value":	""
+			}, {
+				"name":	"BINARY_OUTPUT_FORMAT",
+				"value":	"HEX"
+			}, {
+				"name":	"CLIENT_ENABLE_LOG_INFO_STATEMENT_PARAMETERS",
+				"value":	false
+			}, {
+				"name":	"CLIENT_TELEMETRY_SESSIONLESS_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_CONSENT_CACHE_ID_TOKEN",
+				"value":	false
+			}, {
+				"name":	"DATE_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD"
+			}, {
+				"name":	"CLIENT_FORCE_PROTECT_ID_TOKEN",
+				"value":	true
+			}, {
+				"name":	"CLIENT_STAGE_ARRAY_BINDING_THRESHOLD",
+				"value":	65280
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE_HEARTBEAT_FREQUENCY",
+				"value":	3600
+			}, {
+				"name":	"CLIENT_SESSION_CLONE",
+				"value":	false
+			}, {
+				"name":	"AUTOCOMMIT",
+				"value":	false
+			}, {
+				"name":	"TIMESTAMP_LTZ_OUTPUT_FORMAT",
+				"value":	""
+			}],
+		"rowtype":	[{
+				"name":	"number of rows inserted",
+				"database":	"",
+				"schema":	"",
+				"table":	"",
+				"type":	"fixed",
+				"precision":	19,
+				"scale":	0,
+				"byteLength":	null,
+				"nullable":	false,
+				"collation":	null,
+				"length":	null
+			}],
+		"rowset":	[["1"]],
+		"total":	1,
+		"returned":	1,
+		"queryId":	"01afef94-0507-0aa1-0000-53b1072ce232",
+		"databaseProvider":	null,
+		"finalDatabaseName":	"TESTDB",
+		"finalSchemaName":	"TESTSCHEMA",
+		"finalWarehouseName":	"SIMBA_WH_TEST",
+		"finalRoleName":	"SYSADMIN",
+		"numberOfBinds":	0,
+		"stats":	{
+			"numRowsInserted":	1,
+			"numRowsDeleted":	0,
+			"numRowsUpdated":	0,
+			"numDmlDuplicates":	0
+		},
+		"arrayBindSupported":	false,
+		"statementTypeId":	12544,
+		"version":	1,
+		"sendResultTime":	1698440910013,
+		"queryResultFormat":	"json",
+		"queryContext":	{
+			"entries":	[{
+					"id":	0,
+					"timestamp":	265200325040003,
+					"priority":	0
+				}]
+		}
+	},
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:30.026 DEBUG C     connection.c      755: Item and Value; queryId: 01afef94-0507-0aa1-0000-53b1072ce232
+2023-10-27 21:08:30.026 DEBUG C     connection.c      772: Item and Value; success: 1
+2023-10-27 21:08:30.026 DEBUG C     connection.c      732: Item and Value; finalDatabaseName: TESTDB
+2023-10-27 21:08:30.026 DEBUG C     connection.c      732: Item and Value; finalSchemaName: TESTSCHEMA
+2023-10-27 21:08:30.026 DEBUG C     connection.c      732: Item and Value; finalWarehouseName: SIMBA_WH_TEST
+2023-10-27 21:08:30.026 DEBUG C     connection.c      732: Item and Value; finalRoleName: SYSADMIN
+2023-10-27 21:08:30.026 TRACE C++   QueryContextCache.cpp  256: QueryContextCache: merge existing id: 0 with priority: 0
+2023-10-27 21:08:30.026 TRACE C++   QueryContextCache.cpp  307: QueryContextCache::syncPriorityMap called priorityMap size = 1, newPrioirtyMap size = 0
+2023-10-27 21:08:30.026 TRACE C++   QueryContextCache.cpp  316: QueryContextCache::checkCacheCapacity called. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:30.026 TRACE C++   QueryContextCache.cpp  327: QueryContextCache::checkCacheCapacity returns. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:30.026 DEBUG C     connection.c      789: Item and Value; statementTypeId: 12544
+2023-10-27 21:08:30.026 DEBUG C     connection.c      732: Item and Value; name: number of rows inserted
+2023-10-27 21:08:30.026 DEBUG C     connection.c      789: Item and Value; precision: 19
+2023-10-27 21:08:30.026 DEBUG C     connection.c      789: Item and Value; scale: 0
+2023-10-27 21:08:30.026 DEBUG C     connection.c      772: Item and Value; nullable: 0
+2023-10-27 21:08:30.026 DEBUG C     results.c         292: Found type and ctype; 0: 2
+2023-10-27 21:08:30.026 DEBUG C     connection.c      789: Item and Value; numRowsInserted: 1
+2023-10-27 21:08:30.026 DEBUG C     connection.c      789: Item and Value; numRowsUpdated: 0
+2023-10-27 21:08:30.026 DEBUG C     connection.c      789: Item and Value; numRowsDeleted: 0
+2023-10-27 21:08:30.026 DEBUG C     connection.c      789: Item and Value; numDmlDuplicates: 0
+2023-10-27 21:08:30.026 DEBUG C     connection.c      809: Array: rowset
+2023-10-27 21:08:30.026 DEBUG C++   ResultSetJson.cpp   84: appendChunk -- Appended chunk of size 1.
+2023-10-27 21:08:30.026 DEBUG C     connection.c      789: Item and Value; total: 1
+2023-10-27 21:08:30.026 TRACE PDO   snowflake_driver.c  273: Leaving: 1
+2023-10-27 21:08:30.026 TRACE PDO   snowflake_driver.c  556: Entering: pdo_snowflake_handle_factory
+2023-10-27 21:08:30.026 INFO  PDO   snowflake_driver.c  648: Snowflake PHP PDO Driver: 8.1.2-2.0.0
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  655: user: harry
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  658: password: ****
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  662: host: simbapartner.snowflakecomputing.com
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  666: port: 443
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  671: account: simbapartner
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  676: region: (null)
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  681: database: testdb
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  686: schema: testschema
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  691: warehouse: SIMBA_WH_TEST
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  695: role: sysadmin
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  700: protocol: https
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  706: insecureMode: (null)
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  718: timezone: (null)
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  720: autocommit: 1
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  729: application: phptest
+2023-10-27 21:08:30.026 DEBUG PDO   snowflake_driver.c  738: authenticator: (null)
+2023-10-27 21:08:30.027 DEBUG PDO   snowflake_driver.c  747: priv_key_file: (null)
+2023-10-27 21:08:30.027 DEBUG PDO   snowflake_driver.c  756: priv_key_file_pwd: ****
+2023-10-27 21:08:30.027 DEBUG PDO   snowflake_driver.c  765: proxy: (NULL)
+2023-10-27 21:08:30.027 DEBUG PDO   snowflake_driver.c  774: no_proxy: (null)
+2023-10-27 21:08:30.027 DEBUG PDO   snowflake_driver.c  782: disablequerycontextcache: false
+2023-10-27 21:08:30.027 DEBUG PDO   snowflake_driver.c  790: includeretryreason: true
+2023-10-27 21:08:30.027 DEBUG PDO   snowflake_driver.c  798: login_timeout: 300
+2023-10-27 21:08:30.027 DEBUG PDO   snowflake_driver.c  807: max_login_retries: 7
+2023-10-27 21:08:30.027 INFO  C     client.c          800: Snowflake C/C++ API: 1.0.3, OS: Linux, OS Version: 3.10.0-1127.13.1.el7.x86_64
+2023-10-27 21:08:30.027 DEBUG C     client.c          494: application name: PDO
+2023-10-27 21:08:30.027 DEBUG C     client.c          495: application version: 8.1.2-2.0.0
+2023-10-27 21:08:30.027 DEBUG C     client.c          496: authenticator: snowflake
+2023-10-27 21:08:30.027 DEBUG C     client.c          497: user: harry
+2023-10-27 21:08:30.027 DEBUG C     client.c          498: password: ****
+2023-10-27 21:08:30.027 DEBUG C     client.c          504: host: simbapartner.snowflakecomputing.com
+2023-10-27 21:08:30.027 DEBUG C     client.c          505: port: 443
+2023-10-27 21:08:30.027 DEBUG C     client.c          506: account: simbapartner
+2023-10-27 21:08:30.027 DEBUG C     client.c          507: region: (null)
+2023-10-27 21:08:30.027 DEBUG C     client.c          508: database: testdb
+2023-10-27 21:08:30.027 DEBUG C     client.c          509: schema: testschema
+2023-10-27 21:08:30.027 DEBUG C     client.c          510: warehouse: SIMBA_WH_TEST
+2023-10-27 21:08:30.027 DEBUG C     client.c          511: role: sysadmin
+2023-10-27 21:08:30.027 DEBUG C     client.c          512: protocol: https
+2023-10-27 21:08:30.027 DEBUG C     client.c          513: autocommit: true
+2023-10-27 21:08:30.027 DEBUG C     client.c          514: insecure_mode: false
+2023-10-27 21:08:30.027 DEBUG C     client.c          515: timezone: (null)
+2023-10-27 21:08:30.027 DEBUG C     client.c          516: login_timeout: 300
+2023-10-27 21:08:30.027 DEBUG C     client.c          517: network_timeout: 120
+2023-10-27 21:08:30.027 DEBUG C     client.c          518: qcc_disable: false
+2023-10-27 21:08:30.027 DEBUG C     client.c          519: include_retry_reason: true
+2023-10-27 21:08:30.027 TRACE C     client.c          853: Created body
+2023-10-27 21:08:30.027 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:30.027 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/session/v1/login-request?request_id=8e103f33-16a6-4ea8-8640-87700495daf2&databaseName=testdb&schemaName=testschema&warehouse=SIMBA_WH_TEST&roleName=sysadmin&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:30.027 TRACE C     connection.c     1275: Added application infor header
+2023-10-27 21:08:30.027 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:30.256 DEBUG C     connection.c      880: Curl response size: 3889
+2023-10-27 21:08:30.258 TRACE C     client.c          880: Here is JSON response:
+{
+	"data":	{
+		"masterToken":	"ver:3-hint:92019682442222-ETMsDgAAAYty95VpABRBRVMvQ0JDL1BLQ1M1UGFkZGluZwEAABAAEL2nExfMB6RCvIFMQmEZOz8AAACwzJVbKujjAAMkLu1l7/rqXCyjOQhone/nCOLg0DbA26S1RxHfhD2rfE3PMPCOnRXSx1NhHl3umQwvc0KuXsjIcmxqAFzu6WPM6p8F6MqBQ8NJONfkQvw2qoG4IKUyBsFz1SxZpZCW8Pa8YxCFjUkSglzt089jnNCBjmmEtZgOZ/ASaqTUXl5coRRJz5Gb7l9IohHt4h1QH2XC/gsP8dmijZIzrR7S8AvTUT1FYThwR6UAFATlldDcLhaM3tngdSui7ncN7Y5L",
+		"token":	"ver:3-hint:92019682442222-ETMsDgAAAYty95WgABRBRVMvQ0JDL1BLQ1M1UGFkZGluZwEAABAAEI3JQ1fEwVaQtJ+fOpZjbw0AAACAy5mv7L0K+907yU6zT0otQpJKfCdwFbYBRO8LZ9Qzegdz1HizKWRp4CzTw4n8MwPkOJGif7ZbZqOF2PGjDUXzvEgqZt6HPTangG6USf2oSNWTqx8cIwKTOmJammKSj3N/l4BLMWpvd3q7H4394l+r6EawCZR5f36JRPK4ae/xIEoAFOsWxoEQIk4Jy3mFev4ewVx/l8nN",
+		"validityInSeconds":	3600,
+		"masterValidityInSeconds":	14400,
+		"displayUserName":	"HARRY",
+		"serverVersion":	"7.38.2",
+		"firstLogin":	true,
+		"remMeToken":	null,
+		"remMeValidityInSeconds":	0,
+		"healthCheckInterval":	45,
+		"newClientForUpgrade":	null,
+		"sessionId":	92019724970014,
+		"parameters":	[{
+				"name":	"TIMESTAMP_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3 TZHTZM"
+			}, {
+				"name":	"CLIENT_PREFETCH_THREADS",
+				"value":	4
+			}, {
+				"name":	"TIME_OUTPUT_FORMAT",
+				"value":	"HH24:MI:SS"
+			}, {
+				"name":	"TIMESTAMP_TZ_OUTPUT_FORMAT",
+				"value":	""
+			}, {
+				"name":	"CLIENT_RESULT_CHUNK_SIZE",
+				"value":	48
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE",
+				"value":	false
+			}, {
+				"name":	"CLIENT_METADATA_USE_SESSION_DATABASE",
+				"value":	false
+			}, {
+				"name":	"QUERY_CONTEXT_CACHE_SIZE",
+				"value":	5
+			}, {
+				"name":	"CLIENT_OUT_OF_BAND_TELEMETRY_ENABLED",
+				"value":	false
+			}, {
+				"name":	"ENABLE_STAGE_S3_PRIVATELINK_FOR_US_EAST_1",
+				"value":	true
+			}, {
+				"name":	"TIMESTAMP_NTZ_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_THREADS",
+				"value":	1
+			}, {
+				"name":	"CLIENT_METADATA_REQUEST_USE_CONNECTION_CTX",
+				"value":	false
+			}, {
+				"name":	"CLIENT_HONOR_CLIENT_TZ_FOR_TIMESTAMP_NTZ",
+				"value":	true
+			}, {
+				"name":	"CLIENT_MEMORY_LIMIT",
+				"value":	1536
+			}, {
+				"name":	"CLIENT_TIMESTAMP_TYPE_MAPPING",
+				"value":	"TIMESTAMP_LTZ"
+			}, {
+				"name":	"TIMEZONE",
+				"value":	"America/Los_Angeles"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_SLOTS",
+				"value":	2
+			}, {
+				"name":	"CLIENT_TELEMETRY_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_DISABLE_INCIDENTS",
+				"value":	true
+			}, {
+				"name":	"CLIENT_USE_V1_QUERY_API",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_COLUMN_CASE_INSENSITIVE",
+				"value":	false
+			}, {
+				"name":	"CSV_TIMESTAMP_FORMAT",
+				"value":	""
+			}, {
+				"name":	"BINARY_OUTPUT_FORMAT",
+				"value":	"HEX"
+			}, {
+				"name":	"CLIENT_ENABLE_LOG_INFO_STATEMENT_PARAMETERS",
+				"value":	false
+			}, {
+				"name":	"CLIENT_TELEMETRY_SESSIONLESS_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_FORCE_PROTECT_ID_TOKEN",
+				"value":	true
+			}, {
+				"name":	"DATE_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD"
+			}, {
+				"name":	"CLIENT_CONSENT_CACHE_ID_TOKEN",
+				"value":	false
+			}, {
+				"name":	"CLIENT_STAGE_ARRAY_BINDING_THRESHOLD",
+				"value":	65280
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE_HEARTBEAT_FREQUENCY",
+				"value":	3600
+			}, {
+				"name":	"AUTOCOMMIT",
+				"value":	true
+			}, {
+				"name":	"CLIENT_SESSION_CLONE",
+				"value":	false
+			}, {
+				"name":	"TIMESTAMP_LTZ_OUTPUT_FORMAT",
+				"value":	""
+			}],
+		"sessionInfo":	{
+			"databaseName":	"TESTDB",
+			"schemaName":	"TESTSCHEMA",
+			"warehouseName":	"SIMBA_WH_TEST",
+			"roleName":	"SYSADMIN"
+		},
+		"idToken":	null,
+		"idTokenValidityInSeconds":	0,
+		"responseData":	null,
+		"mfaToken":	null,
+		"mfaTokenValidityInSeconds":	0
+	},
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:30.258 DEBUG C     connection.c      772: Item and Value; success: 1
+2023-10-27 21:08:30.258 DEBUG C     connection.c      730: Item and Value; token: ******
+2023-10-27 21:08:30.258 DEBUG C     connection.c      730: Item and Value; masterToken: ******
+2023-10-27 21:08:30.258 TRACE C++   QueryContextCache.cpp   83: QueryContextCache: clearCache called
+2023-10-27 21:08:30.258 TRACE PDO   snowflake_driver.c  825: Leaving: 1
+2023-10-27 21:08:30.258 TRACE PDO   snowflake_driver.c  185: Entering: snowflake_handle_preparer
+2023-10-27 21:08:30.258 DEBUG PDO   snowflake_driver.c  186: dbh=0x7f5a0fa81480
+2023-10-27 21:08:30.258 DEBUG PDO   snowflake_driver.c  187: sql=select count(*) from autocommittest421000158, len=44
+2023-10-27 21:08:30.258 DEBUG C     client.c         1867: Command size non-zero, setting as sql text size.
+2023-10-27 21:08:30.258 TRACE PDO   snowflake_driver.c  217: Leaving: 1
+2023-10-27 21:08:30.258 TRACE PDO   snowflake_stmt.c  158: Entering: pdo_snowflake_stmt_execute
+2023-10-27 21:08:30.258 TRACE PDO   snowflake_stmt.c  109: Entering: pdo_snowflake_stmt_execute_prepared
+2023-10-27 21:08:30.258 DEBUG C     client.c         2015: Created body
+2023-10-27 21:08:30.258 TRACE C     client.c         2016: Here is constructed body:
+{
+	"sqlText":	"select count(*) from autocommittest421000158",
+	"asyncExec":	false,
+	"sequenceId":	1,
+	"querySubmissionTime":	1698440910000,
+	"describeOnly":	false,
+	"queryContextDTO":	{
+		"entries":	[]
+	}
+}
+2023-10-27 21:08:30.258 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:30.258 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/queries/v1/query-request?requestId=eee779c8-d9ec-4f13-ac49-b0efde269bff&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:30.258 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:30.412 DEBUG C     connection.c      880: Curl response size: 2782
+2023-10-27 21:08:30.413 TRACE C     client.c         2028: Here is JSON response:
+{
+	"data":	{
+		"parameters":	[{
+				"name":	"TIMESTAMP_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3 TZHTZM"
+			}, {
+				"name":	"CLIENT_PREFETCH_THREADS",
+				"value":	4
+			}, {
+				"name":	"TIME_OUTPUT_FORMAT",
+				"value":	"HH24:MI:SS"
+			}, {
+				"name":	"TIMESTAMP_TZ_OUTPUT_FORMAT",
+				"value":	""
+			}, {
+				"name":	"CLIENT_RESULT_CHUNK_SIZE",
+				"value":	48
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE",
+				"value":	false
+			}, {
+				"name":	"CLIENT_METADATA_USE_SESSION_DATABASE",
+				"value":	false
+			}, {
+				"name":	"QUERY_CONTEXT_CACHE_SIZE",
+				"value":	5
+			}, {
+				"name":	"CLIENT_OUT_OF_BAND_TELEMETRY_ENABLED",
+				"value":	false
+			}, {
+				"name":	"ENABLE_STAGE_S3_PRIVATELINK_FOR_US_EAST_1",
+				"value":	true
+			}, {
+				"name":	"TIMESTAMP_NTZ_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_THREADS",
+				"value":	1
+			}, {
+				"name":	"CLIENT_METADATA_REQUEST_USE_CONNECTION_CTX",
+				"value":	false
+			}, {
+				"name":	"CLIENT_HONOR_CLIENT_TZ_FOR_TIMESTAMP_NTZ",
+				"value":	true
+			}, {
+				"name":	"CLIENT_MEMORY_LIMIT",
+				"value":	1536
+			}, {
+				"name":	"CLIENT_TIMESTAMP_TYPE_MAPPING",
+				"value":	"TIMESTAMP_LTZ"
+			}, {
+				"name":	"TIMEZONE",
+				"value":	"America/Los_Angeles"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_SLOTS",
+				"value":	2
+			}, {
+				"name":	"CLIENT_TELEMETRY_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_DISABLE_INCIDENTS",
+				"value":	true
+			}, {
+				"name":	"CLIENT_USE_V1_QUERY_API",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_COLUMN_CASE_INSENSITIVE",
+				"value":	false
+			}, {
+				"name":	"CSV_TIMESTAMP_FORMAT",
+				"value":	""
+			}, {
+				"name":	"BINARY_OUTPUT_FORMAT",
+				"value":	"HEX"
+			}, {
+				"name":	"CLIENT_ENABLE_LOG_INFO_STATEMENT_PARAMETERS",
+				"value":	false
+			}, {
+				"name":	"CLIENT_TELEMETRY_SESSIONLESS_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_FORCE_PROTECT_ID_TOKEN",
+				"value":	true
+			}, {
+				"name":	"DATE_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD"
+			}, {
+				"name":	"CLIENT_CONSENT_CACHE_ID_TOKEN",
+				"value":	false
+			}, {
+				"name":	"CLIENT_STAGE_ARRAY_BINDING_THRESHOLD",
+				"value":	65280
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE_HEARTBEAT_FREQUENCY",
+				"value":	3600
+			}, {
+				"name":	"AUTOCOMMIT",
+				"value":	true
+			}, {
+				"name":	"CLIENT_SESSION_CLONE",
+				"value":	false
+			}, {
+				"name":	"TIMESTAMP_LTZ_OUTPUT_FORMAT",
+				"value":	""
+			}],
+		"rowtype":	[{
+				"name":	"COUNT(*)",
+				"database":	"",
+				"schema":	"",
+				"table":	"",
+				"byteLength":	null,
+				"precision":	18,
+				"type":	"fixed",
+				"scale":	0,
+				"nullable":	false,
+				"collation":	null,
+				"length":	null
+			}],
+		"rowset":	[["2"]],
+		"total":	1,
+		"returned":	1,
+		"queryId":	"01afef94-0507-0915-0000-53b1072cdc32",
+		"databaseProvider":	null,
+		"finalDatabaseName":	"TESTDB",
+		"finalSchemaName":	"TESTSCHEMA",
+		"finalWarehouseName":	"SIMBA_WH_TEST",
+		"finalRoleName":	"SYSADMIN",
+		"numberOfBinds":	0,
+		"arrayBindSupported":	false,
+		"statementTypeId":	4096,
+		"version":	1,
+		"sendResultTime":	1698440910406,
+		"queryResultFormat":	"json",
+		"queryContext":	{
+			"entries":	[{
+					"id":	0,
+					"timestamp":	265200325430369,
+					"priority":	0
+				}]
+		}
+	},
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:30.413 DEBUG C     connection.c      755: Item and Value; queryId: 01afef94-0507-0915-0000-53b1072cdc32
+2023-10-27 21:08:30.413 DEBUG C     connection.c      772: Item and Value; success: 1
+2023-10-27 21:08:30.414 DEBUG C     connection.c      732: Item and Value; finalDatabaseName: TESTDB
+2023-10-27 21:08:30.414 DEBUG C     connection.c      732: Item and Value; finalSchemaName: TESTSCHEMA
+2023-10-27 21:08:30.414 DEBUG C     connection.c      732: Item and Value; finalWarehouseName: SIMBA_WH_TEST
+2023-10-27 21:08:30.414 DEBUG C     connection.c      732: Item and Value; finalRoleName: SYSADMIN
+2023-10-27 21:08:30.414 TRACE C++   QueryContextCache.cpp  297: QueryContextCache: add new item id: 0, priority: 0
+2023-10-27 21:08:30.414 TRACE C++   QueryContextCache.cpp  307: QueryContextCache::syncPriorityMap called priorityMap size = 0, newPrioirtyMap size = 1
+2023-10-27 21:08:30.414 TRACE C++   QueryContextCache.cpp  316: QueryContextCache::checkCacheCapacity called. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:30.414 TRACE C++   QueryContextCache.cpp  327: QueryContextCache::checkCacheCapacity returns. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:30.414 DEBUG C     connection.c      789: Item and Value; statementTypeId: 4096
+2023-10-27 21:08:30.414 DEBUG C     connection.c      732: Item and Value; name: COUNT(*)
+2023-10-27 21:08:30.414 DEBUG C     connection.c      789: Item and Value; precision: 18
+2023-10-27 21:08:30.414 DEBUG C     connection.c      789: Item and Value; scale: 0
+2023-10-27 21:08:30.414 DEBUG C     connection.c      772: Item and Value; nullable: 0
+2023-10-27 21:08:30.414 DEBUG C     results.c         292: Found type and ctype; 0: 2
+2023-10-27 21:08:30.414 DEBUG C     connection.c      809: Array: rowset
+2023-10-27 21:08:30.414 DEBUG C++   ResultSetJson.cpp   84: appendChunk -- Appended chunk of size 1.
+2023-10-27 21:08:30.414 DEBUG C     connection.c      789: Item and Value; total: 1
+2023-10-27 21:08:30.414 DEBUG PDO   snowflake_stmt.c  133: number of columns: 1
+2023-10-27 21:08:30.414 TRACE PDO   snowflake_stmt.c   54: Entering: _pdo_snowflake_stmt_set_row_count
+2023-10-27 21:08:30.414 DEBUG PDO   snowflake_stmt.c   57: row count: 1
+2023-10-27 21:08:30.414 TRACE PDO   snowflake_stmt.c  143: Leaving: 1
+2023-10-27 21:08:30.414 TRACE PDO   snowflake_stmt.c  162: Leaving: 1
+2023-10-27 21:08:30.414 TRACE PDO   snowflake_stmt.c  243: Entering: pdo_snowflake_stmt_describe
+2023-10-27 21:08:30.414 DEBUG PDO   snowflake_stmt.c  244: colno 0
+2023-10-27 21:08:30.414 TRACE PDO   snowflake_stmt.c  288: Leaving: 1
+2023-10-27 21:08:30.414 TRACE PDO   snowflake_stmt.c   76: Entering: pdo_snowflake_stmt_dtor
+2023-10-27 21:08:30.414 DEBUG PDO   snowflake_stmt.c   91: number of columns: 1
+2023-10-27 21:08:30.414 TRACE PDO   snowflake_stmt.c   95: Leaving: 1
+2023-10-27 21:08:30.414 TRACE PDO   snowflake_driver.c  133: Entering: snowflake_handle_closer
+2023-10-27 21:08:30.414 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:30.414 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/session?delete=true&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:30.414 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:30.565 DEBUG C     connection.c      880: Curl response size: 76
+2023-10-27 21:08:30.566 TRACE C     client.c          727: JSON response:
+{
+	"data":	null,
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:30.566 TRACE PDO   snowflake_driver.c  144: Leaving: 1
+2023-10-27 21:08:30.566 TRACE PDO   snowflake_stmt.c  209: Entering: pdo_snowflake_stmt_fetch
+2023-10-27 21:08:30.566 DEBUG PDO   snowflake_stmt.c  210: ori: 0, offset: 0
+2023-10-27 21:08:30.566 TRACE PDO   snowflake_stmt.c  223: Leaving: 1
+2023-10-27 21:08:30.566 TRACE PDO   snowflake_stmt.c  314: Entering: pdo_snowflake_stmt_get_col
+2023-10-27 21:08:30.566 DEBUG PDO   snowflake_stmt.c  334: idx: 0, value: '2', len: 1
+2023-10-27 21:08:30.566 TRACE PDO   snowflake_stmt.c  335: Leaving: 1
+2023-10-27 21:08:30.566 TRACE PDO   snowflake_stmt.c  209: Entering: pdo_snowflake_stmt_fetch
+2023-10-27 21:08:30.566 DEBUG PDO   snowflake_stmt.c  210: ori: 0, offset: 0
+2023-10-27 21:08:30.566 DEBUG C     client.c         1759: No chunk downloader set, end of results.
+2023-10-27 21:08:30.566 DEBUG PDO   snowflake_stmt.c  217: EOL
+2023-10-27 21:08:30.566 TRACE PDO   snowflake_stmt.c  218: Leaving: 0
+2023-10-27 21:08:30.566 TRACE PDO   snowflake_driver.c  232: Entering: snowflake_handle_doer
+2023-10-27 21:08:30.566 DEBUG PDO   snowflake_driver.c  237: sql: drop table if exists autocommittest421000158, len: 44
+2023-10-27 21:08:30.566 DEBUG C     client.c         1867: Command size non-zero, setting as sql text size.
+2023-10-27 21:08:30.566 DEBUG C     client.c         2015: Created body
+2023-10-27 21:08:30.566 TRACE C     client.c         2016: Here is constructed body:
+{
+	"sqlText":	"drop table if exists autocommittest421000158",
+	"asyncExec":	false,
+	"sequenceId":	2,
+	"querySubmissionTime":	1698440910000,
+	"describeOnly":	false,
+	"queryContextDTO":	{
+		"entries":	[{
+				"id":	0,
+				"priority":	0,
+				"timestamp":	265200325430369,
+				"context":	{
+				}
+			}]
+	}
+}
+2023-10-27 21:08:30.566 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:30.566 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/queries/v1/query-request?requestId=144ecbd9-ffe9-416a-a97d-e6fa4f5fd5c2&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:30.566 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:30.797 DEBUG C     connection.c      880: Curl response size: 2836
+2023-10-27 21:08:30.799 TRACE C     client.c         2028: Here is JSON response:
+{
+	"data":	{
+		"parameters":	[{
+				"name":	"TIMESTAMP_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3 TZHTZM"
+			}, {
+				"name":	"CLIENT_PREFETCH_THREADS",
+				"value":	4
+			}, {
+				"name":	"TIME_OUTPUT_FORMAT",
+				"value":	"HH24:MI:SS"
+			}, {
+				"name":	"TIMESTAMP_TZ_OUTPUT_FORMAT",
+				"value":	""
+			}, {
+				"name":	"CLIENT_RESULT_CHUNK_SIZE",
+				"value":	48
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE",
+				"value":	false
+			}, {
+				"name":	"CLIENT_OUT_OF_BAND_TELEMETRY_ENABLED",
+				"value":	false
+			}, {
+				"name":	"CLIENT_METADATA_USE_SESSION_DATABASE",
+				"value":	false
+			}, {
+				"name":	"QUERY_CONTEXT_CACHE_SIZE",
+				"value":	5
+			}, {
+				"name":	"ENABLE_STAGE_S3_PRIVATELINK_FOR_US_EAST_1",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_THREADS",
+				"value":	1
+			}, {
+				"name":	"TIMESTAMP_NTZ_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD HH24:MI:SS.FF3"
+			}, {
+				"name":	"CLIENT_METADATA_REQUEST_USE_CONNECTION_CTX",
+				"value":	false
+			}, {
+				"name":	"CLIENT_HONOR_CLIENT_TZ_FOR_TIMESTAMP_NTZ",
+				"value":	true
+			}, {
+				"name":	"CLIENT_MEMORY_LIMIT",
+				"value":	1536
+			}, {
+				"name":	"CLIENT_TIMESTAMP_TYPE_MAPPING",
+				"value":	"TIMESTAMP_LTZ"
+			}, {
+				"name":	"TIMEZONE",
+				"value":	"America/Los_Angeles"
+			}, {
+				"name":	"CLIENT_RESULT_PREFETCH_SLOTS",
+				"value":	2
+			}, {
+				"name":	"CLIENT_TELEMETRY_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_USE_V1_QUERY_API",
+				"value":	true
+			}, {
+				"name":	"CLIENT_DISABLE_INCIDENTS",
+				"value":	true
+			}, {
+				"name":	"CLIENT_RESULT_COLUMN_CASE_INSENSITIVE",
+				"value":	false
+			}, {
+				"name":	"CSV_TIMESTAMP_FORMAT",
+				"value":	""
+			}, {
+				"name":	"BINARY_OUTPUT_FORMAT",
+				"value":	"HEX"
+			}, {
+				"name":	"CLIENT_ENABLE_LOG_INFO_STATEMENT_PARAMETERS",
+				"value":	false
+			}, {
+				"name":	"CLIENT_TELEMETRY_SESSIONLESS_ENABLED",
+				"value":	true
+			}, {
+				"name":	"CLIENT_CONSENT_CACHE_ID_TOKEN",
+				"value":	false
+			}, {
+				"name":	"DATE_OUTPUT_FORMAT",
+				"value":	"YYYY-MM-DD"
+			}, {
+				"name":	"CLIENT_FORCE_PROTECT_ID_TOKEN",
+				"value":	true
+			}, {
+				"name":	"CLIENT_STAGE_ARRAY_BINDING_THRESHOLD",
+				"value":	65280
+			}, {
+				"name":	"CLIENT_SESSION_KEEP_ALIVE_HEARTBEAT_FREQUENCY",
+				"value":	3600
+			}, {
+				"name":	"CLIENT_SESSION_CLONE",
+				"value":	false
+			}, {
+				"name":	"AUTOCOMMIT",
+				"value":	true
+			}, {
+				"name":	"TIMESTAMP_LTZ_OUTPUT_FORMAT",
+				"value":	""
+			}],
+		"rowtype":	[{
+				"name":	"status",
+				"database":	"",
+				"schema":	"",
+				"table":	"",
+				"type":	"text",
+				"precision":	null,
+				"scale":	null,
+				"byteLength":	16777216,
+				"nullable":	true,
+				"collation":	null,
+				"length":	16777216
+			}],
+		"rowset":	[["AUTOCOMMITTEST421000158 successfully dropped."]],
+		"total":	1,
+		"returned":	1,
+		"queryId":	"01afef94-0507-0aa1-0000-53b1072ce236",
+		"databaseProvider":	null,
+		"finalDatabaseName":	"TESTDB",
+		"finalSchemaName":	"TESTSCHEMA",
+		"finalWarehouseName":	"SIMBA_WH_TEST",
+		"finalRoleName":	"SYSADMIN",
+		"numberOfBinds":	0,
+		"arrayBindSupported":	false,
+		"statementTypeId":	25344,
+		"version":	1,
+		"sendResultTime":	1698440910793,
+		"queryResultFormat":	"json",
+		"queryContext":	{
+			"entries":	[{
+					"id":	0,
+					"timestamp":	265200325817553,
+					"priority":	0
+				}]
+		}
+	},
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:30.799 DEBUG C     connection.c      755: Item and Value; queryId: 01afef94-0507-0aa1-0000-53b1072ce236
+2023-10-27 21:08:30.799 DEBUG C     connection.c      772: Item and Value; success: 1
+2023-10-27 21:08:30.799 DEBUG C     connection.c      732: Item and Value; finalDatabaseName: TESTDB
+2023-10-27 21:08:30.799 DEBUG C     connection.c      732: Item and Value; finalSchemaName: TESTSCHEMA
+2023-10-27 21:08:30.799 DEBUG C     connection.c      732: Item and Value; finalWarehouseName: SIMBA_WH_TEST
+2023-10-27 21:08:30.799 DEBUG C     connection.c      732: Item and Value; finalRoleName: SYSADMIN
+2023-10-27 21:08:30.799 TRACE C++   QueryContextCache.cpp  256: QueryContextCache: merge existing id: 0 with priority: 0
+2023-10-27 21:08:30.799 TRACE C++   QueryContextCache.cpp  307: QueryContextCache::syncPriorityMap called priorityMap size = 1, newPrioirtyMap size = 0
+2023-10-27 21:08:30.799 TRACE C++   QueryContextCache.cpp  316: QueryContextCache::checkCacheCapacity called. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:30.799 TRACE C++   QueryContextCache.cpp  327: QueryContextCache::checkCacheCapacity returns. cacheSet size 1 cache capacity 5
+2023-10-27 21:08:30.799 DEBUG C     connection.c      789: Item and Value; statementTypeId: 25344
+2023-10-27 21:08:30.799 DEBUG C     connection.c      732: Item and Value; name: status
+2023-10-27 21:08:30.799 DEBUG C     connection.c      789: Item and Value; byteLength: 16777216
+2023-10-27 21:08:30.799 DEBUG C     connection.c      789: Item and Value; length: 16777216
+2023-10-27 21:08:30.799 DEBUG C     connection.c      772: Item and Value; nullable: 1
+2023-10-27 21:08:30.799 DEBUG C     results.c         292: Found type and ctype; 2: 5
+2023-10-27 21:08:30.799 DEBUG C     connection.c      809: Array: rowset
+2023-10-27 21:08:30.799 DEBUG C++   ResultSetJson.cpp   84: appendChunk -- Appended chunk of size 1.
+2023-10-27 21:08:30.799 DEBUG C     connection.c      789: Item and Value; total: 1
+2023-10-27 21:08:30.799 TRACE PDO   snowflake_driver.c  273: Leaving: 1
+2023-10-27 21:08:30.799 TRACE PDO   snowflake_stmt.c   76: Entering: pdo_snowflake_stmt_dtor
+2023-10-27 21:08:30.799 DEBUG PDO   snowflake_stmt.c   91: number of columns: 1
+2023-10-27 21:08:30.799 TRACE PDO   snowflake_stmt.c   95: Leaving: 1
+2023-10-27 21:08:30.799 TRACE PDO   snowflake_driver.c  133: Entering: snowflake_handle_closer
+2023-10-27 21:08:30.799 TRACE C     connection.c      299: Created header
+2023-10-27 21:08:30.799 DEBUG C     connection.c      686: URL: https://simbapartner.snowflakecomputing.com:443/session?delete=true&request_guid=00000000-0000-0000-0000-000000000000
+2023-10-27 21:08:30.799 TRACE C     http_perform.c    363: Running curl call
+2023-10-27 21:08:30.923 DEBUG C     connection.c      880: Curl response size: 76
+2023-10-27 21:08:30.924 TRACE C     client.c          727: JSON response:
+{
+	"data":	null,
+	"code":	null,
+	"message":	null,
+	"success":	true
+}
+2023-10-27 21:08:30.924 TRACE PDO   snowflake_driver.c  144: Leaving: 1

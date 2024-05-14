@@ -1,17 +1,7 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
@@ -32,45 +22,55 @@ namespace S3
 namespace Model
 {
 
-  class AWS_S3_API AnalyticsExportDestination
+  /**
+   * <p>Where to publish the analytics results.</p><p><h3>See Also:</h3>   <a
+   * href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/AnalyticsExportDestination">AWS
+   * API Reference</a></p>
+   */
+  class AnalyticsExportDestination
   {
   public:
-    AnalyticsExportDestination();
-    AnalyticsExportDestination(const Aws::Utils::Xml::XmlNode& xmlNode);
-    AnalyticsExportDestination& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API AnalyticsExportDestination();
+    AWS_S3_API AnalyticsExportDestination(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API AnalyticsExportDestination& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
 
-    void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
+    AWS_S3_API void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
 
 
     /**
-     * A destination signifying output to an S3 bucket.
+     * <p>A destination signifying output to an S3 bucket.</p>
      */
     inline const AnalyticsS3BucketDestination& GetS3BucketDestination() const{ return m_s3BucketDestination; }
 
     /**
-     * A destination signifying output to an S3 bucket.
+     * <p>A destination signifying output to an S3 bucket.</p>
+     */
+    inline bool S3BucketDestinationHasBeenSet() const { return m_s3BucketDestinationHasBeenSet; }
+
+    /**
+     * <p>A destination signifying output to an S3 bucket.</p>
      */
     inline void SetS3BucketDestination(const AnalyticsS3BucketDestination& value) { m_s3BucketDestinationHasBeenSet = true; m_s3BucketDestination = value; }
 
     /**
-     * A destination signifying output to an S3 bucket.
+     * <p>A destination signifying output to an S3 bucket.</p>
      */
     inline void SetS3BucketDestination(AnalyticsS3BucketDestination&& value) { m_s3BucketDestinationHasBeenSet = true; m_s3BucketDestination = std::move(value); }
 
     /**
-     * A destination signifying output to an S3 bucket.
+     * <p>A destination signifying output to an S3 bucket.</p>
      */
     inline AnalyticsExportDestination& WithS3BucketDestination(const AnalyticsS3BucketDestination& value) { SetS3BucketDestination(value); return *this;}
 
     /**
-     * A destination signifying output to an S3 bucket.
+     * <p>A destination signifying output to an S3 bucket.</p>
      */
     inline AnalyticsExportDestination& WithS3BucketDestination(AnalyticsS3BucketDestination&& value) { SetS3BucketDestination(std::move(value)); return *this;}
 
   private:
 
     AnalyticsS3BucketDestination m_s3BucketDestination;
-    bool m_s3BucketDestinationHasBeenSet;
+    bool m_s3BucketDestinationHasBeenSet = false;
   };
 
 } // namespace Model

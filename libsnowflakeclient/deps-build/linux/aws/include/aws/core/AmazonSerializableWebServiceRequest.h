@@ -1,17 +1,7 @@
-/*
-  * Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License").
-  * You may not use this file except in compliance with the License.
-  * A copy of the License is located at
-  *
-  *  http://aws.amazon.com/apache2.0
-  *
-  * or in the "license" file accompanying this file. This file is distributed
-  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-  * express or implied. See the License for the specific language governing
-  * permissions and limitations under the License.
-  */
+/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 
@@ -24,11 +14,12 @@
 
 namespace Aws
 {
-    static const char* JSON_CONTENT_TYPE = "application/json";
-    static const char* AMZN_JSON_CONTENT_TYPE_1_0 = "application/x-amz-json-1.0";
-    static const char* AMZN_JSON_CONTENT_TYPE_1_1 = "application/x-amz-json-1.1";
-    static const char* FORM_CONTENT_TYPE = "application/x-www-form-urlencoded";
-    static const char* AMZN_XML_CONTENT_TYPE = "application/xml";
+    static const char JSON_CONTENT_TYPE[]                  = "application/json";
+    static const char AMZN_JSON_CONTENT_TYPE_1_0[]         = "application/x-amz-json-1.0";
+    static const char AMZN_JSON_CONTENT_TYPE_1_1[]         = "application/x-amz-json-1.1";
+    static const char FORM_CONTENT_TYPE[]                  = "application/x-www-form-urlencoded";
+    static const char AMZN_XML_CONTENT_TYPE[]              = "application/xml";
+    static const char AMZN_EVENTSTREAM_CONTENT_TYPE[]      = "application/vnd.amazon.eventstream";
 
     /**
      * High-level abstraction over AWS requests. GetBody() calls SerializePayload() and uses a stringbuf under the hood.

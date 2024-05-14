@@ -1,17 +1,7 @@
-/*
-  * Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License").
-  * You may not use this file except in compliance with the License.
-  * A copy of the License is located at
-  *
-  *  http://aws.amazon.com/apache2.0
-  *
-  * or in the "license" file accompanying this file. This file is distributed
-  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-  * express or implied. See the License for the specific language governing
-  * permissions and limitations under the License.
-  */
+/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 
@@ -46,12 +36,17 @@ namespace Aws
             HttpClient();
             virtual ~HttpClient() {}
 
-            /*
-            * Takes an http request, makes it, and returns the newly allocated HttpResponse
-            */
-            virtual std::shared_ptr<HttpResponse> MakeRequest(HttpRequest& request,
+            /**
+             * Takes an http request, makes it, and returns the newly allocated HttpResponse.
+             */
+            virtual std::shared_ptr<HttpResponse> MakeRequest(const std::shared_ptr<HttpRequest>& request,
                 Aws::Utils::RateLimits::RateLimiterInterface* readLimiter = nullptr,
                 Aws::Utils::RateLimits::RateLimiterInterface* writeLimiter = nullptr) const = 0;
+
+            /**
+             * If yes, the http client supports transfer-encoding:chunked.
+             */
+            virtual bool SupportsChunkedTransferEncoding() const { return true; }
 
             /**
              * Stops all requests in progress and prevents any others from initiating.
@@ -72,10 +67,17 @@ namespace Aws
 
             bool ContinueRequest(const Aws::Http::HttpRequest&) const;
 
+            explicit operator bool() const
+            {
+               return !m_bad;
+            }
+
+        protected:
+            bool m_bad;
+
         private:
 
             std::atomic< bool > m_disableRequestProcessing;
-
             std::mutex m_requestProcessingSignalLock;
             std::condition_variable m_requestProcessingSignal;
         };

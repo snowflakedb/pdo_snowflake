@@ -1,21 +1,12 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
 #include <aws/s3/model/AnalyticsConfiguration.h>
+#include <aws/core/utils/memory/stl/AWSString.h>
 #include <utility>
 
 namespace Aws
@@ -34,42 +25,66 @@ namespace S3
 {
 namespace Model
 {
-  class AWS_S3_API GetBucketAnalyticsConfigurationResult
+  class GetBucketAnalyticsConfigurationResult
   {
   public:
-    GetBucketAnalyticsConfigurationResult();
-    GetBucketAnalyticsConfigurationResult(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
-    GetBucketAnalyticsConfigurationResult& operator=(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
+    AWS_S3_API GetBucketAnalyticsConfigurationResult();
+    AWS_S3_API GetBucketAnalyticsConfigurationResult(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
+    AWS_S3_API GetBucketAnalyticsConfigurationResult& operator=(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
 
 
     /**
-     * The configuration and any analyses for the analytics filter.
+     * <p>The configuration and any analyses for the analytics filter.</p>
      */
     inline const AnalyticsConfiguration& GetAnalyticsConfiguration() const{ return m_analyticsConfiguration; }
 
     /**
-     * The configuration and any analyses for the analytics filter.
+     * <p>The configuration and any analyses for the analytics filter.</p>
      */
     inline void SetAnalyticsConfiguration(const AnalyticsConfiguration& value) { m_analyticsConfiguration = value; }
 
     /**
-     * The configuration and any analyses for the analytics filter.
+     * <p>The configuration and any analyses for the analytics filter.</p>
      */
     inline void SetAnalyticsConfiguration(AnalyticsConfiguration&& value) { m_analyticsConfiguration = std::move(value); }
 
     /**
-     * The configuration and any analyses for the analytics filter.
+     * <p>The configuration and any analyses for the analytics filter.</p>
      */
     inline GetBucketAnalyticsConfigurationResult& WithAnalyticsConfiguration(const AnalyticsConfiguration& value) { SetAnalyticsConfiguration(value); return *this;}
 
     /**
-     * The configuration and any analyses for the analytics filter.
+     * <p>The configuration and any analyses for the analytics filter.</p>
      */
     inline GetBucketAnalyticsConfigurationResult& WithAnalyticsConfiguration(AnalyticsConfiguration&& value) { SetAnalyticsConfiguration(std::move(value)); return *this;}
+
+
+    
+    inline const Aws::String& GetRequestId() const{ return m_requestId; }
+
+    
+    inline void SetRequestId(const Aws::String& value) { m_requestId = value; }
+
+    
+    inline void SetRequestId(Aws::String&& value) { m_requestId = std::move(value); }
+
+    
+    inline void SetRequestId(const char* value) { m_requestId.assign(value); }
+
+    
+    inline GetBucketAnalyticsConfigurationResult& WithRequestId(const Aws::String& value) { SetRequestId(value); return *this;}
+
+    
+    inline GetBucketAnalyticsConfigurationResult& WithRequestId(Aws::String&& value) { SetRequestId(std::move(value)); return *this;}
+
+    
+    inline GetBucketAnalyticsConfigurationResult& WithRequestId(const char* value) { SetRequestId(value); return *this;}
 
   private:
 
     AnalyticsConfiguration m_analyticsConfiguration;
+
+    Aws::String m_requestId;
   };
 
 } // namespace Model

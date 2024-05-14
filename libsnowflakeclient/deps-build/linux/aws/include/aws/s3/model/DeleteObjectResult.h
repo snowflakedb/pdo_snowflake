@@ -1,17 +1,7 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
@@ -35,72 +25,88 @@ namespace S3
 {
 namespace Model
 {
-  class AWS_S3_API DeleteObjectResult
+  class DeleteObjectResult
   {
   public:
-    DeleteObjectResult();
-    DeleteObjectResult(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
-    DeleteObjectResult& operator=(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
+    AWS_S3_API DeleteObjectResult();
+    AWS_S3_API DeleteObjectResult(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
+    AWS_S3_API DeleteObjectResult& operator=(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
 
 
     /**
-     * Specifies whether the versioned object that was permanently deleted was (true)
-     * or was not (false) a delete marker.
+     * <p>Indicates whether the specified object version that was permanently deleted
+     * was (true) or was not (false) a delete marker before deletion. In a simple
+     * DELETE, this header indicates whether (true) or not (false) the current version
+     * of the object is a delete marker.</p>  <p>This functionality is not
+     * supported for directory buckets.</p> 
      */
     inline bool GetDeleteMarker() const{ return m_deleteMarker; }
 
     /**
-     * Specifies whether the versioned object that was permanently deleted was (true)
-     * or was not (false) a delete marker.
+     * <p>Indicates whether the specified object version that was permanently deleted
+     * was (true) or was not (false) a delete marker before deletion. In a simple
+     * DELETE, this header indicates whether (true) or not (false) the current version
+     * of the object is a delete marker.</p>  <p>This functionality is not
+     * supported for directory buckets.</p> 
      */
     inline void SetDeleteMarker(bool value) { m_deleteMarker = value; }
 
     /**
-     * Specifies whether the versioned object that was permanently deleted was (true)
-     * or was not (false) a delete marker.
+     * <p>Indicates whether the specified object version that was permanently deleted
+     * was (true) or was not (false) a delete marker before deletion. In a simple
+     * DELETE, this header indicates whether (true) or not (false) the current version
+     * of the object is a delete marker.</p>  <p>This functionality is not
+     * supported for directory buckets.</p> 
      */
     inline DeleteObjectResult& WithDeleteMarker(bool value) { SetDeleteMarker(value); return *this;}
 
 
     /**
-     * Returns the version ID of the delete marker created as a result of the DELETE
-     * operation.
+     * <p>Returns the version ID of the delete marker created as a result of the DELETE
+     * operation.</p>  <p>This functionality is not supported for directory
+     * buckets.</p> 
      */
     inline const Aws::String& GetVersionId() const{ return m_versionId; }
 
     /**
-     * Returns the version ID of the delete marker created as a result of the DELETE
-     * operation.
+     * <p>Returns the version ID of the delete marker created as a result of the DELETE
+     * operation.</p>  <p>This functionality is not supported for directory
+     * buckets.</p> 
      */
     inline void SetVersionId(const Aws::String& value) { m_versionId = value; }
 
     /**
-     * Returns the version ID of the delete marker created as a result of the DELETE
-     * operation.
+     * <p>Returns the version ID of the delete marker created as a result of the DELETE
+     * operation.</p>  <p>This functionality is not supported for directory
+     * buckets.</p> 
      */
     inline void SetVersionId(Aws::String&& value) { m_versionId = std::move(value); }
 
     /**
-     * Returns the version ID of the delete marker created as a result of the DELETE
-     * operation.
+     * <p>Returns the version ID of the delete marker created as a result of the DELETE
+     * operation.</p>  <p>This functionality is not supported for directory
+     * buckets.</p> 
      */
     inline void SetVersionId(const char* value) { m_versionId.assign(value); }
 
     /**
-     * Returns the version ID of the delete marker created as a result of the DELETE
-     * operation.
+     * <p>Returns the version ID of the delete marker created as a result of the DELETE
+     * operation.</p>  <p>This functionality is not supported for directory
+     * buckets.</p> 
      */
     inline DeleteObjectResult& WithVersionId(const Aws::String& value) { SetVersionId(value); return *this;}
 
     /**
-     * Returns the version ID of the delete marker created as a result of the DELETE
-     * operation.
+     * <p>Returns the version ID of the delete marker created as a result of the DELETE
+     * operation.</p>  <p>This functionality is not supported for directory
+     * buckets.</p> 
      */
     inline DeleteObjectResult& WithVersionId(Aws::String&& value) { SetVersionId(std::move(value)); return *this;}
 
     /**
-     * Returns the version ID of the delete marker created as a result of the DELETE
-     * operation.
+     * <p>Returns the version ID of the delete marker created as a result of the DELETE
+     * operation.</p>  <p>This functionality is not supported for directory
+     * buckets.</p> 
      */
     inline DeleteObjectResult& WithVersionId(const char* value) { SetVersionId(value); return *this;}
 
@@ -120,6 +126,28 @@ namespace Model
     
     inline DeleteObjectResult& WithRequestCharged(RequestCharged&& value) { SetRequestCharged(std::move(value)); return *this;}
 
+
+    
+    inline const Aws::String& GetRequestId() const{ return m_requestId; }
+
+    
+    inline void SetRequestId(const Aws::String& value) { m_requestId = value; }
+
+    
+    inline void SetRequestId(Aws::String&& value) { m_requestId = std::move(value); }
+
+    
+    inline void SetRequestId(const char* value) { m_requestId.assign(value); }
+
+    
+    inline DeleteObjectResult& WithRequestId(const Aws::String& value) { SetRequestId(value); return *this;}
+
+    
+    inline DeleteObjectResult& WithRequestId(Aws::String&& value) { SetRequestId(std::move(value)); return *this;}
+
+    
+    inline DeleteObjectResult& WithRequestId(const char* value) { SetRequestId(value); return *this;}
+
   private:
 
     bool m_deleteMarker;
@@ -127,6 +155,8 @@ namespace Model
     Aws::String m_versionId;
 
     RequestCharged m_requestCharged;
+
+    Aws::String m_requestId;
   };
 
 } // namespace Model

@@ -1,28 +1,18 @@
-/*
-  * Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License").
-  * You may not use this file except in compliance with the License.
-  * A copy of the License is located at
-  *
-  *  http://aws.amazon.com/apache2.0
-  *
-  * or in the "license" file accompanying this file. This file is distributed
-  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-  * express or implied. See the License for the specific language governing
-  * permissions and limitations under the License.
-  */
+/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 
 #include <aws/core/Core_EXPORTS.h>
 
 #include <aws/core/utils/ratelimiter/RateLimiterInterface.h>
-#include <aws/core/utils/memory/stl/AWSFunction.h>
 
 #include <algorithm>
 #include <mutex>
 #include <thread>
+#include <functional>
 
 namespace Aws
 {
@@ -45,7 +35,7 @@ namespace Aws
                 /**
                  * Initializes state, starts counts, does some basic validation.
                  */
-                DefaultRateLimiter(int64_t maxRate, ElapsedTimeFunctionType elapsedTimeFunction = AWS_BUILD_FUNCTION(CLOCK::now)) :
+                DefaultRateLimiter(int64_t maxRate, ElapsedTimeFunctionType elapsedTimeFunction = CLOCK::now) :
                     m_elapsedTimeFunction(elapsedTimeFunction),
                     m_maxRate(0),
                     m_accumulatorLock(),
@@ -63,7 +53,7 @@ namespace Aws
                     static_assert(CLOCK::duration::period::num > 0, "RateLimiter clock duration must have positive numerator");
                     static_assert(CLOCK::duration::period::den > 0, "RateLimiter clock duration must have positive denominator");
 
-                    SetRate(maxRate, true);
+                    DefaultRateLimiter::SetRate(maxRate, true);
                 }
 
                 virtual ~DefaultRateLimiter() = default;

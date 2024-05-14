@@ -1,17 +1,7 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
@@ -38,231 +28,272 @@ namespace Model
 {
 
   /**
-   * Container for restore job parameters.<p><h3>See Also:</h3>   <a
+   * <p>Container for restore job parameters.</p><p><h3>See Also:</h3>   <a
    * href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/RestoreRequest">AWS
    * API Reference</a></p>
    */
-  class AWS_S3_API RestoreRequest
+  class RestoreRequest
   {
   public:
-    RestoreRequest();
-    RestoreRequest(const Aws::Utils::Xml::XmlNode& xmlNode);
-    RestoreRequest& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API RestoreRequest();
+    AWS_S3_API RestoreRequest(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API RestoreRequest& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
 
-    void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
+    AWS_S3_API void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
 
 
     /**
-     * Lifetime of the active copy in days. Do not use with restores that specify
-     * OutputLocation.
+     * <p>Lifetime of the active copy in days. Do not use with restores that specify
+     * <code>OutputLocation</code>.</p> <p>The Days element is required for regular
+     * restores, and must not be provided for select requests.</p>
      */
     inline int GetDays() const{ return m_days; }
 
     /**
-     * Lifetime of the active copy in days. Do not use with restores that specify
-     * OutputLocation.
+     * <p>Lifetime of the active copy in days. Do not use with restores that specify
+     * <code>OutputLocation</code>.</p> <p>The Days element is required for regular
+     * restores, and must not be provided for select requests.</p>
+     */
+    inline bool DaysHasBeenSet() const { return m_daysHasBeenSet; }
+
+    /**
+     * <p>Lifetime of the active copy in days. Do not use with restores that specify
+     * <code>OutputLocation</code>.</p> <p>The Days element is required for regular
+     * restores, and must not be provided for select requests.</p>
      */
     inline void SetDays(int value) { m_daysHasBeenSet = true; m_days = value; }
 
     /**
-     * Lifetime of the active copy in days. Do not use with restores that specify
-     * OutputLocation.
+     * <p>Lifetime of the active copy in days. Do not use with restores that specify
+     * <code>OutputLocation</code>.</p> <p>The Days element is required for regular
+     * restores, and must not be provided for select requests.</p>
      */
     inline RestoreRequest& WithDays(int value) { SetDays(value); return *this;}
 
 
     /**
-     * Glacier related parameters pertaining to this job. Do not use with restores that
-     * specify OutputLocation.
+     * <p>S3 Glacier related parameters pertaining to this job. Do not use with
+     * restores that specify <code>OutputLocation</code>.</p>
      */
     inline const GlacierJobParameters& GetGlacierJobParameters() const{ return m_glacierJobParameters; }
 
     /**
-     * Glacier related parameters pertaining to this job. Do not use with restores that
-     * specify OutputLocation.
+     * <p>S3 Glacier related parameters pertaining to this job. Do not use with
+     * restores that specify <code>OutputLocation</code>.</p>
+     */
+    inline bool GlacierJobParametersHasBeenSet() const { return m_glacierJobParametersHasBeenSet; }
+
+    /**
+     * <p>S3 Glacier related parameters pertaining to this job. Do not use with
+     * restores that specify <code>OutputLocation</code>.</p>
      */
     inline void SetGlacierJobParameters(const GlacierJobParameters& value) { m_glacierJobParametersHasBeenSet = true; m_glacierJobParameters = value; }
 
     /**
-     * Glacier related parameters pertaining to this job. Do not use with restores that
-     * specify OutputLocation.
+     * <p>S3 Glacier related parameters pertaining to this job. Do not use with
+     * restores that specify <code>OutputLocation</code>.</p>
      */
     inline void SetGlacierJobParameters(GlacierJobParameters&& value) { m_glacierJobParametersHasBeenSet = true; m_glacierJobParameters = std::move(value); }
 
     /**
-     * Glacier related parameters pertaining to this job. Do not use with restores that
-     * specify OutputLocation.
+     * <p>S3 Glacier related parameters pertaining to this job. Do not use with
+     * restores that specify <code>OutputLocation</code>.</p>
      */
     inline RestoreRequest& WithGlacierJobParameters(const GlacierJobParameters& value) { SetGlacierJobParameters(value); return *this;}
 
     /**
-     * Glacier related parameters pertaining to this job. Do not use with restores that
-     * specify OutputLocation.
+     * <p>S3 Glacier related parameters pertaining to this job. Do not use with
+     * restores that specify <code>OutputLocation</code>.</p>
      */
     inline RestoreRequest& WithGlacierJobParameters(GlacierJobParameters&& value) { SetGlacierJobParameters(std::move(value)); return *this;}
 
 
     /**
-     * Type of restore request.
+     * <p>Type of restore request.</p>
      */
     inline const RestoreRequestType& GetType() const{ return m_type; }
 
     /**
-     * Type of restore request.
+     * <p>Type of restore request.</p>
+     */
+    inline bool TypeHasBeenSet() const { return m_typeHasBeenSet; }
+
+    /**
+     * <p>Type of restore request.</p>
      */
     inline void SetType(const RestoreRequestType& value) { m_typeHasBeenSet = true; m_type = value; }
 
     /**
-     * Type of restore request.
+     * <p>Type of restore request.</p>
      */
     inline void SetType(RestoreRequestType&& value) { m_typeHasBeenSet = true; m_type = std::move(value); }
 
     /**
-     * Type of restore request.
+     * <p>Type of restore request.</p>
      */
     inline RestoreRequest& WithType(const RestoreRequestType& value) { SetType(value); return *this;}
 
     /**
-     * Type of restore request.
+     * <p>Type of restore request.</p>
      */
     inline RestoreRequest& WithType(RestoreRequestType&& value) { SetType(std::move(value)); return *this;}
 
 
     /**
-     * Glacier retrieval tier at which the restore will be processed.
+     * <p>Retrieval tier at which the restore will be processed.</p>
      */
     inline const Tier& GetTier() const{ return m_tier; }
 
     /**
-     * Glacier retrieval tier at which the restore will be processed.
+     * <p>Retrieval tier at which the restore will be processed.</p>
+     */
+    inline bool TierHasBeenSet() const { return m_tierHasBeenSet; }
+
+    /**
+     * <p>Retrieval tier at which the restore will be processed.</p>
      */
     inline void SetTier(const Tier& value) { m_tierHasBeenSet = true; m_tier = value; }
 
     /**
-     * Glacier retrieval tier at which the restore will be processed.
+     * <p>Retrieval tier at which the restore will be processed.</p>
      */
     inline void SetTier(Tier&& value) { m_tierHasBeenSet = true; m_tier = std::move(value); }
 
     /**
-     * Glacier retrieval tier at which the restore will be processed.
+     * <p>Retrieval tier at which the restore will be processed.</p>
      */
     inline RestoreRequest& WithTier(const Tier& value) { SetTier(value); return *this;}
 
     /**
-     * Glacier retrieval tier at which the restore will be processed.
+     * <p>Retrieval tier at which the restore will be processed.</p>
      */
     inline RestoreRequest& WithTier(Tier&& value) { SetTier(std::move(value)); return *this;}
 
 
     /**
-     * The optional description for the job.
+     * <p>The optional description for the job.</p>
      */
     inline const Aws::String& GetDescription() const{ return m_description; }
 
     /**
-     * The optional description for the job.
+     * <p>The optional description for the job.</p>
+     */
+    inline bool DescriptionHasBeenSet() const { return m_descriptionHasBeenSet; }
+
+    /**
+     * <p>The optional description for the job.</p>
      */
     inline void SetDescription(const Aws::String& value) { m_descriptionHasBeenSet = true; m_description = value; }
 
     /**
-     * The optional description for the job.
+     * <p>The optional description for the job.</p>
      */
     inline void SetDescription(Aws::String&& value) { m_descriptionHasBeenSet = true; m_description = std::move(value); }
 
     /**
-     * The optional description for the job.
+     * <p>The optional description for the job.</p>
      */
     inline void SetDescription(const char* value) { m_descriptionHasBeenSet = true; m_description.assign(value); }
 
     /**
-     * The optional description for the job.
+     * <p>The optional description for the job.</p>
      */
     inline RestoreRequest& WithDescription(const Aws::String& value) { SetDescription(value); return *this;}
 
     /**
-     * The optional description for the job.
+     * <p>The optional description for the job.</p>
      */
     inline RestoreRequest& WithDescription(Aws::String&& value) { SetDescription(std::move(value)); return *this;}
 
     /**
-     * The optional description for the job.
+     * <p>The optional description for the job.</p>
      */
     inline RestoreRequest& WithDescription(const char* value) { SetDescription(value); return *this;}
 
 
     /**
-     * Describes the parameters for Select job types.
+     * <p>Describes the parameters for Select job types.</p>
      */
     inline const SelectParameters& GetSelectParameters() const{ return m_selectParameters; }
 
     /**
-     * Describes the parameters for Select job types.
+     * <p>Describes the parameters for Select job types.</p>
+     */
+    inline bool SelectParametersHasBeenSet() const { return m_selectParametersHasBeenSet; }
+
+    /**
+     * <p>Describes the parameters for Select job types.</p>
      */
     inline void SetSelectParameters(const SelectParameters& value) { m_selectParametersHasBeenSet = true; m_selectParameters = value; }
 
     /**
-     * Describes the parameters for Select job types.
+     * <p>Describes the parameters for Select job types.</p>
      */
     inline void SetSelectParameters(SelectParameters&& value) { m_selectParametersHasBeenSet = true; m_selectParameters = std::move(value); }
 
     /**
-     * Describes the parameters for Select job types.
+     * <p>Describes the parameters for Select job types.</p>
      */
     inline RestoreRequest& WithSelectParameters(const SelectParameters& value) { SetSelectParameters(value); return *this;}
 
     /**
-     * Describes the parameters for Select job types.
+     * <p>Describes the parameters for Select job types.</p>
      */
     inline RestoreRequest& WithSelectParameters(SelectParameters&& value) { SetSelectParameters(std::move(value)); return *this;}
 
 
     /**
-     * Describes the location where the restore job's output is stored.
+     * <p>Describes the location where the restore job's output is stored.</p>
      */
     inline const OutputLocation& GetOutputLocation() const{ return m_outputLocation; }
 
     /**
-     * Describes the location where the restore job's output is stored.
+     * <p>Describes the location where the restore job's output is stored.</p>
+     */
+    inline bool OutputLocationHasBeenSet() const { return m_outputLocationHasBeenSet; }
+
+    /**
+     * <p>Describes the location where the restore job's output is stored.</p>
      */
     inline void SetOutputLocation(const OutputLocation& value) { m_outputLocationHasBeenSet = true; m_outputLocation = value; }
 
     /**
-     * Describes the location where the restore job's output is stored.
+     * <p>Describes the location where the restore job's output is stored.</p>
      */
     inline void SetOutputLocation(OutputLocation&& value) { m_outputLocationHasBeenSet = true; m_outputLocation = std::move(value); }
 
     /**
-     * Describes the location where the restore job's output is stored.
+     * <p>Describes the location where the restore job's output is stored.</p>
      */
     inline RestoreRequest& WithOutputLocation(const OutputLocation& value) { SetOutputLocation(value); return *this;}
 
     /**
-     * Describes the location where the restore job's output is stored.
+     * <p>Describes the location where the restore job's output is stored.</p>
      */
     inline RestoreRequest& WithOutputLocation(OutputLocation&& value) { SetOutputLocation(std::move(value)); return *this;}
 
   private:
 
     int m_days;
-    bool m_daysHasBeenSet;
+    bool m_daysHasBeenSet = false;
 
     GlacierJobParameters m_glacierJobParameters;
-    bool m_glacierJobParametersHasBeenSet;
+    bool m_glacierJobParametersHasBeenSet = false;
 
     RestoreRequestType m_type;
-    bool m_typeHasBeenSet;
+    bool m_typeHasBeenSet = false;
 
     Tier m_tier;
-    bool m_tierHasBeenSet;
+    bool m_tierHasBeenSet = false;
 
     Aws::String m_description;
-    bool m_descriptionHasBeenSet;
+    bool m_descriptionHasBeenSet = false;
 
     SelectParameters m_selectParameters;
-    bool m_selectParametersHasBeenSet;
+    bool m_selectParametersHasBeenSet = false;
 
     OutputLocation m_outputLocation;
-    bool m_outputLocationHasBeenSet;
+    bool m_outputLocationHasBeenSet = false;
   };
 
 } // namespace Model

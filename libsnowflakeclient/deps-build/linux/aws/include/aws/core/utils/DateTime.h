@@ -1,17 +1,7 @@
-/*
-  * Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License").
-  * You may not use this file except in compliance with the License.
-  * A copy of the License is located at
-  *
-  *  http://aws.amazon.com/apache2.0
-  *
-  * or in the "license" file accompanying this file. This file is distributed
-  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-  * express or implied. See the License for the specific language governing
-  * permissions and limitations under the License.
-  */
+/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 
@@ -27,6 +17,7 @@ namespace Aws
         {
             RFC822, //for http headers
             ISO_8601, //for query and xml payloads
+            ISO_8601_BASIC, // for retry headers and signers
             AutoDetect
         };
 
@@ -58,7 +49,7 @@ namespace Aws
         };
 
         /**
-         * Wrapper for all the weird crap we need to do with timestamps. 
+         * Wrapper for timestamp functionality.
          */
         class AWS_CORE_API DateTime
         {
@@ -69,19 +60,21 @@ namespace Aws
             DateTime();
 
             /**
-            *  Initializes time point to any other arbirtrary timepoint
+            *  Initializes time point to any other arbitrary timepoint
             */
             DateTime(const std::chrono::system_clock::time_point& timepointToAssign);
 
             /**
-             * Initializes time point to millis Since epoch   
+             * Initializes time point to millis Since epoch
              */
             DateTime(int64_t millisSinceEpoch);
 
             /**
-             * Initializes time point to epoch time in seconds.millis
+             * Initializes time point to epoch time in seconds with a millis mantissa,
+             *
+             * i.e. 1.1 would be 1100 milliseconds
              */
-            DateTime(double epoch_millis);
+            DateTime(double secondsSinceEpoch);
 
             /**
              * Initializes time point to value represented by timestamp and format.
@@ -102,9 +95,11 @@ namespace Aws
 
             DateTime operator+(const std::chrono::milliseconds& a) const;
             DateTime operator-(const std::chrono::milliseconds& a) const;
-            
+
             /**
-             * Assign from seconds.millis since epoch.
+             * Initializes time point to epoch time in seconds with a millis mantissa,
+             *
+             * i.e. 1.1 would be 1100 milliseconds
              */
             DateTime& operator=(double secondsSinceEpoch);
 
@@ -119,9 +114,14 @@ namespace Aws
             DateTime& operator=(const std::chrono::system_clock::time_point& timepointToAssign);
 
             /**
+             * Assign from an ISO8601 or RFC822 formatted string
+             */
+            DateTime& operator=(const Aws::String& timestamp);
+
+            /**
              * Whether or not parsing the timestamp from string was successful.
              */
-            inline bool WasParseSuccessful() { return m_valid; }
+            inline bool WasParseSuccessful() const { return m_valid; }
 
             /**
              * Convert dateTime to local time string using predefined format.
@@ -144,9 +144,21 @@ namespace Aws
             Aws::String ToGmtString(const char* formatStr) const;
 
             /**
-             * Get the representation of this datetime as seconds.milliseconds since epoch
+            * Convert dateTime to GMT time string using predefined format.
+            */
+            Aws::String ToGmtStringWithMs() const;
+
+            /**
+             * Get the representation of this datetime as seconds with a millis mantissa since epoch
+             *
+             * i.e. 1.1 would be 1100 milliseconds
              */
             double SecondsWithMSPrecision() const;
+
+            /**
+             * Get the seconds without millisecond precision.
+             */
+            int64_t Seconds() const;
 
             /**
              * Milliseconds since epoch of this datetime.
@@ -201,8 +213,8 @@ namespace Aws
             /**
              * Get an instance of DateTime representing this very instant.
              */
-            static DateTime Now(); 
-            
+            static DateTime Now();
+
             /**
              * Get the millis since epoch representing this very instant.
              */
@@ -229,18 +241,25 @@ namespace Aws
             static double ComputeCurrentTimestampInAmazonFormat();
 
             /**
+             * Calculates the current time in GMT with millisecond precision using the format
+             * "Year-month-day hours:minutes:seconds.milliseconds"
+             */
+            static Aws::String CalculateGmtTimeWithMsPrecision();
+
+            /**
              * Compute the difference between two timestamps.
              */
             static std::chrono::milliseconds Diff(const DateTime& a, const DateTime& b);
 
+            std::chrono::milliseconds operator - (const DateTime& other) const;
         private:
             std::chrono::system_clock::time_point m_time;
             bool m_valid;
-                        
+
             void ConvertTimestampStringToTimePoint(const char* timestamp, DateFormat format);
             tm GetTimeStruct(bool localTime) const;
             tm ConvertTimestampToLocalTimeStruct() const;
-            tm ConvertTimestampToGmtStruct() const;   
+            tm ConvertTimestampToGmtStruct() const;
         };
 
     } // namespace Utils
