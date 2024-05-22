@@ -115,7 +115,7 @@ static PHP_GINIT_FUNCTION(pdo_snowflake) {
 #endif
 #endif
     pdo_snowflake_globals->logdir = NULL;
-    pdo_snowflake_globals->loglevel = "DEBUG";
+    pdo_snowflake_globals->loglevel = "FATAL";
     pdo_snowflake_globals->cacert = NULL;
     pdo_snowflake_globals->debug = NULL;
 }
