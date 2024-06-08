@@ -1,17 +1,7 @@
-/*
-  * Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License").
-  * You may not use this file except in compliance with the License.
-  * A copy of the License is located at
-  *
-  *  http://aws.amazon.com/apache2.0
-  *
-  * or in the "license" file accompanying this file. This file is distributed
-  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-  * express or implied. See the License for the specific language governing
-  * permissions and limitations under the License.
-  */
+/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 
@@ -44,6 +34,8 @@ namespace Aws
                 virtual HeaderValueCollection GetHeaders() const override;
                 /**
                  * Get the value for a Header based on its name.
+                 * This function doesn't check the existence of headerName.
+                 * So make sure you call HasHeader() first before calling this function, otherwise the behavior is undefined.
                  */                
                 virtual const Aws::String& GetHeaderValue(const char* headerName) const override;
                 /**
@@ -71,7 +63,7 @@ namespace Aws
                  */
                 virtual bool HasHeader(const char*) const override;
                 /**
-                 * Get size in bytes of the request when as it will be going accross the wire.
+                 * Get size in bytes of the request when as it will be going across the wire.
                  */
                 virtual int64_t GetSize() const override;
                 /**

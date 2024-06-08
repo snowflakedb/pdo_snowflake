@@ -1,17 +1,7 @@
-/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 
@@ -19,6 +9,54 @@
 
 namespace Aws
 {
+    namespace Crt
+    {
+        class ApiHandle;
+
+        namespace Io
+        {
+            class ClientBootstrap;
+            class TlsConnectionOptions;
+
+        }
+    }
+
+    /**
+     * Like we need to call InitAPI() to initialize aws-sdk-cpp, we need ApiHandle to initialize aws-crt-cpp, which is a wrapper of a collection of common runtime libraries.
+     * We will wrap the memory management system and pass it to common runtime libraries via ApiHandle.
+     */
+    AWS_CORE_API Aws::Crt::ApiHandle* GetApiHandle();
+
+    /**
+     * Set the default ClientBootStrap for AWS common runtime libraries in the global scope.
+     */
+    AWS_CORE_API void SetDefaultClientBootstrap(const std::shared_ptr<Aws::Crt::Io::ClientBootstrap>& clientBootstrap);
+
+    /**
+     * Get the default ClientBootStrap for AWS common runtime libraries in the global scope.
+     */
+    AWS_CORE_API Aws::Crt::Io::ClientBootstrap* GetDefaultClientBootstrap();
+
+    /**
+     * Set the default TlsConnectionOptions for AWS common runtime libraries in the global scope.
+     */
+    AWS_CORE_API void SetDefaultTlsConnectionOptions(const std::shared_ptr<Aws::Crt::Io::TlsConnectionOptions>& tlsConnectionOptions);
+
+    /**
+     * Get the default TlsConnectionOptions for AWS common runtime libraries in the global scope.
+     */
+    AWS_CORE_API Aws::Crt::Io::TlsConnectionOptions* GetDefaultTlsConnectionOptions();
+
+    /**
+     * Initialize ApiHandle in aws-crt-cpp.
+     */
+    void InitializeCrt();
+
+    /**
+     * Clean up ApiHandle in aws-crt-cpp.
+     */
+    void CleanupCrt();
+
     namespace Utils
     {
         class EnumParseOverflowContainer;
@@ -26,13 +64,20 @@ namespace Aws
     /**
      * This is used to handle the Enum round tripping problem
      * for when a service updates their enumerations, but the user does not
-     * have an up to date client. This member will be initialized the first time a client
-     * is created and will be cleaned up when the last client goes out of scope.
+     * have an up to date client. This container will be initialized during Aws::InitAPI
+     * and will be cleaned on Aws::ShutdownAPI.
      */
     AWS_CORE_API Utils::EnumParseOverflowContainer* GetEnumOverflowContainer();
 
     /**
-     * Atomically set the underlying container to newValue, if it's current value is expectedValue.
+     * Initializes a global overflow container to a new instance.
+     * This should only be called once from within Aws::InitAPI
      */
-    AWS_CORE_API bool CheckAndSwapEnumOverflowContainer(Utils::EnumParseOverflowContainer* expectedValue, Utils::EnumParseOverflowContainer* newValue);
+    void InitializeEnumOverflowContainer();
+
+    /**
+     * Destroys the global overflow container instance.
+     * This should only be called once from within Aws::ShutdownAPI
+     */
+    void CleanupEnumOverflowContainer();
 }

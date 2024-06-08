@@ -1,16 +1,6 @@
-/*
- * Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- *  http://aws.amazon.com/apache2.0
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
+/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
  */
 
 #pragma once
@@ -19,10 +9,13 @@
 #include <aws/core/utils/UnreferencedParam.h>
 #include <aws/core/utils/memory/MemorySystemInterface.h>
 
+#include <assert.h>
 #include <memory>
 #include <cstdlib>
 #include <algorithm>
 #include <type_traits>
+
+struct aws_allocator;
 
 namespace Aws
 {
@@ -59,6 +52,8 @@ namespace Aws
      *  use these functions instead or Aws::MakeShared
      */
     AWS_CORE_API void Free(void* memoryPtr);
+
+    AWS_CORE_API aws_allocator* get_aws_allocator();
 
     /**
      * ::new, ::delete, ::malloc, ::free, std::make_shared, and std::make_unique should not be used in SDK code
@@ -252,7 +247,50 @@ namespace Aws
         }
     };
 
-    template< typename T > using UniquePtr = std::unique_ptr< T, Deleter< T > >;
+    template< typename T, typename D = Deleter< T > > using UniquePtr = std::unique_ptr< T, D >;
+
+    /*
+     * A UniquePtr that ensures that underlying pointer is set to null on destruction.
+     *   ...thanks to the legacy design, UniquePtr is used as a static global variable that may be destructed twice.
+     */
+    template< typename T, typename D = Deleter< T > >
+    class UniquePtrSafeDeleted : public UniquePtr< T, D >
+    {
+    public:
+        using UniquePtr<T,D>::UniquePtr;
+        UniquePtrSafeDeleted(const UniquePtrSafeDeleted&) noexcept = delete;
+        UniquePtrSafeDeleted(UniquePtrSafeDeleted&&) noexcept = default;
+        UniquePtrSafeDeleted& operator=( const UniquePtrSafeDeleted<T,D>& r ) noexcept = delete;
+        UniquePtrSafeDeleted& operator=( UniquePtrSafeDeleted<T,D>&& r ) noexcept
+        {
+            if(&r != this) {
+                UniquePtr<T, D>::operator=(std::move(r));
+                r.forceReset();
+            }
+            return *this;
+        }
+        UniquePtrSafeDeleted& operator=( std::nullptr_t ) noexcept
+        {
+            forceReset();
+            return *this;
+        }
+
+        void forceReset()
+        {
+            if(!this->get())
+                return;
+            this->reset(nullptr);
+            T volatile* newVal = this->get();  // volatile to prohibit optimizing out setting ptr to null
+            AWS_UNREFERENCED_PARAM(newVal);
+            // issue happens in Release where asserts are not enabled, so the next statement is for you, my dear reader
+            assert(newVal == nullptr && this->get() == nullptr);
+        }
+
+        ~UniquePtrSafeDeleted()
+        {
+            forceReset();
+        }
+    };
 
     /**
      * ::new, ::delete, ::malloc, ::free, std::make_shared, and std::make_unique should not be used in SDK code
@@ -261,7 +299,18 @@ namespace Aws
     template<typename T, typename ...ArgTypes>
     UniquePtr<T> MakeUnique(const char* allocationTag, ArgTypes&&... args)
     {
+        static_assert(!std::is_array<T>::value || std::is_trivial<T>::value,
+                "This wrapper/function is not designed to support non-trivial arrays.");
         return UniquePtr<T>(Aws::New<T>(allocationTag, std::forward<ArgTypes>(args)...));
+    }
+
+    template<typename T, typename D = Deleter<T>, typename ...ArgTypes>
+    UniquePtrSafeDeleted<T, D> MakeUniqueSafeDeleted(const char* allocationTag, ArgTypes&&... args)
+    {
+        static_assert(!std::is_array<T>::value || std::is_trivial<T>::value,
+                      "This wrapper/function is not designed to support non-trivial arrays.");
+
+        return UniquePtrSafeDeleted<T, D>(Aws::New<T>(allocationTag, std::forward<ArgTypes>(args)...), D());
     }
 
     template<typename T>
@@ -292,7 +341,6 @@ namespace Aws
     {
         return UniqueArrayPtr<T>(Aws::NewArray<T>(amount, allocationTag, std::forward<ArgTypes>(args)...));
     }
-
 
 } // namespace Aws
 

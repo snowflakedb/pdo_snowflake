@@ -1,22 +1,13 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
 #include <aws/core/utils/memory/stl/AWSString.h>
 #include <aws/core/utils/memory/stl/AWSVector.h>
+#include <aws/s3/model/TargetObjectKeyFormat.h>
 #include <aws/s3/model/TargetGrant.h>
 #include <utility>
 
@@ -34,161 +25,279 @@ namespace S3
 namespace Model
 {
 
-  class AWS_S3_API LoggingEnabled
+  /**
+   * <p>Describes where logs are stored and the prefix that Amazon S3 assigns to all
+   * log object keys for a bucket. For more information, see <a
+   * href="https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTlogging.html">PUT
+   * Bucket logging</a> in the <i>Amazon S3 API Reference</i>.</p><p><h3>See
+   * Also:</h3>   <a
+   * href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/LoggingEnabled">AWS
+   * API Reference</a></p>
+   */
+  class LoggingEnabled
   {
   public:
-    LoggingEnabled();
-    LoggingEnabled(const Aws::Utils::Xml::XmlNode& xmlNode);
-    LoggingEnabled& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API LoggingEnabled();
+    AWS_S3_API LoggingEnabled(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API LoggingEnabled& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
 
-    void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
+    AWS_S3_API void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
 
 
     /**
-     * Specifies the bucket where you want Amazon S3 to store server access logs. You
-     * can have your logs delivered to any bucket that you own, including the same
+     * <p>Specifies the bucket where you want Amazon S3 to store server access logs.
+     * You can have your logs delivered to any bucket that you own, including the same
      * bucket that is being logged. You can also configure multiple buckets to deliver
-     * their logs to the same target bucket. In this case you should choose a different
-     * TargetPrefix for each source bucket so that the delivered log files can be
-     * distinguished by key.
+     * their logs to the same target bucket. In this case, you should choose a
+     * different <code>TargetPrefix</code> for each source bucket so that the delivered
+     * log files can be distinguished by key.</p>
      */
     inline const Aws::String& GetTargetBucket() const{ return m_targetBucket; }
 
     /**
-     * Specifies the bucket where you want Amazon S3 to store server access logs. You
-     * can have your logs delivered to any bucket that you own, including the same
+     * <p>Specifies the bucket where you want Amazon S3 to store server access logs.
+     * You can have your logs delivered to any bucket that you own, including the same
      * bucket that is being logged. You can also configure multiple buckets to deliver
-     * their logs to the same target bucket. In this case you should choose a different
-     * TargetPrefix for each source bucket so that the delivered log files can be
-     * distinguished by key.
+     * their logs to the same target bucket. In this case, you should choose a
+     * different <code>TargetPrefix</code> for each source bucket so that the delivered
+     * log files can be distinguished by key.</p>
+     */
+    inline bool TargetBucketHasBeenSet() const { return m_targetBucketHasBeenSet; }
+
+    /**
+     * <p>Specifies the bucket where you want Amazon S3 to store server access logs.
+     * You can have your logs delivered to any bucket that you own, including the same
+     * bucket that is being logged. You can also configure multiple buckets to deliver
+     * their logs to the same target bucket. In this case, you should choose a
+     * different <code>TargetPrefix</code> for each source bucket so that the delivered
+     * log files can be distinguished by key.</p>
      */
     inline void SetTargetBucket(const Aws::String& value) { m_targetBucketHasBeenSet = true; m_targetBucket = value; }
 
     /**
-     * Specifies the bucket where you want Amazon S3 to store server access logs. You
-     * can have your logs delivered to any bucket that you own, including the same
+     * <p>Specifies the bucket where you want Amazon S3 to store server access logs.
+     * You can have your logs delivered to any bucket that you own, including the same
      * bucket that is being logged. You can also configure multiple buckets to deliver
-     * their logs to the same target bucket. In this case you should choose a different
-     * TargetPrefix for each source bucket so that the delivered log files can be
-     * distinguished by key.
+     * their logs to the same target bucket. In this case, you should choose a
+     * different <code>TargetPrefix</code> for each source bucket so that the delivered
+     * log files can be distinguished by key.</p>
      */
     inline void SetTargetBucket(Aws::String&& value) { m_targetBucketHasBeenSet = true; m_targetBucket = std::move(value); }
 
     /**
-     * Specifies the bucket where you want Amazon S3 to store server access logs. You
-     * can have your logs delivered to any bucket that you own, including the same
+     * <p>Specifies the bucket where you want Amazon S3 to store server access logs.
+     * You can have your logs delivered to any bucket that you own, including the same
      * bucket that is being logged. You can also configure multiple buckets to deliver
-     * their logs to the same target bucket. In this case you should choose a different
-     * TargetPrefix for each source bucket so that the delivered log files can be
-     * distinguished by key.
+     * their logs to the same target bucket. In this case, you should choose a
+     * different <code>TargetPrefix</code> for each source bucket so that the delivered
+     * log files can be distinguished by key.</p>
      */
     inline void SetTargetBucket(const char* value) { m_targetBucketHasBeenSet = true; m_targetBucket.assign(value); }
 
     /**
-     * Specifies the bucket where you want Amazon S3 to store server access logs. You
-     * can have your logs delivered to any bucket that you own, including the same
+     * <p>Specifies the bucket where you want Amazon S3 to store server access logs.
+     * You can have your logs delivered to any bucket that you own, including the same
      * bucket that is being logged. You can also configure multiple buckets to deliver
-     * their logs to the same target bucket. In this case you should choose a different
-     * TargetPrefix for each source bucket so that the delivered log files can be
-     * distinguished by key.
+     * their logs to the same target bucket. In this case, you should choose a
+     * different <code>TargetPrefix</code> for each source bucket so that the delivered
+     * log files can be distinguished by key.</p>
      */
     inline LoggingEnabled& WithTargetBucket(const Aws::String& value) { SetTargetBucket(value); return *this;}
 
     /**
-     * Specifies the bucket where you want Amazon S3 to store server access logs. You
-     * can have your logs delivered to any bucket that you own, including the same
+     * <p>Specifies the bucket where you want Amazon S3 to store server access logs.
+     * You can have your logs delivered to any bucket that you own, including the same
      * bucket that is being logged. You can also configure multiple buckets to deliver
-     * their logs to the same target bucket. In this case you should choose a different
-     * TargetPrefix for each source bucket so that the delivered log files can be
-     * distinguished by key.
+     * their logs to the same target bucket. In this case, you should choose a
+     * different <code>TargetPrefix</code> for each source bucket so that the delivered
+     * log files can be distinguished by key.</p>
      */
     inline LoggingEnabled& WithTargetBucket(Aws::String&& value) { SetTargetBucket(std::move(value)); return *this;}
 
     /**
-     * Specifies the bucket where you want Amazon S3 to store server access logs. You
-     * can have your logs delivered to any bucket that you own, including the same
+     * <p>Specifies the bucket where you want Amazon S3 to store server access logs.
+     * You can have your logs delivered to any bucket that you own, including the same
      * bucket that is being logged. You can also configure multiple buckets to deliver
-     * their logs to the same target bucket. In this case you should choose a different
-     * TargetPrefix for each source bucket so that the delivered log files can be
-     * distinguished by key.
+     * their logs to the same target bucket. In this case, you should choose a
+     * different <code>TargetPrefix</code> for each source bucket so that the delivered
+     * log files can be distinguished by key.</p>
      */
     inline LoggingEnabled& WithTargetBucket(const char* value) { SetTargetBucket(value); return *this;}
 
 
-    
+    /**
+     * <p>Container for granting information.</p> <p>Buckets that use the bucket owner
+     * enforced setting for Object Ownership don't support target grants. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html#grant-log-delivery-permissions-general">Permissions
+     * for server access log delivery</a> in the <i>Amazon S3 User Guide</i>.</p>
+     */
     inline const Aws::Vector<TargetGrant>& GetTargetGrants() const{ return m_targetGrants; }
 
-    
+    /**
+     * <p>Container for granting information.</p> <p>Buckets that use the bucket owner
+     * enforced setting for Object Ownership don't support target grants. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html#grant-log-delivery-permissions-general">Permissions
+     * for server access log delivery</a> in the <i>Amazon S3 User Guide</i>.</p>
+     */
+    inline bool TargetGrantsHasBeenSet() const { return m_targetGrantsHasBeenSet; }
+
+    /**
+     * <p>Container for granting information.</p> <p>Buckets that use the bucket owner
+     * enforced setting for Object Ownership don't support target grants. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html#grant-log-delivery-permissions-general">Permissions
+     * for server access log delivery</a> in the <i>Amazon S3 User Guide</i>.</p>
+     */
     inline void SetTargetGrants(const Aws::Vector<TargetGrant>& value) { m_targetGrantsHasBeenSet = true; m_targetGrants = value; }
 
-    
+    /**
+     * <p>Container for granting information.</p> <p>Buckets that use the bucket owner
+     * enforced setting for Object Ownership don't support target grants. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html#grant-log-delivery-permissions-general">Permissions
+     * for server access log delivery</a> in the <i>Amazon S3 User Guide</i>.</p>
+     */
     inline void SetTargetGrants(Aws::Vector<TargetGrant>&& value) { m_targetGrantsHasBeenSet = true; m_targetGrants = std::move(value); }
 
-    
+    /**
+     * <p>Container for granting information.</p> <p>Buckets that use the bucket owner
+     * enforced setting for Object Ownership don't support target grants. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html#grant-log-delivery-permissions-general">Permissions
+     * for server access log delivery</a> in the <i>Amazon S3 User Guide</i>.</p>
+     */
     inline LoggingEnabled& WithTargetGrants(const Aws::Vector<TargetGrant>& value) { SetTargetGrants(value); return *this;}
 
-    
+    /**
+     * <p>Container for granting information.</p> <p>Buckets that use the bucket owner
+     * enforced setting for Object Ownership don't support target grants. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html#grant-log-delivery-permissions-general">Permissions
+     * for server access log delivery</a> in the <i>Amazon S3 User Guide</i>.</p>
+     */
     inline LoggingEnabled& WithTargetGrants(Aws::Vector<TargetGrant>&& value) { SetTargetGrants(std::move(value)); return *this;}
 
-    
+    /**
+     * <p>Container for granting information.</p> <p>Buckets that use the bucket owner
+     * enforced setting for Object Ownership don't support target grants. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html#grant-log-delivery-permissions-general">Permissions
+     * for server access log delivery</a> in the <i>Amazon S3 User Guide</i>.</p>
+     */
     inline LoggingEnabled& AddTargetGrants(const TargetGrant& value) { m_targetGrantsHasBeenSet = true; m_targetGrants.push_back(value); return *this; }
 
-    
+    /**
+     * <p>Container for granting information.</p> <p>Buckets that use the bucket owner
+     * enforced setting for Object Ownership don't support target grants. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-server-access-logging.html#grant-log-delivery-permissions-general">Permissions
+     * for server access log delivery</a> in the <i>Amazon S3 User Guide</i>.</p>
+     */
     inline LoggingEnabled& AddTargetGrants(TargetGrant&& value) { m_targetGrantsHasBeenSet = true; m_targetGrants.push_back(std::move(value)); return *this; }
 
 
     /**
-     * This element lets you specify a prefix for the keys that the log files will be
-     * stored under.
+     * <p>A prefix for all log object keys. If you store log files from multiple Amazon
+     * S3 buckets in a single bucket, you can use a prefix to distinguish which log
+     * files came from which bucket.</p>
      */
     inline const Aws::String& GetTargetPrefix() const{ return m_targetPrefix; }
 
     /**
-     * This element lets you specify a prefix for the keys that the log files will be
-     * stored under.
+     * <p>A prefix for all log object keys. If you store log files from multiple Amazon
+     * S3 buckets in a single bucket, you can use a prefix to distinguish which log
+     * files came from which bucket.</p>
+     */
+    inline bool TargetPrefixHasBeenSet() const { return m_targetPrefixHasBeenSet; }
+
+    /**
+     * <p>A prefix for all log object keys. If you store log files from multiple Amazon
+     * S3 buckets in a single bucket, you can use a prefix to distinguish which log
+     * files came from which bucket.</p>
      */
     inline void SetTargetPrefix(const Aws::String& value) { m_targetPrefixHasBeenSet = true; m_targetPrefix = value; }
 
     /**
-     * This element lets you specify a prefix for the keys that the log files will be
-     * stored under.
+     * <p>A prefix for all log object keys. If you store log files from multiple Amazon
+     * S3 buckets in a single bucket, you can use a prefix to distinguish which log
+     * files came from which bucket.</p>
      */
     inline void SetTargetPrefix(Aws::String&& value) { m_targetPrefixHasBeenSet = true; m_targetPrefix = std::move(value); }
 
     /**
-     * This element lets you specify a prefix for the keys that the log files will be
-     * stored under.
+     * <p>A prefix for all log object keys. If you store log files from multiple Amazon
+     * S3 buckets in a single bucket, you can use a prefix to distinguish which log
+     * files came from which bucket.</p>
      */
     inline void SetTargetPrefix(const char* value) { m_targetPrefixHasBeenSet = true; m_targetPrefix.assign(value); }
 
     /**
-     * This element lets you specify a prefix for the keys that the log files will be
-     * stored under.
+     * <p>A prefix for all log object keys. If you store log files from multiple Amazon
+     * S3 buckets in a single bucket, you can use a prefix to distinguish which log
+     * files came from which bucket.</p>
      */
     inline LoggingEnabled& WithTargetPrefix(const Aws::String& value) { SetTargetPrefix(value); return *this;}
 
     /**
-     * This element lets you specify a prefix for the keys that the log files will be
-     * stored under.
+     * <p>A prefix for all log object keys. If you store log files from multiple Amazon
+     * S3 buckets in a single bucket, you can use a prefix to distinguish which log
+     * files came from which bucket.</p>
      */
     inline LoggingEnabled& WithTargetPrefix(Aws::String&& value) { SetTargetPrefix(std::move(value)); return *this;}
 
     /**
-     * This element lets you specify a prefix for the keys that the log files will be
-     * stored under.
+     * <p>A prefix for all log object keys. If you store log files from multiple Amazon
+     * S3 buckets in a single bucket, you can use a prefix to distinguish which log
+     * files came from which bucket.</p>
      */
     inline LoggingEnabled& WithTargetPrefix(const char* value) { SetTargetPrefix(value); return *this;}
+
+
+    /**
+     * <p>Amazon S3 key format for log objects.</p>
+     */
+    inline const TargetObjectKeyFormat& GetTargetObjectKeyFormat() const{ return m_targetObjectKeyFormat; }
+
+    /**
+     * <p>Amazon S3 key format for log objects.</p>
+     */
+    inline bool TargetObjectKeyFormatHasBeenSet() const { return m_targetObjectKeyFormatHasBeenSet; }
+
+    /**
+     * <p>Amazon S3 key format for log objects.</p>
+     */
+    inline void SetTargetObjectKeyFormat(const TargetObjectKeyFormat& value) { m_targetObjectKeyFormatHasBeenSet = true; m_targetObjectKeyFormat = value; }
+
+    /**
+     * <p>Amazon S3 key format for log objects.</p>
+     */
+    inline void SetTargetObjectKeyFormat(TargetObjectKeyFormat&& value) { m_targetObjectKeyFormatHasBeenSet = true; m_targetObjectKeyFormat = std::move(value); }
+
+    /**
+     * <p>Amazon S3 key format for log objects.</p>
+     */
+    inline LoggingEnabled& WithTargetObjectKeyFormat(const TargetObjectKeyFormat& value) { SetTargetObjectKeyFormat(value); return *this;}
+
+    /**
+     * <p>Amazon S3 key format for log objects.</p>
+     */
+    inline LoggingEnabled& WithTargetObjectKeyFormat(TargetObjectKeyFormat&& value) { SetTargetObjectKeyFormat(std::move(value)); return *this;}
 
   private:
 
     Aws::String m_targetBucket;
-    bool m_targetBucketHasBeenSet;
+    bool m_targetBucketHasBeenSet = false;
 
     Aws::Vector<TargetGrant> m_targetGrants;
-    bool m_targetGrantsHasBeenSet;
+    bool m_targetGrantsHasBeenSet = false;
 
     Aws::String m_targetPrefix;
-    bool m_targetPrefixHasBeenSet;
+    bool m_targetPrefixHasBeenSet = false;
+
+    TargetObjectKeyFormat m_targetObjectKeyFormat;
+    bool m_targetObjectKeyFormatHasBeenSet = false;
   };
 
 } // namespace Model

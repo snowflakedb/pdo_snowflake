@@ -1,23 +1,14 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
 #include <aws/s3/model/Owner.h>
 #include <aws/core/utils/memory/stl/AWSVector.h>
 #include <aws/s3/model/RequestCharged.h>
+#include <aws/core/utils/memory/stl/AWSString.h>
 #include <aws/s3/model/Grant.h>
 #include <utility>
 
@@ -37,62 +28,72 @@ namespace S3
 {
 namespace Model
 {
-  class AWS_S3_API GetObjectAclResult
+  class GetObjectAclResult
   {
   public:
-    GetObjectAclResult();
-    GetObjectAclResult(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
-    GetObjectAclResult& operator=(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
+    AWS_S3_API GetObjectAclResult();
+    AWS_S3_API GetObjectAclResult(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
+    AWS_S3_API GetObjectAclResult& operator=(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
 
 
-    
+    /**
+     * <p> Container for the bucket owner's display name and ID.</p>
+     */
     inline const Owner& GetOwner() const{ return m_owner; }
 
-    
+    /**
+     * <p> Container for the bucket owner's display name and ID.</p>
+     */
     inline void SetOwner(const Owner& value) { m_owner = value; }
 
-    
+    /**
+     * <p> Container for the bucket owner's display name and ID.</p>
+     */
     inline void SetOwner(Owner&& value) { m_owner = std::move(value); }
 
-    
+    /**
+     * <p> Container for the bucket owner's display name and ID.</p>
+     */
     inline GetObjectAclResult& WithOwner(const Owner& value) { SetOwner(value); return *this;}
 
-    
+    /**
+     * <p> Container for the bucket owner's display name and ID.</p>
+     */
     inline GetObjectAclResult& WithOwner(Owner&& value) { SetOwner(std::move(value)); return *this;}
 
 
     /**
-     * A list of grants.
+     * <p>A list of grants.</p>
      */
     inline const Aws::Vector<Grant>& GetGrants() const{ return m_grants; }
 
     /**
-     * A list of grants.
+     * <p>A list of grants.</p>
      */
     inline void SetGrants(const Aws::Vector<Grant>& value) { m_grants = value; }
 
     /**
-     * A list of grants.
+     * <p>A list of grants.</p>
      */
     inline void SetGrants(Aws::Vector<Grant>&& value) { m_grants = std::move(value); }
 
     /**
-     * A list of grants.
+     * <p>A list of grants.</p>
      */
     inline GetObjectAclResult& WithGrants(const Aws::Vector<Grant>& value) { SetGrants(value); return *this;}
 
     /**
-     * A list of grants.
+     * <p>A list of grants.</p>
      */
     inline GetObjectAclResult& WithGrants(Aws::Vector<Grant>&& value) { SetGrants(std::move(value)); return *this;}
 
     /**
-     * A list of grants.
+     * <p>A list of grants.</p>
      */
     inline GetObjectAclResult& AddGrants(const Grant& value) { m_grants.push_back(value); return *this; }
 
     /**
-     * A list of grants.
+     * <p>A list of grants.</p>
      */
     inline GetObjectAclResult& AddGrants(Grant&& value) { m_grants.push_back(std::move(value)); return *this; }
 
@@ -112,6 +113,28 @@ namespace Model
     
     inline GetObjectAclResult& WithRequestCharged(RequestCharged&& value) { SetRequestCharged(std::move(value)); return *this;}
 
+
+    
+    inline const Aws::String& GetRequestId() const{ return m_requestId; }
+
+    
+    inline void SetRequestId(const Aws::String& value) { m_requestId = value; }
+
+    
+    inline void SetRequestId(Aws::String&& value) { m_requestId = std::move(value); }
+
+    
+    inline void SetRequestId(const char* value) { m_requestId.assign(value); }
+
+    
+    inline GetObjectAclResult& WithRequestId(const Aws::String& value) { SetRequestId(value); return *this;}
+
+    
+    inline GetObjectAclResult& WithRequestId(Aws::String&& value) { SetRequestId(std::move(value)); return *this;}
+
+    
+    inline GetObjectAclResult& WithRequestId(const char* value) { SetRequestId(value); return *this;}
+
   private:
 
     Owner m_owner;
@@ -119,6 +142,8 @@ namespace Model
     Aws::Vector<Grant> m_grants;
 
     RequestCharged m_requestCharged;
+
+    Aws::String m_requestId;
   };
 
 } // namespace Model

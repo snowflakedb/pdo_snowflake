@@ -1,17 +1,7 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
@@ -34,23 +24,26 @@ namespace Model
 {
 
   /**
-   * Container for object key name prefix and suffix filtering rules.<p><h3>See
-   * Also:</h3>   <a
+   * <p>A container for object key name prefix and suffix filtering
+   * rules.</p><p><h3>See Also:</h3>   <a
    * href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/S3KeyFilter">AWS API
    * Reference</a></p>
    */
-  class AWS_S3_API S3KeyFilter
+  class S3KeyFilter
   {
   public:
-    S3KeyFilter();
-    S3KeyFilter(const Aws::Utils::Xml::XmlNode& xmlNode);
-    S3KeyFilter& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API S3KeyFilter();
+    AWS_S3_API S3KeyFilter(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API S3KeyFilter& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
 
-    void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
+    AWS_S3_API void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
 
 
     
     inline const Aws::Vector<FilterRule>& GetFilterRules() const{ return m_filterRules; }
+
+    
+    inline bool FilterRulesHasBeenSet() const { return m_filterRulesHasBeenSet; }
 
     
     inline void SetFilterRules(const Aws::Vector<FilterRule>& value) { m_filterRulesHasBeenSet = true; m_filterRules = value; }
@@ -73,7 +66,7 @@ namespace Model
   private:
 
     Aws::Vector<FilterRule> m_filterRules;
-    bool m_filterRulesHasBeenSet;
+    bool m_filterRulesHasBeenSet = false;
   };
 
 } // namespace Model

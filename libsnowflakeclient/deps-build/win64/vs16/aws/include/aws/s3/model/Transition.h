@@ -1,17 +1,7 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
@@ -33,101 +23,127 @@ namespace S3
 namespace Model
 {
 
-  class AWS_S3_API Transition
+  /**
+   * <p>Specifies when an object transitions to a specified storage class. For more
+   * information about Amazon S3 lifecycle configuration rules, see <a
+   * href="https://docs.aws.amazon.com/AmazonS3/latest/dev/lifecycle-transition-general-considerations.html">Transitioning
+   * Objects Using Amazon S3 Lifecycle</a> in the <i>Amazon S3 User
+   * Guide</i>.</p><p><h3>See Also:</h3>   <a
+   * href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Transition">AWS API
+   * Reference</a></p>
+   */
+  class Transition
   {
   public:
-    Transition();
-    Transition(const Aws::Utils::Xml::XmlNode& xmlNode);
-    Transition& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API Transition();
+    AWS_S3_API Transition(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API Transition& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
 
-    void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
+    AWS_S3_API void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
 
 
     /**
-     * Indicates at what date the object is to be moved or deleted. Should be in GMT
-     * ISO 8601 Format.
+     * <p>Indicates when objects are transitioned to the specified storage class. The
+     * date value must be in ISO 8601 format. The time is always midnight UTC.</p>
      */
     inline const Aws::Utils::DateTime& GetDate() const{ return m_date; }
 
     /**
-     * Indicates at what date the object is to be moved or deleted. Should be in GMT
-     * ISO 8601 Format.
+     * <p>Indicates when objects are transitioned to the specified storage class. The
+     * date value must be in ISO 8601 format. The time is always midnight UTC.</p>
+     */
+    inline bool DateHasBeenSet() const { return m_dateHasBeenSet; }
+
+    /**
+     * <p>Indicates when objects are transitioned to the specified storage class. The
+     * date value must be in ISO 8601 format. The time is always midnight UTC.</p>
      */
     inline void SetDate(const Aws::Utils::DateTime& value) { m_dateHasBeenSet = true; m_date = value; }
 
     /**
-     * Indicates at what date the object is to be moved or deleted. Should be in GMT
-     * ISO 8601 Format.
+     * <p>Indicates when objects are transitioned to the specified storage class. The
+     * date value must be in ISO 8601 format. The time is always midnight UTC.</p>
      */
     inline void SetDate(Aws::Utils::DateTime&& value) { m_dateHasBeenSet = true; m_date = std::move(value); }
 
     /**
-     * Indicates at what date the object is to be moved or deleted. Should be in GMT
-     * ISO 8601 Format.
+     * <p>Indicates when objects are transitioned to the specified storage class. The
+     * date value must be in ISO 8601 format. The time is always midnight UTC.</p>
      */
     inline Transition& WithDate(const Aws::Utils::DateTime& value) { SetDate(value); return *this;}
 
     /**
-     * Indicates at what date the object is to be moved or deleted. Should be in GMT
-     * ISO 8601 Format.
+     * <p>Indicates when objects are transitioned to the specified storage class. The
+     * date value must be in ISO 8601 format. The time is always midnight UTC.</p>
      */
     inline Transition& WithDate(Aws::Utils::DateTime&& value) { SetDate(std::move(value)); return *this;}
 
 
     /**
-     * Indicates the lifetime, in days, of the objects that are subject to the rule.
-     * The value must be a non-zero positive integer.
+     * <p>Indicates the number of days after creation when objects are transitioned to
+     * the specified storage class. The value must be a positive integer.</p>
      */
     inline int GetDays() const{ return m_days; }
 
     /**
-     * Indicates the lifetime, in days, of the objects that are subject to the rule.
-     * The value must be a non-zero positive integer.
+     * <p>Indicates the number of days after creation when objects are transitioned to
+     * the specified storage class. The value must be a positive integer.</p>
+     */
+    inline bool DaysHasBeenSet() const { return m_daysHasBeenSet; }
+
+    /**
+     * <p>Indicates the number of days after creation when objects are transitioned to
+     * the specified storage class. The value must be a positive integer.</p>
      */
     inline void SetDays(int value) { m_daysHasBeenSet = true; m_days = value; }
 
     /**
-     * Indicates the lifetime, in days, of the objects that are subject to the rule.
-     * The value must be a non-zero positive integer.
+     * <p>Indicates the number of days after creation when objects are transitioned to
+     * the specified storage class. The value must be a positive integer.</p>
      */
     inline Transition& WithDays(int value) { SetDays(value); return *this;}
 
 
     /**
-     * The class of storage used to store the object.
+     * <p>The storage class to which you want the object to transition.</p>
      */
     inline const TransitionStorageClass& GetStorageClass() const{ return m_storageClass; }
 
     /**
-     * The class of storage used to store the object.
+     * <p>The storage class to which you want the object to transition.</p>
+     */
+    inline bool StorageClassHasBeenSet() const { return m_storageClassHasBeenSet; }
+
+    /**
+     * <p>The storage class to which you want the object to transition.</p>
      */
     inline void SetStorageClass(const TransitionStorageClass& value) { m_storageClassHasBeenSet = true; m_storageClass = value; }
 
     /**
-     * The class of storage used to store the object.
+     * <p>The storage class to which you want the object to transition.</p>
      */
     inline void SetStorageClass(TransitionStorageClass&& value) { m_storageClassHasBeenSet = true; m_storageClass = std::move(value); }
 
     /**
-     * The class of storage used to store the object.
+     * <p>The storage class to which you want the object to transition.</p>
      */
     inline Transition& WithStorageClass(const TransitionStorageClass& value) { SetStorageClass(value); return *this;}
 
     /**
-     * The class of storage used to store the object.
+     * <p>The storage class to which you want the object to transition.</p>
      */
     inline Transition& WithStorageClass(TransitionStorageClass&& value) { SetStorageClass(std::move(value)); return *this;}
 
   private:
 
     Aws::Utils::DateTime m_date;
-    bool m_dateHasBeenSet;
+    bool m_dateHasBeenSet = false;
 
     int m_days;
-    bool m_daysHasBeenSet;
+    bool m_daysHasBeenSet = false;
 
     TransitionStorageClass m_storageClass;
-    bool m_storageClassHasBeenSet;
+    bool m_storageClassHasBeenSet = false;
   };
 
 } // namespace Model

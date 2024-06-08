@@ -1,17 +1,7 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
@@ -32,45 +22,55 @@ namespace S3
 namespace Model
 {
 
-  class AWS_S3_API GlacierJobParameters
+  /**
+   * <p>Container for S3 Glacier job parameters.</p><p><h3>See Also:</h3>   <a
+   * href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/GlacierJobParameters">AWS
+   * API Reference</a></p>
+   */
+  class GlacierJobParameters
   {
   public:
-    GlacierJobParameters();
-    GlacierJobParameters(const Aws::Utils::Xml::XmlNode& xmlNode);
-    GlacierJobParameters& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API GlacierJobParameters();
+    AWS_S3_API GlacierJobParameters(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API GlacierJobParameters& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
 
-    void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
+    AWS_S3_API void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
 
 
     /**
-     * Glacier retrieval tier at which the restore will be processed.
+     * <p>Retrieval tier at which the restore will be processed.</p>
      */
     inline const Tier& GetTier() const{ return m_tier; }
 
     /**
-     * Glacier retrieval tier at which the restore will be processed.
+     * <p>Retrieval tier at which the restore will be processed.</p>
+     */
+    inline bool TierHasBeenSet() const { return m_tierHasBeenSet; }
+
+    /**
+     * <p>Retrieval tier at which the restore will be processed.</p>
      */
     inline void SetTier(const Tier& value) { m_tierHasBeenSet = true; m_tier = value; }
 
     /**
-     * Glacier retrieval tier at which the restore will be processed.
+     * <p>Retrieval tier at which the restore will be processed.</p>
      */
     inline void SetTier(Tier&& value) { m_tierHasBeenSet = true; m_tier = std::move(value); }
 
     /**
-     * Glacier retrieval tier at which the restore will be processed.
+     * <p>Retrieval tier at which the restore will be processed.</p>
      */
     inline GlacierJobParameters& WithTier(const Tier& value) { SetTier(value); return *this;}
 
     /**
-     * Glacier retrieval tier at which the restore will be processed.
+     * <p>Retrieval tier at which the restore will be processed.</p>
      */
     inline GlacierJobParameters& WithTier(Tier&& value) { SetTier(std::move(value)); return *this;}
 
   private:
 
     Tier m_tier;
-    bool m_tierHasBeenSet;
+    bool m_tierHasBeenSet = false;
   };
 
 } // namespace Model

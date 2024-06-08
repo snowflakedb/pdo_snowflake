@@ -1,17 +1,7 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
@@ -32,45 +22,56 @@ namespace S3
 namespace Model
 {
 
-  class AWS_S3_API InventorySchedule
+  /**
+   * <p>Specifies the schedule for generating inventory results.</p><p><h3>See
+   * Also:</h3>   <a
+   * href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/InventorySchedule">AWS
+   * API Reference</a></p>
+   */
+  class InventorySchedule
   {
   public:
-    InventorySchedule();
-    InventorySchedule(const Aws::Utils::Xml::XmlNode& xmlNode);
-    InventorySchedule& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API InventorySchedule();
+    AWS_S3_API InventorySchedule(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API InventorySchedule& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
 
-    void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
+    AWS_S3_API void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
 
 
     /**
-     * Specifies how frequently inventory results are produced.
+     * <p>Specifies how frequently inventory results are produced.</p>
      */
     inline const InventoryFrequency& GetFrequency() const{ return m_frequency; }
 
     /**
-     * Specifies how frequently inventory results are produced.
+     * <p>Specifies how frequently inventory results are produced.</p>
+     */
+    inline bool FrequencyHasBeenSet() const { return m_frequencyHasBeenSet; }
+
+    /**
+     * <p>Specifies how frequently inventory results are produced.</p>
      */
     inline void SetFrequency(const InventoryFrequency& value) { m_frequencyHasBeenSet = true; m_frequency = value; }
 
     /**
-     * Specifies how frequently inventory results are produced.
+     * <p>Specifies how frequently inventory results are produced.</p>
      */
     inline void SetFrequency(InventoryFrequency&& value) { m_frequencyHasBeenSet = true; m_frequency = std::move(value); }
 
     /**
-     * Specifies how frequently inventory results are produced.
+     * <p>Specifies how frequently inventory results are produced.</p>
      */
     inline InventorySchedule& WithFrequency(const InventoryFrequency& value) { SetFrequency(value); return *this;}
 
     /**
-     * Specifies how frequently inventory results are produced.
+     * <p>Specifies how frequently inventory results are produced.</p>
      */
     inline InventorySchedule& WithFrequency(InventoryFrequency&& value) { SetFrequency(std::move(value)); return *this;}
 
   private:
 
     InventoryFrequency m_frequency;
-    bool m_frequencyHasBeenSet;
+    bool m_frequencyHasBeenSet = false;
   };
 
 } // namespace Model

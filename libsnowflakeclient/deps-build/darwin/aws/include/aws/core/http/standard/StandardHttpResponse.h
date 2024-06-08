@@ -1,17 +1,7 @@
-/*
-  * Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License").
-  * You may not use this file except in compliance with the License.
-  * A copy of the License is located at
-  *
-  *  http://aws.amazon.com/apache2.0
-  *
-  * or in the "license" file accompanying this file. This file is distributed
-  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-  * express or implied. See the License for the specific language governing
-  * permissions and limitations under the License.
-  */
+/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 
@@ -31,17 +21,15 @@ namespace Aws
             /**
              * Simple STL representation an Http Response, implements HttpResponse.
              */
-            class AWS_CORE_API StandardHttpResponse :
-                public HttpResponse
+            class AWS_CORE_API StandardHttpResponse : public HttpResponse
             {
             public:
                 /**
                  * Initializes an http response with the originalRequest and the response code.
                  */
-                StandardHttpResponse(const HttpRequest& originatingRequest) :
+                StandardHttpResponse(const std::shared_ptr<const HttpRequest>& originatingRequest) :
                     HttpResponse(originatingRequest),
-                    headerMap(),
-                    bodyStream(originatingRequest.GetResponseStreamFactory())
+                    bodyStream(originatingRequest->GetResponseStreamFactory())
                 {}
 
                 ~StandardHttpResponse() = default;
@@ -49,31 +37,36 @@ namespace Aws
                 /**
                  * Get the headers from this response
                  */
-                HeaderValueCollection GetHeaders() const;
+                HeaderValueCollection GetHeaders() const override;
                 /**
                  * Returns true if the response contains a header by headerName
                  */
-                bool HasHeader(const char* headerName) const;
+                bool HasHeader(const char* headerName) const override;
                 /**
                  * Returns the value for a header at headerName if it exists.
                  */
-                const Aws::String& GetHeader(const Aws::String&) const;
+                const Aws::String& GetHeader(const Aws::String&) const override;
                 /**
                  * Gets the response body of the response.
                  */
-                inline Aws::IOStream& GetResponseBody() const { return bodyStream.GetUnderlyingStream(); }
+                inline Aws::IOStream& GetResponseBody() const override { return bodyStream.GetUnderlyingStream(); }
                 /**
                  * Gives full control of the memory of the ResponseBody over to the caller. At this point, it is the caller's
                  * responsibility to clean up this object.
                  */
-                inline Utils::Stream::ResponseStream&& SwapResponseStreamOwnership() { return std::move(bodyStream); }
+                inline Utils::Stream::ResponseStream&& SwapResponseStreamOwnership() override { return std::move(bodyStream); }
                 /**
                  * Adds a header to the http response object.
                  */
-                void AddHeader(const Aws::String&, const Aws::String&);
+                void AddHeader(const Aws::String&, const Aws::String&) override;
+                /**
+                 * Add a header to the http response object, and move the value.
+                 * The name can't be moved as it is converted to lower-case.
+                 */
+                void AddHeader(const Aws::String& headerName, Aws::String&& headerValue) override;
 
             private:
-                StandardHttpResponse(const StandardHttpResponse&);                
+                StandardHttpResponse(const StandardHttpResponse&);
 
                 Aws::Map<Aws::String, Aws::String> headerMap;
                 Utils::Stream::ResponseStream bodyStream;

@@ -1,17 +1,7 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
@@ -34,123 +24,194 @@ namespace S3
 namespace Model
 {
 
-  class AWS_S3_API MetricsFilter
+  /**
+   * <p>Specifies a metrics configuration filter. The metrics configuration only
+   * includes objects that meet the filter's criteria. A filter must be a prefix, an
+   * object tag, an access point ARN, or a conjunction (MetricsAndOperator). For more
+   * information, see <a
+   * href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutBucketMetricsConfiguration.html">PutBucketMetricsConfiguration</a>.</p><p><h3>See
+   * Also:</h3>   <a
+   * href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/MetricsFilter">AWS
+   * API Reference</a></p>
+   */
+  class MetricsFilter
   {
   public:
-    MetricsFilter();
-    MetricsFilter(const Aws::Utils::Xml::XmlNode& xmlNode);
-    MetricsFilter& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API MetricsFilter();
+    AWS_S3_API MetricsFilter(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API MetricsFilter& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
 
-    void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
+    AWS_S3_API void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
 
 
     /**
-     * The prefix used when evaluating a metrics filter.
+     * <p>The prefix used when evaluating a metrics filter.</p>
      */
     inline const Aws::String& GetPrefix() const{ return m_prefix; }
 
     /**
-     * The prefix used when evaluating a metrics filter.
+     * <p>The prefix used when evaluating a metrics filter.</p>
+     */
+    inline bool PrefixHasBeenSet() const { return m_prefixHasBeenSet; }
+
+    /**
+     * <p>The prefix used when evaluating a metrics filter.</p>
      */
     inline void SetPrefix(const Aws::String& value) { m_prefixHasBeenSet = true; m_prefix = value; }
 
     /**
-     * The prefix used when evaluating a metrics filter.
+     * <p>The prefix used when evaluating a metrics filter.</p>
      */
     inline void SetPrefix(Aws::String&& value) { m_prefixHasBeenSet = true; m_prefix = std::move(value); }
 
     /**
-     * The prefix used when evaluating a metrics filter.
+     * <p>The prefix used when evaluating a metrics filter.</p>
      */
     inline void SetPrefix(const char* value) { m_prefixHasBeenSet = true; m_prefix.assign(value); }
 
     /**
-     * The prefix used when evaluating a metrics filter.
+     * <p>The prefix used when evaluating a metrics filter.</p>
      */
     inline MetricsFilter& WithPrefix(const Aws::String& value) { SetPrefix(value); return *this;}
 
     /**
-     * The prefix used when evaluating a metrics filter.
+     * <p>The prefix used when evaluating a metrics filter.</p>
      */
     inline MetricsFilter& WithPrefix(Aws::String&& value) { SetPrefix(std::move(value)); return *this;}
 
     /**
-     * The prefix used when evaluating a metrics filter.
+     * <p>The prefix used when evaluating a metrics filter.</p>
      */
     inline MetricsFilter& WithPrefix(const char* value) { SetPrefix(value); return *this;}
 
 
     /**
-     * The tag used when evaluating a metrics filter.
+     * <p>The tag used when evaluating a metrics filter.</p>
      */
     inline const Tag& GetTag() const{ return m_tag; }
 
     /**
-     * The tag used when evaluating a metrics filter.
+     * <p>The tag used when evaluating a metrics filter.</p>
+     */
+    inline bool TagHasBeenSet() const { return m_tagHasBeenSet; }
+
+    /**
+     * <p>The tag used when evaluating a metrics filter.</p>
      */
     inline void SetTag(const Tag& value) { m_tagHasBeenSet = true; m_tag = value; }
 
     /**
-     * The tag used when evaluating a metrics filter.
+     * <p>The tag used when evaluating a metrics filter.</p>
      */
     inline void SetTag(Tag&& value) { m_tagHasBeenSet = true; m_tag = std::move(value); }
 
     /**
-     * The tag used when evaluating a metrics filter.
+     * <p>The tag used when evaluating a metrics filter.</p>
      */
     inline MetricsFilter& WithTag(const Tag& value) { SetTag(value); return *this;}
 
     /**
-     * The tag used when evaluating a metrics filter.
+     * <p>The tag used when evaluating a metrics filter.</p>
      */
     inline MetricsFilter& WithTag(Tag&& value) { SetTag(std::move(value)); return *this;}
 
 
     /**
-     * A conjunction (logical AND) of predicates, which is used in evaluating a metrics
-     * filter. The operator must have at least two predicates, and an object must match
-     * all of the predicates in order for the filter to apply.
+     * <p>The access point ARN used when evaluating a metrics filter.</p>
+     */
+    inline const Aws::String& GetAccessPointArn() const{ return m_accessPointArn; }
+
+    /**
+     * <p>The access point ARN used when evaluating a metrics filter.</p>
+     */
+    inline bool AccessPointArnHasBeenSet() const { return m_accessPointArnHasBeenSet; }
+
+    /**
+     * <p>The access point ARN used when evaluating a metrics filter.</p>
+     */
+    inline void SetAccessPointArn(const Aws::String& value) { m_accessPointArnHasBeenSet = true; m_accessPointArn = value; }
+
+    /**
+     * <p>The access point ARN used when evaluating a metrics filter.</p>
+     */
+    inline void SetAccessPointArn(Aws::String&& value) { m_accessPointArnHasBeenSet = true; m_accessPointArn = std::move(value); }
+
+    /**
+     * <p>The access point ARN used when evaluating a metrics filter.</p>
+     */
+    inline void SetAccessPointArn(const char* value) { m_accessPointArnHasBeenSet = true; m_accessPointArn.assign(value); }
+
+    /**
+     * <p>The access point ARN used when evaluating a metrics filter.</p>
+     */
+    inline MetricsFilter& WithAccessPointArn(const Aws::String& value) { SetAccessPointArn(value); return *this;}
+
+    /**
+     * <p>The access point ARN used when evaluating a metrics filter.</p>
+     */
+    inline MetricsFilter& WithAccessPointArn(Aws::String&& value) { SetAccessPointArn(std::move(value)); return *this;}
+
+    /**
+     * <p>The access point ARN used when evaluating a metrics filter.</p>
+     */
+    inline MetricsFilter& WithAccessPointArn(const char* value) { SetAccessPointArn(value); return *this;}
+
+
+    /**
+     * <p>A conjunction (logical AND) of predicates, which is used in evaluating a
+     * metrics filter. The operator must have at least two predicates, and an object
+     * must match all of the predicates in order for the filter to apply.</p>
      */
     inline const MetricsAndOperator& GetAnd() const{ return m_and; }
 
     /**
-     * A conjunction (logical AND) of predicates, which is used in evaluating a metrics
-     * filter. The operator must have at least two predicates, and an object must match
-     * all of the predicates in order for the filter to apply.
+     * <p>A conjunction (logical AND) of predicates, which is used in evaluating a
+     * metrics filter. The operator must have at least two predicates, and an object
+     * must match all of the predicates in order for the filter to apply.</p>
+     */
+    inline bool AndHasBeenSet() const { return m_andHasBeenSet; }
+
+    /**
+     * <p>A conjunction (logical AND) of predicates, which is used in evaluating a
+     * metrics filter. The operator must have at least two predicates, and an object
+     * must match all of the predicates in order for the filter to apply.</p>
      */
     inline void SetAnd(const MetricsAndOperator& value) { m_andHasBeenSet = true; m_and = value; }
 
     /**
-     * A conjunction (logical AND) of predicates, which is used in evaluating a metrics
-     * filter. The operator must have at least two predicates, and an object must match
-     * all of the predicates in order for the filter to apply.
+     * <p>A conjunction (logical AND) of predicates, which is used in evaluating a
+     * metrics filter. The operator must have at least two predicates, and an object
+     * must match all of the predicates in order for the filter to apply.</p>
      */
     inline void SetAnd(MetricsAndOperator&& value) { m_andHasBeenSet = true; m_and = std::move(value); }
 
     /**
-     * A conjunction (logical AND) of predicates, which is used in evaluating a metrics
-     * filter. The operator must have at least two predicates, and an object must match
-     * all of the predicates in order for the filter to apply.
+     * <p>A conjunction (logical AND) of predicates, which is used in evaluating a
+     * metrics filter. The operator must have at least two predicates, and an object
+     * must match all of the predicates in order for the filter to apply.</p>
      */
     inline MetricsFilter& WithAnd(const MetricsAndOperator& value) { SetAnd(value); return *this;}
 
     /**
-     * A conjunction (logical AND) of predicates, which is used in evaluating a metrics
-     * filter. The operator must have at least two predicates, and an object must match
-     * all of the predicates in order for the filter to apply.
+     * <p>A conjunction (logical AND) of predicates, which is used in evaluating a
+     * metrics filter. The operator must have at least two predicates, and an object
+     * must match all of the predicates in order for the filter to apply.</p>
      */
     inline MetricsFilter& WithAnd(MetricsAndOperator&& value) { SetAnd(std::move(value)); return *this;}
 
   private:
 
     Aws::String m_prefix;
-    bool m_prefixHasBeenSet;
+    bool m_prefixHasBeenSet = false;
 
     Tag m_tag;
-    bool m_tagHasBeenSet;
+    bool m_tagHasBeenSet = false;
+
+    Aws::String m_accessPointArn;
+    bool m_accessPointArnHasBeenSet = false;
 
     MetricsAndOperator m_and;
-    bool m_andHasBeenSet;
+    bool m_andHasBeenSet = false;
   };
 
 } // namespace Model

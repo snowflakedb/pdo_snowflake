@@ -1,17 +1,7 @@
-/*
-  * Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License").
-  * You may not use this file except in compliance with the License.
-  * A copy of the License is located at
-  *
-  *  http://aws.amazon.com/apache2.0
-  *
-  * or in the "license" file accompanying this file. This file is distributed
-  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-  * express or implied. See the License for the specific language governing
-  * permissions and limitations under the License.
-  */
+/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 
@@ -64,11 +54,7 @@ namespace Aws
                 {
                     m_data.reset(Aws::NewArray<T>(m_size, ARRAY_ALLOCATION_TAG));
 
-#ifdef _WIN32
-                    std::copy(arrayToCopy, arrayToCopy + arraySize, stdext::checked_array_iterator< T * >(m_data.get(), m_size));
-#else
                     std::copy(arrayToCopy, arrayToCopy + arraySize, m_data.get());
-#endif // MSVC
                 }
             }
 
@@ -92,11 +78,7 @@ namespace Aws
                     if(arr->m_size > 0 && arr->m_data)
                     {
                         size_t arraySize = arr->m_size;
-#ifdef _WIN32
-                        std::copy(arr->m_data.get(), arr->m_data.get() + arraySize, stdext::checked_array_iterator< T * >(m_data.get() + location, m_size));
-#else
                         std::copy(arr->m_data.get(), arr->m_data.get() + arraySize, m_data.get() + location);
-#endif // MSVC
                         location += arraySize;
                     }
                 }
@@ -111,11 +93,7 @@ namespace Aws
                 {
                     m_data.reset(Aws::NewArray<T>(m_size, ARRAY_ALLOCATION_TAG));
 
-#ifdef _WIN32
-                    std::copy(other.m_data.get(), other.m_data.get() + other.m_size, stdext::checked_array_iterator< T * >(m_data.get(), m_size));
-#else
                     std::copy(other.m_data.get(), other.m_data.get() + other.m_size, m_data.get());
-#endif // MSVC
                 }
             }
 
@@ -144,11 +122,7 @@ namespace Aws
                 {
                     m_data.reset(Aws::NewArray<T>(m_size, ARRAY_ALLOCATION_TAG));
 
-#ifdef _WIN32
-                    std::copy(other.m_data.get(), other.m_data.get() + other.m_size, stdext::checked_array_iterator< T * >(m_data.get(), m_size));
-#else
                     std::copy(other.m_data.get(), other.m_data.get() + other.m_size, m_data.get());
-#endif // MSVC
                 }
 
                 return *this;

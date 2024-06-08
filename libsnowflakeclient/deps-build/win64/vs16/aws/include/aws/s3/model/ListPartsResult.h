@@ -1,17 +1,7 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
@@ -22,6 +12,7 @@
 #include <aws/s3/model/Owner.h>
 #include <aws/s3/model/StorageClass.h>
 #include <aws/s3/model/RequestCharged.h>
+#include <aws/s3/model/ChecksumAlgorithm.h>
 #include <aws/s3/model/Part.h>
 #include <utility>
 
@@ -41,352 +32,506 @@ namespace S3
 {
 namespace Model
 {
-  class AWS_S3_API ListPartsResult
+  class ListPartsResult
   {
   public:
-    ListPartsResult();
-    ListPartsResult(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
-    ListPartsResult& operator=(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
+    AWS_S3_API ListPartsResult();
+    AWS_S3_API ListPartsResult(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
+    AWS_S3_API ListPartsResult& operator=(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
 
 
     /**
-     * Date when multipart upload will become eligible for abort operation by
-     * lifecycle.
+     * <p>If the bucket has a lifecycle rule configured with an action to abort
+     * incomplete multipart uploads and the prefix in the lifecycle rule matches the
+     * object name in the request, then the response includes this header indicating
+     * when the initiated multipart upload will become eligible for abort operation.
+     * For more information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html#mpu-abort-incomplete-mpu-lifecycle-config">Aborting
+     * Incomplete Multipart Uploads Using a Bucket Lifecycle Configuration</a>.</p>
+     * <p>The response will also include the <code>x-amz-abort-rule-id</code> header
+     * that will provide the ID of the lifecycle configuration rule that defines this
+     * action.</p>  <p>This functionality is not supported for directory
+     * buckets.</p> 
      */
     inline const Aws::Utils::DateTime& GetAbortDate() const{ return m_abortDate; }
 
     /**
-     * Date when multipart upload will become eligible for abort operation by
-     * lifecycle.
+     * <p>If the bucket has a lifecycle rule configured with an action to abort
+     * incomplete multipart uploads and the prefix in the lifecycle rule matches the
+     * object name in the request, then the response includes this header indicating
+     * when the initiated multipart upload will become eligible for abort operation.
+     * For more information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html#mpu-abort-incomplete-mpu-lifecycle-config">Aborting
+     * Incomplete Multipart Uploads Using a Bucket Lifecycle Configuration</a>.</p>
+     * <p>The response will also include the <code>x-amz-abort-rule-id</code> header
+     * that will provide the ID of the lifecycle configuration rule that defines this
+     * action.</p>  <p>This functionality is not supported for directory
+     * buckets.</p> 
      */
     inline void SetAbortDate(const Aws::Utils::DateTime& value) { m_abortDate = value; }
 
     /**
-     * Date when multipart upload will become eligible for abort operation by
-     * lifecycle.
+     * <p>If the bucket has a lifecycle rule configured with an action to abort
+     * incomplete multipart uploads and the prefix in the lifecycle rule matches the
+     * object name in the request, then the response includes this header indicating
+     * when the initiated multipart upload will become eligible for abort operation.
+     * For more information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html#mpu-abort-incomplete-mpu-lifecycle-config">Aborting
+     * Incomplete Multipart Uploads Using a Bucket Lifecycle Configuration</a>.</p>
+     * <p>The response will also include the <code>x-amz-abort-rule-id</code> header
+     * that will provide the ID of the lifecycle configuration rule that defines this
+     * action.</p>  <p>This functionality is not supported for directory
+     * buckets.</p> 
      */
     inline void SetAbortDate(Aws::Utils::DateTime&& value) { m_abortDate = std::move(value); }
 
     /**
-     * Date when multipart upload will become eligible for abort operation by
-     * lifecycle.
+     * <p>If the bucket has a lifecycle rule configured with an action to abort
+     * incomplete multipart uploads and the prefix in the lifecycle rule matches the
+     * object name in the request, then the response includes this header indicating
+     * when the initiated multipart upload will become eligible for abort operation.
+     * For more information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html#mpu-abort-incomplete-mpu-lifecycle-config">Aborting
+     * Incomplete Multipart Uploads Using a Bucket Lifecycle Configuration</a>.</p>
+     * <p>The response will also include the <code>x-amz-abort-rule-id</code> header
+     * that will provide the ID of the lifecycle configuration rule that defines this
+     * action.</p>  <p>This functionality is not supported for directory
+     * buckets.</p> 
      */
     inline ListPartsResult& WithAbortDate(const Aws::Utils::DateTime& value) { SetAbortDate(value); return *this;}
 
     /**
-     * Date when multipart upload will become eligible for abort operation by
-     * lifecycle.
+     * <p>If the bucket has a lifecycle rule configured with an action to abort
+     * incomplete multipart uploads and the prefix in the lifecycle rule matches the
+     * object name in the request, then the response includes this header indicating
+     * when the initiated multipart upload will become eligible for abort operation.
+     * For more information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html#mpu-abort-incomplete-mpu-lifecycle-config">Aborting
+     * Incomplete Multipart Uploads Using a Bucket Lifecycle Configuration</a>.</p>
+     * <p>The response will also include the <code>x-amz-abort-rule-id</code> header
+     * that will provide the ID of the lifecycle configuration rule that defines this
+     * action.</p>  <p>This functionality is not supported for directory
+     * buckets.</p> 
      */
     inline ListPartsResult& WithAbortDate(Aws::Utils::DateTime&& value) { SetAbortDate(std::move(value)); return *this;}
 
 
     /**
-     * Id of the lifecycle rule that makes a multipart upload eligible for abort
-     * operation.
+     * <p>This header is returned along with the <code>x-amz-abort-date</code> header.
+     * It identifies applicable lifecycle configuration rule that defines the action to
+     * abort incomplete multipart uploads.</p>  <p>This functionality is not
+     * supported for directory buckets.</p> 
      */
     inline const Aws::String& GetAbortRuleId() const{ return m_abortRuleId; }
 
     /**
-     * Id of the lifecycle rule that makes a multipart upload eligible for abort
-     * operation.
+     * <p>This header is returned along with the <code>x-amz-abort-date</code> header.
+     * It identifies applicable lifecycle configuration rule that defines the action to
+     * abort incomplete multipart uploads.</p>  <p>This functionality is not
+     * supported for directory buckets.</p> 
      */
     inline void SetAbortRuleId(const Aws::String& value) { m_abortRuleId = value; }
 
     /**
-     * Id of the lifecycle rule that makes a multipart upload eligible for abort
-     * operation.
+     * <p>This header is returned along with the <code>x-amz-abort-date</code> header.
+     * It identifies applicable lifecycle configuration rule that defines the action to
+     * abort incomplete multipart uploads.</p>  <p>This functionality is not
+     * supported for directory buckets.</p> 
      */
     inline void SetAbortRuleId(Aws::String&& value) { m_abortRuleId = std::move(value); }
 
     /**
-     * Id of the lifecycle rule that makes a multipart upload eligible for abort
-     * operation.
+     * <p>This header is returned along with the <code>x-amz-abort-date</code> header.
+     * It identifies applicable lifecycle configuration rule that defines the action to
+     * abort incomplete multipart uploads.</p>  <p>This functionality is not
+     * supported for directory buckets.</p> 
      */
     inline void SetAbortRuleId(const char* value) { m_abortRuleId.assign(value); }
 
     /**
-     * Id of the lifecycle rule that makes a multipart upload eligible for abort
-     * operation.
+     * <p>This header is returned along with the <code>x-amz-abort-date</code> header.
+     * It identifies applicable lifecycle configuration rule that defines the action to
+     * abort incomplete multipart uploads.</p>  <p>This functionality is not
+     * supported for directory buckets.</p> 
      */
     inline ListPartsResult& WithAbortRuleId(const Aws::String& value) { SetAbortRuleId(value); return *this;}
 
     /**
-     * Id of the lifecycle rule that makes a multipart upload eligible for abort
-     * operation.
+     * <p>This header is returned along with the <code>x-amz-abort-date</code> header.
+     * It identifies applicable lifecycle configuration rule that defines the action to
+     * abort incomplete multipart uploads.</p>  <p>This functionality is not
+     * supported for directory buckets.</p> 
      */
     inline ListPartsResult& WithAbortRuleId(Aws::String&& value) { SetAbortRuleId(std::move(value)); return *this;}
 
     /**
-     * Id of the lifecycle rule that makes a multipart upload eligible for abort
-     * operation.
+     * <p>This header is returned along with the <code>x-amz-abort-date</code> header.
+     * It identifies applicable lifecycle configuration rule that defines the action to
+     * abort incomplete multipart uploads.</p>  <p>This functionality is not
+     * supported for directory buckets.</p> 
      */
     inline ListPartsResult& WithAbortRuleId(const char* value) { SetAbortRuleId(value); return *this;}
 
 
     /**
-     * Name of the bucket to which the multipart upload was initiated.
+     * <p>The name of the bucket to which the multipart upload was initiated. Does not
+     * return the access point ARN or access point alias if used.</p>
      */
     inline const Aws::String& GetBucket() const{ return m_bucket; }
 
     /**
-     * Name of the bucket to which the multipart upload was initiated.
+     * <p>The name of the bucket to which the multipart upload was initiated. Does not
+     * return the access point ARN or access point alias if used.</p>
      */
     inline void SetBucket(const Aws::String& value) { m_bucket = value; }
 
     /**
-     * Name of the bucket to which the multipart upload was initiated.
+     * <p>The name of the bucket to which the multipart upload was initiated. Does not
+     * return the access point ARN or access point alias if used.</p>
      */
     inline void SetBucket(Aws::String&& value) { m_bucket = std::move(value); }
 
     /**
-     * Name of the bucket to which the multipart upload was initiated.
+     * <p>The name of the bucket to which the multipart upload was initiated. Does not
+     * return the access point ARN or access point alias if used.</p>
      */
     inline void SetBucket(const char* value) { m_bucket.assign(value); }
 
     /**
-     * Name of the bucket to which the multipart upload was initiated.
+     * <p>The name of the bucket to which the multipart upload was initiated. Does not
+     * return the access point ARN or access point alias if used.</p>
      */
     inline ListPartsResult& WithBucket(const Aws::String& value) { SetBucket(value); return *this;}
 
     /**
-     * Name of the bucket to which the multipart upload was initiated.
+     * <p>The name of the bucket to which the multipart upload was initiated. Does not
+     * return the access point ARN or access point alias if used.</p>
      */
     inline ListPartsResult& WithBucket(Aws::String&& value) { SetBucket(std::move(value)); return *this;}
 
     /**
-     * Name of the bucket to which the multipart upload was initiated.
+     * <p>The name of the bucket to which the multipart upload was initiated. Does not
+     * return the access point ARN or access point alias if used.</p>
      */
     inline ListPartsResult& WithBucket(const char* value) { SetBucket(value); return *this;}
 
 
     /**
-     * Object key for which the multipart upload was initiated.
+     * <p>Object key for which the multipart upload was initiated.</p>
      */
     inline const Aws::String& GetKey() const{ return m_key; }
 
     /**
-     * Object key for which the multipart upload was initiated.
+     * <p>Object key for which the multipart upload was initiated.</p>
      */
     inline void SetKey(const Aws::String& value) { m_key = value; }
 
     /**
-     * Object key for which the multipart upload was initiated.
+     * <p>Object key for which the multipart upload was initiated.</p>
      */
     inline void SetKey(Aws::String&& value) { m_key = std::move(value); }
 
     /**
-     * Object key for which the multipart upload was initiated.
+     * <p>Object key for which the multipart upload was initiated.</p>
      */
     inline void SetKey(const char* value) { m_key.assign(value); }
 
     /**
-     * Object key for which the multipart upload was initiated.
+     * <p>Object key for which the multipart upload was initiated.</p>
      */
     inline ListPartsResult& WithKey(const Aws::String& value) { SetKey(value); return *this;}
 
     /**
-     * Object key for which the multipart upload was initiated.
+     * <p>Object key for which the multipart upload was initiated.</p>
      */
     inline ListPartsResult& WithKey(Aws::String&& value) { SetKey(std::move(value)); return *this;}
 
     /**
-     * Object key for which the multipart upload was initiated.
+     * <p>Object key for which the multipart upload was initiated.</p>
      */
     inline ListPartsResult& WithKey(const char* value) { SetKey(value); return *this;}
 
 
     /**
-     * Upload ID identifying the multipart upload whose parts are being listed.
+     * <p>Upload ID identifying the multipart upload whose parts are being listed.</p>
      */
     inline const Aws::String& GetUploadId() const{ return m_uploadId; }
 
     /**
-     * Upload ID identifying the multipart upload whose parts are being listed.
+     * <p>Upload ID identifying the multipart upload whose parts are being listed.</p>
      */
     inline void SetUploadId(const Aws::String& value) { m_uploadId = value; }
 
     /**
-     * Upload ID identifying the multipart upload whose parts are being listed.
+     * <p>Upload ID identifying the multipart upload whose parts are being listed.</p>
      */
     inline void SetUploadId(Aws::String&& value) { m_uploadId = std::move(value); }
 
     /**
-     * Upload ID identifying the multipart upload whose parts are being listed.
+     * <p>Upload ID identifying the multipart upload whose parts are being listed.</p>
      */
     inline void SetUploadId(const char* value) { m_uploadId.assign(value); }
 
     /**
-     * Upload ID identifying the multipart upload whose parts are being listed.
+     * <p>Upload ID identifying the multipart upload whose parts are being listed.</p>
      */
     inline ListPartsResult& WithUploadId(const Aws::String& value) { SetUploadId(value); return *this;}
 
     /**
-     * Upload ID identifying the multipart upload whose parts are being listed.
+     * <p>Upload ID identifying the multipart upload whose parts are being listed.</p>
      */
     inline ListPartsResult& WithUploadId(Aws::String&& value) { SetUploadId(std::move(value)); return *this;}
 
     /**
-     * Upload ID identifying the multipart upload whose parts are being listed.
+     * <p>Upload ID identifying the multipart upload whose parts are being listed.</p>
      */
     inline ListPartsResult& WithUploadId(const char* value) { SetUploadId(value); return *this;}
 
 
     /**
-     * Part number after which listing begins.
+     * <p>When a list is truncated, this element specifies the last part in the list,
+     * as well as the value to use for the part-number-marker request parameter in a
+     * subsequent request.</p>
      */
     inline int GetPartNumberMarker() const{ return m_partNumberMarker; }
 
     /**
-     * Part number after which listing begins.
+     * <p>When a list is truncated, this element specifies the last part in the list,
+     * as well as the value to use for the part-number-marker request parameter in a
+     * subsequent request.</p>
      */
     inline void SetPartNumberMarker(int value) { m_partNumberMarker = value; }
 
     /**
-     * Part number after which listing begins.
+     * <p>When a list is truncated, this element specifies the last part in the list,
+     * as well as the value to use for the part-number-marker request parameter in a
+     * subsequent request.</p>
      */
     inline ListPartsResult& WithPartNumberMarker(int value) { SetPartNumberMarker(value); return *this;}
 
 
     /**
-     * When a list is truncated, this element specifies the last part in the list, as
-     * well as the value to use for the part-number-marker request parameter in a
-     * subsequent request.
+     * <p>When a list is truncated, this element specifies the last part in the list,
+     * as well as the value to use for the <code>part-number-marker</code> request
+     * parameter in a subsequent request.</p>
      */
     inline int GetNextPartNumberMarker() const{ return m_nextPartNumberMarker; }
 
     /**
-     * When a list is truncated, this element specifies the last part in the list, as
-     * well as the value to use for the part-number-marker request parameter in a
-     * subsequent request.
+     * <p>When a list is truncated, this element specifies the last part in the list,
+     * as well as the value to use for the <code>part-number-marker</code> request
+     * parameter in a subsequent request.</p>
      */
     inline void SetNextPartNumberMarker(int value) { m_nextPartNumberMarker = value; }
 
     /**
-     * When a list is truncated, this element specifies the last part in the list, as
-     * well as the value to use for the part-number-marker request parameter in a
-     * subsequent request.
+     * <p>When a list is truncated, this element specifies the last part in the list,
+     * as well as the value to use for the <code>part-number-marker</code> request
+     * parameter in a subsequent request.</p>
      */
     inline ListPartsResult& WithNextPartNumberMarker(int value) { SetNextPartNumberMarker(value); return *this;}
 
 
     /**
-     * Maximum number of parts that were allowed in the response.
+     * <p>Maximum number of parts that were allowed in the response.</p>
      */
     inline int GetMaxParts() const{ return m_maxParts; }
 
     /**
-     * Maximum number of parts that were allowed in the response.
+     * <p>Maximum number of parts that were allowed in the response.</p>
      */
     inline void SetMaxParts(int value) { m_maxParts = value; }
 
     /**
-     * Maximum number of parts that were allowed in the response.
+     * <p>Maximum number of parts that were allowed in the response.</p>
      */
     inline ListPartsResult& WithMaxParts(int value) { SetMaxParts(value); return *this;}
 
 
     /**
-     * Indicates whether the returned list of parts is truncated.
+     * <p> Indicates whether the returned list of parts is truncated. A true value
+     * indicates that the list was truncated. A list can be truncated if the number of
+     * parts exceeds the limit returned in the MaxParts element.</p>
      */
     inline bool GetIsTruncated() const{ return m_isTruncated; }
 
     /**
-     * Indicates whether the returned list of parts is truncated.
+     * <p> Indicates whether the returned list of parts is truncated. A true value
+     * indicates that the list was truncated. A list can be truncated if the number of
+     * parts exceeds the limit returned in the MaxParts element.</p>
      */
     inline void SetIsTruncated(bool value) { m_isTruncated = value; }
 
     /**
-     * Indicates whether the returned list of parts is truncated.
+     * <p> Indicates whether the returned list of parts is truncated. A true value
+     * indicates that the list was truncated. A list can be truncated if the number of
+     * parts exceeds the limit returned in the MaxParts element.</p>
      */
     inline ListPartsResult& WithIsTruncated(bool value) { SetIsTruncated(value); return *this;}
 
 
-    
+    /**
+     * <p>Container for elements related to a particular part. A response can contain
+     * zero or more <code>Part</code> elements.</p>
+     */
     inline const Aws::Vector<Part>& GetParts() const{ return m_parts; }
 
-    
+    /**
+     * <p>Container for elements related to a particular part. A response can contain
+     * zero or more <code>Part</code> elements.</p>
+     */
     inline void SetParts(const Aws::Vector<Part>& value) { m_parts = value; }
 
-    
+    /**
+     * <p>Container for elements related to a particular part. A response can contain
+     * zero or more <code>Part</code> elements.</p>
+     */
     inline void SetParts(Aws::Vector<Part>&& value) { m_parts = std::move(value); }
 
-    
+    /**
+     * <p>Container for elements related to a particular part. A response can contain
+     * zero or more <code>Part</code> elements.</p>
+     */
     inline ListPartsResult& WithParts(const Aws::Vector<Part>& value) { SetParts(value); return *this;}
 
-    
+    /**
+     * <p>Container for elements related to a particular part. A response can contain
+     * zero or more <code>Part</code> elements.</p>
+     */
     inline ListPartsResult& WithParts(Aws::Vector<Part>&& value) { SetParts(std::move(value)); return *this;}
 
-    
+    /**
+     * <p>Container for elements related to a particular part. A response can contain
+     * zero or more <code>Part</code> elements.</p>
+     */
     inline ListPartsResult& AddParts(const Part& value) { m_parts.push_back(value); return *this; }
 
-    
+    /**
+     * <p>Container for elements related to a particular part. A response can contain
+     * zero or more <code>Part</code> elements.</p>
+     */
     inline ListPartsResult& AddParts(Part&& value) { m_parts.push_back(std::move(value)); return *this; }
 
 
     /**
-     * Identifies who initiated the multipart upload.
+     * <p>Container element that identifies who initiated the multipart upload. If the
+     * initiator is an Amazon Web Services account, this element provides the same
+     * information as the <code>Owner</code> element. If the initiator is an IAM User,
+     * this element provides the user ARN and display name.</p>
      */
     inline const Initiator& GetInitiator() const{ return m_initiator; }
 
     /**
-     * Identifies who initiated the multipart upload.
+     * <p>Container element that identifies who initiated the multipart upload. If the
+     * initiator is an Amazon Web Services account, this element provides the same
+     * information as the <code>Owner</code> element. If the initiator is an IAM User,
+     * this element provides the user ARN and display name.</p>
      */
     inline void SetInitiator(const Initiator& value) { m_initiator = value; }
 
     /**
-     * Identifies who initiated the multipart upload.
+     * <p>Container element that identifies who initiated the multipart upload. If the
+     * initiator is an Amazon Web Services account, this element provides the same
+     * information as the <code>Owner</code> element. If the initiator is an IAM User,
+     * this element provides the user ARN and display name.</p>
      */
     inline void SetInitiator(Initiator&& value) { m_initiator = std::move(value); }
 
     /**
-     * Identifies who initiated the multipart upload.
+     * <p>Container element that identifies who initiated the multipart upload. If the
+     * initiator is an Amazon Web Services account, this element provides the same
+     * information as the <code>Owner</code> element. If the initiator is an IAM User,
+     * this element provides the user ARN and display name.</p>
      */
     inline ListPartsResult& WithInitiator(const Initiator& value) { SetInitiator(value); return *this;}
 
     /**
-     * Identifies who initiated the multipart upload.
+     * <p>Container element that identifies who initiated the multipart upload. If the
+     * initiator is an Amazon Web Services account, this element provides the same
+     * information as the <code>Owner</code> element. If the initiator is an IAM User,
+     * this element provides the user ARN and display name.</p>
      */
     inline ListPartsResult& WithInitiator(Initiator&& value) { SetInitiator(std::move(value)); return *this;}
 
 
-    
+    /**
+     * <p>Container element that identifies the object owner, after the object is
+     * created. If multipart upload is initiated by an IAM user, this element provides
+     * the parent account ID and display name.</p>  <p> <b>Directory buckets</b>
+     * - The bucket owner is returned as the object owner for all the parts.</p>
+     * 
+     */
     inline const Owner& GetOwner() const{ return m_owner; }
 
-    
+    /**
+     * <p>Container element that identifies the object owner, after the object is
+     * created. If multipart upload is initiated by an IAM user, this element provides
+     * the parent account ID and display name.</p>  <p> <b>Directory buckets</b>
+     * - The bucket owner is returned as the object owner for all the parts.</p>
+     * 
+     */
     inline void SetOwner(const Owner& value) { m_owner = value; }
 
-    
+    /**
+     * <p>Container element that identifies the object owner, after the object is
+     * created. If multipart upload is initiated by an IAM user, this element provides
+     * the parent account ID and display name.</p>  <p> <b>Directory buckets</b>
+     * - The bucket owner is returned as the object owner for all the parts.</p>
+     * 
+     */
     inline void SetOwner(Owner&& value) { m_owner = std::move(value); }
 
-    
+    /**
+     * <p>Container element that identifies the object owner, after the object is
+     * created. If multipart upload is initiated by an IAM user, this element provides
+     * the parent account ID and display name.</p>  <p> <b>Directory buckets</b>
+     * - The bucket owner is returned as the object owner for all the parts.</p>
+     * 
+     */
     inline ListPartsResult& WithOwner(const Owner& value) { SetOwner(value); return *this;}
 
-    
+    /**
+     * <p>Container element that identifies the object owner, after the object is
+     * created. If multipart upload is initiated by an IAM user, this element provides
+     * the parent account ID and display name.</p>  <p> <b>Directory buckets</b>
+     * - The bucket owner is returned as the object owner for all the parts.</p>
+     * 
+     */
     inline ListPartsResult& WithOwner(Owner&& value) { SetOwner(std::move(value)); return *this;}
 
 
     /**
-     * The class of storage used to store the object.
+     * <p>The class of storage used to store the uploaded object.</p>  <p>
+     * <b>Directory buckets</b> - Only the S3 Express One Zone storage class is
+     * supported by directory buckets to store objects.</p> 
      */
     inline const StorageClass& GetStorageClass() const{ return m_storageClass; }
 
     /**
-     * The class of storage used to store the object.
+     * <p>The class of storage used to store the uploaded object.</p>  <p>
+     * <b>Directory buckets</b> - Only the S3 Express One Zone storage class is
+     * supported by directory buckets to store objects.</p> 
      */
     inline void SetStorageClass(const StorageClass& value) { m_storageClass = value; }
 
     /**
-     * The class of storage used to store the object.
+     * <p>The class of storage used to store the uploaded object.</p>  <p>
+     * <b>Directory buckets</b> - Only the S3 Express One Zone storage class is
+     * supported by directory buckets to store objects.</p> 
      */
     inline void SetStorageClass(StorageClass&& value) { m_storageClass = std::move(value); }
 
     /**
-     * The class of storage used to store the object.
+     * <p>The class of storage used to store the uploaded object.</p>  <p>
+     * <b>Directory buckets</b> - Only the S3 Express One Zone storage class is
+     * supported by directory buckets to store objects.</p> 
      */
     inline ListPartsResult& WithStorageClass(const StorageClass& value) { SetStorageClass(value); return *this;}
 
     /**
-     * The class of storage used to store the object.
+     * <p>The class of storage used to store the uploaded object.</p>  <p>
+     * <b>Directory buckets</b> - Only the S3 Express One Zone storage class is
+     * supported by directory buckets to store objects.</p> 
      */
     inline ListPartsResult& WithStorageClass(StorageClass&& value) { SetStorageClass(std::move(value)); return *this;}
 
@@ -405,6 +550,54 @@ namespace Model
 
     
     inline ListPartsResult& WithRequestCharged(RequestCharged&& value) { SetRequestCharged(std::move(value)); return *this;}
+
+
+    /**
+     * <p>The algorithm that was used to create a checksum of the object.</p>
+     */
+    inline const ChecksumAlgorithm& GetChecksumAlgorithm() const{ return m_checksumAlgorithm; }
+
+    /**
+     * <p>The algorithm that was used to create a checksum of the object.</p>
+     */
+    inline void SetChecksumAlgorithm(const ChecksumAlgorithm& value) { m_checksumAlgorithm = value; }
+
+    /**
+     * <p>The algorithm that was used to create a checksum of the object.</p>
+     */
+    inline void SetChecksumAlgorithm(ChecksumAlgorithm&& value) { m_checksumAlgorithm = std::move(value); }
+
+    /**
+     * <p>The algorithm that was used to create a checksum of the object.</p>
+     */
+    inline ListPartsResult& WithChecksumAlgorithm(const ChecksumAlgorithm& value) { SetChecksumAlgorithm(value); return *this;}
+
+    /**
+     * <p>The algorithm that was used to create a checksum of the object.</p>
+     */
+    inline ListPartsResult& WithChecksumAlgorithm(ChecksumAlgorithm&& value) { SetChecksumAlgorithm(std::move(value)); return *this;}
+
+
+    
+    inline const Aws::String& GetRequestId() const{ return m_requestId; }
+
+    
+    inline void SetRequestId(const Aws::String& value) { m_requestId = value; }
+
+    
+    inline void SetRequestId(Aws::String&& value) { m_requestId = std::move(value); }
+
+    
+    inline void SetRequestId(const char* value) { m_requestId.assign(value); }
+
+    
+    inline ListPartsResult& WithRequestId(const Aws::String& value) { SetRequestId(value); return *this;}
+
+    
+    inline ListPartsResult& WithRequestId(Aws::String&& value) { SetRequestId(std::move(value)); return *this;}
+
+    
+    inline ListPartsResult& WithRequestId(const char* value) { SetRequestId(value); return *this;}
 
   private:
 
@@ -435,6 +628,10 @@ namespace Model
     StorageClass m_storageClass;
 
     RequestCharged m_requestCharged;
+
+    ChecksumAlgorithm m_checksumAlgorithm;
+
+    Aws::String m_requestId;
   };
 
 } // namespace Model

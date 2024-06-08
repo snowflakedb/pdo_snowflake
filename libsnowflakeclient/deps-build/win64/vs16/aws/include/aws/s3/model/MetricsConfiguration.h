@@ -1,17 +1,7 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
@@ -33,94 +23,133 @@ namespace S3
 namespace Model
 {
 
-  class AWS_S3_API MetricsConfiguration
+  /**
+   * <p>Specifies a metrics configuration for the CloudWatch request metrics
+   * (specified by the metrics configuration ID) from an Amazon S3 bucket. If you're
+   * updating an existing metrics configuration, note that this is a full replacement
+   * of the existing metrics configuration. If you don't include the elements you
+   * want to keep, they are erased. For more information, see <a
+   * href="https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTMetricConfiguration.html">PutBucketMetricsConfiguration</a>.</p><p><h3>See
+   * Also:</h3>   <a
+   * href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/MetricsConfiguration">AWS
+   * API Reference</a></p>
+   */
+  class MetricsConfiguration
   {
   public:
-    MetricsConfiguration();
-    MetricsConfiguration(const Aws::Utils::Xml::XmlNode& xmlNode);
-    MetricsConfiguration& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API MetricsConfiguration();
+    AWS_S3_API MetricsConfiguration(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API MetricsConfiguration& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
 
-    void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
+    AWS_S3_API void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
 
 
     /**
-     * The ID used to identify the metrics configuration.
+     * <p>The ID used to identify the metrics configuration. The ID has a 64 character
+     * limit and can only contain letters, numbers, periods, dashes, and
+     * underscores.</p>
      */
     inline const Aws::String& GetId() const{ return m_id; }
 
     /**
-     * The ID used to identify the metrics configuration.
+     * <p>The ID used to identify the metrics configuration. The ID has a 64 character
+     * limit and can only contain letters, numbers, periods, dashes, and
+     * underscores.</p>
+     */
+    inline bool IdHasBeenSet() const { return m_idHasBeenSet; }
+
+    /**
+     * <p>The ID used to identify the metrics configuration. The ID has a 64 character
+     * limit and can only contain letters, numbers, periods, dashes, and
+     * underscores.</p>
      */
     inline void SetId(const Aws::String& value) { m_idHasBeenSet = true; m_id = value; }
 
     /**
-     * The ID used to identify the metrics configuration.
+     * <p>The ID used to identify the metrics configuration. The ID has a 64 character
+     * limit and can only contain letters, numbers, periods, dashes, and
+     * underscores.</p>
      */
     inline void SetId(Aws::String&& value) { m_idHasBeenSet = true; m_id = std::move(value); }
 
     /**
-     * The ID used to identify the metrics configuration.
+     * <p>The ID used to identify the metrics configuration. The ID has a 64 character
+     * limit and can only contain letters, numbers, periods, dashes, and
+     * underscores.</p>
      */
     inline void SetId(const char* value) { m_idHasBeenSet = true; m_id.assign(value); }
 
     /**
-     * The ID used to identify the metrics configuration.
+     * <p>The ID used to identify the metrics configuration. The ID has a 64 character
+     * limit and can only contain letters, numbers, periods, dashes, and
+     * underscores.</p>
      */
     inline MetricsConfiguration& WithId(const Aws::String& value) { SetId(value); return *this;}
 
     /**
-     * The ID used to identify the metrics configuration.
+     * <p>The ID used to identify the metrics configuration. The ID has a 64 character
+     * limit and can only contain letters, numbers, periods, dashes, and
+     * underscores.</p>
      */
     inline MetricsConfiguration& WithId(Aws::String&& value) { SetId(std::move(value)); return *this;}
 
     /**
-     * The ID used to identify the metrics configuration.
+     * <p>The ID used to identify the metrics configuration. The ID has a 64 character
+     * limit and can only contain letters, numbers, periods, dashes, and
+     * underscores.</p>
      */
     inline MetricsConfiguration& WithId(const char* value) { SetId(value); return *this;}
 
 
     /**
-     * Specifies a metrics configuration filter. The metrics configuration will only
-     * include objects that meet the filter's criteria. A filter must be a prefix, a
-     * tag, or a conjunction (MetricsAndOperator).
+     * <p>Specifies a metrics configuration filter. The metrics configuration will only
+     * include objects that meet the filter's criteria. A filter must be a prefix, an
+     * object tag, an access point ARN, or a conjunction (MetricsAndOperator).</p>
      */
     inline const MetricsFilter& GetFilter() const{ return m_filter; }
 
     /**
-     * Specifies a metrics configuration filter. The metrics configuration will only
-     * include objects that meet the filter's criteria. A filter must be a prefix, a
-     * tag, or a conjunction (MetricsAndOperator).
+     * <p>Specifies a metrics configuration filter. The metrics configuration will only
+     * include objects that meet the filter's criteria. A filter must be a prefix, an
+     * object tag, an access point ARN, or a conjunction (MetricsAndOperator).</p>
+     */
+    inline bool FilterHasBeenSet() const { return m_filterHasBeenSet; }
+
+    /**
+     * <p>Specifies a metrics configuration filter. The metrics configuration will only
+     * include objects that meet the filter's criteria. A filter must be a prefix, an
+     * object tag, an access point ARN, or a conjunction (MetricsAndOperator).</p>
      */
     inline void SetFilter(const MetricsFilter& value) { m_filterHasBeenSet = true; m_filter = value; }
 
     /**
-     * Specifies a metrics configuration filter. The metrics configuration will only
-     * include objects that meet the filter's criteria. A filter must be a prefix, a
-     * tag, or a conjunction (MetricsAndOperator).
+     * <p>Specifies a metrics configuration filter. The metrics configuration will only
+     * include objects that meet the filter's criteria. A filter must be a prefix, an
+     * object tag, an access point ARN, or a conjunction (MetricsAndOperator).</p>
      */
     inline void SetFilter(MetricsFilter&& value) { m_filterHasBeenSet = true; m_filter = std::move(value); }
 
     /**
-     * Specifies a metrics configuration filter. The metrics configuration will only
-     * include objects that meet the filter's criteria. A filter must be a prefix, a
-     * tag, or a conjunction (MetricsAndOperator).
+     * <p>Specifies a metrics configuration filter. The metrics configuration will only
+     * include objects that meet the filter's criteria. A filter must be a prefix, an
+     * object tag, an access point ARN, or a conjunction (MetricsAndOperator).</p>
      */
     inline MetricsConfiguration& WithFilter(const MetricsFilter& value) { SetFilter(value); return *this;}
 
     /**
-     * Specifies a metrics configuration filter. The metrics configuration will only
-     * include objects that meet the filter's criteria. A filter must be a prefix, a
-     * tag, or a conjunction (MetricsAndOperator).
+     * <p>Specifies a metrics configuration filter. The metrics configuration will only
+     * include objects that meet the filter's criteria. A filter must be a prefix, an
+     * object tag, an access point ARN, or a conjunction (MetricsAndOperator).</p>
      */
     inline MetricsConfiguration& WithFilter(MetricsFilter&& value) { SetFilter(std::move(value)); return *this;}
 
   private:
 
     Aws::String m_id;
-    bool m_idHasBeenSet;
+    bool m_idHasBeenSet = false;
 
     MetricsFilter m_filter;
-    bool m_filterHasBeenSet;
+    bool m_filterHasBeenSet = false;
   };
 
 } // namespace Model

@@ -1,23 +1,14 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
 #include <aws/core/utils/stream/ResponseStream.h>
 #include <aws/core/utils/Array.h>
 #include <aws/s3/model/RequestCharged.h>
+#include <aws/core/utils/memory/stl/AWSString.h>
 #include <utility>
 
 namespace Aws
@@ -29,30 +20,34 @@ namespace S3
 {
 namespace Model
 {
-  class AWS_S3_API GetObjectTorrentResult
+  class GetObjectTorrentResult
   {
   public:
-    GetObjectTorrentResult();
+    AWS_S3_API GetObjectTorrentResult();
     //We have to define these because Microsoft doesn't auto generate them
-    GetObjectTorrentResult(GetObjectTorrentResult&&);
-    GetObjectTorrentResult& operator=(GetObjectTorrentResult&&);
+    AWS_S3_API GetObjectTorrentResult(GetObjectTorrentResult&&);
+    AWS_S3_API GetObjectTorrentResult& operator=(GetObjectTorrentResult&&);
     //we delete these because Microsoft doesn't handle move generation correctly
     //and we therefore don't trust them to get it right here either.
     GetObjectTorrentResult(const GetObjectTorrentResult&) = delete;
     GetObjectTorrentResult& operator=(const GetObjectTorrentResult&) = delete;
 
 
-    GetObjectTorrentResult(Aws::AmazonWebServiceResult<Aws::Utils::Stream::ResponseStream>&& result);
-    GetObjectTorrentResult& operator=(Aws::AmazonWebServiceResult<Aws::Utils::Stream::ResponseStream>&& result);
+    AWS_S3_API GetObjectTorrentResult(Aws::AmazonWebServiceResult<Aws::Utils::Stream::ResponseStream>&& result);
+    AWS_S3_API GetObjectTorrentResult& operator=(Aws::AmazonWebServiceResult<Aws::Utils::Stream::ResponseStream>&& result);
 
 
 
-    
-    inline Aws::IOStream& GetBody() { return m_body.GetUnderlyingStream(); }
+    /**
+     * <p>A Bencoded dictionary as defined by the BitTorrent specification</p>
+     */
+    inline Aws::IOStream& GetBody() const { return m_body.GetUnderlyingStream(); }
 
-    
+    /**
+     * <p>A Bencoded dictionary as defined by the BitTorrent specification</p>
+     */
     inline void ReplaceBody(Aws::IOStream* body) { m_body = Aws::Utils::Stream::ResponseStream(body); }
-    
+
 
     
     inline const RequestCharged& GetRequestCharged() const{ return m_requestCharged; }
@@ -69,11 +64,35 @@ namespace Model
     
     inline GetObjectTorrentResult& WithRequestCharged(RequestCharged&& value) { SetRequestCharged(std::move(value)); return *this;}
 
+
+    
+    inline const Aws::String& GetRequestId() const{ return m_requestId; }
+
+    
+    inline void SetRequestId(const Aws::String& value) { m_requestId = value; }
+
+    
+    inline void SetRequestId(Aws::String&& value) { m_requestId = std::move(value); }
+
+    
+    inline void SetRequestId(const char* value) { m_requestId.assign(value); }
+
+    
+    inline GetObjectTorrentResult& WithRequestId(const Aws::String& value) { SetRequestId(value); return *this;}
+
+    
+    inline GetObjectTorrentResult& WithRequestId(Aws::String&& value) { SetRequestId(std::move(value)); return *this;}
+
+    
+    inline GetObjectTorrentResult& WithRequestId(const char* value) { SetRequestId(value); return *this;}
+
   private:
 
-  Aws::Utils::Stream::ResponseStream m_body;
+    Aws::Utils::Stream::ResponseStream m_body;
 
     RequestCharged m_requestCharged;
+
+    Aws::String m_requestId;
   };
 
 } // namespace Model

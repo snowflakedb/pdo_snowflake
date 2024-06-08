@@ -1,21 +1,12 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
 #include <aws/s3/model/InventoryConfiguration.h>
+#include <aws/core/utils/memory/stl/AWSString.h>
 #include <utility>
 
 namespace Aws
@@ -34,42 +25,66 @@ namespace S3
 {
 namespace Model
 {
-  class AWS_S3_API GetBucketInventoryConfigurationResult
+  class GetBucketInventoryConfigurationResult
   {
   public:
-    GetBucketInventoryConfigurationResult();
-    GetBucketInventoryConfigurationResult(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
-    GetBucketInventoryConfigurationResult& operator=(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
+    AWS_S3_API GetBucketInventoryConfigurationResult();
+    AWS_S3_API GetBucketInventoryConfigurationResult(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
+    AWS_S3_API GetBucketInventoryConfigurationResult& operator=(const Aws::AmazonWebServiceResult<Aws::Utils::Xml::XmlDocument>& result);
 
 
     /**
-     * Specifies the inventory configuration.
+     * <p>Specifies the inventory configuration.</p>
      */
     inline const InventoryConfiguration& GetInventoryConfiguration() const{ return m_inventoryConfiguration; }
 
     /**
-     * Specifies the inventory configuration.
+     * <p>Specifies the inventory configuration.</p>
      */
     inline void SetInventoryConfiguration(const InventoryConfiguration& value) { m_inventoryConfiguration = value; }
 
     /**
-     * Specifies the inventory configuration.
+     * <p>Specifies the inventory configuration.</p>
      */
     inline void SetInventoryConfiguration(InventoryConfiguration&& value) { m_inventoryConfiguration = std::move(value); }
 
     /**
-     * Specifies the inventory configuration.
+     * <p>Specifies the inventory configuration.</p>
      */
     inline GetBucketInventoryConfigurationResult& WithInventoryConfiguration(const InventoryConfiguration& value) { SetInventoryConfiguration(value); return *this;}
 
     /**
-     * Specifies the inventory configuration.
+     * <p>Specifies the inventory configuration.</p>
      */
     inline GetBucketInventoryConfigurationResult& WithInventoryConfiguration(InventoryConfiguration&& value) { SetInventoryConfiguration(std::move(value)); return *this;}
+
+
+    
+    inline const Aws::String& GetRequestId() const{ return m_requestId; }
+
+    
+    inline void SetRequestId(const Aws::String& value) { m_requestId = value; }
+
+    
+    inline void SetRequestId(Aws::String&& value) { m_requestId = std::move(value); }
+
+    
+    inline void SetRequestId(const char* value) { m_requestId.assign(value); }
+
+    
+    inline GetBucketInventoryConfigurationResult& WithRequestId(const Aws::String& value) { SetRequestId(value); return *this;}
+
+    
+    inline GetBucketInventoryConfigurationResult& WithRequestId(Aws::String&& value) { SetRequestId(std::move(value)); return *this;}
+
+    
+    inline GetBucketInventoryConfigurationResult& WithRequestId(const char* value) { SetRequestId(value); return *this;}
 
   private:
 
     InventoryConfiguration m_inventoryConfiguration;
+
+    Aws::String m_requestId;
   };
 
 } // namespace Model

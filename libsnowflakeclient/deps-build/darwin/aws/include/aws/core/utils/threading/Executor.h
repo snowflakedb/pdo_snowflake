@@ -1,30 +1,15 @@
-/*
-  * Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License").
-  * You may not use this file except in compliance with the License.
-  * A copy of the License is located at
-  *
-  *  http://aws.amazon.com/apache2.0
-  *
-  * or in the "license" file accompanying this file. This file is distributed
-  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-  * express or implied. See the License for the specific language governing
-  * permissions and limitations under the License.
-  */
+/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
+#if !defined(AWS_EXECUTOR_H)
+#define AWS_EXECUTOR_H
 
 #include <aws/core/Core_EXPORTS.h>
-#include <aws/core/utils/memory/stl/AWSFunction.h>
-#include <aws/core/utils/memory/stl/AWSQueue.h>
-#include <aws/core/utils/memory/stl/AWSVector.h>
-#include <aws/core/utils/memory/stl/AWSMap.h>
-#include <aws/core/utils/threading/Semaphore.h>
+
 #include <functional>
-#include <future>
-#include <mutex>
-#include <atomic>
 
 namespace Aws
 {
@@ -32,8 +17,6 @@ namespace Aws
     {
         namespace Threading
         {
-            class ThreadTask;
-
             /**
             * Interface for implementing an Executor, to implement a custom thread execution strategy, inherit from this class
             * and override SubmitToThread().
@@ -53,78 +36,28 @@ namespace Aws
                     return SubmitToThread(std::move(callable));
                 }
 
+                /* explicit _overload_ of the template function above to avoid template bloat */
+                bool Submit(std::function<void()>&& callable)
+                {
+                    return SubmitToThread(std::move(callable));
+                }
+
+                /**
+                 * Call to wait until all tasks have finished.
+                 */
+                virtual void WaitUntilStopped() { return; };
+
             protected:
                 /**
                 * To implement your own executor implementation, then simply subclass Executor and implement this method.
                 */
                 virtual bool SubmitToThread(std::function<void()>&&) = 0;
             };
-
-
-            /**
-            * Default Executor implementation. Simply spawns a thread and detaches it.
-            */
-            class AWS_CORE_API DefaultExecutor : public Executor
-            {
-            public:
-                DefaultExecutor() : m_state(State::Free) {}
-                ~DefaultExecutor();
-            protected:
-                enum class State
-                {
-                    Free, Locked, Shutdown
-                };
-                bool SubmitToThread(std::function<void()>&&) override;
-                void Detach(std::thread::id id);
-                std::atomic<State> m_state;
-                Aws::UnorderedMap<std::thread::id, std::thread> m_threads;
-            };
-
-            enum class OverflowPolicy
-            {
-                QUEUE_TASKS_EVENLY_ACCROSS_THREADS,
-                REJECT_IMMEDIATELY
-            };
-
-            /**
-            * Thread Pool Executor implementation.
-            */
-            class AWS_CORE_API PooledThreadExecutor : public Executor
-            {
-            public:
-                PooledThreadExecutor(size_t poolSize, OverflowPolicy overflowPolicy = OverflowPolicy::QUEUE_TASKS_EVENLY_ACCROSS_THREADS);
-                ~PooledThreadExecutor();
-
-                /**
-                * Rule of 5 stuff.
-                * Don't copy or move
-                */
-                PooledThreadExecutor(const PooledThreadExecutor&) = delete;
-                PooledThreadExecutor& operator =(const PooledThreadExecutor&) = delete;
-                PooledThreadExecutor(PooledThreadExecutor&&) = delete;
-                PooledThreadExecutor& operator =(PooledThreadExecutor&&) = delete;
-
-            protected:
-                bool SubmitToThread(std::function<void()>&&) override;
-
-            private:
-                Aws::Queue<std::function<void()>*> m_tasks;
-                std::mutex m_queueLock;
-                Aws::Utils::Threading::Semaphore m_sync;
-                Aws::Vector<ThreadTask*> m_threadTaskHandles;
-                size_t m_poolSize;
-                OverflowPolicy m_overflowPolicy;
-
-                /**
-                 * Once you call this, you are responsible for freeing the memory pointed to by task.
-                 */
-                std::function<void()>* PopTask();
-                bool HasTasks();
-
-                friend class ThreadTask;
-            };
-
-
         } // namespace Threading
     } // namespace Utils
 } // namespace Aws
+
+// TODO: remove on a next minor API bump from 1.11.x
+#endif // !defined(AWS_EXECUTOR_H)
+#include <aws/core/utils/threading/DefaultExecutor.h>
+#include <aws/core/utils/threading/PooledThreadExecutor.h>

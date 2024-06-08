@@ -1,17 +1,7 @@
-﻿/*
-* Copyright 2010-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License").
-* You may not use this file except in compliance with the License.
-* A copy of the License is located at
-*
-*  http://aws.amazon.com/apache2.0
-*
-* or in the "license" file accompanying this file. This file is distributed
-* on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
-* express or implied. See the License for the specific language governing
-* permissions and limitations under the License.
-*/
+﻿/**
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0.
+ */
 
 #pragma once
 #include <aws/s3/S3_EXPORTS.h>
@@ -33,255 +23,382 @@ namespace S3
 namespace Model
 {
 
-  class AWS_S3_API Redirect
+  /**
+   * <p>Specifies how requests are redirected. In the event of an error, you can
+   * specify a different error code to return.</p><p><h3>See Also:</h3>   <a
+   * href="http://docs.aws.amazon.com/goto/WebAPI/s3-2006-03-01/Redirect">AWS API
+   * Reference</a></p>
+   */
+  class Redirect
   {
   public:
-    Redirect();
-    Redirect(const Aws::Utils::Xml::XmlNode& xmlNode);
-    Redirect& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API Redirect();
+    AWS_S3_API Redirect(const Aws::Utils::Xml::XmlNode& xmlNode);
+    AWS_S3_API Redirect& operator=(const Aws::Utils::Xml::XmlNode& xmlNode);
 
-    void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
+    AWS_S3_API void AddToNode(Aws::Utils::Xml::XmlNode& parentNode) const;
 
 
     /**
-     * The host name to use in the redirect request.
+     * <p>The host name to use in the redirect request.</p>
      */
     inline const Aws::String& GetHostName() const{ return m_hostName; }
 
     /**
-     * The host name to use in the redirect request.
+     * <p>The host name to use in the redirect request.</p>
+     */
+    inline bool HostNameHasBeenSet() const { return m_hostNameHasBeenSet; }
+
+    /**
+     * <p>The host name to use in the redirect request.</p>
      */
     inline void SetHostName(const Aws::String& value) { m_hostNameHasBeenSet = true; m_hostName = value; }
 
     /**
-     * The host name to use in the redirect request.
+     * <p>The host name to use in the redirect request.</p>
      */
     inline void SetHostName(Aws::String&& value) { m_hostNameHasBeenSet = true; m_hostName = std::move(value); }
 
     /**
-     * The host name to use in the redirect request.
+     * <p>The host name to use in the redirect request.</p>
      */
     inline void SetHostName(const char* value) { m_hostNameHasBeenSet = true; m_hostName.assign(value); }
 
     /**
-     * The host name to use in the redirect request.
+     * <p>The host name to use in the redirect request.</p>
      */
     inline Redirect& WithHostName(const Aws::String& value) { SetHostName(value); return *this;}
 
     /**
-     * The host name to use in the redirect request.
+     * <p>The host name to use in the redirect request.</p>
      */
     inline Redirect& WithHostName(Aws::String&& value) { SetHostName(std::move(value)); return *this;}
 
     /**
-     * The host name to use in the redirect request.
+     * <p>The host name to use in the redirect request.</p>
      */
     inline Redirect& WithHostName(const char* value) { SetHostName(value); return *this;}
 
 
     /**
-     * The HTTP redirect code to use on the response. Not required if one of the
-     * siblings is present.
+     * <p>The HTTP redirect code to use on the response. Not required if one of the
+     * siblings is present.</p>
      */
     inline const Aws::String& GetHttpRedirectCode() const{ return m_httpRedirectCode; }
 
     /**
-     * The HTTP redirect code to use on the response. Not required if one of the
-     * siblings is present.
+     * <p>The HTTP redirect code to use on the response. Not required if one of the
+     * siblings is present.</p>
+     */
+    inline bool HttpRedirectCodeHasBeenSet() const { return m_httpRedirectCodeHasBeenSet; }
+
+    /**
+     * <p>The HTTP redirect code to use on the response. Not required if one of the
+     * siblings is present.</p>
      */
     inline void SetHttpRedirectCode(const Aws::String& value) { m_httpRedirectCodeHasBeenSet = true; m_httpRedirectCode = value; }
 
     /**
-     * The HTTP redirect code to use on the response. Not required if one of the
-     * siblings is present.
+     * <p>The HTTP redirect code to use on the response. Not required if one of the
+     * siblings is present.</p>
      */
     inline void SetHttpRedirectCode(Aws::String&& value) { m_httpRedirectCodeHasBeenSet = true; m_httpRedirectCode = std::move(value); }
 
     /**
-     * The HTTP redirect code to use on the response. Not required if one of the
-     * siblings is present.
+     * <p>The HTTP redirect code to use on the response. Not required if one of the
+     * siblings is present.</p>
      */
     inline void SetHttpRedirectCode(const char* value) { m_httpRedirectCodeHasBeenSet = true; m_httpRedirectCode.assign(value); }
 
     /**
-     * The HTTP redirect code to use on the response. Not required if one of the
-     * siblings is present.
+     * <p>The HTTP redirect code to use on the response. Not required if one of the
+     * siblings is present.</p>
      */
     inline Redirect& WithHttpRedirectCode(const Aws::String& value) { SetHttpRedirectCode(value); return *this;}
 
     /**
-     * The HTTP redirect code to use on the response. Not required if one of the
-     * siblings is present.
+     * <p>The HTTP redirect code to use on the response. Not required if one of the
+     * siblings is present.</p>
      */
     inline Redirect& WithHttpRedirectCode(Aws::String&& value) { SetHttpRedirectCode(std::move(value)); return *this;}
 
     /**
-     * The HTTP redirect code to use on the response. Not required if one of the
-     * siblings is present.
+     * <p>The HTTP redirect code to use on the response. Not required if one of the
+     * siblings is present.</p>
      */
     inline Redirect& WithHttpRedirectCode(const char* value) { SetHttpRedirectCode(value); return *this;}
 
 
     /**
-     * Protocol to use (http, https) when redirecting requests. The default is the
-     * protocol that is used in the original request.
+     * <p>Protocol to use when redirecting requests. The default is the protocol that
+     * is used in the original request.</p>
      */
     inline const Protocol& GetProtocol() const{ return m_protocol; }
 
     /**
-     * Protocol to use (http, https) when redirecting requests. The default is the
-     * protocol that is used in the original request.
+     * <p>Protocol to use when redirecting requests. The default is the protocol that
+     * is used in the original request.</p>
+     */
+    inline bool ProtocolHasBeenSet() const { return m_protocolHasBeenSet; }
+
+    /**
+     * <p>Protocol to use when redirecting requests. The default is the protocol that
+     * is used in the original request.</p>
      */
     inline void SetProtocol(const Protocol& value) { m_protocolHasBeenSet = true; m_protocol = value; }
 
     /**
-     * Protocol to use (http, https) when redirecting requests. The default is the
-     * protocol that is used in the original request.
+     * <p>Protocol to use when redirecting requests. The default is the protocol that
+     * is used in the original request.</p>
      */
     inline void SetProtocol(Protocol&& value) { m_protocolHasBeenSet = true; m_protocol = std::move(value); }
 
     /**
-     * Protocol to use (http, https) when redirecting requests. The default is the
-     * protocol that is used in the original request.
+     * <p>Protocol to use when redirecting requests. The default is the protocol that
+     * is used in the original request.</p>
      */
     inline Redirect& WithProtocol(const Protocol& value) { SetProtocol(value); return *this;}
 
     /**
-     * Protocol to use (http, https) when redirecting requests. The default is the
-     * protocol that is used in the original request.
+     * <p>Protocol to use when redirecting requests. The default is the protocol that
+     * is used in the original request.</p>
      */
     inline Redirect& WithProtocol(Protocol&& value) { SetProtocol(std::move(value)); return *this;}
 
 
     /**
-     * The object key prefix to use in the redirect request. For example, to redirect
-     * requests for all pages with prefix docs/ (objects in the docs/ folder) to
-     * documents/, you can set a condition block with KeyPrefixEquals set to docs/ and
-     * in the Redirect set ReplaceKeyPrefixWith to /documents. Not required if one of
-     * the siblings is present. Can be present only if ReplaceKeyWith is not provided.
+     * <p>The object key prefix to use in the redirect request. For example, to
+     * redirect requests for all pages with prefix <code>docs/</code> (objects in the
+     * <code>docs/</code> folder) to <code>documents/</code>, you can set a condition
+     * block with <code>KeyPrefixEquals</code> set to <code>docs/</code> and in the
+     * Redirect set <code>ReplaceKeyPrefixWith</code> to <code>/documents</code>. Not
+     * required if one of the siblings is present. Can be present only if
+     * <code>ReplaceKeyWith</code> is not provided.</p>  <p>Replacement must
+     * be made for object keys containing special characters (such as carriage returns)
+     * when using XML requests. For more information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
      */
     inline const Aws::String& GetReplaceKeyPrefixWith() const{ return m_replaceKeyPrefixWith; }
 
     /**
-     * The object key prefix to use in the redirect request. For example, to redirect
-     * requests for all pages with prefix docs/ (objects in the docs/ folder) to
-     * documents/, you can set a condition block with KeyPrefixEquals set to docs/ and
-     * in the Redirect set ReplaceKeyPrefixWith to /documents. Not required if one of
-     * the siblings is present. Can be present only if ReplaceKeyWith is not provided.
+     * <p>The object key prefix to use in the redirect request. For example, to
+     * redirect requests for all pages with prefix <code>docs/</code> (objects in the
+     * <code>docs/</code> folder) to <code>documents/</code>, you can set a condition
+     * block with <code>KeyPrefixEquals</code> set to <code>docs/</code> and in the
+     * Redirect set <code>ReplaceKeyPrefixWith</code> to <code>/documents</code>. Not
+     * required if one of the siblings is present. Can be present only if
+     * <code>ReplaceKeyWith</code> is not provided.</p>  <p>Replacement must
+     * be made for object keys containing special characters (such as carriage returns)
+     * when using XML requests. For more information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
+     */
+    inline bool ReplaceKeyPrefixWithHasBeenSet() const { return m_replaceKeyPrefixWithHasBeenSet; }
+
+    /**
+     * <p>The object key prefix to use in the redirect request. For example, to
+     * redirect requests for all pages with prefix <code>docs/</code> (objects in the
+     * <code>docs/</code> folder) to <code>documents/</code>, you can set a condition
+     * block with <code>KeyPrefixEquals</code> set to <code>docs/</code> and in the
+     * Redirect set <code>ReplaceKeyPrefixWith</code> to <code>/documents</code>. Not
+     * required if one of the siblings is present. Can be present only if
+     * <code>ReplaceKeyWith</code> is not provided.</p>  <p>Replacement must
+     * be made for object keys containing special characters (such as carriage returns)
+     * when using XML requests. For more information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
      */
     inline void SetReplaceKeyPrefixWith(const Aws::String& value) { m_replaceKeyPrefixWithHasBeenSet = true; m_replaceKeyPrefixWith = value; }
 
     /**
-     * The object key prefix to use in the redirect request. For example, to redirect
-     * requests for all pages with prefix docs/ (objects in the docs/ folder) to
-     * documents/, you can set a condition block with KeyPrefixEquals set to docs/ and
-     * in the Redirect set ReplaceKeyPrefixWith to /documents. Not required if one of
-     * the siblings is present. Can be present only if ReplaceKeyWith is not provided.
+     * <p>The object key prefix to use in the redirect request. For example, to
+     * redirect requests for all pages with prefix <code>docs/</code> (objects in the
+     * <code>docs/</code> folder) to <code>documents/</code>, you can set a condition
+     * block with <code>KeyPrefixEquals</code> set to <code>docs/</code> and in the
+     * Redirect set <code>ReplaceKeyPrefixWith</code> to <code>/documents</code>. Not
+     * required if one of the siblings is present. Can be present only if
+     * <code>ReplaceKeyWith</code> is not provided.</p>  <p>Replacement must
+     * be made for object keys containing special characters (such as carriage returns)
+     * when using XML requests. For more information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
      */
     inline void SetReplaceKeyPrefixWith(Aws::String&& value) { m_replaceKeyPrefixWithHasBeenSet = true; m_replaceKeyPrefixWith = std::move(value); }
 
     /**
-     * The object key prefix to use in the redirect request. For example, to redirect
-     * requests for all pages with prefix docs/ (objects in the docs/ folder) to
-     * documents/, you can set a condition block with KeyPrefixEquals set to docs/ and
-     * in the Redirect set ReplaceKeyPrefixWith to /documents. Not required if one of
-     * the siblings is present. Can be present only if ReplaceKeyWith is not provided.
+     * <p>The object key prefix to use in the redirect request. For example, to
+     * redirect requests for all pages with prefix <code>docs/</code> (objects in the
+     * <code>docs/</code> folder) to <code>documents/</code>, you can set a condition
+     * block with <code>KeyPrefixEquals</code> set to <code>docs/</code> and in the
+     * Redirect set <code>ReplaceKeyPrefixWith</code> to <code>/documents</code>. Not
+     * required if one of the siblings is present. Can be present only if
+     * <code>ReplaceKeyWith</code> is not provided.</p>  <p>Replacement must
+     * be made for object keys containing special characters (such as carriage returns)
+     * when using XML requests. For more information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
      */
     inline void SetReplaceKeyPrefixWith(const char* value) { m_replaceKeyPrefixWithHasBeenSet = true; m_replaceKeyPrefixWith.assign(value); }
 
     /**
-     * The object key prefix to use in the redirect request. For example, to redirect
-     * requests for all pages with prefix docs/ (objects in the docs/ folder) to
-     * documents/, you can set a condition block with KeyPrefixEquals set to docs/ and
-     * in the Redirect set ReplaceKeyPrefixWith to /documents. Not required if one of
-     * the siblings is present. Can be present only if ReplaceKeyWith is not provided.
+     * <p>The object key prefix to use in the redirect request. For example, to
+     * redirect requests for all pages with prefix <code>docs/</code> (objects in the
+     * <code>docs/</code> folder) to <code>documents/</code>, you can set a condition
+     * block with <code>KeyPrefixEquals</code> set to <code>docs/</code> and in the
+     * Redirect set <code>ReplaceKeyPrefixWith</code> to <code>/documents</code>. Not
+     * required if one of the siblings is present. Can be present only if
+     * <code>ReplaceKeyWith</code> is not provided.</p>  <p>Replacement must
+     * be made for object keys containing special characters (such as carriage returns)
+     * when using XML requests. For more information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
      */
     inline Redirect& WithReplaceKeyPrefixWith(const Aws::String& value) { SetReplaceKeyPrefixWith(value); return *this;}
 
     /**
-     * The object key prefix to use in the redirect request. For example, to redirect
-     * requests for all pages with prefix docs/ (objects in the docs/ folder) to
-     * documents/, you can set a condition block with KeyPrefixEquals set to docs/ and
-     * in the Redirect set ReplaceKeyPrefixWith to /documents. Not required if one of
-     * the siblings is present. Can be present only if ReplaceKeyWith is not provided.
+     * <p>The object key prefix to use in the redirect request. For example, to
+     * redirect requests for all pages with prefix <code>docs/</code> (objects in the
+     * <code>docs/</code> folder) to <code>documents/</code>, you can set a condition
+     * block with <code>KeyPrefixEquals</code> set to <code>docs/</code> and in the
+     * Redirect set <code>ReplaceKeyPrefixWith</code> to <code>/documents</code>. Not
+     * required if one of the siblings is present. Can be present only if
+     * <code>ReplaceKeyWith</code> is not provided.</p>  <p>Replacement must
+     * be made for object keys containing special characters (such as carriage returns)
+     * when using XML requests. For more information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
      */
     inline Redirect& WithReplaceKeyPrefixWith(Aws::String&& value) { SetReplaceKeyPrefixWith(std::move(value)); return *this;}
 
     /**
-     * The object key prefix to use in the redirect request. For example, to redirect
-     * requests for all pages with prefix docs/ (objects in the docs/ folder) to
-     * documents/, you can set a condition block with KeyPrefixEquals set to docs/ and
-     * in the Redirect set ReplaceKeyPrefixWith to /documents. Not required if one of
-     * the siblings is present. Can be present only if ReplaceKeyWith is not provided.
+     * <p>The object key prefix to use in the redirect request. For example, to
+     * redirect requests for all pages with prefix <code>docs/</code> (objects in the
+     * <code>docs/</code> folder) to <code>documents/</code>, you can set a condition
+     * block with <code>KeyPrefixEquals</code> set to <code>docs/</code> and in the
+     * Redirect set <code>ReplaceKeyPrefixWith</code> to <code>/documents</code>. Not
+     * required if one of the siblings is present. Can be present only if
+     * <code>ReplaceKeyWith</code> is not provided.</p>  <p>Replacement must
+     * be made for object keys containing special characters (such as carriage returns)
+     * when using XML requests. For more information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
      */
     inline Redirect& WithReplaceKeyPrefixWith(const char* value) { SetReplaceKeyPrefixWith(value); return *this;}
 
 
     /**
-     * The specific object key to use in the redirect request. For example, redirect
-     * request to error.html. Not required if one of the sibling is present. Can be
-     * present only if ReplaceKeyPrefixWith is not provided.
+     * <p>The specific object key to use in the redirect request. For example, redirect
+     * request to <code>error.html</code>. Not required if one of the siblings is
+     * present. Can be present only if <code>ReplaceKeyPrefixWith</code> is not
+     * provided.</p>  <p>Replacement must be made for object keys containing
+     * special characters (such as carriage returns) when using XML requests. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
      */
     inline const Aws::String& GetReplaceKeyWith() const{ return m_replaceKeyWith; }
 
     /**
-     * The specific object key to use in the redirect request. For example, redirect
-     * request to error.html. Not required if one of the sibling is present. Can be
-     * present only if ReplaceKeyPrefixWith is not provided.
+     * <p>The specific object key to use in the redirect request. For example, redirect
+     * request to <code>error.html</code>. Not required if one of the siblings is
+     * present. Can be present only if <code>ReplaceKeyPrefixWith</code> is not
+     * provided.</p>  <p>Replacement must be made for object keys containing
+     * special characters (such as carriage returns) when using XML requests. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
+     */
+    inline bool ReplaceKeyWithHasBeenSet() const { return m_replaceKeyWithHasBeenSet; }
+
+    /**
+     * <p>The specific object key to use in the redirect request. For example, redirect
+     * request to <code>error.html</code>. Not required if one of the siblings is
+     * present. Can be present only if <code>ReplaceKeyPrefixWith</code> is not
+     * provided.</p>  <p>Replacement must be made for object keys containing
+     * special characters (such as carriage returns) when using XML requests. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
      */
     inline void SetReplaceKeyWith(const Aws::String& value) { m_replaceKeyWithHasBeenSet = true; m_replaceKeyWith = value; }
 
     /**
-     * The specific object key to use in the redirect request. For example, redirect
-     * request to error.html. Not required if one of the sibling is present. Can be
-     * present only if ReplaceKeyPrefixWith is not provided.
+     * <p>The specific object key to use in the redirect request. For example, redirect
+     * request to <code>error.html</code>. Not required if one of the siblings is
+     * present. Can be present only if <code>ReplaceKeyPrefixWith</code> is not
+     * provided.</p>  <p>Replacement must be made for object keys containing
+     * special characters (such as carriage returns) when using XML requests. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
      */
     inline void SetReplaceKeyWith(Aws::String&& value) { m_replaceKeyWithHasBeenSet = true; m_replaceKeyWith = std::move(value); }
 
     /**
-     * The specific object key to use in the redirect request. For example, redirect
-     * request to error.html. Not required if one of the sibling is present. Can be
-     * present only if ReplaceKeyPrefixWith is not provided.
+     * <p>The specific object key to use in the redirect request. For example, redirect
+     * request to <code>error.html</code>. Not required if one of the siblings is
+     * present. Can be present only if <code>ReplaceKeyPrefixWith</code> is not
+     * provided.</p>  <p>Replacement must be made for object keys containing
+     * special characters (such as carriage returns) when using XML requests. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
      */
     inline void SetReplaceKeyWith(const char* value) { m_replaceKeyWithHasBeenSet = true; m_replaceKeyWith.assign(value); }
 
     /**
-     * The specific object key to use in the redirect request. For example, redirect
-     * request to error.html. Not required if one of the sibling is present. Can be
-     * present only if ReplaceKeyPrefixWith is not provided.
+     * <p>The specific object key to use in the redirect request. For example, redirect
+     * request to <code>error.html</code>. Not required if one of the siblings is
+     * present. Can be present only if <code>ReplaceKeyPrefixWith</code> is not
+     * provided.</p>  <p>Replacement must be made for object keys containing
+     * special characters (such as carriage returns) when using XML requests. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
      */
     inline Redirect& WithReplaceKeyWith(const Aws::String& value) { SetReplaceKeyWith(value); return *this;}
 
     /**
-     * The specific object key to use in the redirect request. For example, redirect
-     * request to error.html. Not required if one of the sibling is present. Can be
-     * present only if ReplaceKeyPrefixWith is not provided.
+     * <p>The specific object key to use in the redirect request. For example, redirect
+     * request to <code>error.html</code>. Not required if one of the siblings is
+     * present. Can be present only if <code>ReplaceKeyPrefixWith</code> is not
+     * provided.</p>  <p>Replacement must be made for object keys containing
+     * special characters (such as carriage returns) when using XML requests. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
      */
     inline Redirect& WithReplaceKeyWith(Aws::String&& value) { SetReplaceKeyWith(std::move(value)); return *this;}
 
     /**
-     * The specific object key to use in the redirect request. For example, redirect
-     * request to error.html. Not required if one of the sibling is present. Can be
-     * present only if ReplaceKeyPrefixWith is not provided.
+     * <p>The specific object key to use in the redirect request. For example, redirect
+     * request to <code>error.html</code>. Not required if one of the siblings is
+     * present. Can be present only if <code>ReplaceKeyPrefixWith</code> is not
+     * provided.</p>  <p>Replacement must be made for object keys containing
+     * special characters (such as carriage returns) when using XML requests. For more
+     * information, see <a
+     * href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints">
+     * XML related object key constraints</a>.</p> 
      */
     inline Redirect& WithReplaceKeyWith(const char* value) { SetReplaceKeyWith(value); return *this;}
 
   private:
 
     Aws::String m_hostName;
-    bool m_hostNameHasBeenSet;
+    bool m_hostNameHasBeenSet = false;
 
     Aws::String m_httpRedirectCode;
-    bool m_httpRedirectCodeHasBeenSet;
+    bool m_httpRedirectCodeHasBeenSet = false;
 
     Protocol m_protocol;
-    bool m_protocolHasBeenSet;
+    bool m_protocolHasBeenSet = false;
 
     Aws::String m_replaceKeyPrefixWith;
-    bool m_replaceKeyPrefixWithHasBeenSet;
+    bool m_replaceKeyPrefixWithHasBeenSet = false;
 
     Aws::String m_replaceKeyWith;
-    bool m_replaceKeyWithHasBeenSet;
+    bool m_replaceKeyWithHasBeenSet = false;
   };
 
 } // namespace Model
