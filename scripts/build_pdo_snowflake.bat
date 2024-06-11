@@ -43,25 +43,12 @@ xcopy ^
     "%depsdir%\lib\" ^
     /v /y
 if %ERRORLEVEL% NEQ 0 goto :error
-rmdir /S /Q "%depsdir%\include\aws"
-if %ERRORLEVEL% NEQ 0 goto :error
-xcopy ^
-    "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\aws\include\aws" ^
-    "%depsdir%\include\aws\" ^
-    /v /y /e
-if %ERRORLEVEL% NEQ 0 goto :error
 
 :: Move Azure
 xcopy ^
     "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\azure\lib\*.lib" ^
     "%depsdir%\lib\" ^
     /v /y
-if %ERRORLEVEL% NEQ 0 goto :error
-:: No delete since no directory for azure headers
-xcopy ^
-    "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\azure\include\*" ^
-    "%depsdir%\include\" ^
-    /v /y /e
 if %ERRORLEVEL% NEQ 0 goto :error
 
 :: Move Curl
@@ -70,25 +57,12 @@ xcopy ^
     "%depsdir%\lib\" ^
     /v /y
 if %ERRORLEVEL% NEQ 0 goto :error
-rmdir /S /Q "%depsdir%\include\curl"
-if %ERRORLEVEL% NEQ 0 goto :error
-xcopy ^
-    "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\curl\include\curl" ^
-    "%depsdir%\include\curl\" ^
-    /v /y /e
-if %ERRORLEVEL% NEQ 0 goto :error
 
 :: Move oob
 xcopy ^
     "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\oob\lib\*.lib" ^
     "%depsdir%\lib\" ^
     /v /y
-if %ERRORLEVEL% NEQ 0 goto :error
-:: No delete since no directory for oob headers
-xcopy ^
-    "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\oob\include\*" ^
-    "%depsdir%\include\" ^
-    /v /y /e
 if %ERRORLEVEL% NEQ 0 goto :error
 
 :: Move OpenSSL
@@ -97,25 +71,12 @@ xcopy ^
     "%depsdir%\lib\" ^
     /v /y
 if %ERRORLEVEL% NEQ 0 goto :error
-rmdir /S /Q "%depsdir%\include\openssl"
-if %ERRORLEVEL% NEQ 0 goto :error
-xcopy ^
-    "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\openssl\include\openssl" ^
-    "%depsdir%\include\openssl\" ^
-    /v /y /e
-if %ERRORLEVEL% NEQ 0 goto :error
 
 :: Move zlib
 xcopy ^
     "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\zlib\lib\*.lib" ^
     "%depsdir%\lib\" ^
     /v /y
-if %ERRORLEVEL% NEQ 0 goto :error
-:: No delete since no directory for zlib headers
-xcopy ^
-    "%pdodir%\libsnowflakeclient\deps-build\%build_dir%\zlib\include\*" ^
-    "%depsdir%\include\" ^
-    /v /y /e
 if %ERRORLEVEL% NEQ 0 goto :error
 
 :: Move libsnowflakeclient
