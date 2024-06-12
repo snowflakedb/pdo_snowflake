@@ -21,26 +21,8 @@ if [[ -z "$CMAKE" ]]; then
 fi
 
 if [[ -z "$GCC" || -z "$GXX" ]]; then
-    if [[ "$(which gcc49)" ]]; then
-        GCC="$(which gcc49)"
-        GXX="$(which g++49)"
-    elif [[ "$(which gcc-4.9)" ]]; then
-        GCC="$(which gcc-4.9)"
-        GXX="$(which g++-4.9)"
-    elif [[ "$(which gcc52)" ]]; then
-        GCC="$(which gcc52)"
-        GXX="$(which g++52)"
-    elif [[ "$(which gcc62)" ]]; then
-        GCC="$(which gcc62)"
-        GXX="$(which g++62)"
-    elif [[ "$(which gcc72)" ]]; then
-        GCC="$(which gcc72)"
-        GXX="$(which g++72)"
-    else
-        # Default to system
-        GCC="$(which gcc)"
-        GXX="$(which g++)"
-    fi
+    GCC="$(which gcc)"
+    GXX="$(which g++)"
 fi
 
 if [[ "$PLATFORM" == "darwin" ]]; then
