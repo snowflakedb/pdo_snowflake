@@ -303,6 +303,20 @@ where:
     $dbh = new PDO("snowflake:account=testaccount.us-east-2.aws", "user", "password");
     $dbh = new PDO("snowflake:account=testaccount;region=us-east-2.aws", "user", "password");
 
+You can specify the host name for your account directly as shown below instead of using `account` and `region`:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:host=<host_name>", "<user>", "<password>");
+
+where:
+
+- :code:`<host_name>` is the host name for your account, usually in the format of :code:`<account_identifier>.snowflakecomputing.com`
+
+where:
+
+- :code:`<account_identifier>` is your account identifier. For information about account identifiers, see `Account identifiers <https://docs.snowflake.com/en/user-guide/admin-account-identifier>`_.
+
 Using Key Pair Authentication
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
