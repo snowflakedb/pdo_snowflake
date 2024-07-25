@@ -249,6 +249,8 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
         PDO_LOG_RETURN(0);
     }
     SF_COLUMN_DESC *F = snowflake_desc(S->stmt);
+    uint64* max_variant_size = NULL;
+    snowflake_get_attribute(S->stmt->connection, SF_CON_MAX_VARIANT_SIZE, (void**)&max_variant_size);
     for (i = 0; i < stmt->column_count; i++) {
         cols[i].precision = (zend_ulong) F[i].precision;
         switch (F[i].type) {
@@ -256,7 +258,7 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
             case SF_DB_TYPE_ARRAY:
             case SF_DB_TYPE_VARIANT:
                 /* No size is given from the server */
-                cols[i].maxlen = SF_MAX_OBJECT_SIZE;
+                cols[i].maxlen = (size_t)(*max_variant_size);
                 break;
             case SF_DB_TYPE_BOOLEAN:
                 cols[i].maxlen =
