@@ -59,7 +59,7 @@ extern "C" {
 /**
  * The maximum object size
  */
-#define SF_MAX_OBJECT_SIZE 16777216
+#define SF_MAX_OBJECT_SIZE SF_MACRO_DEPRECATED_WARNING("SF_MAX_OBJECT_SIZE is deprecated, please use snowflake_get_attribute() instead to retrieve the max LOB size.") 16777216 
 
 /**
  * Login timeout in seconds
@@ -259,6 +259,9 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_INCLUDE_RETRY_REASON,
     SF_CON_RETRY_TIMEOUT,
     SF_CON_MAX_RETRY,
+    SF_CON_MAX_VARCHAR_SIZE,
+    SF_CON_MAX_BINARY_SIZE,
+    SF_CON_MAX_VARIANT_SIZE,
     SF_DIR_QUERY_URL,
     SF_DIR_QUERY_URL_PARAM,
     SF_DIR_QUERY_TOKEN,
@@ -385,6 +388,11 @@ typedef struct SF_CONNECT {
 
     // Error
     SF_ERROR_STRUCT error;
+
+    // max lob size
+    uint64 max_varchar_size;
+    uint64 max_binary_size;
+    uint64 max_variant_size;
 } SF_CONNECT;
 
 /**
