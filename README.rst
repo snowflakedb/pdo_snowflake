@@ -17,6 +17,9 @@ to connect to the Snowflake database.
 Prerequisites
 ================================================================================
 
+Operating system
+For a list of the operating systems supported by Snowflake clients, see `Operating system support <https://docs.snowflake.com/en/release-notes/requirements#label-client-operating-system-support>`_.
+
 To build the Snowflake PHP PDO Driver, the following software must be installed:
 
 - On Windows: Visual Studio 2019
