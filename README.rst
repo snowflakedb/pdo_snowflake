@@ -114,6 +114,10 @@ To build the PHP driver for Windows:
        git clone https://github.com/snowflakedb/pdo_snowflake.git
        cd pdo_snowflake
 
+
+   **Choose a target directory where none of the subdirectories contain any spaces or special characters on the path.** E.g. :code:`C:\temp\pdo_snowflake`.
+   Without this, one of the setup scripts (`phpsdk-starter.bat`) will fail during step 4. 
+
 #. Run the script to download the PHP SDK:
 
    .. code-block:: batch
