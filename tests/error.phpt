@@ -47,7 +47,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     $dbh = null; // Ensure closing db.
 
     try {
-        $dbh = new PDO($dsn, "HIHIHI", "HAHAHAH");
+        $dbh = new PDO($dsn, $user, "HAHAHAH");
     } catch (PDOException $e) {
         echo 'Connection failed: ' . $e->getMessage() . "\n";
     }
