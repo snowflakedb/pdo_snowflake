@@ -41,6 +41,11 @@ extern "C" {
  */
 #define SF_AUTHENTICATOR_EXTERNAL_BROWSER "externalbrowser"
 
+ /**
+ * Authenticator, oauth
+ */
+#define SF_AUTHENTICATOR_OAUTH "oauth"
+
 /**
  * UUID4 length
  */
@@ -262,11 +267,13 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_MAX_VARCHAR_SIZE,
     SF_CON_MAX_BINARY_SIZE,
     SF_CON_MAX_VARIANT_SIZE,
+    SF_CON_OCSP_FAIL_OPEN,
     SF_DIR_QUERY_URL,
     SF_DIR_QUERY_URL_PARAM,
     SF_DIR_QUERY_TOKEN,
     SF_RETRY_ON_CURLE_COULDNT_CONNECT_COUNT,
-    SF_QUERY_RESULT_TYPE
+    SF_QUERY_RESULT_TYPE,
+    SF_CON_OAUTH_TOKEN
 } SF_ATTRIBUTE;
 
 /**
@@ -318,6 +325,7 @@ typedef struct SF_CONNECT {
     char *passcode;
     sf_bool passcode_in_password;
     sf_bool insecure_mode;
+    sf_bool ocsp_fail_open;
     sf_bool autocommit;
     char *timezone;
     char *service_name;
@@ -393,6 +401,9 @@ typedef struct SF_CONNECT {
     uint64 max_varchar_size;
     uint64 max_binary_size;
     uint64 max_variant_size;
+
+    //token for OAuth authentication
+    char *oauth_token;
 } SF_CONNECT;
 
 /**
