@@ -277,6 +277,11 @@ Using the Driver
 
 The next sections explain how to use the driver in a PHP page.
 
+Note
+----------------------------------------------------------------------
+
+This driver currently does not support GCP regional endpoints. Please ensure that any workloads using through this driver do not require support for regional endpoints on GCP. If you have questions about this, please contact Snowflake Support.
+
 Connecting to the Snowflake Database
 ----------------------------------------------------------------------
 
@@ -573,7 +578,6 @@ The PHP PDO Snowflake driver uses phpt test framework. Refer the following docum
 
 - https://qa.php.net/write-test.php
 - https://qa.php.net/phpt_details.php
-
 
 Troubleshooting
 ================================================================================
