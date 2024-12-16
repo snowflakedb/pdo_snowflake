@@ -85,7 +85,7 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
   dnl # IMPORTANT NOTE: Change scripts/build_pdo_snowflake.sh to update
   dnl # the actual link options for pdo_snowflake.so
 
-  CFLAGS="-std=c99 -Werror $CFLAGS"
+  CFLAGS="-std=c11 -Werror $CFLAGS"
 
   PHP_NEW_EXTENSION(
     pdo_snowflake,

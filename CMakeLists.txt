@@ -10,7 +10,7 @@ set(CMAKE_C_FLAGS
 
 # coverage
 set(CMAKE_C_FLAGS
-        "${CMAKE_C_FLAGS} -std=c99 -Werror -g -O0 -ggdb -fprofile-arcs -ftest-coverage -fPIC")
+        "${CMAKE_C_FLAGS} -Werror -g -O0 -ggdb -fprofile-arcs -ftest-coverage -fPIC")
 
 if (UNIX AND NOT APPLE)
     set(LINUX TRUE)
