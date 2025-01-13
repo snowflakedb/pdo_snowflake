@@ -547,6 +547,10 @@ static int pdo_snowflake_stmt_param_hook(
         case PDO_PARAM_EVT_FREE:
             v = pdo_sf_param_store_get(S->bound_params,
                                        (size_t) param->paramno + 1, ZSTR_VAL(param->name));
+            if (!v)
+            {
+                break;
+            }
             if (Z_TYPE_P(parameter) != IS_NULL) {
                 switch (param->param_type) {
                     case PDO_PARAM_INT:
