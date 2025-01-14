@@ -107,33 +107,18 @@ if test "$PHP_COVERAGE" = "yes"; then
   if test "$gcc_ccache" = "yes" && (test -z "$CCACHE_DISABLE" || test "$CCACHE_DISABLE" != "1"); then
     AC_MSG_ERROR([ccache must be disabled when --enable-coverage option is used. You can disable ccache by setting environment variable CCACHE_DISABLE=1.])
   fi
-  lcov_version_list="1.5 1.6 1.7 1.9 1.10 1.11 1.12 1.13 1.14 1.15 1.16 2.0"
   AC_CHECK_PROG(LCOV, lcov, lcov)
   AC_CHECK_PROG(GENHTML, genhtml, genhtml)
   PHP_SUBST(LCOV)
   PHP_SUBST(GENHTML)
 
   if test "$LCOV"; then
-    AC_CACHE_CHECK([for lcov version], php_cv_lcov_version, [
-      php_cv_lcov_version=invalid
-      lcov_version=`$LCOV -v 2>/dev/null | $SED -e 's/^.* //'` #'
-      for lcov_check_version in $lcov_version_list; do
-        if test "$lcov_version" = "$lcov_check_version"; then
-          php_cv_lcov_version="$lcov_check_version (ok)"
-        fi
-      done
-    ])
+    lcov_version=`$LCOV -v 2>/dev/null | $SED -e 's/^.* //'` #'
   else
-    lcov_msg="To enable code coverage reporting you must have one of the following LCOV versions installed: $lcov_version_list"      
+    lcov_version=invalid
+    lcov_msg="To enable code coverage reporting you must have LCOV installed."
     AC_MSG_ERROR([$lcov_msg])
   fi
-  case $php_cv_lcov_version in
-    ""|invalid[)]
-      lcov_msg="You must have one of the following versions of LCOV: $lcov_version_list (found: $lcov_version)."
-      AC_MSG_ERROR([$lcov_msg])
-      LCOV="exit 0;"
-      ;;
-  esac
   if test -z "$GENHTML"; then
     AC_MSG_ERROR([Could not find genhtml from the LCOV package])
   fi
