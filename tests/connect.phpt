@@ -9,7 +9,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     include __DIR__ . "/common.php";
 
     // full parameters
-    $dbh = new PDO("$dsn;application=phptest;authenticator=snowflake;priv_key_file=tests/p8test.pem;priv_key_file_pwd=test;disablequerycontext=true;includeretryreason=false;logintimeout=250;maxhttpretries=8;retrytimeout=350", $user, $password);
+    $dbh = new PDO("$dsn;application=phptest;authenticator=snowflake;priv_key_file=tests/p8test.pem;priv_key_file_pwd=test;disablequerycontext=true;includeretryreason=false;logintimeout=250;maxhttpretries=8;retrytimeout=350;ocspfailopen=false;disableocspchecks=true", $user, $password);
     // create table for testing autocommit later
     $tablename = "autocommittest" . rand();
     $count = $dbh->exec("create or replace table " . $tablename . "(c1 int)");

@@ -54,12 +54,20 @@ struct StageInfo
 
   std::string path;
 
-  // required by s3 client
-  std::string region;
+  std::string region; // S3/GCS region
+
+  // An endpoint (Azure, AWS FIPS and GCS custom endpoint override)
+  std::string endPoint;
+
+  // whether to use s3 regional URL (AWS Only)
+  // TODO SNOW-1818804: this field will be deprecated when the server returns {@link
+  // #useRegionalUrl}
+  bool useS3RegionalUrl;
+
+  // whether to use regional URL (AWS and GCS only)
+  bool useRegionalUrl;
 
   std::string storageAccount; //Required by Azure
-
-  std::string endPoint;       //Required by Azure & for S3 FIPS
 
   std::string presignedUrl;   //Required by GCS for uploading
 

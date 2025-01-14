@@ -62,11 +62,6 @@ extern "C" {
 #define SF_COMMAND_LEN 10
 
 /**
- * The maximum object size
- */
-#define SF_MAX_OBJECT_SIZE SF_MACRO_DEPRECATED_WARNING("SF_MAX_OBJECT_SIZE is deprecated, please use snowflake_get_attribute() instead to retrieve the max LOB size.") 16777216 
-
-/**
  * Login timeout in seconds
  */
 // make the login timetout defaults to 300 to be inline with retry timeout
@@ -92,6 +87,11 @@ extern "C" {
  * Default JWT renew timeout in seconds
  */
 #define SF_JWT_CNXN_WAIT_TIME 10
+
+/**
+ * Privatelink host suffix.
+ */
+#define PRIVATELINK_HOSTNAME_SUFFIX ".privatelink.snowflakecomputing."
 
 /**
  * Snowflake Data types
@@ -164,7 +164,8 @@ typedef enum SF_STATUS {
     SF_STATUS_ERROR_NULL_POINTER = 240022,
     SF_STATUS_ERROR_BUFFER_TOO_SMALL = 240023,
     SF_STATUS_ERROR_UNSUPPORTED_QUERY_RESULT_FORMAT = 240024,
-    SF_STATUS_ERROR_OTHER = 240025
+    SF_STATUS_ERROR_OTHER = 240025,
+    SF_STATUS_ERROR_FILE_TRANSFER = 240026
 } SF_STATUS;
 
 /**
@@ -268,6 +269,16 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_MAX_BINARY_SIZE,
     SF_CON_MAX_VARIANT_SIZE,
     SF_CON_OCSP_FAIL_OPEN,
+    SF_CON_PUT_TEMPDIR,
+    SF_CON_PUT_COMPRESSLV,
+    SF_CON_PUT_USE_URANDOM_DEV,
+    SF_CON_PUT_FASTFAIL,
+    SF_CON_PUT_MAXRETRIES,
+    SF_CON_GET_FASTFAIL,
+    SF_CON_GET_MAXRETRIES,
+    SF_CON_GET_THRESHOLD,
+    SF_CON_STAGE_BIND_THRESHOLD,
+    SF_CON_DISABLE_STAGE_BIND,
     SF_DIR_QUERY_URL,
     SF_DIR_QUERY_URL_PARAM,
     SF_DIR_QUERY_TOKEN,
@@ -291,8 +302,12 @@ typedef enum SF_GLOBAL_ATTRIBUTE {
  * Attributes for Snowflake statement context.
  */
 typedef enum SF_STMT_ATTRIBUTE {
-    SF_STMT_USER_REALLOC_FUNC
+    SF_STMT_USER_REALLOC_FUNC,
+    SF_STMT_MULTI_STMT_COUNT,
+    SF_STMT_PARAMSET_SIZE
 } SF_STMT_ATTRIBUTE;
+#define SF_MULTI_STMT_COUNT_UNSET (-1)
+#define SF_MULTI_STMT_COUNT_UNLIMITED 0
 
 /**
  * Snowflake Error
@@ -404,6 +419,27 @@ typedef struct SF_CONNECT {
 
     //token for OAuth authentication
     char *oauth_token;
+
+    // put get configurations
+    sf_bool use_s3_regional_url;
+    sf_bool put_use_urand_dev;
+    int8 put_compress_level;
+    char* put_temp_dir;
+    sf_bool put_fastfail;
+    int8 put_maxretries;
+    sf_bool get_fastfail;
+    int8 get_maxretries;
+    int64 get_threshold;
+
+    // stage binding
+    /* used when updating stage binding options */
+    SF_MUTEX_HANDLE mutex_stage_bind;
+    sf_bool binding_stage_created;
+    uint64 stage_binding_threshold;
+    // the flag indecates the threshold from session parameter is overridden
+    // by the setting from connection attribute
+    sf_bool binding_threshold_overridden;
+    sf_bool stage_binding_disabled;
 } SF_CONNECT;
 
 /**
@@ -453,6 +489,16 @@ typedef struct SF_CHUNK_DOWNLOADER SF_CHUNK_DOWNLOADER;
  */
 typedef struct SF_PUT_GET_RESPONSE SF_PUT_GET_RESPONSE;
 
+typedef void* result_set_ptr;
+
+/**
+ * An enumeration over all supported query result formats.
+ */
+typedef enum QueryResultFormat_e
+{
+  SF_ARROW_FORMAT, SF_JSON_FORMAT, SF_PUTGET_FORMAT, SF_FORMAT_UNKNOWN
+} QueryResultFormat;
+
 /**
  * Statement context
  */
@@ -462,9 +508,9 @@ typedef struct SF_STMT {
     char request_id[SF_UUID4_LEN];
     SF_ERROR_STRUCT error;
     SF_CONNECT *connection;
-    void *qrf;
+    QueryResultFormat qrf;
     char *sql_text;
-    void *result_set;
+    result_set_ptr result_set;
     int64 chunk_rowcount;
     int64 total_rowcount;
     int64 total_fieldcount;
@@ -476,6 +522,12 @@ typedef struct SF_STMT {
     SF_STATS *stats;
     void *stmt_attrs;
     sf_bool is_dml;
+    sf_bool is_multi_stmt;
+    void* multi_stmt_result_ids;
+    int64 multi_stmt_count;
+    int64 paramset_size;
+    sf_bool array_bind_supported;
+    int64 affected_rows;
 
     /**
      * User realloc function used in snowflake_fetch
@@ -488,14 +540,32 @@ typedef struct SF_STMT {
 
 /**
  * Bind input parameter context
+ * Array binding (usually for insert/update multiple rows with one query) supported.
+ * To do that, value should be set to the array having multiple values,
+ * statement attribute SF_STMT_PARAMSET_SIZE set to the number of elements of the array
+ * in each binding.
+ * for SF_C_TYPE_STRING len should be set to the buffer length of each string value,
+ * NOT the entire length of the array. It would be used to find the start of each value.
+ * len_ind should be set to an array of length,indicating the actual length of each value.
+ * each length could be set to
+ * SF_BIND_LEN_NULL to indicate NULL data
+ * SF_BIND_LEN_NTS to indicate NULL terminated string (for SF_C_TYPE_STRING only).
+ * >= 0 for actual data length (for SF_C_TYPE_STRING only).
+ * len_ind could be omitted (set to NULL) as well if no NULL data,
+ * and for for SF_C_TYPE_STRING, all string values are null terminated.
  */
+
+#define SF_BIND_LEN_NULL -1
+#define SF_BIND_LEN_NTS -3
+
 typedef struct {
     size_t idx; /* One based index of the columns, 0 if Named */
     char * name; /* Named Parameter name, NULL if positional */
     SF_C_TYPE c_type; /* input data type in C */
-    void *value; /* input value */
-    size_t len; /* input value length. valid only for SF_C_TYPE_STRING */
+    void *value; /* input value, could be array of multiple values */
+    size_t len; /* The length of each input value. valid only for SF_C_TYPE_STRING */
     SF_DB_TYPE type; /* (optional) target Snowflake data type */
+    int* len_ind; /* (optional) The array of length indicator to support array binding*/
 } SF_BIND_INPUT;
 
 /**
@@ -792,6 +862,15 @@ SF_STATUS STDCALL snowflake_execute_with_capture(SF_STMT *sfstmt,
  */
 SF_STATUS STDCALL snowflake_describe_with_capture(SF_STMT *sfstmt,
                                                   SF_QUERY_RESULT_CAPTURE *result_capture);
+
+/**
+ * Determines whether more results are available and, if so,
+ * initializes processing for the next one.
+ * @param sfstmt SNOWFLAKE_STMT context.
+ *
+ * @return 0 if success, otherwise an errno is returned.
+ */
+SF_STATUS STDCALL snowflake_next_result(SF_STMT* sfstmt);
 
 /**
  * Fetches the next row for the statement and stores on the bound buffer
