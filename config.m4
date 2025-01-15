@@ -107,7 +107,7 @@ if test "$PHP_COVERAGE" = "yes"; then
   if test "$gcc_ccache" = "yes" && (test -z "$CCACHE_DISABLE" || test "$CCACHE_DISABLE" != "1"); then
     AC_MSG_ERROR([ccache must be disabled when --enable-coverage option is used. You can disable ccache by setting environment variable CCACHE_DISABLE=1.])
   fi
-  lcov_version_list="1.5 1.6 1.7 1.9 1.10 1.11 1.12 1.13 1.14 1.15 1.16"
+  lcov_version_list="1.5 1.6 1.7 1.9 1.10 1.11 1.12 1.13 1.14 1.15 1.16 2.0"
   AC_CHECK_PROG(LCOV, lcov, lcov)
   AC_CHECK_PROG(GENHTML, genhtml, genhtml)
   PHP_SUBST(LCOV)
@@ -116,7 +116,8 @@ if test "$PHP_COVERAGE" = "yes"; then
   if test "$LCOV"; then
     AC_CACHE_CHECK([for lcov version], php_cv_lcov_version, [
       php_cv_lcov_version=invalid
-      lcov_version=`$LCOV -v 2>/dev/null | $SED -e 's/^.* //'` #'
+      echo "LCOV: " `$LCOV --version`
+      lcov_version=`$LCOV --version 2>/dev/null | $SED -e 's/^.* //' | cut -d- -f1` #'
       for lcov_check_version in $lcov_version_list; do
         if test "$lcov_version" = "$lcov_check_version"; then
           php_cv_lcov_version="$lcov_check_version (ok)"
