@@ -825,14 +825,14 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
             &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
     PDO_LOG_DBG(
         "ocspfailopen: %s",
-        vars[PDO_SNOWFLAKE_CONN_ATTR_INCLUDE_RETRY_REASON_IDX].optval);
+        vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_FAIL_OPEN_IDX].optval);
 
     snowflake_global_set_attribute(SF_GLOBAL_OCSP_CHECK,
-        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE].optval, "true") == 0) ?
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval, "true") == 0) ?
             &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
     PDO_LOG_DBG(
         "disableocspchecks: %s",
-        vars[PDO_SNOWFLAKE_CONN_ATTR_INCLUDE_RETRY_REASON_IDX].optval);
+        vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval);
 
     if (snowflake_connect(H->server) > 0) {
         pdo_snowflake_error(dbh);
