@@ -94,7 +94,7 @@ Building the Driver on Windows
 
 **Note**: Snowflake supports only thread-safe versions of PHP.
 
-You must install Microsoft Visual Studio 2019 (VS16) with the C++ development installer option.
+You must install Microsoft Visual Studio 2019 (VS16) or 2022 (VS17) with the C++ development installer option.
 
 To build the PHP driver for Windows:
 
@@ -131,7 +131,7 @@ To build the PHP driver for Windows:
 
    - :code:`<arch>` is your CPU architecture (Currently, the driver only supports :code:`x64`).
    - :code:`<build>` is the type of binary that you want to build (:code:`Release` or :code:`Debug`).
-   - :code:`<visual studio version>` is the version of Visual Studio that you are using (Currently, the driver only supports :code:`VS16`).
+   - :code:`<visual studio version>` is the version of Visual Studio that you are using (Currently, the driver only supports :code:`VS16` and :code:`VS17`).
    - :code:`<path to PHP SDK>` is the path to the directory where the PHP SDK should be downloaded.
      **Do not create this directory.** The script creates this directory for you when downloading the PHP SDK.
 
@@ -573,7 +573,7 @@ To run the tests, do the following:
 where:
 
 - :code:`<arch>` is your CPU architecture (Currently :code:`x64` is the only supported one).
-- :code:`<visual studio version>` is the version of Visual Studio that you are using (Currently :code:`VS16` is the only supported one).
+- :code:`<visual studio version>` is the version of Visual Studio that you are using (Currently :code:`VS16` and :code:`VS17` are supported).
 - :code:`<path to PHP SDK>` is the path to the directory where the PHP SDK should be downloaded.
 
 Additional Notes
