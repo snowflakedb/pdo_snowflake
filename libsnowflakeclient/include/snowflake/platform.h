@@ -46,6 +46,18 @@ typedef pthread_mutex_t SF_MUTEX_HANDLE;
 
 #endif
 
+// Defined for #pragma warning messages.
+#define MACRO_TO_STRING2(x) #x
+#define MACRO_TO_STRING(x) MACRO_TO_STRING2(x)
+
+// For marking functions and variables deprecated, i.e. like following:
+// #define FOO SF_MACRO_DEPRECATED_WARNING("FOO is deprecated, use BAR instead") BAR
+#if defined(_MSC_VER)
+#define SF_MACRO_DEPRECATED_WARNING(MSG) __pragma(message ( __FILE__ "(" MACRO_TO_STRING(__LINE__) ") : warning C4996: " MSG))
+#else
+#define SF_MACRO_DEPRECATED_WARNING(MSG)  _Pragma(MACRO_TO_STRING(GCC warning MSG))
+#endif
+
 #include "SF_CRTFunctionSafe.h"
 
 struct tm *STDCALL sf_gmtime(const time_t *timep, struct tm *result);
@@ -141,6 +153,9 @@ void STDCALL sf_memory_error_handler();
 
 // this should be called by application before any calls of sfclient
 void STDCALL sf_exception_on_memory_failure();
+
+// Defined for unused function parameters.
+#define UNUSED(x) (void)(x)
 
 #ifdef __cplusplus
 }
