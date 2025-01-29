@@ -7,6 +7,15 @@
 #include "pdo/php_pdo_driver.h"
 #include "php_pdo_snowflake_int.h"
 
+extern
+void STDCALL set_snowflake_error(SF_ERROR_STRUCT *error,
+                                 SF_STATUS error_code,
+                                 const char *msg,
+                                 const char *sqlstate,
+                                 const char *sfqid,
+                                 const char *file,
+                                 int line);
+
 /**
  * Mapping event enum to name
  */
@@ -131,6 +140,18 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
     /* Bind Columns/Results before fetching */
     stmt->column_count = (int) snowflake_num_fields(S->stmt);
     PDO_LOG_DBG("number of columns: %d", stmt->column_count);
+    if (stmt->column_count < 0)
+    {
+        PDO_LOG_ERR("Unsupported query type %s.", S->stmt->sql_text);
+        set_snowflake_error(&S->stmt->error,
+                            SF_STATUS_ERROR_GENERAL,
+                            "Unsupported query type.",
+                            SF_SQLSTATE_GENERAL_ERROR,
+                            snowflake_sfqid(S->stmt),
+                            __FILE__, __LINE__);
+        pdo_snowflake_error_stmt(stmt);
+        PDO_LOG_RETURN(0);
+    }
     // Create an array of string structs
     S->bound_results = ecalloc((size_t) stmt->column_count, sizeof(pdo_snowflake_string));
 
