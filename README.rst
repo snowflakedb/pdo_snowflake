@@ -362,19 +362,11 @@ Configuring OCSP Checking
 
 By default, OCSP (Online Certificate Status Protocol) checking is enabled and is set per PDO connection.
 
-To disable OCSP checking for a PDO connection, set :code:`disableocspchecks=true` in the DSN connection string. For example:
+To disable OCSP checking for a PDO connection, set :code:`insecure_mode=true` in the DSN connection string. For example:
 
 .. code-block:: php
 
-    $dbh = new PDO("snowflake:account=testaccount;disableocspchecks=true", "user", "password");
-
-By default, OCSP checking uses fail-open approach. For more details see `Fail-Open or Fail-Close behavior <https://docs.snowflake.com/en/user-guide/ocsp#fail-open-or-fail-close-behavior>`_.
-
-To switch to use fail-close approach, set :code:`ocspfailopen=false` in the DSN connection string. For example:
-
-.. code-block:: php
-
-    $dbh = new PDO("snowflake:account=testaccount;ocspfailopen=false", "user", "password");
+    $dbh = new PDO("snowflake:account=testaccount;insecure_mode=true", "user", "password");
 
 Proxy
 ----------------------------------------------------------------------
