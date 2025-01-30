@@ -155,7 +155,7 @@ void STDCALL sf_memory_error_handler();
 void STDCALL sf_exception_on_memory_failure();
 
 // Defined for unused function parameters.
-#define UNUSED(x) (void)(x)
+#define SF_UNUSED(x) (void)(x)
 
 #ifdef __cplusplus
 }
