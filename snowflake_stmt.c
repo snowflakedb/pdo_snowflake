@@ -105,8 +105,6 @@ static int pdo_snowflake_stmt_dtor(pdo_stmt_t *stmt) /* {{{ */
 }
 /* }}} */
 
-extern sf_bool STDCALL _is_put_get_command(char* sql_text);
-
 /**
  * Execute a prepared statement. This is called by pdo_snowflake_stmt_execute.
  * 
@@ -123,19 +121,6 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
     const char * qid;
     pdo_snowflake_stmt *S = stmt->driver_data;
     pdo_snowflake_db_handle *H = S->H;
-
-    if (_is_put_get_command(S->stmt->sql_text))
-    {
-        PDO_LOG_ERR("Unsupported query type %s.", S->stmt->sql_text);
-        set_snowflake_error(&S->stmt->error,
-                            SF_STATUS_ERROR_GENERAL,
-                            "Unsupported query type.",
-                            SF_SQLSTATE_GENERAL_ERROR,
-                            snowflake_sfqid(S->stmt),
-                            __FILE__, __LINE__);
-        pdo_snowflake_error_stmt(stmt);
-        PDO_LOG_RETURN(0);
-    }
 
     /* execute */
 	query_status = snowflake_execute(S->stmt);
@@ -155,6 +140,7 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
     /* Bind Columns/Results before fetching */
     stmt->column_count = (int) snowflake_num_fields(S->stmt);
     PDO_LOG_DBG("number of columns: %d", stmt->column_count);
+    // won't hit for now but leave it to prevent crash with unexpected query result.
     if (stmt->column_count < 0)
     {
         PDO_LOG_ERR("Unsupported query type %s.", S->stmt->sql_text);
