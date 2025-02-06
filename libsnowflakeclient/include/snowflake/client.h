@@ -14,6 +14,7 @@ extern "C" {
 #include "platform.h"
 #include "version.h"
 #include "logger.h"
+#include "secure_storage.h"
 
 /**
  * API Name
@@ -45,6 +46,11 @@ extern "C" {
  * Authenticator, oauth
  */
 #define SF_AUTHENTICATOR_OAUTH "oauth"
+
+ /**
+ * Authenticator, programmatic access token
+ */
+#define SF_AUTHENTICATOR_PAT "programmatic_access_token"
 
 /**
  * UUID4 length
@@ -264,6 +270,7 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_DISABLE_QUERY_CONTEXT_CACHE,
     SF_CON_INCLUDE_RETRY_REASON,
     SF_CON_RETRY_TIMEOUT,
+    SF_CON_CLIENT_REQUEST_MFA_TOKEN,
     SF_CON_MAX_RETRY,
     SF_CON_MAX_VARCHAR_SIZE,
     SF_CON_MAX_BINARY_SIZE,
@@ -284,7 +291,8 @@ typedef enum SF_ATTRIBUTE {
     SF_DIR_QUERY_TOKEN,
     SF_RETRY_ON_CURLE_COULDNT_CONNECT_COUNT,
     SF_QUERY_RESULT_TYPE,
-    SF_CON_OAUTH_TOKEN
+    SF_CON_OAUTH_TOKEN,
+    SF_CON_PAT
 } SF_ATTRIBUTE;
 
 /**
@@ -342,6 +350,7 @@ typedef struct SF_CONNECT {
     sf_bool insecure_mode;
     sf_bool ocsp_fail_open;
     sf_bool autocommit;
+    sf_bool client_request_mfa_token;
     char *timezone;
     char *service_name;
     char *query_result_format;
@@ -378,6 +387,9 @@ typedef struct SF_CONNECT {
     uint64 qcc_capacity;
     // the pointer of qcc instance
     void * qcc;
+
+    // MFA Token Cache
+    secure_storage_ptr token_cache;
 
     // whether to include retry reason in retry for query request
     sf_bool include_retry_reason;
@@ -419,6 +431,9 @@ typedef struct SF_CONNECT {
 
     //token for OAuth authentication
     char *oauth_token;
+
+    //programmatic access token
+    char *programmatic_access_token;
 
     // put get configurations
     sf_bool use_s3_regional_url;
