@@ -12,6 +12,14 @@ if (PHP_PDO_SNOWFLAKE != "no") {
     if (CHECK_LIB('libsnowflakeclient_a.lib', 'pdo_snowflake') && CHECK_LIB('libcurl_a.lib', 'pdo_snowflake') && 
             CHECK_LIB('libssl_a.lib', 'pdo_snowflake') && CHECK_LIB('libcrypto_a.lib', 'pdo_snowflake') && CHECK_LIB('zlib_a.lib', 'pdo_snowflake') && CHECK_LIB('libtelemetry_a.lib', 'pdo_snowflake') &&
             CHECK_LIB('arrow_static.lib', 'pdo_snowflake') && CHECK_LIB('libboost_filesystem.lib', 'pdo_snowflake') && CHECK_LIB('libboost_regex.lib', 'pdo_snowflake') && CHECK_LIB('libboost_system.lib', 'pdo_snowflake') &&
+            CHECK_LIB('aws-cpp-sdk-s3.lib', 'pdo_snowflake') && CHECK_LIB('aws-cpp-sdk-core.lib', 'pdo_snowflake') &&
+            CHECK_LIB('aws-crt-cpp.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-s3.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-auth.lib', 'pdo_snowflake') &&
+            CHECK_LIB('aws-c-http.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-mqtt.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-compression.lib', 'pdo_snowflake') &&
+            CHECK_LIB('aws-checksums.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-cal.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-event-stream.lib', 'pdo_snowflake') &&
+            CHECK_LIB('aws-c-sdkutils.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-io.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-common.lib', 'pdo_snowflake') &&
+            CHECK_LIB('azure-storage-lite.lib', 'pdo_snowflake') &&
+            CHECK_LIB('Userenv.lib', 'pdo_snowflake') && CHECK_LIB('Version.lib', 'pdo_snowflake') && CHECK_LIB('Secur32.lib', 'pdo_snowflake') &&
+            CHECK_LIB('Ncrypt.lib', 'pdo_snowflake') && CHECK_LIB('Shlwapi.lib', 'pdo_snowflake') &&
             CHECK_HEADER_ADD_INCLUDE('snowflake\\client.h', 'CFLAGS_PDO_SNOWFLAKE', configure_module_dirname + '\\libsnowflakeclient\\include')) {
         STDOUT.WriteLine("INFO: Snowflake PDO Configuration");
         ADD_EXTENSION_DEP('pdo_snowflake', 'pdo');

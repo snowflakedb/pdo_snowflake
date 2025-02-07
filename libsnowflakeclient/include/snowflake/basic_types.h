@@ -17,7 +17,7 @@ extern "C" {
 /**
  * Supported data types
  */
-typedef char int8;
+typedef signed char int8;
 typedef unsigned char uint8;
 typedef unsigned int uint32;
 typedef int int32;

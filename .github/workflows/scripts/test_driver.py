@@ -16,6 +16,15 @@ def run_command(cmd):
         exit(-1)
 
 
+def run_command_no_exit(cmd):
+    print(cmd)
+    result = subprocess.Popen(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+    for line in result.stdout:
+        print(line.strip().decode('utf-8'))
+    for line in result.stderr:
+        print(line.strip().decode('utf-8'))
+
+
 def test_windows():
     print("====> Read build config from env")
     arch = os.environ.get('ARCH', 'x64')
@@ -40,7 +49,7 @@ def test_windows():
 
     print ("====> run test")
     run_tests_file = os.path.join("D:\\php-sdk\\phpmaster", vs, arch, "php-src", "run-tests.php")
-    run_command("php.exe " + run_tests_file + " .\\tests -d extension=pdo_snowflake || ver>null")
+    run_command_no_exit("php.exe " + run_tests_file + " .\\tests -d extension=pdo_snowflake || ver>null")
     print ("====> parse test results")
     run_command("python .\\.github\\workflows\\scripts\\check_result.py .\\tests")
 
@@ -63,7 +72,7 @@ def test_posix():
     run_test_options = ""
     if use_valgrind == 'true' or use_valgrind == '1':
         run_test_options = run_test_options + ' -m'
-    run_command("php -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' ./run-tests.php -d extension=modules/pdo_snowflake.so" + run_test_options)
+    run_command_no_exit("php -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' ./run-tests.php -d extension=modules/pdo_snowflake.so" + run_test_options)
     print ("====> parse test results")
     run_command("python ./.github/workflows/scripts/check_result.py ./tests")
 

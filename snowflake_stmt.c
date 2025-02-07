@@ -140,6 +140,7 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
     /* Bind Columns/Results before fetching */
     stmt->column_count = (int) snowflake_num_fields(S->stmt);
     PDO_LOG_DBG("number of columns: %d", stmt->column_count);
+    // won't hit for now but leave it to prevent crash with unexpected query result.
     if (stmt->column_count < 0)
     {
         PDO_LOG_ERR("Unsupported query type %s.", S->stmt->sql_text);

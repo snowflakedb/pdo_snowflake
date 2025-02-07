@@ -26,40 +26,6 @@ extern "C" {
     #endif
 #endif
 
-// Defined for #pragma warning messages.
-#define MACRO_TO_STRING2(x) #x
-#define MACRO_TO_STRING(x) MACRO_TO_STRING2(x)
-
-#if defined(_MSC_VER)
-#define SF_MACRO_DEPRECATED_WARNING(MSG) __pragma(message ( __FILE__ "(" MACRO_TO_STRING(__LINE__) ") : warning C4996: " MSG))
-#else
-#define SF_MACRO_DEPRECATED_WARNING(MSG)  _Pragma(MACRO_TO_STRING(GCC warning MSG))
-#endif
-
-// sf_getenv and sf_strerror is unsafe and deprecated.
-// Please change to use sf_getenv_s and sf_strerror_s.
-#define sf_getenv SF_MACRO_DEPRECATED_WARNING("sf_getenv is deprecated, please use sf_getenv_s instead.") getenv
-#define sf_strerror SF_MACRO_DEPRECATED_WARNING("sf_strerror is deprecated, please use sf_strerror_s instead.") strerror
-// sf_free_s is deprecated. It does nothing and should not be called anymore.
-#define sf_free_s SF_MACRO_DEPRECATED_WARNING("sf_free_s is deprecated and it does nothing.")
-
-// all sb_ functions are deprecated and should use sf_ functions instead.
-#define sb_memcpy SF_MACRO_DEPRECATED_WARNING("sb_memcpy is deprecated, please use sf_memcpy instead.") sf_memcpy
-#define sb_copy SF_MACRO_DEPRECATED_WARNING("sb_copy is deprecated, please use sf_copy instead.") sf_copy
-#define sb_cat SF_MACRO_DEPRECATED_WARNING("sb_cat is deprecated, please use sf_cat instead.") sf_cat
-#define sb_strcpy SF_MACRO_DEPRECATED_WARNING("sb_strcpy is deprecated, please use sf_strcpy instead.") sf_strcpy
-#define sb_strncpy SF_MACRO_DEPRECATED_WARNING("sb_strncpy is deprecated, please use sf_strncpy instead.") sf_strncpy
-#define sb_strcat SF_MACRO_DEPRECATED_WARNING("sb_strcat is deprecated, please use sf_strcat instead.") sf_strcat
-#define sb_strncat SF_MACRO_DEPRECATED_WARNING("sb_strncat is deprecated, please use sf_strncat instead.") sf_strncat
-#define sb_vsnprintf SF_MACRO_DEPRECATED_WARNING("sb_vsnprintf is deprecated, please use sf_vsnprintf instead.") sf_vsnprintf
-#define sb_sprintf SF_MACRO_DEPRECATED_WARNING("sb_sprintf is deprecated, please use sf_sprintf instead.") sf_sprintf
-#define sb_snprintf SF_MACRO_DEPRECATED_WARNING("sb_snprintf is deprecated, please use sf_snprintf instead.") sf_snprintf
-#define sb_sscanf SF_MACRO_DEPRECATED_WARNING("sb_sscanf is deprecated, please use sf_sscanf instead.") sf_sscanf
-#define sb_vfprintf SF_MACRO_DEPRECATED_WARNING("sb_vfprintf is deprecated, please use sf_vfprintf instead.") sf_vfprintf
-#define sb_fprintf SF_MACRO_DEPRECATED_WARNING("sb_fprintf is deprecated, please use sf_fprintf instead.") sf_fprintf
-#define sb_printf SF_MACRO_DEPRECATED_WARNING("sb_printf is deprecated, please use sf_printf instead.") sf_printf
-#define sb_fopen SF_MACRO_DEPRECATED_WARNING("sb_fopen is deprecated, please use sf_fopen instead.") sf_fopen
-
     /// @brief Copy bytes between buffers.
     ///
     /// @param out_dest         Destination buffer. (NOT OWN)

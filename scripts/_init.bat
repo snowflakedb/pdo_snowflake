@@ -61,7 +61,7 @@ if "%vs_version%"=="VS16" (
     set vsdir=vs16
     set vc_version=vs16
 )
-else if "%vs_version%"=="VS17" (
+if "%vs_version%"=="VS17" (
     set cmake_generator=Visual Studio 17 2022
     set vsdir=vs17
     set vc_version=vs17
