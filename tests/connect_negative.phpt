@@ -80,6 +80,17 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         echo sprintf("Expected error: %s\n", substr($e->getMessage(), 0, 15));
     }
 
+    // a semicolon should be escaped with an other semicolon
+    // use invalid jwt token and check the error message to ensure keypair auth
+    // is used and the invalid token is sent to server as expected
+    try {
+        $dbh = new PDO("snowflake:account=$account;authenticator=snowflake_jwt;priv_key_file_pwd=test;;;priv_key_file=tests/p8test-semicolon.pem", $user, "");
+        echo "Fail. Must fail to connect.\n";
+    } catch(PDOException $e) {
+        // Ignore the error detail that server changed serveral times
+        echo sprintf("Expected error: %s\n", substr($e->getMessage(), 0, 15));
+    }
+
     // login timeout
     // use an invalid(unreachable) proxy to trigger login timeout
     $starttime = time();
@@ -108,6 +119,7 @@ Expected error code: 240005 for invalid application name
 Expected error: SQLSTATE[08001] [240005] unsupported authenticator
 Expected error: SQLSTATE[HY000] [240000] authenticator initialization failed
 Expected error: SQLSTATE[HY000] [240000] authenticator initialization failed
+Expected error: SQLSTATE[08001]
 Expected error: SQLSTATE[08001]
 Test for logintimeout passed
 ===DONE===
