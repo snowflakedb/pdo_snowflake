@@ -303,6 +303,10 @@ static int pdo_snowflake_stmt_describe(pdo_stmt_t *stmt, int colno) /* {{{ */
                 cols[i].maxlen = (size_t) F[i].byte_size;
                 break;
         }
+        if (cols[i].name)
+        {
+            zend_string_release(cols[i].name);
+        }
         cols[i].name = zend_string_init(
           F[i].name, strlen(F[i].name), 0);
 #if (PHP_VERSION_ID < 80100)
