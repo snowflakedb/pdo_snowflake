@@ -587,7 +587,9 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"maxhttpretries",      "7",          0},
         {"retrytimeout",        "300",        0},
         {"ocspfailopen",        "true",       0},
-        {"disableocspchecks",   "false",      0}
+        {"disableocspchecks",   "false",      0},
+        {"passcode",            NULL,         0},
+        {"passcodeinpassword",  "off",        0}
     };
 
     // Parse the input data parameters
@@ -833,6 +835,23 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     PDO_LOG_DBG(
         "disableocspchecks: %s",
         vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval);
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_PASSCODE_IDX].optval != NULL) {
+        /* passcode */
+        snowflake_set_attribute(
+            H->server, SF_CON_PASSCODE,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_PASSCODE_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "passcode: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_PASSCODE_IDX].optval != NULL ? "******" : "(NULL)");
+
+    snowflake_set_attribute(
+        H->server, SF_CON_PASSCODE_IN_PASSWORD,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_PASSCODE_IN_PASSWORD_IDX].optval, "on) == 0) ?
+            &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG(
+        "passcodeinpassword: %s",
+        vars[PDO_SNOWFLAKE_CONN_ATTR_PASSCODE_IN_PASSWORD_IDX].optval);
 
     if (snowflake_connect(H->server) > 0) {
         pdo_snowflake_error(dbh);

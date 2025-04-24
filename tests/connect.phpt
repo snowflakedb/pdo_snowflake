@@ -68,6 +68,20 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         print_r($dbh->errorInfo());
     }
     $dbh = null;
+
+    // MFA passcode using dummy passcode.
+	// This feature is tested in libsfclient here we just confirm passcode can be used in
+	// connection string and passed to libsfclient.
+    $dbh = new PDO("$dsn;passcode=dummy", $user, $password);
+    $dbh = null;
+
+	// MFA passcode in password, connection fails due to no passcode provided in password.
+    try {
+        $dbh = new PDO("$dsn;passcodeinpassword=on", $user, $password);
+        echo "Fail. Must fail to connect.\n";
+    } catch(PDOException $e) {
+        echo sprintf("Expected error code: %d for passcodeinpassword\n", $e->getCode());
+    }
 ?>
 ===DONE===
 <?php exit(0); ?>
@@ -76,5 +90,6 @@ OK
 1
 2
 2
+Expected error code: 390100 for passcodeinpassword
 ===DONE===
 
