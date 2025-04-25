@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2017-2018 Snowflake Computing, Inc. All rights reserved.
- */
-
 #ifndef SNOWFLAKE_PDO_RBTREE_H
 #define SNOWFLAKE_PDO_RBTREE_H
 

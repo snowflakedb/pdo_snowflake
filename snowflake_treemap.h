@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2017-2019 Snowflake Computing, Inc. All rights reserved.
- */
-
 #ifndef SNOWFLAKE_TREEMAP_H
 #define SNOWFLAKE_TREEMAP_H
 
