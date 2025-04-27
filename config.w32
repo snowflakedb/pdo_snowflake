@@ -12,7 +12,7 @@ if (PHP_PDO_SNOWFLAKE != "no") {
     if (CHECK_LIB('libsnowflakeclient_a.lib', 'pdo_snowflake') && CHECK_LIB('libcurl_a.lib', 'pdo_snowflake') && 
             CHECK_LIB('libssl_a.lib', 'pdo_snowflake') && CHECK_LIB('libcrypto_a.lib', 'pdo_snowflake') && CHECK_LIB('zlib_a.lib', 'pdo_snowflake') && CHECK_LIB('libtelemetry_a.lib', 'pdo_snowflake') &&
             CHECK_LIB('arrow_static.lib', 'pdo_snowflake') && CHECK_LIB('libboost_filesystem.lib', 'pdo_snowflake') && CHECK_LIB('libboost_regex.lib', 'pdo_snowflake') && CHECK_LIB('libboost_system.lib', 'pdo_snowflake') &&
-            CHECK_LIB('aws-cpp-sdk-s3.lib', 'pdo_snowflake') && CHECK_LIB('aws-cpp-sdk-core.lib', 'pdo_snowflake') &&
+            CHECK_LIB('libboost_url.lib', 'pdo_snowflake') && CHECK_LIB('aws-cpp-sdk-s3.lib', 'pdo_snowflake') && CHECK_LIB('aws-cpp-sdk-core.lib', 'pdo_snowflake') &&
             CHECK_LIB('aws-crt-cpp.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-s3.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-auth.lib', 'pdo_snowflake') &&
             CHECK_LIB('aws-c-http.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-mqtt.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-compression.lib', 'pdo_snowflake') &&
             CHECK_LIB('aws-checksums.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-cal.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-event-stream.lib', 'pdo_snowflake') &&

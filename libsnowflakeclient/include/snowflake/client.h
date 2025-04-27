@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019 Snowflake Computing, Inc. All rights reserved.
+ * Copyright (c) 2018-2025 Snowflake Computing, Inc. All rights reserved.
  */
 
 #ifndef SNOWFLAKE_CLIENT_H
@@ -16,9 +16,6 @@ extern "C" {
 #include "logger.h"
 #include "secure_storage.h"
 
-/**
- * API Name
- */
 #define SF_API_NAME "C API"
 
 /**
@@ -66,6 +63,11 @@ extern "C" {
  * Download/upload length
  */
 #define SF_COMMAND_LEN 10
+
+/**
+ * Browser response timeout in seconds
+ */
+#define SF_BROWSER_RESPONSE_TIMEOUT 120
 
 /**
  * Login timeout in seconds
@@ -171,7 +173,8 @@ typedef enum SF_STATUS {
     SF_STATUS_ERROR_BUFFER_TOO_SMALL = 240023,
     SF_STATUS_ERROR_UNSUPPORTED_QUERY_RESULT_FORMAT = 240024,
     SF_STATUS_ERROR_OTHER = 240025,
-    SF_STATUS_ERROR_FILE_TRANSFER = 240026
+    SF_STATUS_ERROR_FILE_TRANSFER = 240026,
+    SF_STATUS_ERROR_QUERY_CANCELLED = 240027
 } SF_STATUS;
 
 /**
@@ -275,6 +278,7 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_MAX_VARCHAR_SIZE,
     SF_CON_MAX_BINARY_SIZE,
     SF_CON_MAX_VARIANT_SIZE,
+    SF_CON_DISABLE_SAML_URL_CHECK,
     SF_CON_OCSP_FAIL_OPEN,
     SF_CON_PUT_TEMPDIR,
     SF_CON_PUT_COMPRESSLV,
@@ -292,6 +296,8 @@ typedef enum SF_ATTRIBUTE {
     SF_RETRY_ON_CURLE_COULDNT_CONNECT_COUNT,
     SF_QUERY_RESULT_TYPE,
     SF_CON_OAUTH_TOKEN,
+    SF_CON_DISABLE_CONSOLE_LOGIN,
+    SF_CON_BROWSER_RESPONSE_TIMEOUT,
     SF_CON_PAT
 } SF_ATTRIBUTE;
 
@@ -303,7 +309,10 @@ typedef enum SF_GLOBAL_ATTRIBUTE {
     SF_GLOBAL_CA_BUNDLE_FILE,
     SF_GLOBAL_SSL_VERSION,
     SF_GLOBAL_DEBUG,
-    SF_GLOBAL_OCSP_CHECK
+    SF_GLOBAL_OCSP_CHECK,
+    SF_GLOBAL_CLIENT_CONFIG_FILE,
+    SF_GLOBAL_LOG_LEVEL,
+    SF_GLOBAL_LOG_PATH
 } SF_GLOBAL_ATTRIBUTE;
 
 /**
@@ -316,6 +325,26 @@ typedef enum SF_STMT_ATTRIBUTE {
 } SF_STMT_ATTRIBUTE;
 #define SF_MULTI_STMT_COUNT_UNSET (-1)
 #define SF_MULTI_STMT_COUNT_UNLIMITED 0
+
+/**
+ * The query status
+ */
+typedef enum SF_QUERY_STATUS {
+    SF_QUERY_STATUS_ABORTED,
+    SF_QUERY_STATUS_ABORTING,
+    SF_QUERY_STATUS_BLOCKED,
+    SF_QUERY_STATUS_DISCONNECTED,
+    SF_QUERY_STATUS_FAILED_WITH_ERROR,
+    SF_QUERY_STATUS_FAILED_WITH_INCIDENT,
+    SF_QUERY_STATUS_NO_DATA,
+    SF_QUERY_STATUS_RUNNING,
+    SF_QUERY_STATUS_QUEUED,
+    SF_QUERY_STATUS_QUEUED_REPAIRING_WAREHOUSE,
+    SF_QUERY_STATUS_RESTARTED,
+    SF_QUERY_STATUS_RESUMING_WAREHOUSE,
+    SF_QUERY_STATUS_SUCCESS,
+    SF_QUERY_STATUS_UNKNOWN
+} SF_QUERY_STATUS;
 
 /**
  * Snowflake Error
@@ -400,6 +429,7 @@ typedef struct SF_CONNECT {
 
     int64 login_timeout;
     int64 network_timeout;
+    int64 browser_response_timeout;
     // retry timeout for new retry strategy
     int64 retry_timeout;
 
@@ -429,6 +459,7 @@ typedef struct SF_CONNECT {
     uint64 max_binary_size;
     uint64 max_variant_size;
 
+    sf_bool disable_saml_url_check;
     //token for OAuth authentication
     char *oauth_token;
 
@@ -455,6 +486,7 @@ typedef struct SF_CONNECT {
     // by the setting from connection attribute
     sf_bool binding_threshold_overridden;
     sf_bool stage_binding_disabled;
+    sf_bool disable_console_login;
 } SF_CONNECT;
 
 /**
@@ -543,6 +575,8 @@ typedef struct SF_STMT {
     int64 paramset_size;
     sf_bool array_bind_supported;
     int64 affected_rows;
+    sf_bool is_async; // whether the query is async
+    sf_bool is_async_results_fetched;
 
     /**
      * User realloc function used in snowflake_fetch
@@ -699,6 +733,25 @@ SF_STATUS STDCALL snowflake_get_attribute(
 SF_STMT *STDCALL snowflake_stmt(SF_CONNECT *sf);
 
 /**
+ * Creates sf SNOWFLAKE_STMT context for async queries.
+ *
+ * @param sf The SF_CONNECT context.
+ * @param query_id the query id of the async query.
+ *
+ * @return sfstmt SNOWFLAKE_STMT context for async queries.
+ */
+SF_STMT* STDCALL snowflake_init_async_query_result(SF_CONNECT *sf, const char *query_id);
+
+/**
+ * Get the status of a query
+ * 
+ * @param sfstmt The SF_STMT context.
+ * 
+ * @return The query status.
+ */
+SF_QUERY_STATUS STDCALL snowflake_get_query_status(SF_STMT *sfstmt);
+
+/**
  * Frees the memory used by a SF_QUERY_RESULT_CAPTURE struct.
  * Note that this only frees the struct itself, and *not* the underlying
  * capture buffer! The caller is responsible for managing that.
@@ -776,6 +829,14 @@ SF_STATUS STDCALL snowflake_propagate_error(SF_CONNECT *sf, SF_STMT *sfstmt);
  */
 SF_STATUS STDCALL
 snowflake_query(SF_STMT *sfstmt, const char *command, size_t command_size);
+
+/**
+ * Cancels a query given the statement.
+ *
+ * @param sf SNOWFLAKE_STMT context.
+ * @return 0 if success, otherwise an errno is returned.
+ */
+SF_STATUS STDCALL snowflake_cancel_query(SF_STMT* sfstmt);
 
 /**
  * Returns the number of affected rows in the last execution.  This function
@@ -859,6 +920,14 @@ snowflake_stmt_get_attr(SF_STMT *sfstmt, SF_STMT_ATTRIBUTE type, void **value);
  * @return 0 if success, otherwise an errno is returned.
  */
 SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt);
+
+/**
+ * Executes a statement asynchronously.
+ * @param sfstmt SNOWFLAKE_STMT context.
+ *
+ * @return 0 if success, otherwise an errno is returned.
+ */
+SF_STATUS STDCALL snowflake_async_execute(SF_STMT *sfstmt);
 
 /**
  * Executes a statement with capture.

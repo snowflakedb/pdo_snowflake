@@ -9,6 +9,7 @@
 #include <string>
 
 #include "snowflake/secure_storage.h"
+#include <boost/optional.hpp>
 
 namespace Snowflake {
 
@@ -25,8 +26,8 @@ namespace Client {
     switch (type) {
       case SecureStorageKeyType::MFA_TOKEN:
         return "MFA_TOKEN";
-      case SecureStorageKeyType::SSO_TOKEN:
-        return "SSO_TOKEN";
+      case SecureStorageKeyType::ID_TOKEN:
+        return "ID_TOKEN";
       case SecureStorageKeyType::OAUTH_REFRESH_TOKEN:
         return "OAUTH_REFRESH_TOKEN";
       case SecureStorageKeyType::OAUTH_ACCESS_TOKEN:
@@ -49,7 +50,7 @@ namespace Client {
   {
 
   public:
-    static std::string convertTarget(const SecureStorageKey& key);
+    static boost::optional<std::string> convertTarget(const SecureStorageKey& key);
 
     /**
      * storeToken

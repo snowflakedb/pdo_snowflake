@@ -13,7 +13,7 @@ typedef void* secure_storage_ptr;
 
 typedef enum {
   MFA_TOKEN,
-  SSO_TOKEN,
+  ID_TOKEN,
   OAUTH_REFRESH_TOKEN,
   OAUTH_ACCESS_TOKEN
 } SecureStorageKeyType;

@@ -105,6 +105,7 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
     LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/boost/lib/libboost_filesystem.a"
     LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/boost/lib/libboost_regex.a"
     LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/boost/lib/libboost_system.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/boost/lib/libboost_url.a"
     LDFLAGS="$LDFLAGS -Wl,--no-whole-archive"
   fi
   dnl # IMPORTANT NOTE: Change scripts/build_pdo_snowflake.sh to update
