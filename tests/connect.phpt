@@ -77,7 +77,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 
 	// MFA passcode in password, connection fails due to no passcode provided in password.
     try {
-        $dbh = new PDO("$dsn;passcodeinpassword=on", $user, $password);
+        $dbh = new PDO("$dsn;passcodeinpassword=true", $user, $password);
         echo "Fail. Must fail to connect.\n";
     } catch(PDOException $e) {
         echo sprintf("Expected error code: %d for passcodeinpassword\n", $e->getCode());
