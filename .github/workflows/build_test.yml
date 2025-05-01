@@ -55,11 +55,12 @@ jobs:
         shell: cmd
 
       - name: test driver
-        run: del .\tests\selectltz.phpt /q/f
-        run: xcopy .\.github\workflows\scripts\parameters.json .\ /I/Y/F
-        run: python .\.github\workflows\scripts\set_secrets.py .\parameters.json
-        run: .\scripts\env.bat
-        run: php.exe D:\php-sdk\phpmaster\vs16\x64\php-src\run-tests.php .\\tests -d extension=pdo_snowflake
+        run: |
+          del .\tests\selectltz.phpt /q/f
+          xcopy .\.github\workflows\scripts\parameters.json .\ /I/Y/F
+          python .\.github\workflows\scripts\set_secrets.py .\parameters.json
+          .\scripts\env.bat
+          php.exe D:\php-sdk\phpmaster\vs16\x64\php-src\run-tests.php .\\tests -d extension=pdo_snowflake
         shell: cmd
 
   build_test_windows-vs2022:
