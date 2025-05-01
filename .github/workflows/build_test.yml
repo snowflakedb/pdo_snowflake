@@ -58,8 +58,7 @@ jobs:
         run: |
           del .\tests\selectltz.phpt /q/f
           xcopy .\.github\workflows\scripts\parameters.json .\ /I/Y/F
-          python .\.github\workflows\scripts\set_secrets.py .\parameters.json
-          .\scripts\env.bat
+          python .\.github\workflows\scripts\set_secrets.py .\testenv.ini
           php.exe D:\php-sdk\phpmaster\vs16\x64\php-src\run-tests.php .\\tests -d extension=pdo_snowflake
         shell: cmd
 
