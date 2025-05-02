@@ -62,9 +62,8 @@ jobs:
         shell: cmd
 
       - name: run test
-        run: |
-          timeout 3m php.exe D:\php-sdk\phpmaster\vs16\x64\php-src\run-tests.php .\tests\putget.phpt -d extension=pdo_snowflake
-          more .\sflog\*
+        timeout-minutes: 3
+        run: php.exe D:\php-sdk\phpmaster\vs16\x64\php-src\run-tests.php .\tests\putget.phpt -d extension=pdo_snowflake
         shell: cmd
 
       - name: show log
