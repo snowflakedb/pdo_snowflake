@@ -54,14 +54,22 @@ jobs:
         run: python .\.github\workflows\scripts\build_driver.py
         shell: cmd
 
-      - name: test driver
-        id: testStep
+      - name: test setup
         run: |
           del .\tests\selectltz.phpt /q/f
           python .\.github\workflows\scripts\set_secrets.py .\testenv.ini.txt
           move  /Y .\testenv.ini.txt .\testenv.ini
+        shell: cmd
+
+      - name: run test
+        run: |
           timeout 3m php.exe D:\php-sdk\phpmaster\vs16\x64\php-src\run-tests.php .\tests\putget.phpt -d extension=pdo_snowflake
           more .\sflog\*
+        shell: cmd
+
+      - name: show log
+        if: always()
+        run: more .\sflog\*
         shell: cmd
 
   build_test_windows-vs2022:
