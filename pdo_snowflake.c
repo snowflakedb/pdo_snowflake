@@ -85,7 +85,7 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
 /* {{{ PHP_MSHUTDOWN_FUNCTION
  */
 static PHP_MSHUTDOWN_FUNCTION(pdo_snowflake) {
-//    snowflake_global_term();
+    snowflake_global_term();
     php_pdo_unregister_driver(&pdo_snowflake_driver);
     UNREGISTER_INI_ENTRIES();
 
