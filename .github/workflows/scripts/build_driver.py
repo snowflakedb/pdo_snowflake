@@ -42,10 +42,6 @@ def build_windows():
     run_command("rmdir .\\libsnowflakeclient\\lib\\darwin /s/q")
     run_command("rmdir .\\libsnowflakeclient\\deps-build\\linux /s/q")
     run_command("rmdir .\\libsnowflakeclient\\deps-build\\darwin /s/q")
-    if vs == 'VS16':
-      run_command("rmdir .\\libsnowflakeclient\\deps-build\\win64\\vs17 /s/q")
-    else:
-      run_command("rmdir .\\libsnowflakeclient\\deps-build\\win64\\vs16 /s/q")
 
     print("====> setup php sdk and php source")
     run_command("scripts\\setup_php_sdk.bat " + arch + " " + target + " " + vs + " D:\\php-sdk")
@@ -66,8 +62,6 @@ def build_posix():
     print("====> working directory: " + ropo)
     print("====> prepare repository")
     os.chdir(ropo)
-    print("====> remove unnecessary files")
-    run_command("rm -rf ./libsnowflakeclient/deps-build/win64")
     print ("====> build pdo driver")
     run_command("./scripts/build_pdo_snowflake.sh")
     run_command("php -dextension=modules/pdo_snowflake.so -m | grep pdo_snowflake")
