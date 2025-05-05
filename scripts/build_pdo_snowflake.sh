@@ -63,6 +63,7 @@ if [[ "$PLATFORM" == "linux" ]]; then
         libsnowflakeclient/deps-build/linux/oob/lib/libtelemetry.a \
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-s3.a \
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-core.a \
+        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-sts.a \
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-crt-cpp.a \
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-s3.a \
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-auth.a \
@@ -83,6 +84,7 @@ if [[ "$PLATFORM" == "linux" ]]; then
         libsnowflakeclient/deps-build/linux/boost/lib/libboost_filesystem.a \
         libsnowflakeclient/deps-build/linux/boost/lib/libboost_regex.a \
         libsnowflakeclient/deps-build/linux/boost/lib/libboost_system.a \
+        libsnowflakeclient/deps-build/linux/boost/lib/libboost_url.a \
         -O2 \
         -Wl,--whole-archive \
         -Wl,--no-whole-archive \
@@ -96,6 +98,7 @@ if [[ "$PLATFORM" == "linux" ]]; then
         libsnowflakeclient/deps-build/linux/oob/lib/libtelemetry.a \
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-s3.a \
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-core.a \
+        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-sts.a \
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-crt-cpp.a \
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-s3.a \
         libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-auth.a \
@@ -115,7 +118,8 @@ if [[ "$PLATFORM" == "linux" ]]; then
         libsnowflakeclient/deps-build/linux/arrow_deps/lib/libjemalloc_pic.a \
         libsnowflakeclient/deps-build/linux/boost/lib/libboost_filesystem.a \
         libsnowflakeclient/deps-build/linux/boost/lib/libboost_regex.a \
-        libsnowflakeclient/deps-build/linux/boost/lib/libboost_system.a
+        libsnowflakeclient/deps-build/linux/boost/lib/libboost_system.a \
+        libsnowflakeclient/deps-build/linux/boost/lib/libboost_url.a
 elif [[ "$PLATFORM" == "darwin" ]]; then
     # Darwin uses -force_load instead
     echo "Linking for Darwin"
@@ -133,6 +137,7 @@ elif [[ "$PLATFORM" == "darwin" ]]; then
         libsnowflakeclient/deps-build/darwin/boost/lib/libboost_filesystem.a \
         libsnowflakeclient/deps-build/darwin/boost/lib/libboost_regex.a \
         libsnowflakeclient/deps-build/darwin/boost/lib/libboost_system.a \
+        libsnowflakeclient/deps-build/darwin/boost/lib/libboost_url.a \
         -Wl,-force_load,libsnowflakeclient/lib/darwin/libsnowflakeclient.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/openssl/lib/libcrypto.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/openssl/lib/libssl.a \
@@ -140,6 +145,7 @@ elif [[ "$PLATFORM" == "darwin" ]]; then
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/oob/lib/libtelemetry.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-cpp-sdk-s3.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-cpp-sdk-core.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-cpp-sdk-sts.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-crt-cpp.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-c-s3.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-c-auth.a \
