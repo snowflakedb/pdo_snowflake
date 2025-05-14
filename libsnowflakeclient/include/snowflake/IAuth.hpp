@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2018-2025 Snowflake Computing, Inc. All rights reserved.
- */
-
 #ifndef SNOWFLAKECLIENT_IAUTH_HPP
 #define SNOWFLAKECLIENT_IAUTH_HPP
 

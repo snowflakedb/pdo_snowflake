@@ -1,6 +1,5 @@
 /*
  * File:   SecureStorageApple.hpp *
- * Copyright (c) 2013-2020 Snowflake Computing
  */
 
 #ifndef PROJECT_SECURESTORAGE_HPP

@@ -1,7 +1,3 @@
-/**
- * Copyright (c) 2025 Snowflake Computing
- */
-
 #ifndef SNOWFLAKE_TOMLCONFIGPARSER_HPP
 #define SNOWFLAKE_TOMLCONFIGPARSER_HPP
 

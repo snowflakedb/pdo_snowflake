@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2024 Snowflake Computing, Inc. All rights reserved.
- */
-
 #ifndef _SF_CRTFUNCTIONSAFE_H_
 #define _SF_CRTFUNCTIONSAFE_H_
 

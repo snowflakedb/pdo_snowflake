@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2018-2025 Snowflake Computing, Inc. All rights reserved.
- */
-
 #ifndef SNOWFLAKE_CLIENT_H
 #define SNOWFLAKE_CLIENT_H
 

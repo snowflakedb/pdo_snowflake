@@ -51,14 +51,13 @@ namespace Snowflake {
       long connectTimeoutInSeconds;
     };
 
-    extern const HttpClientConfig defaultHttpClientConfig;
-
     class IHttpClient {
     public:
       virtual boost::optional<HttpResponse> run(HttpRequest req) = 0;
       virtual ~IHttpClient() = default;
 
       static IHttpClient* createSimple(const HttpClientConfig&);
+      static IHttpClient* getInstance();
     };
 
   }

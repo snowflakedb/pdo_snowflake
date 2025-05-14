@@ -4,9 +4,6 @@
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the MIT license. See `log.c` for details.
  */
-/*
- * Copyright (c) 2018-2025 Snowflake Computing, Inc. All rights reserved.
- */
 
 #ifndef SNOWFLAKE_LOGGER_H
 #define SNOWFLAKE_LOGGER_H
