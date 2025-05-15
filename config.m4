@@ -76,6 +76,12 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
     LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/aws/lib/libaws-c-io.a"
     LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/aws/lib/libaws-c-common.a"
     LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/azure/lib/libazure-storage-lite.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/arrow/lib/libarrow.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/arrow_deps/lib/libjemalloc_pic.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/boost/lib/libboost_filesystem.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/boost/lib/libboost_regex.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/boost/lib/libboost_system.a"
+    LDFLAGS="$LDFLAGS -Wl,-force_load,$SNOWFLAKE_CLIENT_DIR/deps-build/darwin/boost/lib/libboost_url.a"
   fi
   if test "$build_linux" == "yes"; then
     LDFLAGS="$LDFLAGS -Wl,--whole-archive"
@@ -105,6 +111,7 @@ if test "$PHP_PDO_SNOWFLAKE" != "no"; then
     LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/boost/lib/libboost_filesystem.a"
     LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/boost/lib/libboost_regex.a"
     LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/boost/lib/libboost_system.a"
+    LDFLAGS="$LDFLAGS $SNOWFLAKE_CLIENT_DIR/deps-build/linux/boost/lib/libboost_url.a"
     LDFLAGS="$LDFLAGS -Wl,--no-whole-archive"
   fi
   dnl # IMPORTANT NOTE: Change scripts/build_pdo_snowflake.sh to update

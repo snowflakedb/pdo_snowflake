@@ -105,7 +105,7 @@ Expected error code: 240005 for missing account
 Expected error code: 240005 for missing user
 Expected error code: 240005 for missing password
 Expected error code: 240005 for invalid application name
-Expected error: SQLSTATE[08001] [240005] unsupported authenticator
+Expected error: SQLSTATE[HY000] [240000] authentication failed
 Expected error: SQLSTATE[HY000] [240000] authenticator initialization failed
 Expected error: SQLSTATE[HY000] [240000] authenticator initialization failed
 Expected error: SQLSTATE[08001]

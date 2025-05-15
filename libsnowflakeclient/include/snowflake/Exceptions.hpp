@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2018-2024 Snowflake Computing, Inc. All rights reserved.
- */
-
 #ifndef SNOWFLAKECLIENT_EXCEPTIONS_HPP
 #define SNOWFLAKECLIENT_EXCEPTIONS_HPP
 

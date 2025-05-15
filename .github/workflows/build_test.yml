@@ -144,7 +144,7 @@ jobs:
         
         
         - name: build driver
-          run: python ./.github/workflows/scripts/build_driver.py
+          run: ./scripts/build_pdo_snowflake.sh
           
         
         - name: test driver

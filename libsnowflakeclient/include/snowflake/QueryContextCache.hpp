@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2024 Snowflake Computing, Inc. All rights reserved.
- */
-
 #pragma once
 #ifndef QUERY_CONTEXT_CACHE_HPP
 #define QUERY_CONTEXT_CACHE_HPP
