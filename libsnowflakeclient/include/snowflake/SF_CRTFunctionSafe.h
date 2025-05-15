@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2024 Snowflake Computing, Inc. All rights reserved.
- */
-
 #ifndef _SF_CRTFUNCTIONSAFE_H_
 #define _SF_CRTFUNCTIONSAFE_H_
 
@@ -348,6 +344,34 @@ extern "C" {
         return *out_file = fopen(in_filename, in_mode);
 #else
         return *out_file = fopen64(in_filename, in_mode);
+#endif
+    }
+
+    /// @brief Extract tokens from strings.
+///
+/// This function wraps the strtok_s (Windows) or strtok_r (POSIX) functions.
+/// On the first call, in_str should provide a pointer to the string to be parsed,
+/// while the in_context pointer helps keep track of the parsing. To retrieve the
+/// next token, in_str should be NULL and the same in_context should be passed in.
+/// The delimiter character(s) may vary for successive calls. 
+/// For more information, please see: https://linux.die.net/man/3/strtok_r and 
+/// https://msdn.microsoft.com/en-us/library/ftsafwz3.aspx.
+/// Note: The input string will be modified when using this function. 
+///
+/// @param in_str               String to be parsed. (NOT OWN)
+/// @param in_delim             Delimiter for the tokens. (NOT OWN)
+/// @param in_context           Pointer to maintain context. (NOT OWN)
+/// 
+/// @return The next token; NULL if there are no more tokens.
+    inline char* sf_strtok(
+        char* in_str,
+        const char* in_delim,
+        char** in_context)
+    {
+#ifdef _MSC_VER
+        return strtok_s(in_str, in_delim, in_context);
+#else
+        return strtok_r(in_str, in_delim, in_context);
 #endif
     }
 
