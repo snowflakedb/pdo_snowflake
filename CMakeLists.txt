@@ -37,7 +37,7 @@ set(SOURCE_FILES
 
 # set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
 
-include_directories(
+include_directories( 
         include
         libsnowflakeclient/include
         ${PHP_HOME}/include/php
