@@ -356,6 +356,44 @@ where:
 - :code:`<username>` Specifies the login name of the user for the connection.
 - :code:`""` Specifies the password for the specified user. The parameter is required. When using key-pair authentication, specify an empty string.
 
+Using Multi-factor authentication (MFA)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PHP PDO driver supports Multi-factor authentication.
+Guidance can be found in
+`Multi-factor authentication (MFA) <https://docs.snowflake.com/en/user-guide/security-mfa>`_.
+
+To connect to the Snowflake database using Duo-generated passcode instead of the push mechanism,
+Specify the data source name (:code:`dsn`) parameter as shown below:
+
+.. code-block:: php
+
+    $dbh = new PDO("account=<account name>;passcode=<duo_generated_passcode>",
+                    "<username>", "<password>");
+
+where:
+
+- :code:`<account_name>` Specifies your
+  `Snowflake account name <https://docs.snowflake.com/en/user-guide/connecting.html#your-snowflake-account-name>`_.
+- :code:`passcode = <duo_generated_passcode>` Specifies the Duo-generated passcode.
+- :code:`<username>` Specifies the login name of the user for the connection.
+- :code:`<password>` Specifies the password for the specified user.
+
+You can also use passcodeinpassword and set passcode and password concatenated, in the form of <password_string><passcode_string>,
+Specify the data source name (:code:`dsn`) parameter as shown below:
+
+.. code-block:: php
+
+    $dbh = new PDO("account=<account name>;passcodeinpassword=on",
+                    "<username>", "<password><passcode>");
+
+where:
+
+- :code:`<account_name>` Specifies your
+  `Snowflake account name <https://docs.snowflake.com/en/user-guide/connecting.html#your-snowflake-account-name>`_.
+- :code:`passcodeinpassword=on` Specifies the Duo-generated passcode.
+- :code:`<username>` Specifies Duo passcode is embedded in the password.
+- :code:`<password><passcode>` Specifies the password and passcode concatenated.
 
 Configuring OCSP Checking
 ----------------------------------------------------------------------
