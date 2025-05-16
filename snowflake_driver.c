@@ -1,5 +1,3 @@
-/* Copyright (c) 2017-2019 Snowflake Computing Inc. All right reserved.  */
-
 #ifdef HAVE_CONFIG_H
 #endif
 
