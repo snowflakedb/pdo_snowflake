@@ -84,11 +84,20 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     // use invalid jwt token and check the error message to ensure keypair auth
     // is used and the invalid token is sent to server as expected
     try {
-        $dbh = new PDO("snowflake:account=$account;authenticator=snowflake_jwt;priv_key_file_pwd=test;;;priv_key_file=tests/p8test-semicolon.pem", $user, "");
+        $dbh = new PDO("snowflake:account=$account;authenticator=snowflake_jwt;priv_key_file_pwd=te;;st;;;priv_key_file=tests/p8test-semicolon.pem", $user, "");
         echo "Fail. Must fail to connect.\n";
     } catch(PDOException $e) {
         // Ignore the error detail that server changed serveral times
         echo sprintf("Expected error: %s\n", substr($e->getMessage(), 0, 15));
+    }
+
+    // invalid password for the key with a semicolon
+    try {
+        $dbh = new PDO("snowflake:account=$account;authenticator=snowflake_jwt;priv_key_file_pwd=test;priv_key_file=tests/p8test-semicolon.pem", $user, "");
+        echo "Fail. Must fail to connect.\n";
+    } catch(PDOException $e) {
+        // Ignore the error detail that server changed serveral times
+        echo sprintf("Expected error: %s\n", $e->getMessage());
     }
 
     // login timeout
@@ -121,5 +130,6 @@ Expected error: SQLSTATE[HY000] [240000] authenticator initialization failed
 Expected error: SQLSTATE[HY000] [240000] authenticator initialization failed
 Expected error: SQLSTATE[08001]
 Expected error: SQLSTATE[08001]
+Expected error: SQLSTATE[HY000] [240000] authenticator initialization failed
 Test for logintimeout passed
 ===DONE===
