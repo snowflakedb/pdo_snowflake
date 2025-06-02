@@ -229,8 +229,9 @@ Installing the Driver on Linux and macOS
 
        extension=pdo_snowflake.so
        pdo_snowflake.cacert=<path to PHP config directory>/cacert.pem
-       # pdo_snowflake.logdir=/tmp     # location of log directory
-       # pdo_snowflake.loglevel=DEBUG  # log level
+       # pdo_snowflake.logdir=/tmp             # location of log directory
+       # pdo_snowflake.loglevel=DEBUG          # log level
+       # pdo_snowflake.clientconfigfile=/tmp   # location of config file
 
    where :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the
    previous step.
@@ -264,8 +265,9 @@ Installing the Driver on Windows
 
        extension=php_pdo_snowflake.dll
        pdo_snowflake.cacert=<path to PHP config directory>\cacert.pem
-       ; pdo_snowflake.logdir=C:\path\to\logdir     ; location of log directory
-       ; pdo_snowflake.loglevel=DEBUG  ; log level
+       ; pdo_snowflake.logdir=C:\path\to\logdir                ; location of log directory
+       ; pdo_snowflake.loglevel=DEBUG                          ; log level
+       ; pdo_snowflake.clientconfigfile=C:\path\to\configfile  ; location of config file
 
    where :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the
    previous step.
@@ -655,6 +657,7 @@ Locate :code:`pdo.so` under :code:`/usr/lib` and specify it in :code:`phpt` file
     pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     pdo_snowflake.logdir=/tmp
     pdo_snowflake.loglevel=DEBUG
+    pdo_snowflake.clientconfigfile=/tmp
 
 Where is the log files?
 ----------------------------------------------------------------------
@@ -665,7 +668,8 @@ The location of log files are specified by the parameters in php.ini:
 
     extension=pdo_snowflake.so
     pdo_snowflake.cacert=/etc/php/8.1/conf.d/cacert.pem
-    pdo_snowflake.logdir=/tmp     ; location of log directory
-    pdo_snowflake.loglevel=DEBUG  ; log level
+    pdo_snowflake.logdir=/tmp            ; location of log directory
+    pdo_snowflake.loglevel=DEBUG         ; log level
+    pdo_snowflake.clientconfigfile=/tmp  ; location of config file
 
 where :code:`pdo_snowflake.loglevel` can be :code:`TRACE`, :code:`DEBUG`, :code:`INFO`, :code:`WARN`, :code:`ERROR` and :code:`FATAL`.

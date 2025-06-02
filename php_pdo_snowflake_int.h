@@ -24,6 +24,7 @@ ZEND_BEGIN_MODULE_GLOBALS(pdo_snowflake)
     char *logdir; /* log directory */
     char *loglevel; /* log level */
     char *debug; /* debug flag. This dumps all logs on screen */
+    char *clientconfigfile; /*location of client config file*/
 ZEND_END_MODULE_GLOBALS(pdo_snowflake)
 
 ZEND_EXTERN_MODULE_GLOBALS(pdo_snowflake)

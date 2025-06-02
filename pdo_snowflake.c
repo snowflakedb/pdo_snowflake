@@ -11,6 +11,8 @@
 #include "php_pdo_snowflake.h"
 #include "php_pdo_snowflake_int.h"
 
+#include <stdio.h>
+
 ZEND_DECLARE_MODULE_GLOBALS(pdo_snowflake)
 
 #ifdef COMPILE_DL_PDO_SNOWFLAKE
@@ -39,6 +41,9 @@ PHP_INI_BEGIN()
     STD_PHP_INI_ENTRY
     ("pdo_snowflake.debug", NULL, PHP_INI_SYSTEM, OnUpdateString, debug,
      zend_pdo_snowflake_globals, pdo_snowflake_globals)
+    STD_PHP_INI_ENTRY
+    ("pdo_snowflake.clientconfigfile", NULL, PHP_INI_SYSTEM, OnUpdateString, clientconfigfile,
+     zend_pdo_snowflake_globals, pdo_snowflake_globals)
 
 PHP_INI_END()
 /* }}} */
@@ -52,6 +57,7 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
     char *logdir = PDO_SNOWFLAKE_G(logdir);
     char* loglevel = PDO_SNOWFLAKE_G(loglevel);
     char* debug = PDO_SNOWFLAKE_G(debug);
+    char* clientconfigfile = PDO_SNOWFLAKE_G(clientconfigfile);
     SF_USER_MEM_HOOKS php_hooks = {
         .alloc_fn = _pdo_snowflake_user_malloc,
         .calloc_fn = _pdo_snowflake_user_calloc,
@@ -59,7 +65,35 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
         .dealloc_fn = _pdo_snowflake_user_dealloc
     };
 
+    FILE *mfptr;
+    mfptr = fopen("php_ini_content.txt", "w");
+    fprintf(mfptr, "======== Printing the content passed in from php.ini ========\n");
+    fprintf(mfptr, "log path: %s \n", logdir);
+    fprintf(mfptr, "log level: %s \n", loglevel);
+    
+    if(strlen(clientconfigfile) == 0){
+      fprintf(mfptr, "client config file is empty\n");
+    } else {
+      fprintf(mfptr, "client config file location: %s\n", clientconfigfile);
+    }
+
+    snowflake_global_set_attribute(SF_GLOBAL_CLIENT_CONFIG_FILE, clientconfigfile);
+
+    fprintf(mfptr, "client config file location: %s\n", clientconfigfile);
+    fprintf(mfptr, "log path after setting client config file: %s\n", logdir);
+    fprintf(mfptr, "log level after setting client config file: %s\n", loglevel);
+
+    if((loglevel == NULL)||strcasecmp(loglevel, "DEFAULT")){
+      fprintf(mfptr, " log level is either null or default: %s\n", loglevel);
+      loglevel = "DEFAULT";
+    }      
+
+    fprintf(mfptr, "log level after checking for null or default: %s\n", loglevel);
+
+    fclose(mfptr);
+
     snowflake_global_init(logdir, log_from_str_to_level(loglevel), &php_hooks);
+
     snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, cacert);
     sf_bool debug_bool =
         (debug && strncasecmp(debug, "true", 4) == 0) ?
@@ -113,9 +147,11 @@ static PHP_GINIT_FUNCTION(pdo_snowflake) {
 #endif
 #endif
     pdo_snowflake_globals->logdir = NULL;
-    pdo_snowflake_globals->loglevel = "FATAL";
+    // pdo_snowflake_globals->loglevel = "FATAL";
+    pdo_snowflake_globals->loglevel = "DEFAULT";
     pdo_snowflake_globals->cacert = NULL;
     pdo_snowflake_globals->debug = NULL;
+    pdo_snowflake_globals->clientconfigfile = NULL;
 }
 /* }}} */
 
