@@ -65,38 +65,38 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
         .dealloc_fn = _pdo_snowflake_user_dealloc
     };
 
-    FILE *mfptr;
-    mfptr = fopen("php_ini_content.txt", "w");
-    fprintf(mfptr, "======== Printing the content passed in from php.ini ========\n");
-    fprintf(mfptr, "log path: %s \n", logdir);
-    fprintf(mfptr, "log level: %s \n", loglevel);
-    fprintf(mfptr, "value of debug: %s \n", debug);
-    int8 r = (debug && strncasecmp(debug, "true", 4) == 0);
-    fprintf(mfptr, "value of this expression on line 103 is: %d \n", r);
+    // FILE *mfptr;
+    // mfptr = fopen("php_ini_content.txt", "w");
+    // fprintf(mfptr, "======== Printing the content passed in from php.ini ========\n");
+    // fprintf(mfptr, "log path: %s \n", logdir);
+    // fprintf(mfptr, "log level: %s \n", loglevel);
+    // fprintf(mfptr, "value of debug: %s \n", debug);
+    // int8 r = (debug && strncasecmp(debug, "true", 4) == 0);
+    // fprintf(mfptr, "value of this expression on line 103 is: %d \n", r);
     
-    if(strlen(clientconfigfile) == 0){
-      fprintf(mfptr, "client config file is empty\n");
-    } else {
-      fprintf(mfptr, "client config file location: %s\n", clientconfigfile);
-    }
+    // if(strlen(clientconfigfile) == 0){
+    //   fprintf(mfptr, "client config file is empty\n");
+    // } else {
+    //   fprintf(mfptr, "client config file location: %s\n", clientconfigfile);
+    // }
 
     snowflake_global_set_attribute(SF_GLOBAL_CLIENT_CONFIG_FILE, clientconfigfile);
 
-    fprintf(mfptr, "client config file location: %s\n", clientconfigfile);
-    fprintf(mfptr, "log path after setting client config file: %s\n", logdir);
-    fprintf(mfptr, "log level after setting client config file: %s\n", loglevel);
+    // fprintf(mfptr, "client config file location: %s\n", clientconfigfile);
+    // fprintf(mfptr, "log path after setting client config file: %s\n", logdir);
+    // fprintf(mfptr, "log level after setting client config file: %s\n", loglevel);
 
     if((loglevel == NULL)||strcasecmp(loglevel, "DEFAULT")){
-      fprintf(mfptr, " log level is either null or default: %s\n", loglevel);
+      // fprintf(mfptr, " log level is either null or default: %s\n", loglevel);
       snowflake_global_init(logdir, SF_LOG_DEFAULT, &php_hooks);
     } else {
       snowflake_global_init(logdir, log_from_str_to_level(loglevel), &php_hooks);
     }
 
-    fprintf(mfptr, "log level after checking for null or default: %s\n", loglevel);
+    // fprintf(mfptr, "log level after checking for null or default: %s\n", loglevel);
 
 
-    fclose(mfptr);    
+    // fclose(mfptr);    
 
     snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, cacert);
     sf_bool debug_bool =
