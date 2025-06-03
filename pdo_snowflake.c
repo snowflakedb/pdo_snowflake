@@ -70,6 +70,9 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
     fprintf(mfptr, "======== Printing the content passed in from php.ini ========\n");
     fprintf(mfptr, "log path: %s \n", logdir);
     fprintf(mfptr, "log level: %s \n", loglevel);
+    fprintf(mfptr, "value of debug: %s \n", debug);
+    int8 r = (debug && strncasecmp(debug, "true", 4) == 0);
+    fprintf(mfptr, "value of this expression on line 103 is: %d \n", r);
     
     if(strlen(clientconfigfile) == 0){
       fprintf(mfptr, "client config file is empty\n");
@@ -85,14 +88,15 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
 
     if((loglevel == NULL)||strcasecmp(loglevel, "DEFAULT")){
       fprintf(mfptr, " log level is either null or default: %s\n", loglevel);
-      loglevel = "DEFAULT";
-    }      
+      snowflake_global_init(logdir, SF_LOG_DEFAULT, &php_hooks);
+    } else {
+      snowflake_global_init(logdir, log_from_str_to_level(loglevel), &php_hooks);
+    }
 
     fprintf(mfptr, "log level after checking for null or default: %s\n", loglevel);
 
-    fclose(mfptr);
 
-    snowflake_global_init(logdir, log_from_str_to_level(loglevel), &php_hooks);
+    fclose(mfptr);    
 
     snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, cacert);
     sf_bool debug_bool =
