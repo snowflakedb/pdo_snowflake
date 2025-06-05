@@ -236,7 +236,7 @@ Installing the Driver on Linux and macOS
    where :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the previous step.
 
    where :code:`<path to client config file>` is the path to the directory where you created 
-   the :code:'sf_client_config' file.
+   the :code:`sf_client_config` file.
 
 #. If you are using PHP with an application server or web server (e.g. Apache or nginx), restart the server.
 
@@ -269,10 +269,12 @@ Installing the Driver on Windows
        pdo_snowflake.cacert=<path to PHP config directory>\cacert.pem
        ; pdo_snowflake.logdir=C:\path\to\logdir                ; location of log directory
        ; pdo_snowflake.loglevel=DEBUG                          ; log level
-       ; pdo_snowflake.clientconfigfile=C:\path\to\configfile  ; location of config file
+       ; pdo_snowflake.clientconfigfile=<path to client config file>/sf_client_config.json
 
-   where :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the
-   previous step.
+   where :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the previous step.
+
+   where :code:`<path to client config file>` is the path to the directory where you created 
+   the :code:`sf_client_config` file.
 
 #. If you are using PHP with an application server or web server (e.g. Apache or nginx), restart the server.
 
@@ -659,7 +661,7 @@ Locate :code:`pdo.so` under :code:`/usr/lib` and specify it in :code:`phpt` file
     pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     pdo_snowflake.logdir=/tmp
     pdo_snowflake.loglevel=DEBUG
-    pdo_snowflake.clientconfigfile=/tmp
+    pdo_snowflake.clientconfigfile=/tmp/sf_client_config.json
 
 Where is the log files?
 ----------------------------------------------------------------------
@@ -672,6 +674,56 @@ The location of log files are specified by the parameters in php.ini:
     pdo_snowflake.cacert=/etc/php/8.1/conf.d/cacert.pem
     pdo_snowflake.logdir=/tmp            ; location of log directory
     pdo_snowflake.loglevel=DEBUG         ; log level
-    pdo_snowflake.clientconfigfile=/tmp  ; location of config file
+    pdo_snowflake.clientconfigfile=/tmp/sf_client_config.json
 
 where :code:`pdo_snowflake.loglevel` can be :code:`TRACE`, :code:`DEBUG`, :code:`INFO`, :code:`WARN`, :code:`ERROR` and :code:`FATAL`.
+
+Use easy logging while debugging your code
+----------------------------------------------------------------------
+
+When debugging an application, increasing the log level can provide more granular information about what the application is doing. The Easy Logging feature simplifies debugging by letting you change the log level and the log file destination using a configuration file (default: :code:`sf_client_config.json`).
+
+You typically change log levels only when debugging your application.
+
+This configuration file uses JSON to define the :code:`log_level` and :code:`log_path` logging parameters, as follows:
+
+   .. code-block:: none
+
+       {
+           "common": {
+               "log_level" : "INFO",
+               "log_path" :  "/some-path/some-directory"
+           }
+       }
+
+where:
+- :code:`log_level` is the desired logging level
+- :code:`log_path` is the location to store the log files. The driver automatically creates a sub-directory in the specified log_path. For example, if you set :code:`log_path` to :code:`/Users/me/logs`, the drivers creates the :code:`/Users/me/logs/` directory and stores the logs there.
+
+The driver looks for the location of the configuration file in the following order:
+
+- :code:`clientConfigFile` connection parameter, containing the full path to the configuration file, such as the following:
+
+   .. code-block:: none
+
+       const snowflake = require('snowflake-sdk');
+
+        var connection = snowflake.createConnection({
+            account: account,
+            username: user,
+            password: password,
+            application: application,
+            clientConfigFile: '/some/path/client_config.json'
+        });
+- :code:`SF_CLIENT_CONFIG_FILE` environment variable, containing the full path to the configuration file (e.g. :code:`export SF_CLIENT_CONFIG_FILE=/some_path/some-directory/client_config.json`).
+- driver installation directory, where the file must be named :code:`sf_client_config.json`.
+- User’s home directory, where the file must be named :code:`sf_client_config.json`.
+
+   .. code-block:: none
+   **Note**
+   To enhance security, the driver requires the logging configuration file on Unix-style systems to limit file permissions to allow only the file owner to modify the files (such as :code:`chmod 0600` or :code:`chmod 0644`).
+
+To minimize the number of searches for a configuration file, the driver reads the configuration file only:
+
+- for the first connection.
+- for the first connection using the :code:`clientConfigFile` parameter.
