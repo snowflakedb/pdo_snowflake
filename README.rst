@@ -231,12 +231,8 @@ Installing the Driver on Linux and macOS
        pdo_snowflake.cacert=<path to PHP config directory>/cacert.pem
        # pdo_snowflake.logdir=/tmp             # location of log directory
        # pdo_snowflake.loglevel=DEBUG          # log level
-       # pdo_snowflake.clientconfigfile=<path to client config file>/sf_client_config.json   
 
    where :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the previous step.
-
-   where :code:`<path to client config file>` is the path to the directory where you created 
-   the :code:`sf_client_config` file.
 
 #. If you are using PHP with an application server or web server (e.g. Apache or nginx), restart the server.
 
@@ -269,12 +265,8 @@ Installing the Driver on Windows
        pdo_snowflake.cacert=<path to PHP config directory>\cacert.pem
        ; pdo_snowflake.logdir=C:\path\to\logdir                ; location of log directory
        ; pdo_snowflake.loglevel=DEBUG                          ; log level
-       ; pdo_snowflake.clientconfigfile=<path to client config file>/sf_client_config.json
 
    where :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the previous step.
-
-   where :code:`<path to client config file>` is the path to the directory where you created 
-   the :code:`sf_client_config` file.
 
 #. If you are using PHP with an application server or web server (e.g. Apache or nginx), restart the server.
 
@@ -661,7 +653,6 @@ Locate :code:`pdo.so` under :code:`/usr/lib` and specify it in :code:`phpt` file
     pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     pdo_snowflake.logdir=/tmp
     pdo_snowflake.loglevel=DEBUG
-    pdo_snowflake.clientconfigfile=/tmp/sf_client_config.json
 
 Where is the log files?
 ----------------------------------------------------------------------
@@ -674,7 +665,6 @@ The location of log files are specified by the parameters in php.ini:
     pdo_snowflake.cacert=/etc/php/8.1/conf.d/cacert.pem
     pdo_snowflake.logdir=/tmp            ; location of log directory
     pdo_snowflake.loglevel=DEBUG         ; log level
-    pdo_snowflake.clientconfigfile=/tmp/sf_client_config.json
 
 where :code:`pdo_snowflake.loglevel` can be :code:`TRACE`, :code:`DEBUG`, :code:`INFO`, :code:`WARN`, :code:`ERROR` and :code:`FATAL`.
 
