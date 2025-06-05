@@ -11,8 +11,6 @@
 #include "php_pdo_snowflake.h"
 #include "php_pdo_snowflake_int.h"
 
-#include <stdio.h>
-
 ZEND_DECLARE_MODULE_GLOBALS(pdo_snowflake)
 
 #ifdef COMPILE_DL_PDO_SNOWFLAKE
@@ -66,23 +64,14 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
     };
 
     snowflake_global_set_attribute(SF_GLOBAL_CLIENT_CONFIG_FILE, clientconfigfile);
-
-    FILE *mfptr;
-    mfptr = fopen("pdo_value.txt", "w");
-    fprintf(mfptr, "current log dir: %s\n", logdir);
-    fprintf(mfptr, "current log level: %s\n", loglevel);
-    
+  
     // this condition is needed for now as log_from_str_to_level does not support DEFAULT
     if((loglevel == NULL)||(strcasecmp(loglevel, "DEFAULT") == 0)){
-      fprintf(mfptr, "easy logging is used bc loglevel: %s and logdir %s \n", loglevel, logdir);
       snowflake_global_init(logdir, SF_LOG_DEFAULT, &php_hooks);
     } else {
-      fprintf(mfptr, "easy logging is not used bc loglevel: %s and loglevel:%s\n", loglevel, logdir );
       snowflake_global_init(logdir, log_from_str_to_level(loglevel), &php_hooks);
     }
     
-    fclose(mfptr);
-
     snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, cacert);
     sf_bool debug_bool =
         (debug && strncasecmp(debug, "true", 4) == 0) ?

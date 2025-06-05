@@ -231,10 +231,12 @@ Installing the Driver on Linux and macOS
        pdo_snowflake.cacert=<path to PHP config directory>/cacert.pem
        # pdo_snowflake.logdir=/tmp             # location of log directory
        # pdo_snowflake.loglevel=DEBUG          # log level
-       # pdo_snowflake.clientconfigfile=/tmp   # location of config file
+       # pdo_snowflake.clientconfigfile=<path to client config file>/sf_client_config.json   
 
-   where :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the
-   previous step.
+   where :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the previous step.
+
+   where :code:`<path to client config file>` is the path to the directory where you created 
+   the :code:'sf_client_config' file.
 
 #. If you are using PHP with an application server or web server (e.g. Apache or nginx), restart the server.
 
