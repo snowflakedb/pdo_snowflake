@@ -687,7 +687,7 @@ You typically change log levels only when debugging your application.
        }
 
 where:
-- :code:`log_level` is the desired logging level
+- :code:`log_level` is the desired logging level.
 - :code:`log_path` is the location to store the log files.
 
    .. code-block:: none
@@ -712,7 +712,7 @@ where :code:`<path to client config file>` is the path to the directory where yo
 
 The driver looks for the location of the configuration file in the following order:
 
-#. in php.ini
+#. :code:`pdo_snowflake.clientconfigfile` in php.ini
 #. :code:`SF_CLIENT_CONFIG_FILE` environment variable, containing the full path to the configuration file (e.g. :code:`export SF_CLIENT_CONFIG_FILE=/some_path/some-directory/client_config.json`).
 #. php directory (e.g. where :code:`php.exe` is located).
 #. User’s home directory.
@@ -721,5 +721,6 @@ The driver looks for the location of the configuration file in the following ord
    **Note**
    To enhance security, the driver requires the logging configuration file on Unix-style systems to limit file permissions to allow only the file owner to modify the files (such as :code:`chmod 0600` or :code:`chmod 0644`).
 
+    .. code-block:: none
    **Note**
-   File must be named :code:`sf_client_config.json` for scenario 3 and 4
+   File must be named :code:`sf_client_config.json` for scenario 3 and 4.
