@@ -692,28 +692,11 @@ where:
 
 The driver looks for the location of the configuration file in the following order:
 
-- :code:`clientConfigFile` connection parameter, containing the full path to the configuration file, such as the following:
-
-   .. code-block:: none
-
-       const snowflake = require('snowflake-sdk');
-
-        var connection = snowflake.createConnection({
-            account: account,
-            username: user,
-            password: password,
-            application: application,
-            clientConfigFile: '/some/path/client_config.json'
-        });
 - :code:`SF_CLIENT_CONFIG_FILE` environment variable, containing the full path to the configuration file (e.g. :code:`export SF_CLIENT_CONFIG_FILE=/some_path/some-directory/client_config.json`).
-- driver installation directory, where the file must be named :code:`sf_client_config.json`.
+- driver's directory (e.g. the :code:`/ext` directory where the driver was copied to in an earlier step), where the file must be named :code:`sf_client_config.json`.
+- php directory (e.g. where :code:`php.exe` is located), where the file must be named :code:`sf_client_config.json`.
 - User’s home directory, where the file must be named :code:`sf_client_config.json`.
 
    .. code-block:: none
    **Note**
    To enhance security, the driver requires the logging configuration file on Unix-style systems to limit file permissions to allow only the file owner to modify the files (such as :code:`chmod 0600` or :code:`chmod 0644`).
-
-To minimize the number of searches for a configuration file, the driver reads the configuration file only:
-
-- for the first connection.
-- for the first connection using the :code:`clientConfigFile` parameter.
