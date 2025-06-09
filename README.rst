@@ -304,6 +304,7 @@ Dependes on the region where your account being hosted, you might need to use :c
 or append the region to the :code:`account` parameter.
 You might also need to append :code:`cloud` in :code:`region` parameter in the format of :code:`<region>.<cloud>`, or do the
 same when you append it to the :code:`account` parameter.
+Note: If a value contains a semicolon (;), it must be escaped by doubling it (;;). For example, the value `te;st` should be written as `te;;st`.
 
 where:
 
