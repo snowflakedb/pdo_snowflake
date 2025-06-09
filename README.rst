@@ -687,6 +687,7 @@ You typically change log levels only when debugging your application.
        }
 
 where:
+
 - :code:`log_level` is the desired logging level.
 - :code:`log_path` is the location to store the log files.
 
