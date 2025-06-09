@@ -720,8 +720,8 @@ The driver looks for the location of the configuration file in the following ord
 
    .. code-block:: none
    **Note**
-   To enhance security, the driver requires the logging configuration file on Unix-style systems to limit file permissions to allow only the file owner to modify the files (such as :code:`chmod 0600` or :code:`chmod 0644`).
+    To enhance security, the driver requires the logging configuration file on Unix-style systems to limit file permissions to allow only the file owner to modify the files (such as :code:`chmod 0600` or :code:`chmod 0644`).
 
-    .. code-block:: none
+   .. code-block:: none
    **Note**
-   File must be named :code:`sf_client_config.json` for scenario 3 and 4.
+    File must be named :code:`sf_client_config.json` for scenario 3 and 4.
