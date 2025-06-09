@@ -692,7 +692,7 @@ where:
 
    .. code-block:: none
    **Note**
-    The driver automatically creates a sub-directory in the specified log_path. For example, if you set :code:`log_path` to :code:`/Users/me/logs`, the drivers creates the :code:`/Users/me/logs/` directory and stores the logs there.
+    The driver will use easy logging's settings when :code:`log_level` or :code:`log_path` or both not specified in php.ini.
 
 Next, navigate to php.ini to set the path for :code:`sf_client_config.json`:
 
