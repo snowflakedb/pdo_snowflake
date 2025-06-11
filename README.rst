@@ -675,7 +675,7 @@ When debugging an application, increasing the log level can provide more granula
 
 You typically change log levels only when debugging your application.
 
-:code:`sf_client_config.json` is a JOSN configuration file that is used to define the logging parameters: :code:`log_level` and :code:`log_path`, as follows:
+:code:`sf_client_config.json` is a JSON configuration file that is used to define the logging parameters: :code:`log_level` and :code:`log_path`, as follows:
 
    .. code-block:: none
 
@@ -705,10 +705,6 @@ Next, navigate to php.ini to set the path for :code:`sf_client_config.json`:
     ; pdo_snowflake.loglevel=DEBUG                          ; log level
     ; pdo_snowflake.clientconfigfile=<path to client config file>/sf_client_config.json
 
-where :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the previous step.
-
-where :code:`pdo_snowflake.loglevel` can be :code:`TRACE`, :code:`DEBUG`, :code:`INFO`, :code:`WARN`, :code:`ERROR` and :code:`FATAL`.
-
 where :code:`<path to client config file>` is the path to the directory where you created the :code:`sf_client_config file`.
 
 The driver looks for the location of the configuration file in the following order:
@@ -721,6 +717,7 @@ The driver looks for the location of the configuration file in the following ord
    .. code-block:: none
    **Note**
     To enhance security, the driver requires the logging configuration file on Unix-style systems to limit file permissions to allow only the file owner to modify the files (such as :code:`chmod 0600` or :code:`chmod 0644`).
+
 
    .. code-block:: none
    **Note**
