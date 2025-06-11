@@ -654,7 +654,7 @@ Locate :code:`pdo.so` under :code:`/usr/lib` and specify it in :code:`phpt` file
     pdo_snowflake.logdir=/tmp
     pdo_snowflake.loglevel=DEBUG
 
-Where is the log files?
+Where are the log files?
 ----------------------------------------------------------------------
 
 The location of log files are specified by the parameters in php.ini:
@@ -671,7 +671,7 @@ where :code:`pdo_snowflake.loglevel` can be :code:`TRACE`, :code:`DEBUG`, :code:
 Use easy logging while debugging your code
 ----------------------------------------------------------------------
 
-When debugging an application, increasing the log level can provide more granular information about what the application is doing. The Easy Logging feature simplifies debugging by letting you change the log level and the log file destination using a configuration file (i.e. :code:`sf_client_config.json`).
+When debugging an application, increasing the log level can provide more granular information about what the application is doing. The Easy Logging feature simplifies debugging by letting you change the log level and the log file destination using the configuration file, :code:`sf_client_config.json`.
 
 You typically change log levels only when debugging your application.
 
@@ -693,9 +693,9 @@ where:
 
    .. code-block:: none
    **Note**
-    The driver will use easy logging's settings when :code:`log_level` or :code:`log_path` or both not specified in php.ini.
+    The driver will use Easy Logging's settings when :code:`log_level` or :code:`log_path` or both are not specified in php.ini.
 
-Next, navigate to php.ini to set the path for :code:`sf_client_config.json`:
+Next, edit php.ini to define the value for :code:`pdo_snowflake.clientconfigfile`. :code:`pdo_snowflake.clientconfigfile` specifies the location of the Easy Logging configuration file. This is similar to other settings such as :code:`pdo_snowflake.logdir` and :code:`pdo_snowflake.loglevel`.
 
 .. code-block:: ini
 
@@ -703,9 +703,9 @@ Next, navigate to php.ini to set the path for :code:`sf_client_config.json`:
     pdo_snowflake.cacert=<path to PHP config directory>\cacert.pem
     ; pdo_snowflake.logdir=C:\path\to\logdir                ; location of log directory
     ; pdo_snowflake.loglevel=DEBUG                          ; log level
-    ; pdo_snowflake.clientconfigfile=<path to client config file>/sf_client_config.json
+    pdo_snowflake.clientconfigfile=<path to client config file>/sf_client_config.json
 
-where :code:`<path to client config file>` is the path to the directory where you created the :code:`sf_client_config file`.
+With :code:`logdir` and :code:`loglevel` commented out, Easy Logging picks up the log settings from :code:`clientconfigfile`.
 
 The driver looks for the location of the configuration file in the following order:
 
