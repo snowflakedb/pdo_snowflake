@@ -278,7 +278,9 @@ The next sections explain how to use the driver in a PHP page.
 Note
 ----------------------------------------------------------------------
 
-This driver currently does not support GCP regional endpoints. Please ensure that any workloads using through this driver do not require support for regional endpoints on GCP. If you have questions about this, please contact Snowflake Support.
+- This driver currently does not support GCP regional endpoints. Please ensure that any workloads using through this driver do not require support for regional endpoints on GCP. If you have questions about this, please contact Snowflake Support.
+
+- The :code:`region` parameter has been deprecated. To specify region information you need to append it in :code:`account` parameter.
 
 Connecting to the Snowflake Database
 ----------------------------------------------------------------------
@@ -310,12 +312,6 @@ where:
 .. code-block:: php
 
     $dbh = new PDO("snowflake:account=testaccount.us-east-2.aws", "user", "password");
-
-Notice
-----------------------------------------------------------------------
-The :code:`region` parameter as been deprecated.
-To specify region information you need to append it in :code:`account` parameter.
-----------------------------------------------------------------------
 
 You can specify the host name for your account directly as shown below instead of using `account`:
 
