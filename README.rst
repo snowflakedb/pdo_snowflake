@@ -298,10 +298,9 @@ where:
 - :code:`<user>` is the login name of the user for the connection.
 - :code:`<password>` is the password for the specified user.
 
-Dependes on the region where your account being hosted, you might need to use :code:`region` parameter to specify the region
-or append the region to the :code:`account` parameter.
-You might also need to append :code:`cloud` in :code:`region` parameter in the format of :code:`<region>.<cloud>`, or do the
-same when you append it to the :code:`account` parameter.
+Dependes on the region where your account being hosted, you might need to append the region to
+the :code:`account` parameter in the format of :code:`<account>.<region>`.
+You might also need to append :code:`cloud` as well, in the format of :code:`<account>.<region>.<cloud>`.
 
 where:
 
@@ -311,9 +310,14 @@ where:
 .. code-block:: php
 
     $dbh = new PDO("snowflake:account=testaccount.us-east-2.aws", "user", "password");
-    $dbh = new PDO("snowflake:account=testaccount;region=us-east-2.aws", "user", "password");
 
-You can specify the host name for your account directly as shown below instead of using `account` and `region`:
+Notice
+----------------------------------------------------------------------
+The :code:`region` parameter as been deprecated.
+To specify region information you need to append it in :code:`account` parameter.
+----------------------------------------------------------------------
+
+You can specify the host name for your account directly as shown below instead of using `account`:
 
 .. code-block:: php
 

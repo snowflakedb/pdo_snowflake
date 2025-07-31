@@ -3,11 +3,7 @@
 #define SNOWFLAKECLIENT_CSPATESTATIONS_HPP
 
 #include <string>
-#include <picojson.h>
-#include <curl/curl.h>
-#include <boost/url.hpp>
-#include "HttpClient.hpp"
-#include "AWSUtils.hpp"
+#include <boost/optional.hpp>
 
 namespace Snowflake {
 
@@ -36,38 +32,54 @@ namespace Client {
     return "UNKNOWN";
   }
 
+  inline boost::optional<AttestationType> attestationTypeFromString(const std::string& type)
+  {
+    if (type == "AWS")
+      return AttestationType::AWS;
+    if (type == "AZURE")
+      return AttestationType::AZURE;
+    if (type == "GCP")
+      return AttestationType::GCP;
+    if (type == "OIDC")
+      return AttestationType::OIDC;
+
+    return boost::none;
+  }
+
   struct Attestation {
     AttestationType type;
     std::string credential;
     boost::optional<std::string> issuer;
     boost::optional<std::string> subject;
-    boost::optional<std::string> arn;
 
     static Attestation makeOidc(const std::string& token, const std::string& issuer, const std::string& subject) {
-      return Attestation{AttestationType::OIDC, token, issuer, subject, boost::none};
+      return Attestation{AttestationType::OIDC, token, issuer, subject};
     }
 
-    static Attestation makeAws(const std::string& credential, const std::string& arn) {
-      return Attestation{AttestationType::AWS, credential, boost::none, boost::none, arn};
+    static Attestation makeAws(const std::string& credential) {
+      return Attestation{AttestationType::AWS, credential, boost::none, boost::none};
     }
 
     static Attestation makeAzure(const std::string& credential, const std::string& issuer, const std::string& subject) {
-      return Attestation{AttestationType::AZURE, credential, issuer, subject, boost::none};
+      return Attestation{AttestationType::AZURE, credential, issuer, subject};
     }
 
     static Attestation makeGcp(const std::string& credential, const std::string& issuer, const std::string& subject) {
-      return Attestation{AttestationType::GCP, credential, issuer, subject, boost::none};
+      return Attestation{AttestationType::GCP, credential, issuer, subject};
     }
   };
 
-  extern const std::unique_ptr<IHttpClient> defaultHttpClient;
+  class IHttpClient;
+  namespace AwsUtils {
+    class ISdkWrapper;
+  }
 
   struct AttestationConfig {
     boost::optional<AttestationType> type;
     boost::optional<std::string> token;
     boost::optional<std::string> snowflakeEntraResource;
-    IHttpClient* httpClient = IHttpClient::getInstance();
-    AwsUtils::ISdkWrapper* awsSdkWrapper = AwsUtils::ISdkWrapper::getInstance();
+    IHttpClient* httpClient = NULL;
+    AwsUtils::ISdkWrapper* awsSdkWrapper = NULL;
   };
 
   boost::optional<Attestation> createAttestation(AttestationConfig& config);
