@@ -45,6 +45,11 @@ extern "C" {
  */
 #define SF_AUTHENTICATOR_PAT "programmatic_access_token"
 
+ /**
+ * Authenticator, SSO token
+ */
+#define SF_AUTHENTICATOR_ID_TOKEN "ID_TOKEN"
+
 /**
  * UUID4 length
  */
@@ -237,6 +242,11 @@ typedef enum SF_STATUS {
  */
 typedef enum SF_ATTRIBUTE {
     SF_CON_ACCOUNT,
+    /**
+     * SF_CON_REGION is deprecated.
+     * Instead you could specify full server URL using SF_CON_HOST,
+     * or specify region through SF_CON_ACCOUNT with format <account>.<region>
+     */
     SF_CON_REGION,
     SF_CON_USER,
     SF_CON_PASSWORD,
@@ -270,6 +280,7 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_INCLUDE_RETRY_REASON,
     SF_CON_RETRY_TIMEOUT,
     SF_CON_CLIENT_REQUEST_MFA_TOKEN,
+    SF_CON_CLIENT_STORE_TEMPORARY_CREDENTIAL,
     SF_CON_MAX_RETRY,
     SF_CON_MAX_VARCHAR_SIZE,
     SF_CON_MAX_BINARY_SIZE,
@@ -423,6 +434,10 @@ typedef struct SF_CONNECT {
     char *token;
     char *master_token;
 
+    // For token cache auth.
+    char* sso_token;
+    char* mfa_token;
+
     int64 login_timeout;
     int64 network_timeout;
     int64 browser_response_timeout;
@@ -483,6 +498,7 @@ typedef struct SF_CONNECT {
     sf_bool binding_threshold_overridden;
     sf_bool stage_binding_disabled;
     sf_bool disable_console_login;
+    sf_bool client_store_temporary_credential;
 } SF_CONNECT;
 
 /**

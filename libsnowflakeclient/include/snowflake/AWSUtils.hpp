@@ -23,7 +23,6 @@ namespace Snowflake {
       public:
         virtual boost::optional<std::string> getEC2Region() = 0;
         virtual Aws::Auth::AWSCredentials getCredentials() = 0;
-        virtual boost::optional<std::string> getArn() = 0;
         virtual ~ISdkWrapper() = default;
         static ISdkWrapper* getInstance();
       };

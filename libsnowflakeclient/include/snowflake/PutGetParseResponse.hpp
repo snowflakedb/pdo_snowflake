@@ -63,6 +63,8 @@ struct StageInfo
   // whether to use regional URL (AWS and GCS only)
   bool useRegionalUrl;
 
+  bool useVirtualUrl; //Required by GCS for the endpoint.
+
   std::string storageAccount; //Required by Azure
 
   std::string presignedUrl;   //Required by GCS for uploading
