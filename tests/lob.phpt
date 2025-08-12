@@ -10,7 +10,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     ini_set('memory_limit', '1024M');
     include __DIR__ . "/common.php";
 
-    $MAX_LOB_SIZE = 16 * 1024 * 1024;
+    $MAX_LOB_SIZE = 128 * 1024 * 1024;
 
     $dbh = new PDO($dsn, $user, $password);
     $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
