@@ -8,6 +8,24 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php
     include __DIR__ . "/common.php";
 
+    // OKTA authenticaiton
+    $dbh = new PDO("snowflake:account=$account;disablesamlcheck=true;application=phptest;authenticator=https://dev-90125362.okta.com/", $oktauser, $oktapwd, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+    $sth = $dbh->query("select 1234");
+    while($row=$sth->fetch(PDO::FETCH_NUM)){
+        echo "RESULT: " . $row[0]. "\n";
+    }
+    $dbh = null;
+    echo "OK\n";
+
+    // OKTA authenticaiton and SAML URL 
+    $dbh = new PDO("snowflake:account=$account;disablesamlcheck=false;application=phptest;authenticator=https://dev-90125362.okta.com/", $oktauser, $oktapwd, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        $sth = $dbh->query("select 1234");
+    while($row=$sth->fetch(PDO::FETCH_NUM)){
+        echo "RESULT: " . $row[0]. "\n";
+    }
+    $dbh = null;
+    echo "OK\n";
+
     // full parameters
     $dbh = new PDO("$dsn;application=phptest;authenticator=snowflake;priv_key_file=tests/p8test.pem;priv_key_file_pwd=test;disablequerycontext=true;includeretryreason=false;logintimeout=250;maxhttpretries=8;retrytimeout=350;ocspfailopen=false;disableocspchecks=true", $user, $password);
     // create table for testing autocommit later
@@ -86,6 +104,10 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 ===DONE===
 <?php exit(0); ?>
 --EXPECT--
+RESULT: 1234
+OK
+RESULT: 1234
+OK
 OK
 1
 2
