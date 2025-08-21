@@ -8,9 +8,7 @@
     $schema = $p['SNOWFLAKE_TEST_SCHEMA'];
     $warehouse = $p['SNOWFLAKE_TEST_WAREHOUSE'];
     $role = $p['SNOWFLAKE_TEST_ROLE'];
-    $oktauser=$p['SNOWFLAKE_OKTA_TEST_USER'];
-    $oktapwd=$p['SNOWFLAKE_OKTA_TEST_PASSWORD'];
-
+    
     if (array_key_exists('SNOWFLAKE_TEST_HOST', $p)) {
         $host = $p['SNOWFLAKE_TEST_HOST'];
     } else {
