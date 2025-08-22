@@ -654,13 +654,11 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     snowflake_set_attribute(H->server, SF_CON_APPLICATION_NAME,
                             PHP_PDO_SNOWFLAKE_NAME);
     PDO_LOG_DBG("APP NAME: %s", PHP_PDO_SNOWFLAKE_NAME);
-    snowflake_set_attribute(H->server, SF_CON_APPLICATION_VERSION, "2.3.0");
-    // snowflake_set_attribute(H->server, SF_CON_APPLICATION_VERSION, version);
+    snowflake_set_attribute(H->server, SF_CON_APPLICATION_VERSION, version);
     snowflake_set_attribute(H->server, SF_CON_USER, dbh->username);
     PDO_LOG_DBG(
         "user: %s", dbh->username);
     snowflake_set_attribute(H->server, SF_CON_PASSWORD, dbh->password);
-    PDO_LOG_DBG("OKTA dwp : %s", dbh->password);
     PDO_LOG_DBG(
         "password: %s", dbh->password != NULL ? "******" : "(NULL)");
     snowflake_set_attribute(

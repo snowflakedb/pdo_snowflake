@@ -8,7 +8,6 @@
     $schema = $p['SNOWFLAKE_TEST_SCHEMA'];
     $warehouse = $p['SNOWFLAKE_TEST_WAREHOUSE'];
     $role = $p['SNOWFLAKE_TEST_ROLE'];
-    
     if (array_key_exists('SNOWFLAKE_TEST_HOST', $p)) {
         $host = $p['SNOWFLAKE_TEST_HOST'];
     } else {
