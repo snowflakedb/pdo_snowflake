@@ -396,13 +396,19 @@ where:
 OKTA Authentication
 ----------------------------------------------------------------------
 
-PHP PDO driver for Snowflake supports OKTA Authentication. To connect to Snowflake database using OKTA Authentication, specify the data source name (dsn) parameters as follows:
+PHP PDO driver for Snowflake supports OKTA Authentication. 
+
+Before proceeding, please ensure that OKTA Authentication is set up for both server and client side. For more information, please consult `Configure OKTA for External OAuth <https://docs.snowflake.com/en/user-guide/oauth-okta#configuration-procedure>`
+
+To connect to Snowflake database using OKTA Authentication, create a new PDO object and specify the data source name (dsn) parameters as follows:
 
 .. code-block:: php
     $dbh = new PDO("snowflake:account=$account;authenticator=<OKTA authenticator URL>", $oktauser, $oktapwd);
 
 where:
 
+- :code:`account` is your snowflake account name
+- :code:`authenticator` is your OKTA authenticator URL
 - :code:`oktauser` is your okta username
 - :code:`oktapwd` is your okta password
 
