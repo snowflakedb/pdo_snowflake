@@ -396,11 +396,12 @@ where:
 Using OKTA authentication
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The PHP PDO driver supports OKTA Authentication. Guidance can be found `Native SSO - OKTA only <https://docs.snowflake.com/en/user-guide/admin-security-fed-auth-use#label-native-sso-okta>`
+The PHP PDO driver supports OKTA Authentication. Guidance can be found in `Native SSO - OKTA only <https://docs.snowflake.com/en/user-guide/admin-security-fed-auth-use#label-native-sso-okta>`_.
 
 To connect to Snowflake database using OKTA Authentication, create a new PDO object and specify the data source name (dsn) parameters as follows:
 
 .. code-block:: php
+
     $dbh = new PDO("snowflake:account=$account;disablesamlurlcheck=false;authenticator=<OKTA authenticator URL>", $oktauser, $oktapwd);
 
 where:
@@ -414,6 +415,7 @@ where:
 To disable SAML checking for a PDO connection, set :code:`disablesamlurlcheck=true` in the DSN connection string. For example:
 
 .. code-block:: php
+    
     $dbh = new PDO("snowflake:account=$account;disablesamlurlcheck=true;authenticator=<OKTA authenticator URL>", $oktauser, $oktapwd);
 
 Configuring OCSP Checking
