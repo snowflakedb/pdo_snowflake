@@ -407,7 +407,7 @@ To connect to Snowflake database using OKTA Authentication, create a new PDO obj
 where:
 
 - :code:`account` is your snowflake account name
-- :code:`disablesamlurlcheck` is used to turn on and off SAML checking. Defaults to false.
+- :code:`disablesamlurlcheck` is used to turn on and off `SAML checking <https://docs.snowflake.com/en/developer-guide/odbc/odbc-parameters>`_
 - :code:`authenticator` is your OKTA authenticator URL
 - :code:`oktauser` is your okta username
 - :code:`oktapwd` is your okta password
