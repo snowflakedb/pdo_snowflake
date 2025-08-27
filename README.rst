@@ -407,12 +407,12 @@ To connect to Snowflake database using OKTA Authentication, create a new PDO obj
 where:
 
 - :code:`account` is your snowflake account name
-- :code:`disablesamlurlcheck` is used to turn on and off `SAML checking <https://docs.snowflake.com/en/developer-guide/odbc/odbc-parameters>`_
+- :code:`disablesamlurlcheck` specifies whether to disable verification for SAML URLs.
 - :code:`authenticator` is your OKTA authenticator URL
 - :code:`oktauser` is your okta username
 - :code:`oktapwd` is your okta password
 
-To disable SAML checking for a PDO connection, set :code:`disablesamlurlcheck=true` in the DSN connection string. For example:
+By default, the PHP PDO driver verifies SAML URLs. To disable SAML checking for a PDO connection, set :code:`disablesamlurlcheck=true` in the DSN connection string. For example:
 
 .. code-block:: php
     
