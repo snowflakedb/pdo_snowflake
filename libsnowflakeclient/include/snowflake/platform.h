@@ -150,6 +150,8 @@ void STDCALL sf_memory_error_handler();
 // this should be called by application before any calls of sfclient
 void STDCALL sf_exception_on_memory_failure();
 
+void STDCALL sf_get_callers_executable_path(char* out_buf, size_t buf_size);
+
 // Defined for unused function parameters.
 #define SF_UNUSED(x) (void)(x)
 
