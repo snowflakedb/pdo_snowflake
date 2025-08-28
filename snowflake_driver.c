@@ -653,7 +653,6 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
 
     snowflake_set_attribute(H->server, SF_CON_APPLICATION_NAME,
                             PHP_PDO_SNOWFLAKE_NAME);
-    PDO_LOG_DBG("APP NAME: %s", PHP_PDO_SNOWFLAKE_NAME);
     snowflake_set_attribute(H->server, SF_CON_APPLICATION_VERSION, version);
     snowflake_set_attribute(H->server, SF_CON_USER, dbh->username);
     PDO_LOG_DBG(
