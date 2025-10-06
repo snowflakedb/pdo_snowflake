@@ -38,7 +38,7 @@ echo ./configure "${CONFIGURE_OPTS[@]}"
 ./configure "${CONFIGURE_OPTS[@]}"
 make
 
-if [[ "aarch64" == $(uname -p) ]]; then
+if [[ "aarch64" == $(uname -m) ]]; then
     ARCH_DIR=aarch64
 else
     ARCH_DIR=
