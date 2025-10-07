@@ -391,6 +391,31 @@ where:
 - :code:`<username>` Specifies Duo passcode is embedded in the password.
 - :code:`<password><passcode>` Specifies the password and passcode concatenated.
 
+Using OKTA authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PHP PDO driver supports OKTA Authentication. Guidance can be found in `Native SSO - OKTA only <https://docs.snowflake.com/en/user-guide/admin-security-fed-auth-use#label-native-sso-okta>`_.
+
+To connect to Snowflake database using OKTA Authentication, create a new PDO object and specify the data source name (dsn) parameters as follows:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=$account;disablesamlurlcheck=false;authenticator=<OKTA authenticator URL>", $oktauser, $oktapwd);
+
+where:
+
+- :code:`account` is your snowflake account name
+- :code:`disablesamlurlcheck` specifies whether to disable verification for SAML URLs.
+- :code:`authenticator` is your OKTA authenticator URL
+- :code:`oktauser` is your okta username
+- :code:`oktapwd` is your okta password
+
+By default, the PHP PDO driver verifies SAML URLs. To disable SAML checking for a PDO connection, set :code:`disablesamlurlcheck=true` in the DSN connection string. For example:
+
+.. code-block:: php
+    
+    $dbh = new PDO("snowflake:account=$account;disablesamlurlcheck=true;authenticator=<OKTA authenticator URL>", $oktauser, $oktapwd);
+
 Configuring OCSP Checking
 ----------------------------------------------------------------------
 
