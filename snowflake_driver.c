@@ -645,8 +645,6 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
 
     // Set context attributes
     char version[128];
-    strcpy(version, PHP_VERSION);
-    strcat(version, "-");
     strcat(version, PDO_SNOWFLAKE_VERSION);
 
     PDO_LOG_INF("Snowflake PHP PDO Driver: %s", version);
