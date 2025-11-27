@@ -89,7 +89,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 --EXPECT--
 Connected to Snowflake
 name: C1, native_type: FIXED, scale: 0, precision: 38, len: 0
-name: C2, native_type: BINARY, scale: 0, precision: 0, len: 67108864
+name: C2, native_type: BINARY, scale: 0, precision: 0, len: 8388608
 Results in String
 C1: 1, C2: 1234,5678,65,66
 C1: 2, C2: abcd,def0,67,68
