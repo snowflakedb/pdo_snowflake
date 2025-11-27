@@ -588,7 +588,8 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"disableocspchecks",   "false",      0},
         {"passcode",            NULL,         0},
         {"passcodeinpassword",  "false",      0},
-        {"disablesamlurlcheck", "false",      0}
+        {"disablesamlurlcheck", "false",      0},
+        {"wif_impersonation_path", NULL,      0}
     };
 
     // Parse the input data parameters
@@ -849,6 +850,15 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     snowflake_set_attribute(H->server, SF_CON_DISABLE_SAML_URL_CHECK, 
         (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_DISABLE_SAML_URL_CHECK_IDX].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
     PDO_LOG_DBG("disablesamlURLcheck: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_DISABLE_SAML_URL_CHECK_IDX].optval);
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_IMPERSONATION_PATH_IDX].optval != NULL) {
+        /* wif_impersonation_path */
+        snowflake_set_attribute(
+            H->server, SF_CON_WIF_IMPERSONATION_PATH,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_IMPERSONATION_PATH_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "wif_impersonation_path: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_IMPERSONATION_PATH_IDX].optval);
 
     if (snowflake_connect(H->server) > 0) {
         pdo_snowflake_error(dbh);

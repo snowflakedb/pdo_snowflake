@@ -78,6 +78,7 @@ namespace Client {
     boost::optional<AttestationType> type;
     boost::optional<std::string> token;
     boost::optional<std::string> snowflakeEntraResource;
+    boost::optional<std::string> workloadIdentityImpersonationPath;
     IHttpClient* httpClient = NULL;
     AwsUtils::ISdkWrapper* awsSdkWrapper = NULL;
   };
