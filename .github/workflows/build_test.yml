@@ -66,7 +66,7 @@ jobs:
         # have to specify patch version on windows
         # otherwise could get version mismatch issue when running test on github
         # need to keep track on the latest version
-        php-version: ['8.4.8']
+        php-version: ['8.4.13']
     # The type of runner that the job will run on
     runs-on: windows-latest
     env:
@@ -130,10 +130,10 @@ jobs:
       matrix:
         php-version: ['8.1', '8.2', '8.3', '8.4']
     # The type of runner that the job will run on
-    runs-on: macos-13
+    runs-on: macos-latest
     env: 
-      PHP_HOME: /usr/local
-      TEST_PHP_EXECUTABLE: /usr/local/bin/php
+      PHP_HOME: /opt/homebrew
+      TEST_PHP_EXECUTABLE: /opt/homebrew/bin/php
       NO_INTERACTION: true
     steps:
         # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it

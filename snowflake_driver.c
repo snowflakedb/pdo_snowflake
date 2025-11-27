@@ -587,7 +587,8 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"ocspfailopen",        "true",       0},
         {"disableocspchecks",   "false",      0},
         {"passcode",            NULL,         0},
-        {"passcodeinpassword",  "false",      0}
+        {"passcodeinpassword",  "false",      0},
+        {"disablesamlurlcheck", "false",      0}
     };
 
     // Parse the input data parameters
@@ -642,17 +643,11 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         dbh->auto_commit = (unsigned) auto_commit;
     }
 
-    // Set context attributes
-    char version[128];
-    strcpy(version, PHP_VERSION);
-    strcat(version, "-");
-    strcat(version, PDO_SNOWFLAKE_VERSION);
-
-    PDO_LOG_INF("Snowflake PHP PDO Driver: %s", version);
+    PDO_LOG_INF("Snowflake PHP PDO Driver: %s", PDO_SNOWFLAKE_VERSION);
 
     snowflake_set_attribute(H->server, SF_CON_APPLICATION_NAME,
                             PHP_PDO_SNOWFLAKE_NAME);
-    snowflake_set_attribute(H->server, SF_CON_APPLICATION_VERSION, version);
+    snowflake_set_attribute(H->server, SF_CON_APPLICATION_VERSION, PDO_SNOWFLAKE_VERSION);
     snowflake_set_attribute(H->server, SF_CON_USER, dbh->username);
     PDO_LOG_DBG(
         "user: %s", dbh->username);
@@ -850,6 +845,10 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     PDO_LOG_DBG(
         "passcodeinpassword: %s",
         vars[PDO_SNOWFLAKE_CONN_ATTR_PASSCODE_IN_PASSWORD_IDX].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_DISABLE_SAML_URL_CHECK, 
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_DISABLE_SAML_URL_CHECK_IDX].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("disablesamlURLcheck: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_DISABLE_SAML_URL_CHECK_IDX].optval);
 
     if (snowflake_connect(H->server) > 0) {
         pdo_snowflake_error(dbh);
