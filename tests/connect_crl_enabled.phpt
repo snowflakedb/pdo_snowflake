@@ -23,7 +23,6 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     
     $dbh = new PDO("{$dsn};disableocspchecks=true;crl_check=true;crl_advisory=false;crl_disk_caching=true", $user, $password);
     
-    // Execute a simple query to verify the connection works
     $sth = $dbh->query("SELECT 1");
     $row = $sth->fetch(PDO::FETCH_NUM);
     echo "Query result: " . $row[0] . "\n";
@@ -63,7 +62,7 @@ CRL cache directory created: crl_cache_test_%s
 Files in cache before connection: 0
 Query result: 1
 Files in cache after connection: %d
-%s
+CRL cache populated successfully
 CRL cache directory cleaned up
 OK
 ===DONE===
