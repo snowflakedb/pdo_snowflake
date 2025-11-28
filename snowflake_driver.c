@@ -588,7 +588,12 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"disableocspchecks",   "false",      0},
         {"passcode",            NULL,         0},
         {"passcodeinpassword",  "false",      0},
-        {"disablesamlurlcheck", "false",      0}
+        {"disablesamlurlcheck", "false",      0},
+        {"crl_check",           "false",      0},
+        {"crl_advisory",        "true",       0},
+        {"crl_allow_no_crl",    "false",      0},
+        {"crl_memory_caching",  "true",       0},
+        {"crl_disk_caching",    "true",       0},
     };
 
     // Parse the input data parameters
@@ -849,6 +854,42 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     snowflake_set_attribute(H->server, SF_CON_DISABLE_SAML_URL_CHECK, 
         (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_DISABLE_SAML_URL_CHECK_IDX].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
     PDO_LOG_DBG("disablesamlURLcheck: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_DISABLE_SAML_URL_CHECK_IDX].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_CRL_CHECK,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_CHECK_IDX].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("crl_check: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_DISABLE_SAML_URL_CHECK_IDX].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_CRL_ADVISORY,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_ADVISORY_IDX].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("crl_advisory: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_ADVISORY_IDX].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_CRL_ALLOW_NO_CRL,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_ALLOW_NO_CRL_IDX].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("crl_allow_no_crl: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_ALLOW_NO_CRL_IDX].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_CRL_MEMORY_CACHING,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_MEMORY_CACHING_IDX].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("crl_memory_caching: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_MEMORY_CACHING_IDX].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_CRL_DISK_CACHING,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_DISK_CACHING_IDX].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("crl_disk_caching: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_DISK_CACHING_IDX].optval);
+
+    int8 ocsp_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval, "true") != 0);
+    int8 crl_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_CHECK_IDX].optval, "true") == 0);
+    
+    if (ocsp_enabled && crl_enabled) {
+        PDO_LOG_ERR("Both OCSP and CRL checks are enabled. Only one revocation check method can be enabled at a time.");
+        
+        strcpy(dbh->error_code, "HY000");
+        zend_throw_exception_ex(
+            php_pdo_get_exception(),
+            1,
+            "SQLSTATE[HY000] [1] Both host certificate revocation check methods (OCSP and CRL) are enabled. "
+            "Please turn off crl_check or toggle OCSP with disableocspchecks.");
+        ret = 0;
+        goto cleanup;
+    }
 
     if (snowflake_connect(H->server) > 0) {
         pdo_snowflake_error(dbh);
