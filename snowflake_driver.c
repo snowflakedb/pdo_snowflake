@@ -590,10 +590,11 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"passcodeinpassword",  "false",      0},
         {"disablesamlurlcheck", "false",      0},
         {"crl_check",           "false",      0},
-        {"crl_advisory",        "true",       0},
+        {"crl_advisory",        "false",      0},
         {"crl_allow_no_crl",    "false",      0},
         {"crl_memory_caching",  "true",       0},
         {"crl_disk_caching",    "true",       0},
+        {"crl_download_timeout", "120",       0},
     };
 
     // Parse the input data parameters
@@ -874,6 +875,15 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     snowflake_set_attribute(H->server, SF_CON_CRL_DISK_CACHING,
         (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_DISK_CACHING_IDX].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
     PDO_LOG_DBG("crl_disk_caching: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_DISK_CACHING_IDX].optval);
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_DOWNLOAD_TIMEOUT_IDX].optval != NULL) {
+        int_attr_value = strtoll(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_DOWNLOAD_TIMEOUT_IDX].optval, NULL, 10);
+        snowflake_set_attribute(
+            H->server, SF_CON_CRL_DOWNLOAD_TIMEOUT,
+            &int_attr_value);
+        PDO_LOG_DBG(
+            "crl_download_timeout: %d", int_attr_value);
+    }
 
     int8 ocsp_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval, "true") != 0);
     int8 crl_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_CHECK_IDX].optval, "true") == 0);
