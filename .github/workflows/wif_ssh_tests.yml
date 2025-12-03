@@ -1,0 +1,42 @@
+name: WIF Tests (SSH to Cloud VMs)
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  wif-tests:
+    runs-on: ubuntu-latest
+    env:
+      PHP_HOME: /usr
+      GIT_BRANCH: ${{ github.ref_name }}
+      SNOWFLAKE_TEST_WIF_ACCOUNT: ${{ secrets.SNOWFLAKE_TEST_WIF_ACCOUNT }}
+      SNOWFLAKE_TEST_WIF_HOST_AWS: ${{ secrets.SNOWFLAKE_TEST_WIF_HOST_AWS }}
+      SNOWFLAKE_TEST_WIF_HOST_AZURE: ${{ secrets.SNOWFLAKE_TEST_WIF_HOST_AZURE }}
+      SNOWFLAKE_TEST_WIF_HOST_GCP: ${{ secrets.SNOWFLAKE_TEST_WIF_HOST_GCP }}
+      HOST_AWS: ${{ secrets.HOST_AWS }}
+      HOST_AZURE: ${{ secrets.HOST_AZURE }}
+      HOST_GCP: ${{ secrets.HOST_GCP }}
+      WIF_SSH_KEY_AWS_AZURE: ${{ secrets.WIF_SSH_KEY_AWS_AZURE }}
+      WIF_SSH_KEY_GCP: ${{ secrets.WIF_SSH_KEY_GCP }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, json
+      
+      - name: Build PDO driver
+        run: ./scripts/build_pdo_snowflake.sh
+      
+      - name: Run WIF tests on cloud VMs
+        run: |
+          chmod +x ./scripts/test_wif.sh
+          ./scripts/test_wif.sh
+
