@@ -48,6 +48,8 @@ def test_windows():
 
 
     print ("====> run test")
+    print ("====> exclude WIF test (runs separately in wif_ssh_tests.yml)")
+    run_command("del .\\tests\\wif_auth.phpt /q/f ")
     run_tests_file = os.path.join("D:\\php-sdk\\phpmaster", vs, arch, "php-src", "run-tests.php")
     run_command_no_exit("php.exe " + run_tests_file + " .\\tests -d extension=pdo_snowflake || ver>null")
     print ("====> parse test results")
@@ -69,6 +71,8 @@ def test_posix():
     run_command("./scripts/env.sh && env | grep SNOWFLAKE_TEST > testenv.ini")
 
     print ("====> run test")
+    print ("====> exclude WIF test (runs separately in wif_ssh_tests.yml)")
+    run_command("rm -f ./tests/wif_auth.phpt")
     run_test_options = ""
     if use_valgrind == 'true' or use_valgrind == '1':
         run_test_options = run_test_options + ' -m'
