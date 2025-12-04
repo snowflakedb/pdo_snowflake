@@ -7,13 +7,16 @@ export RSA_KEY_PATH_GCP="/tmp/rsa_wif_gcp"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 WIF_TEST_DIR="pdo_tests/${GIT_BRANCH}_${TIMESTAMP}"
 
+# SSH options to bypass host key verification (required for CI/CD where runners change)
+SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes"
+
 run_wif_tests() {
   local cloud_provider="$1"
   local host="$2"
   local snowflake_host="$3"
   local rsa_key_path="$4"
 
-  ssh -i "$rsa_key_path" -o IdentitiesOnly=yes -p 443 "$host" env WIF_TEST_DIR="$WIF_TEST_DIR" bash << EOF
+  ssh -i "$rsa_key_path" $SSH_OPTS -p 443 "$host" env WIF_TEST_DIR="$WIF_TEST_DIR" bash << EOF
     set -e
     set -o pipefail
 
@@ -22,13 +25,13 @@ run_wif_tests() {
     echo "Created test directory: \$WIF_TEST_DIR"
 EOF
 
-  scp -P 443 -i "$rsa_key_path" -o IdentitiesOnly=yes "./modules/pdo_snowflake.so" "$host:$WIF_TEST_DIR/pdo_snowflake.so"
-  scp -P 443 -i "$rsa_key_path" -o IdentitiesOnly=yes "./libsnowflakeclient/cacert.pem" "$host:$WIF_TEST_DIR/cacert.pem"
-  scp -P 443 -i "$rsa_key_path" -o IdentitiesOnly=yes "./tests/wif_auth.phpt" "$host:$WIF_TEST_DIR/wif_auth.phpt"
-  scp -P 443 -i "$rsa_key_path" -o IdentitiesOnly=yes "./run-tests.php" "$host:$WIF_TEST_DIR/run-tests.php"
+  scp -P 443 -i "$rsa_key_path" $SSH_OPTS "./modules/pdo_snowflake.so" "$host:$WIF_TEST_DIR/pdo_snowflake.so"
+  scp -P 443 -i "$rsa_key_path" $SSH_OPTS "./libsnowflakeclient/cacert.pem" "$host:$WIF_TEST_DIR/cacert.pem"
+  scp -P 443 -i "$rsa_key_path" $SSH_OPTS "./tests/wif_auth.phpt" "$host:$WIF_TEST_DIR/wif_auth.phpt"
+  scp -P 443 -i "$rsa_key_path" $SSH_OPTS "./run-tests.php" "$host:$WIF_TEST_DIR/run-tests.php"
 
 
-ssh -i "$rsa_key_path" -o IdentitiesOnly=yes -p 443 "$host" env BRANCH="$GIT_BRANCH" SNOWFLAKE_TEST_WIF_HOST="$snowflake_host" SNOWFLAKE_TEST_WIF_PROVIDER="$cloud_provider" SNOWFLAKE_TEST_WIF_ACCOUNT="$SNOWFLAKE_TEST_WIF_ACCOUNT" WIF_TEST_DIR="$WIF_TEST_DIR" bash << EOF
+ssh -i "$rsa_key_path" $SSH_OPTS -p 443 "$host" env BRANCH="$GIT_BRANCH" SNOWFLAKE_TEST_WIF_HOST="$snowflake_host" SNOWFLAKE_TEST_WIF_PROVIDER="$cloud_provider" SNOWFLAKE_TEST_WIF_ACCOUNT="$SNOWFLAKE_TEST_WIF_ACCOUNT" WIF_TEST_DIR="$WIF_TEST_DIR" bash << EOF
     set -e
     set -o pipefail
     docker run \
@@ -67,7 +70,7 @@ run_tests_and_set_result() {
   else
     echo "$provider tests passed"
   fi
-  ssh -i "$rsa_key_path" -o IdentitiesOnly=yes -p 443 "$host" env WIF_TEST_DIR="$WIF_TEST_DIR" bash << EOF
+  ssh -i "$rsa_key_path" $SSH_OPTS -p 443 "$host" env WIF_TEST_DIR="$WIF_TEST_DIR" bash << EOF
       set -e
       set -o pipefail
       rm -rf "\$WIF_TEST_DIR"
