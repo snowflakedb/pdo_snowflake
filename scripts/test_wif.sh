@@ -47,7 +47,7 @@ ssh -i "$rsa_key_path" $SSH_OPTS -p 443 "$host" env BRANCH="$GIT_BRANCH" SNOWFLA
         bash -c "
           echo \"Running tests on branch: \$BRANCH\"
           cd /pdo_tests/tests_dir
-          if ! php run-tests.php -d extension=pdo_snowflake.so wif_auth.phpt; then
+          if ! php run-tests.php -d extension=/pdo_tests/tests_dir/pdo_snowflake.so wif_auth.phpt; then
               echo \"Tests failed\"
               exit 1
           fi
