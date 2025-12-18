@@ -91,6 +91,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 ===DONE===
 <?php exit(0); ?>
 --EXPECTF--
+Connected to Snowflake
 name: C1, native_type: FIXED, scale: 0, precision: 38, len: 0
 name: C2, native_type: TEXT, scale: 0, precision: 38, len: 134217728
 Results in String
