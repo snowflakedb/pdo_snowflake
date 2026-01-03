@@ -45,6 +45,20 @@ extern "C" {
  */
 #define SF_AUTHENTICATOR_PAT "programmatic_access_token"
 
+/**
+ * Workload Identity Federation authenticator
+ */
+#define SF_AUTHENTICATOR_WORKLOAD_IDENTITY "workload_identity"
+
+ /**
+ * Authenticator, oauth_authorization_code
+ */
+#define SF_AUTHENTICATOR_OAUTH_AUTHORIZATION_CODE "oauth_authorization_code"
+
+/**
+* Authenticator, oauth_client_credentials
+*/
+#define SF_AUTHENTICATOR_OAUTH_CLIENT_CREDENTIALS "oauth_client_credentials"
  /**
  * Authenticator, SSO token
  */
@@ -81,6 +95,11 @@ extern "C" {
  * retry timeout in seconds
  */
 #define SF_RETRY_TIMEOUT 300
+
+ /**
+ * network timeout in seconds
+ */
+#define SF_NETWORK_TIMEOUT 90
 
     /**
      * CRL download timeout in seconds
@@ -126,7 +145,8 @@ typedef enum SF_DB_TYPE {
     SF_DB_TYPE_BINARY,
     SF_DB_TYPE_TIME,
     SF_DB_TYPE_BOOLEAN,
-    SF_DB_TYPE_ANY
+    SF_DB_TYPE_DECFLOAT,
+    SF_DB_TYPE_ANY,
 } SF_DB_TYPE;
 
 /**
@@ -308,15 +328,27 @@ typedef enum SF_ATTRIBUTE {
     SF_RETRY_ON_CURLE_COULDNT_CONNECT_COUNT,
     SF_QUERY_RESULT_TYPE,
     SF_CON_OAUTH_TOKEN,
+    SF_CON_OAUTH_REFRESH_TOKEN,
     SF_CON_DISABLE_CONSOLE_LOGIN,
     SF_CON_BROWSER_RESPONSE_TIMEOUT,
     SF_CON_PAT,
+    SF_CON_OAUTH_TOKEN_ENDPOINT,
+    SF_CON_OAUTH_AUTHORIZATION_ENDPOINT,
+    SF_CON_OAUTH_REDIRECT_URI,
+    SF_CON_OAUTH_CLIENT_ID,
+    SF_CON_OAUTH_CLIENT_SECRET,
+    SF_CON_OAUTH_SCOPE,
+    SF_CON_SINGLE_USE_REFRESH_TOKEN,
     SF_CON_CRL_CHECK,
     SF_CON_CRL_ADVISORY,
     SF_CON_CRL_ALLOW_NO_CRL,
     SF_CON_CRL_DISK_CACHING,
     SF_CON_CRL_MEMORY_CACHING,
-    SF_CON_CRL_DOWNLOAD_TIMEOUT
+    SF_CON_CRL_DOWNLOAD_TIMEOUT,
+    SF_CON_WIF_PROVIDER,
+    SF_CON_WIF_TOKEN,
+    SF_CON_WIF_AZURE_RESOURCE,
+    SF_CON_WORKLOAD_IDENTITY_IMPERSONATION_PATH
 } SF_ATTRIBUTE;
 
 /**
@@ -456,6 +488,16 @@ typedef struct SF_CONNECT {
     char* sso_token;
     char* mfa_token;
 
+    // Oauth authentication
+    char* oauth_authorization_endpoint;
+    char* oauth_token_endpoint;
+    char* oauth_redirect_uri;
+    char* oauth_client_id;
+    char* oauth_client_secret;
+    char* oauth_scope;
+    char* oauth_refresh_token;
+    sf_bool single_use_refresh_token;
+
     int64 login_timeout;
     int64 network_timeout;
     int64 browser_response_timeout;
@@ -494,6 +536,14 @@ typedef struct SF_CONNECT {
 
     //programmatic access token
     char *programmatic_access_token;
+
+    // WIF (Workload Identity Federation) configuration
+    char *wif_provider;
+    char *wif_token;
+    char *wif_azure_resource;
+
+    // WIF impersonation path
+    char *workload_identity_impersonation_path;
 
     // put get configurations
     sf_bool use_s3_regional_url;
