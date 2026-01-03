@@ -54,6 +54,9 @@ typedef pthread_mutex_t SF_MUTEX_HANDLE;
 #define SF_MACRO_DEPRECATED_WARNING(MSG)  _Pragma(MACRO_TO_STRING(GCC warning MSG))
 #endif
 
+// Defined for unused function parameters.
+#define SF_UNUSED(x) (void)(x)
+
 #include "SF_CRTFunctionSafe.h"
 
 struct tm *STDCALL sf_gmtime(const time_t *timep, struct tm *result);
@@ -151,9 +154,6 @@ void STDCALL sf_memory_error_handler();
 void STDCALL sf_exception_on_memory_failure();
 
 void STDCALL sf_get_callers_executable_path(char* out_buf, size_t buf_size);
-
-// Defined for unused function parameters.
-#define SF_UNUSED(x) (void)(x)
 
 #ifdef __cplusplus
 }
