@@ -416,6 +416,29 @@ By default, the PHP PDO driver verifies SAML URLs. To disable SAML checking for 
     
     $dbh = new PDO("snowflake:account=$account;disablesamlurlcheck=true;authenticator=<OKTA authenticator URL>", $oktauser, $oktapwd);
 
+Using OAuth 2.0 authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PHP PDO driver supports OAuth 2.0 Authentication. Guidance can be found in `Native SSO - OKTA only <https://docs.snowflake.com/en/user-guide/oauth-intro>`_.
+
+To connect to Snowflake database using OAuth 2.0 Authentication, create a new PDO object and specify the data source name (dsn) parameters as follows:
+
+.. code-block:: php
+
+    $dbh = new PDO($dsn;authenticator=<oauth_authorization_code || oauth_client_credentials>;oauth_client_id=<client_id>;oauth_client_secret=<client_secret>;oauth_scope=<oauth_scope>;
+    oauth_redirect_uri=<redirect_uri>;oauth_token_endpoint=<token_endpoint_url>",$user, "password is not required));
+
+where:
+
+- :code:`authenticator` is either :code:`OAUTH_AUTHORIZATION_CODE` or :code:`OAUTH_CLIENT_CREDENTIALS` based on the OAuth flow you are using.
+- :code:`oauth_client_id` is your OAuth client id
+- :code:`oauth_client_secret` is your OAuth client secret
+- :code:`oauth_scope` is the OAuth scope. If your role name is 'custom_user', this field should be 'session:role:custom_user'. If this field is not provided, the driver will use the role figured in the role attribute of the DSN connection string.
+- :code:`oauth_redirect_uri` is the redirect URI configured in your OAuth client application
+- :code:`oauth_token_endpoint` is the OAuth token endpoint URL
+
+By default, the PHP PDO driver verifies SAML URLs. To disable SAML checking for a PDO connection, set :code:`disablesamlurlcheck=true` in the DSN connection string. For example:
+
 Configuring OCSP Checking
 ----------------------------------------------------------------------
 
