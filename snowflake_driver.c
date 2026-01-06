@@ -595,14 +595,18 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"crl_memory_caching",  "true",       0},
         {"crl_disk_caching",    "true",       0},
         {"crl_download_timeout", "120",       0},
-        {"oauth_authenticator",  NULL,        0},
         {"oauth_token_endpoint", NULL,      0},
         {"oauth_authorization_endpoint", NULL, 0},
         {"oauth_redirect_uri",  NULL,         0},
         {"oauth_client_id",     NULL,         0},
         {"oauth_client_secret", NULL,         0},
         {"oauth_scope",   NULL,         0},
-        {"single_use_refresh_token", "false", 0}
+        {"single_use_refresh_token", "false", 0},
+#ifdef __LINUX__
+        {"client_store_temporary_credential", "false", 0}
+#else
+        {"client_store_temporary_credential", "true", 0}
+#endif
     };
 
     // Parse the input data parameters
@@ -920,6 +924,10 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     snowflake_set_attribute(H->server, SF_CON_SINGLE_USE_REFRESH_TOKEN,
         (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_SINGLE_USE_REFRESH_TOKEN].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
     PDO_LOG_DBG("single_use_refresh_token: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_SINGLE_USE_REFRESH_TOKEN].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_CLIENT_STORE_TEMPORARY_CREDENTIAL,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CLIENT_STORE_TEMPORARY_CREDENTIAL].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("client_store_temporary_credential: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CLIENT_STORE_TEMPORARY_CREDENTIAL].optval);
 
     int8 ocsp_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval, "true") != 0);
     int8 crl_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_CHECK_IDX].optval, "true") == 0);
