@@ -438,7 +438,11 @@ where:
 - :code:`oauth_redirect_uri` is the redirect URI configured in your OAuth client application
 - :code:`oauth_token_endpoint` is the OAuth token endpoint URL
 
-By default, the PHP PDO driver verifies SAML URLs. To disable SAML checking for a PDO connection, set :code:`disablesamlurlcheck=true` in the DSN connection string. For example:
+By default, the PHP PDO driver enables client temporary credentials for OAuth 2.0 connections in Windows and MAC. (It is disabled in Linux by Default). To control client temporary credentials for a PDO connection, set :code:`client_store_temporary_credential=<true|false>` in the DSN connection string. For example:
+.. code-block:: php
+    
+    $dbh = new PDO($dsn;authenticator=<oauth_authorization_code || oauth_client_credentials>;oauth_client_id=<client_id>;oauth_client_secret=<client_secret>;oauth_scope=<oauth_scope>;
+    oauth_redirect_uri=<redirect_uri>;oauth_token_endpoint=<token_endpoint_url>;client_store_temporary_credential=false",$user, $pass);
 
 Configuring OCSP Checking
 ----------------------------------------------------------------------
