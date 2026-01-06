@@ -595,6 +595,12 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"crl_memory_caching",  "true",       0},
         {"crl_disk_caching",    "true",       0},
         {"crl_download_timeout", "120",       0},
+#if defined(__LINUX__)
+        {"client_store_temporary_credential", "false", 0},
+#else
+        {"client_store_temporary_credential", "true", 0},
+#endif
+        {"oauth_authenticator",  NULL,        0},
         {"oauth_token_endpoint", NULL,      0},
         {"oauth_authorization_endpoint", NULL, 0},
         {"oauth_redirect_uri",  NULL,         0},
