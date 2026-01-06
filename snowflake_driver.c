@@ -910,7 +910,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     
     snowflake_set_attribute(H->server, SF_CON_OAUTH_CLIENT_SECRET,
         vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_CLIENT_SECRET].optval);
-    PDO_LOG_DBG("oauth_client_secret: %s", dbh->oauth_client_secret != NULL ? "******" : "(NULL)");
+    PDO_LOG_DBG("oauth_client_secret: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_CLIENT_SECRET].optval!= NULL ? "******" : "(NULL)");
 
     snowflake_set_attribute(H->server, SF_CON_OAUTH_SCOPE,
         vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_SCOPE].optval);

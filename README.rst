@@ -419,7 +419,7 @@ By default, the PHP PDO driver verifies SAML URLs. To disable SAML checking for 
 Using OAuth 2.0 authentication
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The PHP PDO driver supports OAuth 2.0 Authentication. Guidance can be found in `Native SSO - OKTA only <https://docs.snowflake.com/en/user-guide/oauth-intro>`_.
+The PHP PDO driver supports OAuth 2.0 Authentication. Guidance can be found in `OAuth Intro <https://docs.snowflake.com/en/user-guide/oauth-intro>`_.
 
 To connect to Snowflake database using OAuth 2.0 Authentication, create a new PDO object and specify the data source name (dsn) parameters as follows:
 
@@ -430,6 +430,7 @@ To connect to Snowflake database using OAuth 2.0 Authentication, create a new PD
 
 where:
 
+- :code:`$dsn` is your snowflake dsn connection string. The basic fields such as account, user are specified in the dsn.
 - :code:`authenticator` is either :code:`OAUTH_AUTHORIZATION_CODE` or :code:`OAUTH_CLIENT_CREDENTIALS` based on the OAuth flow you are using.
 - :code:`oauth_client_id` is your OAuth client id
 - :code:`oauth_client_secret` is your OAuth client secret
