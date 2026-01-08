@@ -48,11 +48,13 @@ namespace IAuth
         {}
 
         virtual void start() = 0;
+        virtual int start(std::string host, int port, std::string path) = 0;
         virtual void stop() = 0;
         virtual int getPort() = 0;
         virtual void startAccept() = 0;
+        virtual void startAccept(std::string state) = 0;
         virtual bool receive() = 0;
-        virtual std::string getSAMLToken() = 0;
+        virtual std::string getToken() = 0;
         virtual bool isConsentCacheIdToken() = 0;
         virtual void setTimeout(int timeout) = 0;
     };
