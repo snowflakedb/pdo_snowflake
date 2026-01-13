@@ -9,3 +9,4 @@
   - Removed PHP version prefix from the reported PDO version (snowflakedb/pdo_snowflake#454)
   - Added support for CRL (certificate revocation list) (snowflakedb/pdo_snowflake#457).
   - Added the changelog.yml GitHub workflow to ensure changelog is updated on release PRs (snowflakedb/pdo_snowflake#459).
+  - Support Decfloat type (snowflakedb/pdo_snowflake#466).
