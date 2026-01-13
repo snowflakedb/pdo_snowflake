@@ -1,0 +1,51 @@
+FROM rockylinux:9
+
+USER root
+WORKDIR /
+
+# Install Remi repository for multiple PHP versions
+# See: https://rpms.remirepo.net/wizard/
+RUN dnf -y update && \
+    dnf install -y epel-release && \
+    dnf install -y https://rpms.remirepo.net/enterprise/remi-release-9.rpm && \
+    dnf install -y \
+        autoconf \
+        automake \
+        cmake \
+        gcc \
+        gcc-c++ \
+        git \
+        libtool \
+        make \
+        python3 \
+        which && \
+    dnf clean all
+
+# PHP version to install (default 8.1)
+ARG PHP_VERSION=8.1
+
+# Install PHP from Remi repository
+RUN dnf module reset php -y && \
+    dnf module enable php:remi-${PHP_VERSION} -y && \
+    dnf install -y \
+        php \
+        php-devel \
+        php-pdo \
+        php-json && \
+    dnf clean all
+
+# Verify PHP installation
+RUN php --version && \
+    php -m | grep -E "PDO|json"
+
+# Accept user ID as build argument to match host permissions
+ARG USER_ID=1001
+ARG GROUP_ID=1001
+
+# Create user for proper permission testing
+RUN groupadd -g ${GROUP_ID} user && \
+    useradd -u ${USER_ID} -g ${GROUP_ID} -m -s /bin/bash user && \
+    chown -R user:user /home/user
+
+USER user
+WORKDIR /home/user
