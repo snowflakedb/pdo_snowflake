@@ -595,6 +595,9 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"crl_memory_caching",  "true",       0},
         {"crl_disk_caching",    "true",       0},
         {"crl_download_timeout", "120",       0},
+        {"workload_identity_provider", NULL,  0},
+        {"token",               NULL,         0},
+        {"workload_identity_azure_resource", NULL, 0},
     };
 
     // Parse the input data parameters
@@ -884,6 +887,30 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         PDO_LOG_DBG(
             "crl_download_timeout: %d", int_attr_value);
     }
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_PROVIDER_IDX].optval != NULL) {
+        snowflake_set_attribute(
+            H->server, SF_CON_WIF_PROVIDER,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_PROVIDER_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "workload_identity_provider: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_PROVIDER_IDX].optval);
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_TOKEN_IDX].optval != NULL) {
+        snowflake_set_attribute(
+            H->server, SF_CON_WIF_TOKEN,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_TOKEN_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "token: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_TOKEN_IDX].optval != NULL ? "******" : "(NULL)");
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AZURE_RESOURCE_IDX].optval != NULL) {
+        snowflake_set_attribute(
+            H->server, SF_CON_WIF_AZURE_RESOURCE,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AZURE_RESOURCE_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "workload_identity_azure_resource: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AZURE_RESOURCE_IDX].optval);
 
     int8 ocsp_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval, "true") != 0);
     int8 crl_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_CHECK_IDX].optval, "true") == 0);
