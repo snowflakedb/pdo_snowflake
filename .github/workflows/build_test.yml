@@ -153,7 +153,6 @@ jobs:
           run: python ./.github/workflows/scripts/test_driver.py
 
   build_test_rockylinux9:
-    name: Tests on Rocky Linux 9 (PHP ${{ matrix.php-version }})
     strategy:
       fail-fast: false
       matrix:
@@ -163,7 +162,7 @@ jobs:
       PHP_VERSION: ${{ matrix.php-version }}
     steps:
       - uses: actions/checkout@v4
-      - name: Build and Run Tests in Docker
+      - name: Build Driver and Run Tests in Docker
         run: ./ci/test_rockylinux9_docker.sh
         shell: bash
 
