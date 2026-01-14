@@ -11,12 +11,15 @@ RUN dnf -y update && \
         autoconf \
         automake \
         cmake \
+        diffutils \
+        file \
         gcc \
         gcc-c++ \
         libtool \
         make \
         python3 \
         which && \
+    ln -s /usr/bin/python3 /usr/bin/python && \
     dnf clean all
 
 # PHP version to install (required build arg)
