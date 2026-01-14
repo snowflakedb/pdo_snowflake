@@ -10,3 +10,4 @@
   - Added support for CRL (certificate revocation list) (snowflakedb/pdo_snowflake#457).
   - Added the changelog.yml GitHub workflow to ensure changelog is updated on release PRs (snowflakedb/pdo_snowflake#459).
   - Support Decfloat type (snowflakedb/pdo_snowflake#466).
+  - Added OAuth 2.0 authentication support both authorization code and client credentials (snowflakedb/pdo_snowflake#471).
