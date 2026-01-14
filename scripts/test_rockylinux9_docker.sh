@@ -19,7 +19,7 @@
 # Set constants
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PROJECT_DIR="$( dirname "${THIS_DIR}")"
-CONTAINER_HOME_DIR="/home/user/pdo_snowflake"
+CONTAINER_PROJECT_DIR="/home/user/pdo_snowflake"
 
 if [[ -z "${PHP_VERSION}" ]]; then
     echo "[ERROR] PHP_VERSION environment variable not set"
@@ -51,7 +51,6 @@ docker run --network=host \
     -e SNOWFLAKE_TEST_DATABASE \
     -e SNOWFLAKE_TEST_SCHEMA \
     -e SNOWFLAKE_TEST_ROLE \
-    -e PHP_VERSION \
     -e PHP_HOME \
     -e TEST_PHP_EXECUTABLE \
     -e NO_INTERACTION \
