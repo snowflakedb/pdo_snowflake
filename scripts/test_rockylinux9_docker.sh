@@ -58,5 +58,5 @@ docker run --network=host \
     -e GITHUB_WORKSPACE=$CONTAINER_PROJECT_DIR \
     --mount type=bind,source="${PROJECT_DIR}",target=$CONTAINER_PROJECT_DIR \
     ${CONTAINER_NAME}:1.0 \
-    ${CONTAINER_PROJECT_DIR}/scripts/test_rockylinux9_docker.sh
+    ${CONTAINER_PROJECT_DIR}/scripts/test_rockylinux9.sh
 
