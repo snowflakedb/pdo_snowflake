@@ -13,15 +13,18 @@
 #   - SNOWFLAKE_TEST_DATABASE
 #   - SNOWFLAKE_TEST_SCHEMA
 #   - SNOWFLAKE_TEST_ROLE
-#   - PHP_VERSION (optional, default: 8.1)
+#   - PHP_VERSION
 #
-
-set -o pipefail
 
 # Set constants
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PROJECT_DIR="$( dirname "${THIS_DIR}")"
-PHP_VERSION="${PHP_VERSION:-8.1}"
+
+if [[ -z "${PHP_VERSION}" ]]; then
+    echo "[ERROR] PHP_VERSION environment variable not set"
+    exit 1
+fi
+
 CONTAINER_NAME="test_pdo_snowflake_rockylinux9_php${PHP_VERSION}"
 
 echo "[INFO] Building Rocky Linux 9 Docker image with PHP ${PHP_VERSION}"
@@ -35,7 +38,7 @@ docker build --pull -t ${CONTAINER_NAME}:1.0 \
     --build-arg USER_ID=$USER_ID \
     --build-arg GROUP_ID=$GROUP_ID \
     --build-arg PHP_VERSION=$PHP_VERSION \
-    . -f ci/image/Dockerfile.rockylinux9-test
+    . -f docker/test-rockylinux9/Dockerfile.rockylinux9
 popd
 
 echo "[INFO] Starting Rocky Linux 9 Docker container"
@@ -47,8 +50,12 @@ docker run --network=host \
     -e SNOWFLAKE_TEST_DATABASE \
     -e SNOWFLAKE_TEST_SCHEMA \
     -e SNOWFLAKE_TEST_ROLE \
-    -e NO_INTERACTION=true \
+    -e PHP_HOME \
+    -e TEST_PHP_EXECUTABLE \
+    -e NO_INTERACTION \
+    -e USE_VALGRIND \
+    -e GITHUB_WORKSPACE=/home/user/pdo_snowflake \
     --mount type=bind,source="${PROJECT_DIR}",target=/home/user/pdo_snowflake \
     ${CONTAINER_NAME}:1.0 \
-    /home/user/pdo_snowflake/ci/test_rockylinux9.sh
+    /home/user/pdo_snowflake/scripts/test_rockylinux9.sh
 

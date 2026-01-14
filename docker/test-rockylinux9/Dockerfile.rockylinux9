@@ -6,7 +6,6 @@ WORKDIR /
 # Install Remi repository for multiple PHP versions
 # See: https://rpms.remirepo.net/wizard/
 RUN dnf -y update && \
-    dnf install -y epel-release && \
     dnf install -y https://rpms.remirepo.net/enterprise/remi-release-9.rpm && \
     dnf install -y \
         autoconf \
@@ -14,15 +13,14 @@ RUN dnf -y update && \
         cmake \
         gcc \
         gcc-c++ \
-        git \
         libtool \
         make \
         python3 \
         which && \
     dnf clean all
 
-# PHP version to install (default 8.1)
-ARG PHP_VERSION=8.1
+# PHP version to install (required build arg)
+ARG PHP_VERSION
 
 # Install PHP from Remi repository
 RUN dnf module reset php -y && \
@@ -49,3 +47,4 @@ RUN groupadd -g ${GROUP_ID} user && \
 
 USER user
 WORKDIR /home/user
+

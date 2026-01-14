@@ -160,10 +160,14 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PHP_VERSION: ${{ matrix.php-version }}
+      PHP_HOME: /usr
+      TEST_PHP_EXECUTABLE: /usr/bin/php
+      NO_INTERACTION: true
+      USE_VALGRIND: 0
     steps:
       - uses: actions/checkout@v4
-      - name: Build Driver and Run Tests in Docker
-        run: ./ci/test_rockylinux9_docker.sh
+      - name: Build and Run Tests in Docker
+        run: ./scripts/test_rockylinux9_docker.sh
         shell: bash
 
   code-coverage:
