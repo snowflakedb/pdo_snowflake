@@ -153,6 +153,7 @@ jobs:
           run: python ./.github/workflows/scripts/test_driver.py
 
   build_test_rockylinux9:
+    name: build_test_rockylinux9 (${{ matrix.php-version }}, ${{ matrix.os == 'ubuntu-latest' && 'x64' || 'arm64' }})
     strategy:
       fail-fast: false
       matrix:
