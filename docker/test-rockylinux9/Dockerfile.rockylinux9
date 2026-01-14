@@ -38,7 +38,8 @@ RUN dnf module reset php -y && \
 
 # Verify PHP installation
 RUN php --version && \
-    php -m | grep -E "PDO|json"
+    php -m | grep PDO && \
+    php -m | grep json
 
 # Accept user ID as build argument to match host permissions
 ARG USER_ID=1001

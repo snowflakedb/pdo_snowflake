@@ -3,7 +3,7 @@
 # Test PDO Snowflake in Rocky Linux 9 Docker
 #
 # This script builds a Rocky Linux 9 Docker image with PHP and build dependencies,
-# then runs the test script inside the container. It is called by GitHub Actions.
+# then runs the build and test commands inside the container. It is called by GitHub Actions.
 #
 # Required environment variables (set by GHA workflow):
 #   - SNOWFLAKE_TEST_USER
@@ -59,5 +59,12 @@ docker run --network=host \
     -e GITHUB_WORKSPACE=$CONTAINER_PROJECT_DIR \
     --mount type=bind,source="${PROJECT_DIR}",target=$CONTAINER_PROJECT_DIR \
     ${CONTAINER_NAME}:1.0 \
-    ${CONTAINER_PROJECT_DIR}/scripts/test_rockylinux9.sh
+    bash -c "
+        set -e
+        cd \${GITHUB_WORKSPACE}
+        echo '[INFO] PHP version:'
+        php --version
+        python3 ./.github/workflows/scripts/build_driver.py
+        python3 ./.github/workflows/scripts/test_driver.py
+    "
 
