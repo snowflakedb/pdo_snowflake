@@ -19,8 +19,7 @@
 # Set constants
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PROJECT_DIR="$( dirname "${THIS_DIR}")"
-CONTAINER_USER="user"
-CONTAINER_PROJECT_DIR="/home/${CONTAINER_USER}/${PROJECT_NAME}"
+CONTAINER_HOME_DIR="/home/user/pdo_snowflake"
 
 if [[ -z "${PHP_VERSION}" ]]; then
     echo "[ERROR] PHP_VERSION environment variable not set"
