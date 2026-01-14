@@ -19,6 +19,8 @@
 # Set constants
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PROJECT_DIR="$( dirname "${THIS_DIR}")"
+CONTAINER_USER="user"
+CONTAINER_PROJECT_DIR="/home/${CONTAINER_USER}/${PROJECT_NAME}"
 
 if [[ -z "${PHP_VERSION}" ]]; then
     echo "[ERROR] PHP_VERSION environment variable not set"
@@ -54,8 +56,8 @@ docker run --network=host \
     -e TEST_PHP_EXECUTABLE \
     -e NO_INTERACTION \
     -e USE_VALGRIND \
-    -e GITHUB_WORKSPACE=/home/user/pdo_snowflake \
-    --mount type=bind,source="${PROJECT_DIR}",target=/home/user/pdo_snowflake \
+    -e GITHUB_WORKSPACE=$CONTAINER_PROJECT_DIR \
+    --mount type=bind,source="${PROJECT_DIR}",target=$CONTAINER_PROJECT_DIR \
     ${CONTAINER_NAME}:1.0 \
-    /home/user/pdo_snowflake/scripts/test_rockylinux9.sh
+    ${CONTAINER_PROJECT_DIR}/scripts/test_rockylinux9.sh
 

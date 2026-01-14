@@ -168,7 +168,7 @@ jobs:
       USE_VALGRIND: 0
     steps:
       - uses: actions/checkout@v4
-      - name: Build and Run Tests in Docker
+      - name: Build Driver and Run Tests in Docker
         run: ./scripts/test_rockylinux9_docker.sh
         shell: bash
 
