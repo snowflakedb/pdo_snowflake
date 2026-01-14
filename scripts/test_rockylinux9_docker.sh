@@ -52,6 +52,7 @@ docker run --network=host \
     -e SNOWFLAKE_TEST_DATABASE \
     -e SNOWFLAKE_TEST_SCHEMA \
     -e SNOWFLAKE_TEST_ROLE \
+    -e PHP_VERSION \
     -e PHP_HOME \
     -e TEST_PHP_EXECUTABLE \
     -e NO_INTERACTION \
