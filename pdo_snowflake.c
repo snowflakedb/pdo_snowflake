@@ -78,14 +78,20 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
         SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
     snowflake_global_set_attribute(SF_GLOBAL_DEBUG, &debug_bool);
 
-    REGISTER_PDO_CLASS_CONST_LONG("SNOWFLAKE_ATTR_SSL_CAPATH",
-                                  (zend_long) PDO_SNOWFLAKE_ATTR_SSL_CAPATH);
-    REGISTER_PDO_CLASS_CONST_LONG(
+    zend_declare_class_constant_long(
+      php_pdo_get_dbh_ce(),
+      "SNOWFLAKE_ATTR_SSL_CAPATH",
+      sizeof("SNOWFLAKE_ATTR_SSL_CAPATH")-1,
+      (zend_long) PDO_SNOWFLAKE_ATTR_SSL_CAPATH);
+    zend_declare_class_constant_long(
+      php_pdo_get_dbh_ce(),
       "SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS",
+      sizeof("SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS")-1,
       (zend_long) PDO_SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS);
-
-    REGISTER_PDO_CLASS_CONST_LONG(
+    zend_declare_class_constant_long(
+      php_pdo_get_dbh_ce(),
       "SNOWFLAKE_ATTR_QUERY_ID",
+      sizeof("SNOWFLAKE_ATTR_QUERY_ID")-1,
       (zend_long) PDO_SNOWFLAKE_ATTR_QUERY_ID);
 
     return php_pdo_register_driver(&pdo_snowflake_driver);
