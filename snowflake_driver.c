@@ -603,9 +603,11 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"oauth_scope",   NULL,         0},
         {"single_use_refresh_token", "false", 0},
 #ifdef __LINUX__
-        {"client_store_temporary_credential", "false", 0}
+        {"client_store_temporary_credential", "false", 0},
+        {"client_request_mfa_token", "false", 0}
 #else
-        {"client_store_temporary_credential", "true", 0}
+        {"client_store_temporary_credential", "true", 0},
+        {"client_request_mfa_token", "true", 0}
 #endif
     };
 
@@ -928,6 +930,10 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     snowflake_set_attribute(H->server, SF_CON_CLIENT_STORE_TEMPORARY_CREDENTIAL,
         (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CLIENT_STORE_TEMPORARY_CREDENTIAL].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
     PDO_LOG_DBG("client_store_temporary_credential: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CLIENT_STORE_TEMPORARY_CREDENTIAL].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_CLIENT_REQUEST_MFA_TOKEN,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CLIENT_REQUEST_MFA_TOKEN].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("client_request_mfa_token: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CLIENT_REQUEST_MFA_TOKEN].optval);
 
     int8 ocsp_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval, "true") != 0);
     int8 crl_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_CHECK_IDX].optval, "true") == 0);
