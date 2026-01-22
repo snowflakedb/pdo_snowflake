@@ -75,6 +75,18 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     $dbh = new PDO("$dsn;passcode=dummy", $user, $password);
     $dbh = null;
 
+	// Client store temporary credential option.
+	// This feature is tested in libsfclient here we just confirm it can be used in
+	// connection string and passed to libsfclient.
+    $dbh = new PDO("$dsn;client_store_temporary_credential=true", $user, $password);
+    $dbh = null;
+
+	// Client request MFA token option.
+	// This feature is tested in libsfclient here we just confirm it can be used in
+	// connection string and passed to libsfclient.
+    $dbh = new PDO("$dsn;client_request_mfa_token=true", $user, $password);
+    $dbh = null;
+
 	// MFA passcode in password, connection fails due to no passcode provided in password.
     try {
         $dbh = new PDO("$dsn;passcodeinpassword=true", $user, $password);

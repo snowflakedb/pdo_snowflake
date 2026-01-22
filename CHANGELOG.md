@@ -1,6 +1,9 @@
 #### For the official PDO Snowflake Release Notes please refer to https://docs.snowflake.com/en/release-notes/clients-drivers/php-pdo
 
 # Changelog
+- v3.5.0
+  - Added support for `client_request_mfa_token` connection option to enable MFA token caching for username/password MFA authentication.
+
 - v3.4.0
   - Added native okta authentication support (snowflakedb/pdo_snowflake#439).
   - Fixed aarch64 build (snowflakedb/pdo_snowflake#450).

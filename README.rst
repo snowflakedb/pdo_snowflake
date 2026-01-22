@@ -438,11 +438,22 @@ where:
 - :code:`oauth_redirect_uri` is the redirect URI configured in your OAuth client application
 - :code:`oauth_token_endpoint` is the OAuth token endpoint URL
 
-By default, the PHP PDO driver enables client temporary credentials for OAuth 2.0 connections in Windows and MAC. (It is disabled in Linux by Default). To control client temporary credentials for a PDO connection, set :code:`client_store_temporary_credential=<true|false>` in the DSN connection string. For example:
+By default, the PHP PDO driver enables client temporary credentials storage for OAuth 2.0 and external browser authentication in Windows and macOS. (It is disabled on Linux by default). To control this feature for a PDO connection, set :code:`client_store_temporary_credential=<true|false>` in the DSN connection string. For example:
+
 .. code-block:: php
     
-    $dbh = new PDO($dsn;authenticator=<oauth_authorization_code || oauth_client_credentials>;oauth_client_id=<client_id>;oauth_client_secret=<client_secret>;oauth_scope=<oauth_scope>;
-    oauth_redirect_uri=<redirect_uri>;oauth_token_endpoint=<token_endpoint_url>;client_store_temporary_credential=false",$user, $pass);
+    $dbh = new PDO("$dsn;authenticator=<oauth_authorization_code || oauth_client_credentials>;oauth_client_id=<client_id>;oauth_client_secret=<client_secret>;oauth_scope=<oauth_scope>;
+    oauth_redirect_uri=<redirect_uri>;oauth_token_endpoint=<token_endpoint_url>;client_store_temporary_credential=false", $user, $pass);
+
+This option caches OAuth tokens and ID tokens in platform-specific secure storage (Windows Credential Manager on Windows, macOS Keychain on macOS, or file-based cache on Linux).
+
+To enable MFA token caching for :code:`username_password_mfa` authenticator, set :code:`client_request_mfa_token=<true|false>` in the DSN connection string. For example:
+
+.. code-block:: php
+
+    $dbh = new PDO("$dsn;authenticator=username_password_mfa;client_request_mfa_token=true", $user, $pass);
+
+By default, this is enabled on Windows and macOS, but disabled on Linux. MFA token caching requires the Snowflake account to have :code:`ALLOW_CLIENT_MFA_CACHING=TRUE` enabled.
 
 Configuring OCSP Checking
 ----------------------------------------------------------------------
