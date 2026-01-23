@@ -44,7 +44,7 @@ function validateExternalBrowserEnvVars(): void {
 /**
  * Get connection configuration from environment variables
  */
-function getExternalBrowserBaseConfig(): array {
+function getExternalBrowserDsnConfig(): array {
     return [
         'host' => getenv('SNOWFLAKE_AUTH_TEST_HOST'),
         'account' => getenv('SNOWFLAKE_AUTH_TEST_ACCOUNT'),

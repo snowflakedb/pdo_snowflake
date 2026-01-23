@@ -10,7 +10,7 @@ skipIfGitHubActions();
 require_once __DIR__ . '/auth_helper.php';
 validateExternalBrowserEnvVars();
 
-$config = getExternalBrowserBaseConfig();
+$config = getExternalBrowserDsnConfig();
 $wrongUser = 'WrongUser';
 $browserUser = getenv('SNOWFLAKE_AUTH_TEST_BROWSER_USER');
 $browserPass = getenv('SNOWFLAKE_AUTH_TEST_OKTA_PASS');
