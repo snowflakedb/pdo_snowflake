@@ -14,7 +14,6 @@ timestamps {
         'Test Authentication': {
           stage('Test Authentication') {
             withCredentials([
-              string(credentialsId: 'PRODSUB-jenkins-nexus-standard-login', variable: 'NEXUS_USERNAME'),
               string(credentialsId: 'a791118f-a1ea-46cd-b876-56da1b9bc71c', variable: 'NEXUS_PASSWORD'),
               string(credentialsId: 'sfctest0-parameters-secret', variable: 'PARAMETERS_SECRET')
             ]) {
