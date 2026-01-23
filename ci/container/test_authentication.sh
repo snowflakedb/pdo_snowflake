@@ -6,7 +6,6 @@
 
 set -o pipefail
 
-export WORKSPACE=${WORKSPACE:-/mnt/workspace}
 export SOURCE_ROOT=${SOURCE_ROOT:-/mnt/host}
 
 echo "=========================================="

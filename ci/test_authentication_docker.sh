@@ -8,7 +8,6 @@ set -o pipefail
 
 export THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export REPO_ROOT="$(cd "${THIS_DIR}/.." && pwd)"
-export WORKSPACE=${WORKSPACE:-/tmp}
 export INTERNAL_REPO=${INTERNAL_REPO:-nexus.int.snowflakecomputing.com:8086}
 
 echo "========================================"
@@ -53,14 +52,19 @@ fi
 echo ""
 echo "Launching Docker container..."
 echo "  Image: ${INTERNAL_REPO}/docker/snowdrivers-test-external-browser-php:1"
-echo "  Workspace: ${WORKSPACE}"
+echo "  Source: ${REPO_ROOT}"
 echo ""
+
+# Build Docker args
+DOCKER_ARGS="-v ${REPO_ROOT}:/mnt/host -e GITHUB_ACTIONS --rm"
+
+# Generate JUnit XML only in CI
+if [[ "$CI" == "true" ]]; then
+  DOCKER_ARGS="$DOCKER_ARGS -e TEST_PHP_JUNIT=/mnt/host/tests/AuthenticationTests/junit-results.xml"
+fi
 
 # Run tests in Docker
 docker run \
-  -v "${REPO_ROOT}:/mnt/host" \
-  -v "${WORKSPACE}:/mnt/workspace" \
-  -e GITHUB_ACTIONS \
-  --rm \
+  $DOCKER_ARGS \
   ${INTERNAL_REPO}/docker/snowdrivers-test-external-browser-php:1 \
   "/mnt/host/ci/container/test_authentication.sh"
