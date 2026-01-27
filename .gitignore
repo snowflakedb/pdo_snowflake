@@ -49,3 +49,6 @@ callgrind.out.*
 configure.ac
 vendor/
 sflog/
+*.json
+*.p8
+!*.gpg
