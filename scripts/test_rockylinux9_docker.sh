@@ -55,6 +55,7 @@ docker run --network=host \
     -e TEST_PHP_EXECUTABLE \
     -e NO_INTERACTION \
     -e USE_VALGRIND \
+    -e GITHUB_ACTIONS \
     -e GITHUB_WORKSPACE=$CONTAINER_PROJECT_DIR \
     --mount type=bind,source="${PROJECT_DIR}",target=$CONTAINER_PROJECT_DIR \
     ${CONTAINER_NAME}:1.0 \

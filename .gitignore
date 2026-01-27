@@ -48,3 +48,4 @@ gmon.out
 callgrind.out.*
 configure.ac
 vendor/
+sflog/
