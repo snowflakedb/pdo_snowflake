@@ -44,11 +44,10 @@ export NO_INTERACTION=true
 # Temporarily disable 'exit on error' to capture test exit code
 set +e
 
-# Run external browser tests (subprocess loads extension to avoid log conflicts)
-echo "Running external browser authentication tests..."
+clea# Run all authentication tests
 php run-tests.php \
   -p $(which php) \
-  tests/AuthenticationTests/externalbrowser*.phpt
+  tests/AuthenticationTests/
 
 EXIT_CODE=$?
 
@@ -59,7 +58,7 @@ if [ $EXIT_CODE -eq 0 ]; then
     echo "All authentication tests PASSED"
 else
     echo "Authentication tests FAILED"
-    for f in tests/AuthenticationTests/externalbrowser*.out; do
+    for f in tests/AuthenticationTests/*.out; do
         [ -f "$f" ] && echo "=== $f ===" && cat "$f"
     done
 fi
