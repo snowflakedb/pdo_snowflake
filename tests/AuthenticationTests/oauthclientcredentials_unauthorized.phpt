@@ -25,17 +25,19 @@ foreach ($required as $var) {
 <?php
 require_once __DIR__ . '/auth_helper.php';
 
-$host = getenv('SNOWFLAKE_AUTH_TEST_HOST');
-$account = getenv('SNOWFLAKE_AUTH_TEST_ACCOUNT');
-$database = getenv('SNOWFLAKE_AUTH_TEST_DATABASE');
-$schema = getenv('SNOWFLAKE_AUTH_TEST_SCHEMA');
-$warehouse = getenv('SNOWFLAKE_AUTH_TEST_WAREHOUSE');
-$role = getenv('SNOWFLAKE_AUTH_TEST_ROLE');
-$invalidClientId = 'invalidID';
-$clientSecret = getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_CLIENT_SECRET');
-$tokenUrl = getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_TOKEN');
+$config = [
+    'host' => getenv('SNOWFLAKE_AUTH_TEST_HOST'),
+    'account' => getenv('SNOWFLAKE_AUTH_TEST_ACCOUNT'),
+    'database' => getenv('SNOWFLAKE_AUTH_TEST_DATABASE'),
+    'schema' => getenv('SNOWFLAKE_AUTH_TEST_SCHEMA'),
+    'warehouse' => getenv('SNOWFLAKE_AUTH_TEST_WAREHOUSE'),
+    'role' => getenv('SNOWFLAKE_AUTH_TEST_ROLE'),
+    'oauth_client_secret' => getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_CLIENT_SECRET'),
+    'oauth_token_endpoint' => getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_TOKEN'),
+];
 
-$dsn = "snowflake:host=$host;port=443;protocol=https;account=$account;database=$database;schema=$schema;warehouse=$warehouse;role=$role;authenticator=oauth_client_credentials;oauth_client_id=$invalidClientId;oauth_client_secret=$clientSecret;oauth_token_endpoint=$tokenUrl;oauth_scope=session:role:$role";
+$invalidClientId = 'invalidID';
+$dsn = buildOAuthClientCredentialsDsn($config, ['oauth_client_id' => $invalidClientId]);
 
 echo "Connection process started\n";
 $proc = startConnectionProcess($dsn, $invalidClientId);

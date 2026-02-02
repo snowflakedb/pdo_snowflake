@@ -71,6 +71,144 @@ function buildExternalBrowserDsn(array $config): string {
 }
 
 /**
+ * Build simple base DSN with just host and account
+ */
+function buildBaseDsn(array $config): string {
+    return sprintf(
+        "snowflake:host=%s;account=%s",
+        $config['host'],
+        $config['account']
+    );
+}
+
+/**
+ * Build DSN for Okta native authentication
+ * 
+ * @param array $config Base config with host, account
+ * @param array $options Optional overrides: authenticator
+ * @return string DSN string
+ */
+function buildOktaDsn(array $config, array $options = []): string {
+    $authenticator = $options['authenticator'] ?? $config['authenticator'] ?? '';
+    
+    return sprintf(
+        "snowflake:host=%s;account=%s;authenticator=%s",
+        $config['host'],
+        $config['account'],
+        $authenticator
+    );
+}
+
+/**
+ * Build DSN for MFA authentication
+ * 
+ * @param array $config Base config with host, account
+ * @param array $options Optional: passcode, authenticator, client_request_mfa_token
+ * @return string DSN string
+ */
+function buildMfaDsn(array $config, array $options = []): string {
+    $dsn = sprintf(
+        "snowflake:host=%s;account=%s",
+        $config['host'],
+        $config['account']
+    );
+    
+    if (!empty($options['authenticator'])) {
+        $dsn .= ";authenticator=" . $options['authenticator'];
+    }
+    if (!empty($options['passcode'])) {
+        $dsn .= ";passcode=" . $options['passcode'];
+    }
+    if (!empty($options['client_request_mfa_token'])) {
+        $dsn .= ";client_request_mfa_token=" . $options['client_request_mfa_token'];
+    }
+    
+    return $dsn;
+}
+
+/**
+ * Build DSN for PAT (Programmatic Access Token) authentication
+ * 
+ * @param array $config Base config with host, account
+ * @param array $options Optional: token (for DSN-based PAT)
+ * @return string DSN string
+ */
+function buildPatDsn(array $config, array $options = []): string {
+    $dsn = sprintf(
+        "snowflake:host=%s;account=%s;authenticator=programmatic_access_token",
+        $config['host'],
+        $config['account']
+    );
+    
+    if (!empty($options['token'])) {
+        $dsn .= ";token=" . $options['token'];
+    }
+    
+    return $dsn;
+}
+
+/**
+ * Build DSN for OAuth Okta Authorization Code authentication
+ * 
+ * @param array $config Config with host, account, database, schema, warehouse, role, oauth params
+ * @param array $options Optional overrides for oauth params
+ * @return string DSN string
+ */
+function buildOAuthOktaAuthCodeDsn(array $config, array $options = []): string {
+    $clientId = $options['oauth_client_id'] ?? $config['oauth_client_id'] ?? '';
+    $clientSecret = $options['oauth_client_secret'] ?? $config['oauth_client_secret'] ?? '';
+    $redirectUri = $options['oauth_redirect_uri'] ?? $config['oauth_redirect_uri'] ?? '';
+    $authUrl = $options['oauth_authorization_endpoint'] ?? $config['oauth_authorization_endpoint'] ?? '';
+    $tokenUrl = $options['oauth_token_endpoint'] ?? $config['oauth_token_endpoint'] ?? '';
+    $scope = $options['oauth_scope'] ?? $config['oauth_scope'] ?? "session:role:{$config['role']}";
+    
+    return sprintf(
+        "snowflake:host=%s;port=443;protocol=https;account=%s;database=%s;schema=%s;warehouse=%s;role=%s;authenticator=oauth_authorization_code;oauth_client_id=%s;oauth_client_secret=%s;oauth_redirect_uri=%s;oauth_authorization_endpoint=%s;oauth_token_endpoint=%s;oauth_scope=%s",
+        $config['host'],
+        $config['account'],
+        $config['database'],
+        $config['schema'],
+        $config['warehouse'],
+        $config['role'],
+        $clientId,
+        $clientSecret,
+        $redirectUri,
+        $authUrl,
+        $tokenUrl,
+        $scope
+    );
+}
+
+/**
+ * Get config for OAuth Okta Auth Code tests from environment
+ */
+function getOAuthOktaAuthCodeConfig(): array {
+    return [
+        'host' => getenv('SNOWFLAKE_AUTH_TEST_HOST'),
+        'account' => getenv('SNOWFLAKE_AUTH_TEST_ACCOUNT'),
+        'database' => getenv('SNOWFLAKE_AUTH_TEST_DATABASE'),
+        'schema' => getenv('SNOWFLAKE_AUTH_TEST_SCHEMA'),
+        'warehouse' => getenv('SNOWFLAKE_AUTH_TEST_WAREHOUSE'),
+        'role' => getenv('SNOWFLAKE_AUTH_TEST_ROLE'),
+        'oauth_client_id' => getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_CLIENT_ID'),
+        'oauth_client_secret' => getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_CLIENT_SECRET'),
+        'oauth_redirect_uri' => getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_REDIRECT_URI'),
+        'oauth_authorization_endpoint' => getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_AUTH_URL'),
+        'oauth_token_endpoint' => getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_TOKEN'),
+    ];
+}
+
+/**
+ * Get Okta user credentials from environment
+ */
+function getOktaCredentials(): array {
+    return [
+        'user' => getenv('SNOWFLAKE_AUTH_TEST_OKTA_USER'),
+        'password' => getenv('SNOWFLAKE_AUTH_TEST_OKTA_PASS'),
+    ];
+}
+
+/**
  * Get pdo_snowflake INI settings for subprocess
  * Returns array of "key=value" strings for -d flags
  * 
@@ -361,6 +499,34 @@ function buildOAuthSnowflakeRedirectUriDsn(array $config): string {
         $config['oauth_client_secret'],
         $config['oauth_redirect_uri'],
         $config['oauth_scope_role']
+    );
+}
+
+/**
+ * Build DSN for OAuth Client Credentials authentication
+ * 
+ * @param array $config Base config with host, account, database, schema, warehouse, role
+ * @param array $options OAuth options: oauth_client_id, oauth_client_secret, oauth_token_endpoint
+ * @return string DSN string
+ */
+function buildOAuthClientCredentialsDsn(array $config, array $options = []): string {
+    $clientId = $options['oauth_client_id'] ?? $config['oauth_client_id'] ?? '';
+    $clientSecret = $options['oauth_client_secret'] ?? $config['oauth_client_secret'] ?? '';
+    $tokenEndpoint = $options['oauth_token_endpoint'] ?? $config['oauth_token_endpoint'] ?? '';
+    $scope = $options['oauth_scope'] ?? "session:role:{$config['role']}";
+    
+    return sprintf(
+        "snowflake:host=%s;port=443;protocol=https;account=%s;database=%s;schema=%s;warehouse=%s;role=%s;authenticator=oauth_client_credentials;oauth_client_id=%s;oauth_client_secret=%s;oauth_token_endpoint=%s;oauth_scope=%s",
+        $config['host'],
+        $config['account'],
+        $config['database'],
+        $config['schema'],
+        $config['warehouse'],
+        $config['role'],
+        $clientId,
+        $clientSecret,
+        $tokenEndpoint,
+        $scope
     );
 }
 

@@ -23,16 +23,19 @@ extension=modules/pdo_snowflake.so
 pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 --FILE--
 <?php
-$host = getenv('SNOWFLAKE_AUTH_TEST_HOST');
-$account = getenv('SNOWFLAKE_AUTH_TEST_ACCOUNT');
-$oktaUrl = getenv('SNOWFLAKE_AUTH_TEST_OKTA_AUTH');
-$oktaUser = getenv('SNOWFLAKE_AUTH_TEST_OKTA_USER');
-$oktaPassword = getenv('SNOWFLAKE_AUTH_TEST_OKTA_PASS');
+require_once __DIR__ . '/auth_helper.php';
 
-$dsn = "snowflake:host=$host;account=$account;authenticator=$oktaUrl";
+$config = [
+    'host' => getenv('SNOWFLAKE_AUTH_TEST_HOST'),
+    'account' => getenv('SNOWFLAKE_AUTH_TEST_ACCOUNT'),
+    'authenticator' => getenv('SNOWFLAKE_AUTH_TEST_OKTA_AUTH'),
+];
+$creds = getOktaCredentials();
+
+$dsn = buildOktaDsn($config);
 
 try {
-    $pdo = new PDO($dsn, $oktaUser, $oktaPassword);
+    $pdo = new PDO($dsn, $creds['user'], $creds['password']);
     $stmt = $pdo->query("SELECT 1");
     $result = $stmt->fetch(PDO::FETCH_NUM);
     if ($result[0] == "1") {

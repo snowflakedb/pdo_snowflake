@@ -30,8 +30,10 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php
 require_once __DIR__ . '/auth_helper.php';
 
-$host = getenv('SNOWFLAKE_AUTH_TEST_HOST');
-$account = getenv('SNOWFLAKE_AUTH_TEST_ACCOUNT');
+$config = [
+    'host' => getenv('SNOWFLAKE_AUTH_TEST_HOST'),
+    'account' => getenv('SNOWFLAKE_AUTH_TEST_ACCOUNT'),
+];
 $user = getenv('SNOWFLAKE_AUTH_TEST_OKTA_USER');
 
 $tokenName = generatePatTokenName();
@@ -43,7 +45,7 @@ if (empty($token)) {
     exit(1);
 }
 
-$dsn = "snowflake:host=$host;account=$account";
+$dsn = buildBaseDsn($config);
 
 try {
     $pdo = new PDO($dsn, $user, $token);

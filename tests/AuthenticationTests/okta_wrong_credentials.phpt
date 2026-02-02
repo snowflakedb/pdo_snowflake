@@ -21,11 +21,15 @@ extension=modules/pdo_snowflake.so
 pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 --FILE--
 <?php
-$host = getenv('SNOWFLAKE_AUTH_TEST_HOST');
-$account = getenv('SNOWFLAKE_AUTH_TEST_ACCOUNT');
-$oktaUrl = getenv('SNOWFLAKE_AUTH_TEST_OKTA_AUTH');
+require_once __DIR__ . '/auth_helper.php';
 
-$dsn = "snowflake:host=$host;account=$account;authenticator=$oktaUrl";
+$config = [
+    'host' => getenv('SNOWFLAKE_AUTH_TEST_HOST'),
+    'account' => getenv('SNOWFLAKE_AUTH_TEST_ACCOUNT'),
+    'authenticator' => getenv('SNOWFLAKE_AUTH_TEST_OKTA_AUTH'),
+];
+
+$dsn = buildOktaDsn($config);
 
 try {
     $pdo = new PDO($dsn, 'invalidUsername', 'fakepassword');

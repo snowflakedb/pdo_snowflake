@@ -23,11 +23,13 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php
 require_once __DIR__ . '/auth_helper.php';
 
-$host = getenv('SNOWFLAKE_AUTH_TEST_HOST');
-$account = getenv('SNOWFLAKE_AUTH_TEST_ACCOUNT');
+$config = [
+    'host' => getenv('SNOWFLAKE_AUTH_TEST_HOST'),
+    'account' => getenv('SNOWFLAKE_AUTH_TEST_ACCOUNT'),
+];
 $user = getenv('SNOWFLAKE_AUTH_TEST_OKTA_USER');
 
-$dsn = "snowflake:host=$host;account=$account;authenticator=programmatic_access_token;token=invalidToken";
+$dsn = buildPatDsn($config, ['token' => 'invalidToken']);
 
 try {
     $pdo = new PDO($dsn, $user, '');

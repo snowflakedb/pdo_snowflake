@@ -24,17 +24,19 @@ require_once __DIR__ . '/auth_helper.php';
 
 deleteTemporaryCredentialFile();
 
-$host = getenv('SNOWFLAKE_AUTH_TEST_HOST');
-$account = getenv('SNOWFLAKE_AUTH_TEST_ACCOUNT');
+$config = [
+    'host' => getenv('SNOWFLAKE_AUTH_TEST_HOST'),
+    'account' => getenv('SNOWFLAKE_AUTH_TEST_ACCOUNT'),
+];
 $user = getenv('SNOWFLAKE_AUTH_TEST_MFA_USER');
 $password = getenv('SNOWFLAKE_AUTH_TEST_MFA_PASSWORD');
 $mfaSeed = getenv('SNOWFLAKE_AUTH_MFA_SEED');
 
-// Simple DSN matching README example (no authenticator needed for basic MFA)
-$simpleDsn = "snowflake:host=$host;account=$account";
-
 // DSN with authenticator for MFA token caching
-$cachingDsn = "snowflake:host=$host;account=$account;authenticator=username_password_mfa;client_request_mfa_token=true";
+$cachingDsn = buildMfaDsn($config, [
+    'authenticator' => 'username_password_mfa',
+    'client_request_mfa_token' => 'true',
+]);
 
 // Get TOTP codes from seed
 $totpCodes = getTotpCodes($mfaSeed);
@@ -50,7 +52,7 @@ $lastError = '';
 // TOTP codes are time-sensitive - try each quickly until one works
 for ($i = 0; $i < count($totpCodes); $i++) {
     $totpCode = $totpCodes[$i];
-    $dsn = $simpleDsn . ";passcode=" . $totpCode;
+    $dsn = buildMfaDsn($config, ['passcode' => $totpCode]);
     
     $output = tryMfaConnection($dsn, $user, $password);
     

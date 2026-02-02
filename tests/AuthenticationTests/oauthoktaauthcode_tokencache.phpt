@@ -30,21 +30,12 @@ foreach ($required as $var) {
 <?php
 require_once __DIR__ . '/auth_helper.php';
 
-$host = getenv('SNOWFLAKE_AUTH_TEST_HOST');
-$account = getenv('SNOWFLAKE_AUTH_TEST_ACCOUNT');
-$database = getenv('SNOWFLAKE_AUTH_TEST_DATABASE');
-$schema = getenv('SNOWFLAKE_AUTH_TEST_SCHEMA');
-$warehouse = getenv('SNOWFLAKE_AUTH_TEST_WAREHOUSE');
-$role = getenv('SNOWFLAKE_AUTH_TEST_ROLE');
-$clientId = getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_CLIENT_ID');
-$clientSecret = getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_CLIENT_SECRET');
-$redirectUri = str_replace('portToReplace', '8005', getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_REDIRECT_URI'));
-$authUrl = getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_AUTH_URL');
-$tokenUrl = getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_TOKEN');
-$user = getenv('SNOWFLAKE_AUTH_TEST_OKTA_USER');
-$password = getenv('SNOWFLAKE_AUTH_TEST_OKTA_PASS');
+$config = getOAuthOktaAuthCodeConfig();
+$config['oauth_redirect_uri'] = str_replace('portToReplace', '8005', $config['oauth_redirect_uri']);
+$creds = getOktaCredentials();
+$user = $creds['user'];
 
-$dsn = "snowflake:host=$host;port=443;protocol=https;account=$account;database=$database;schema=$schema;warehouse=$warehouse;role=$role;authenticator=oauth_authorization_code;oauth_client_id=$clientId;oauth_client_secret=$clientSecret;oauth_redirect_uri=$redirectUri;oauth_authorization_endpoint=$authUrl;oauth_token_endpoint=$tokenUrl;oauth_scope=session:role:$role";
+$dsn = buildOAuthOktaAuthCodeDsn($config);
 
 // Clean up any existing cached tokens
 deleteTemporaryCredentialFile();
@@ -55,7 +46,7 @@ deleteTemporaryCredentialFile();
 echo "SECTION 1: Initial authentication using browser\n";
 
 $proc = startConnectionProcess($dsn, $user);
-provideBrowserCredentials('externalOauthOktaSuccess', $user, $password);
+provideBrowserCredentials('externalOauthOktaSuccess', $user, $creds['password']);
 $output = waitForConnection($proc);
 
 if (strpos($output, 'SUCCESS') !== false) {
@@ -100,11 +91,11 @@ echo "\nSECTION 3: Re-authenticate after token deletion\n";
 deleteTemporaryCredentialFile();
 
 // Use different port for this connection
-$redirectUri2 = str_replace('portToReplace', '8006', getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_REDIRECT_URI'));
-$dsn2 = "snowflake:host=$host;port=443;protocol=https;account=$account;database=$database;schema=$schema;warehouse=$warehouse;role=$role;authenticator=oauth_authorization_code;oauth_client_id=$clientId;oauth_client_secret=$clientSecret;oauth_redirect_uri=$redirectUri2;oauth_authorization_endpoint=$authUrl;oauth_token_endpoint=$tokenUrl;oauth_scope=session:role:$role";
+$config['oauth_redirect_uri'] = str_replace('portToReplace', '8006', getenv('SNOWFLAKE_AUTH_TEST_EXTERNAL_OAUTH_OKTA_REDIRECT_URI'));
+$dsn2 = buildOAuthOktaAuthCodeDsn($config);
 
 $proc = startConnectionProcess($dsn2, $user);
-provideBrowserCredentials('externalOauthOktaSuccess', $user, $password);
+provideBrowserCredentials('externalOauthOktaSuccess', $user, $creds['password']);
 $output = waitForConnection($proc);
 
 if (strpos($output, 'SUCCESS') !== false) {
