@@ -6,25 +6,13 @@
 
 set -o pipefail
 
-export WORKSPACE=${WORKSPACE:-/mnt/workspace}
 export SOURCE_ROOT=${SOURCE_ROOT:-/mnt/host}
-export BUILD_DIR=${BUILD_DIR:-/tmp/pdo_snowflake_build}
 
 echo "=========================================="
 echo "PHP External Browser Authentication Tests"
 echo "=========================================="
 
-echo "Copying source to build directory..."
-rm -rf "${BUILD_DIR}"
-mkdir -p "${BUILD_DIR}"
-
-# Copy source files, excluding generated build artifacts that contain host-specific paths
-cp -r "${SOURCE_ROOT}/." "${BUILD_DIR}/"
-cd "${BUILD_DIR}"
-
-rm -f Makefile Makefile.* config.h config.log config.nice config.status configure configure~ libtool 2>/dev/null || true
-rm -rf .libs autom4te.cache modules 2>/dev/null || true
-find . \( -name "*.lo" -o -name "*.o" -o -name "*.la" \) -delete 2>/dev/null || true
+cd "${SOURCE_ROOT}"
 
 # Load authentication parameters from JSON file
 AUTH_PARAMETER_FILE="./.github/workflows/parameters/private/parameters_aws_auth_tests.json"
@@ -41,7 +29,6 @@ echo ""
 echo "Building pdo_snowflake extension..."
 export PHP_HOME=${PHP_HOME:-/usr}
 export PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
-
 bash scripts/build_pdo_snowflake.sh
 
 echo "Extension built"
