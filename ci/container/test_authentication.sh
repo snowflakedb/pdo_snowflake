@@ -6,25 +6,25 @@
 
 set -o pipefail
 
-export WORKSPACE=${WORKSPACE:-/mnt/workspace}
-export SOURCE_ROOT=${SOURCE_ROOT:-/mnt/host}
-export BUILD_DIR=${BUILD_DIR:-/tmp/pdo_snowflake_build}
+export HOST_ROOT=${HOST_ROOT:-/mnt/host}
+export BUILD_ROOT="/tmp/pdo_snowflake_build"
 
 echo "=========================================="
 echo "PHP External Browser Authentication Tests"
 echo "=========================================="
 
+# Copy source to writable location (avoids permission issues and stale build artifacts)
 echo "Copying source to build directory..."
-rm -rf "${BUILD_DIR}"
-mkdir -p "${BUILD_DIR}"
+rm -rf "$BUILD_ROOT"
+mkdir -p "$BUILD_ROOT"
+cp -r "$HOST_ROOT"/* "$BUILD_ROOT/" 2>/dev/null || true
+cp -r "$HOST_ROOT"/.[!.]* "$BUILD_ROOT/" 2>/dev/null || true
 
-# Copy source files, excluding generated build artifacts that contain host-specific paths
-cp -r "${SOURCE_ROOT}/." "${BUILD_DIR}/"
-cd "${BUILD_DIR}"
-
-rm -f Makefile Makefile.* config.h config.log config.nice config.status configure configure~ libtool 2>/dev/null || true
-rm -rf .libs autom4te.cache modules 2>/dev/null || true
-find . \( -name "*.lo" -o -name "*.o" -o -name "*.la" \) -delete 2>/dev/null || true
+# Clean stale build artifacts that may have host paths
+cd "$BUILD_ROOT"
+rm -rf .libs autom4te.cache 2>/dev/null || true
+rm -f Makefile Makefile.fragments Makefile.objects config.h config.log config.status configure libtool 2>/dev/null || true
+find . -name '*.o' -o -name '*.lo' -o -name '*.la' 2>/dev/null | xargs rm -f 2>/dev/null || true
 
 # Load authentication parameters from JSON file
 AUTH_PARAMETER_FILE="./.github/workflows/parameters/private/parameters_aws_auth_tests.json"
@@ -41,7 +41,6 @@ echo ""
 echo "Building pdo_snowflake extension..."
 export PHP_HOME=${PHP_HOME:-/usr}
 export PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
-
 bash scripts/build_pdo_snowflake.sh
 
 echo "Extension built"
@@ -57,11 +56,10 @@ export NO_INTERACTION=true
 # Temporarily disable 'exit on error' to capture test exit code
 set +e
 
-# Run external browser tests (subprocess loads extension to avoid log conflicts)
-echo "Running external browser authentication tests..."
+# Run all authentication tests
 php run-tests.php \
   -p $(which php) \
-  tests/AuthenticationTests/externalbrowser*.phpt
+  tests/AuthenticationTests/
 
 EXIT_CODE=$?
 
@@ -72,9 +70,15 @@ if [ $EXIT_CODE -eq 0 ]; then
     echo "All authentication tests PASSED"
 else
     echo "Authentication tests FAILED"
-    for f in tests/AuthenticationTests/externalbrowser*.out; do
+    for f in tests/AuthenticationTests/*.out; do
         [ -f "$f" ] && echo "=== $f ===" && cat "$f"
     done
+fi
+
+# Copy test results back to host for CI
+if [ -d "$HOST_ROOT/tests/AuthenticationTests" ]; then
+    cp -f tests/AuthenticationTests/*.out "$HOST_ROOT/tests/AuthenticationTests/" 2>/dev/null || true
+    cp -f tests/AuthenticationTests/junit-results.xml "$HOST_ROOT/tests/AuthenticationTests/" 2>/dev/null || true
 fi
 
 exit $EXIT_CODE
