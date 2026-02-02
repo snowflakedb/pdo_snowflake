@@ -49,9 +49,17 @@ else
     exit 1
 fi
 
+# Detect architecture
+ARCH=$(uname -m)
+if [[ "$ARCH" == "arm64" ]]; then
+  DOCKER_IMAGE="${INTERNAL_REPO}/docker/snowdrivers-test-external-browser-php-mac:1"
+else
+  DOCKER_IMAGE="${INTERNAL_REPO}/docker/snowdrivers-test-external-browser-php:1"
+fi
+
 echo ""
 echo "Launching Docker container..."
-echo "  Image: ${INTERNAL_REPO}/docker/snowdrivers-test-external-browser-php:1"
+echo "  Image: ${DOCKER_IMAGE}"
 echo "  Source: ${REPO_ROOT}"
 echo ""
 
@@ -66,5 +74,5 @@ fi
 # Run tests in Docker
 docker run \
   $DOCKER_ARGS \
-  ${INTERNAL_REPO}/docker/snowdrivers-test-external-browser-php:1 \
+  ${DOCKER_IMAGE} \
   "/mnt/host/ci/container/test_authentication.sh"
