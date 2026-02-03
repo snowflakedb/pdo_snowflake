@@ -7,6 +7,7 @@
   - Updated `libsnowflakeclient` to v2.7.0 (snowflakedb/pdo_snowflake#482)
   - Updated `openssl` to v3.0.18 (snowflakedb/pdo_snowflake#482)
   - Updated `libcurl` to v8.16.0 (snowflakedb/pdo_snowflake#482)
+  - Add an auto-detected application path to the CLIENT_ENVIRONMENT (snowflakedb/pdo_snowflake#479)
 
 - v3.4.0
   - Added native okta authentication support (snowflakedb/pdo_snowflake#439).
