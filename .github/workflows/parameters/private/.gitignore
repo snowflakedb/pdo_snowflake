@@ -1,0 +1,4 @@
+# Ignore decrypted files - only .gpg files should be committed
+*.json
+*.p8
+!*.gpg

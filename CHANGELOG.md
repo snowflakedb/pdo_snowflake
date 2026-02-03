@@ -3,6 +3,10 @@
 # Changelog
 - v3.5.0
   - Added support for `client_request_mfa_token` connection option to enable MFA token caching for username/password MFA authentication.
+  - Deprecate CentOS 7 builds. Rocky 8/RHEL8 is now the minimum system version. (snowflakedb/pdo_snowflake#482)
+  - Updated `libsnowflakeclient` to v2.7.0 (snowflakedb/pdo_snowflake#482)
+  - Updated `openssl` to v3.0.18 (snowflakedb/pdo_snowflake#482)
+  - Updated `libcurl` to v8.16.0 (snowflakedb/pdo_snowflake#482)
 
 - v3.4.0
   - Added native okta authentication support (snowflakedb/pdo_snowflake#439).
