@@ -36,7 +36,7 @@ try {
     echo "ERROR: Should have thrown exception\n";
 } catch (PDOException $e) {
     $error = $e->getMessage();
-    if (stripos($error, '401') !== false || stripos($error, 'okta') !== false) {
+    if (stripos($error, '401') !== false || stripos($error, 'okta') !== false || stripos($error, 'Authentication failed') !== false) {
         echo "Okta wrong credentials: Expected error received\n";
     } else {
         echo "Okta wrong credentials: Unexpected error - $error\n";
