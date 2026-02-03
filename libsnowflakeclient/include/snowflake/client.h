@@ -348,7 +348,8 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_WIF_PROVIDER,
     SF_CON_WIF_TOKEN,
     SF_CON_WIF_AZURE_RESOURCE,
-    SF_CON_WORKLOAD_IDENTITY_IMPERSONATION_PATH
+    SF_CON_WORKLOAD_IDENTITY_IMPERSONATION_PATH,
+    SF_CON_APPLICATION_PATH
 } SF_ATTRIBUTE;
 
 /**
@@ -461,6 +462,9 @@ typedef struct SF_CONNECT {
 
     // Partner application name
     char * application;
+
+    // Override for APPLICATION_PATH in CLIENT_ENVIRONMENT
+    char * application_path;
 
     // Proxy
     char * proxy;
