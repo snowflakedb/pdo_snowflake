@@ -3,6 +3,7 @@
 # Changelog
 - v3.5.0
   - Added support for `client_request_mfa_token` connection option to enable MFA token caching for username/password MFA authentication.
+  - Added automatic detection of PHP script path for `APPLICATION_PATH` in `CLIENT_ENVIRONMENT` to improve security monitoring.
 
 - v3.4.0
   - Added native okta authentication support (snowflakedb/pdo_snowflake#439).
