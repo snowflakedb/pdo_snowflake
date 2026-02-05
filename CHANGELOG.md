@@ -3,6 +3,7 @@
 # Changelog
 - v3.5.0
   - Added support for `client_request_mfa_token` connection option to enable MFA token caching for username/password MFA authentication.
+  - Added support for `multiple statement query`.
 
 - v3.4.0
   - Added native okta authentication support (snowflakedb/pdo_snowflake#439).
