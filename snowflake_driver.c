@@ -602,6 +602,9 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"oauth_client_secret", NULL,         0},
         {"oauth_scope",   NULL,         0},
         {"single_use_refresh_token", "false", 0},
+        {"workload_identity_provider", NULL,  0},
+        {"token",               NULL,         0},
+        {"workload_identity_azure_resource", NULL, 0},
 #ifdef __LINUX__
         {"client_store_temporary_credential", "false", 0},
         {"client_request_mfa_token", "false", 0}
@@ -899,6 +902,30 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
             "crl_download_timeout: %d", int_attr_value);
     }
 
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_PROVIDER_IDX].optval != NULL) {
+        snowflake_set_attribute(
+            H->server, SF_CON_WIF_PROVIDER,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_PROVIDER_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "workload_identity_provider: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_PROVIDER_IDX].optval != NULL ? vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_PROVIDER_IDX].optval : "(NULL)");
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_TOKEN_IDX].optval != NULL) {
+        snowflake_set_attribute(
+            H->server, SF_CON_WIF_TOKEN,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_TOKEN_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "token: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_TOKEN_IDX].optval != NULL ? "******" : "(NULL)");
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AZURE_RESOURCE_IDX].optval != NULL) {
+        snowflake_set_attribute(
+            H->server, SF_CON_WIF_AZURE_RESOURCE,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AZURE_RESOURCE_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "workload_identity_azure_resource: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AZURE_RESOURCE_IDX].optval != NULL ? vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AZURE_RESOURCE_IDX].optval : "(NULL)");
+
     snowflake_set_attribute(H->server, SF_CON_OAUTH_AUTHORIZATION_ENDPOINT,
         vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_AUTHORIZATION_ENDPOINT].optval);
     PDO_LOG_DBG("oauth_authorization_endpoint: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_AUTHORIZATION_ENDPOINT].optval);
@@ -914,7 +941,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     snowflake_set_attribute(H->server, SF_CON_OAUTH_CLIENT_ID,
         vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_CLIENT_ID].optval);
     PDO_LOG_DBG("oauth_client_id: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_CLIENT_ID].optval);
-    
+
     snowflake_set_attribute(H->server, SF_CON_OAUTH_CLIENT_SECRET,
         vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_CLIENT_SECRET].optval);
     PDO_LOG_DBG("oauth_client_secret: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_CLIENT_SECRET].optval!= NULL ? "******" : "(NULL)");
@@ -951,10 +978,10 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
 
     int8 ocsp_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval, "true") != 0);
     int8 crl_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_CHECK_IDX].optval, "true") == 0);
-    
+
     if (ocsp_enabled && crl_enabled) {
         PDO_LOG_ERR("Both OCSP and CRL checks are enabled. Only one revocation check method can be enabled at a time.");
-        
+
         strcpy(dbh->error_code, "HY000");
         zend_throw_exception_ex(
             php_pdo_get_exception(),
