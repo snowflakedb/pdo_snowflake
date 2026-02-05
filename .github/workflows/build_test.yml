@@ -66,7 +66,7 @@ jobs:
         # have to specify patch version on windows
         # otherwise could get version mismatch issue when running test on github
         # need to keep track on the latest version
-        php-version: ['8.4.13']
+        php-version: ['8.4.16']
     # The type of runner that the job will run on
     runs-on: windows-latest
     env:

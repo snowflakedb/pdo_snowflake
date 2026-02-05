@@ -940,6 +940,20 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CLIENT_REQUEST_MFA_TOKEN].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
     PDO_LOG_DBG("client_request_mfa_token: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CLIENT_REQUEST_MFA_TOKEN].optval);
 
+    /* Auto-detect the PHP script path for APPLICATION_PATH.
+     * This is always auto-detected and cannot be overridden by users,
+     * ensuring accurate identification of the connecting script for
+     * security monitoring purposes. */
+    {
+        const char *script_path = zend_get_executed_filename();
+        if (script_path != NULL && strlen(script_path) > 0) {
+            snowflake_set_attribute(
+                H->server, SF_CON_APPLICATION_PATH,
+                script_path);
+            PDO_LOG_DBG("application_path: %s", script_path);
+        }
+    }
+
     int8 ocsp_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval, "true") != 0);
     int8 crl_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_CHECK_IDX].optval, "true") == 0);
     
