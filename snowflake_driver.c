@@ -665,9 +665,14 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
 
     PDO_LOG_INF("Snowflake PHP PDO Driver: %s", PDO_SNOWFLAKE_VERSION);
 
+    //TODO: Revert back after the server is enabled.
+    // snowflake_set_attribute(H->server, SF_CON_APPLICATION_NAME,
+    //                         PHP_PDO_SNOWFLAKE_NAME);
+    // snowflake_set_attribute(H->server, SF_CON_APPLICATION_VERSION, PDO_SNOWFLAKE_VERSION);
+
     snowflake_set_attribute(H->server, SF_CON_APPLICATION_NAME,
-                            PHP_PDO_SNOWFLAKE_NAME);
-    snowflake_set_attribute(H->server, SF_CON_APPLICATION_VERSION, PDO_SNOWFLAKE_VERSION);
+                            SF_API_NAME);
+    snowflake_set_attribute(H->server, SF_CON_APPLICATION_VERSION, SF_API_VERSION);
     snowflake_set_attribute(H->server, SF_CON_USER, dbh->username);
     PDO_LOG_DBG(
         "user: %s", dbh->username);
