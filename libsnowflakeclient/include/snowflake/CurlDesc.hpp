@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2024 Snowflake Computing, Inc. All rights reserved.
- */
-
 #ifndef SNOWFLAKE_CURLDESC_HPP
 #define	SNOWFLAKE_CURLDESC_HPP
 

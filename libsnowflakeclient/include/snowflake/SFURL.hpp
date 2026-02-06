@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2024 Snowflake Computing, Inc. All rights reserved.
- */
-
 #ifndef SFURL_HPP
 #define SFURL_HPP
 
@@ -207,6 +203,8 @@ public:
    * @return SFURL being constructed
    */
   static SFURL parse(const std::string &url);
+
+  static SFURL parse(const char* url);
 
   /**
    * Scheme getter

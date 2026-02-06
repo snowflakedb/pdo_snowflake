@@ -49,8 +49,6 @@ Building the PHP PDO Driver
 
 The following sections explain how to build the PHP PDO Driver on Linux, macOS, and Windows.
 
-:Note: Snowflake PHP PDO driver does not yet support ARM/AARCH64 architecture on Linux.
-While this feature is implemented, you can consider using the Snowflake ODBC driver https://developers.snowflake.com/odbc/ for PHP which supports multiple architectures.
 
 Building the Driver on Linux and macOS
 --------------------------------------
@@ -229,11 +227,10 @@ Installing the Driver on Linux and macOS
 
        extension=pdo_snowflake.so
        pdo_snowflake.cacert=<path to PHP config directory>/cacert.pem
-       # pdo_snowflake.logdir=/tmp     # location of log directory
-       # pdo_snowflake.loglevel=DEBUG  # log level
+       # pdo_snowflake.logdir=/tmp             # location of log directory
+       # pdo_snowflake.loglevel=DEBUG          # log level
 
-   where :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the
-   previous step.
+   where :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the previous step.
 
 #. If you are using PHP with an application server or web server (e.g. Apache or nginx), restart the server.
 
@@ -264,11 +261,10 @@ Installing the Driver on Windows
 
        extension=php_pdo_snowflake.dll
        pdo_snowflake.cacert=<path to PHP config directory>\cacert.pem
-       ; pdo_snowflake.logdir=C:\path\to\logdir     ; location of log directory
-       ; pdo_snowflake.loglevel=DEBUG  ; log level
+       ; pdo_snowflake.logdir=C:\path\to\logdir                ; location of log directory
+       ; pdo_snowflake.loglevel=DEBUG                          ; log level
 
-   where :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the
-   previous step.
+   where :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the previous step.
 
 #. If you are using PHP with an application server or web server (e.g. Apache or nginx), restart the server.
 
@@ -280,7 +276,9 @@ The next sections explain how to use the driver in a PHP page.
 Note
 ----------------------------------------------------------------------
 
-This driver currently does not support GCP regional endpoints. Please ensure that any workloads using through this driver do not require support for regional endpoints on GCP. If you have questions about this, please contact Snowflake Support.
+- This driver currently does not support GCP regional endpoints. Please ensure that any workloads using through this driver do not require support for regional endpoints on GCP. If you have questions about this, please contact Snowflake Support.
+
+- The :code:`region` parameter has been deprecated. To specify region information you need to append it in :code:`account` parameter.
 
 Connecting to the Snowflake Database
 ----------------------------------------------------------------------
@@ -300,10 +298,9 @@ where:
 - :code:`<user>` is the login name of the user for the connection.
 - :code:`<password>` is the password for the specified user.
 
-Dependes on the region where your account being hosted, you might need to use :code:`region` parameter to specify the region
-or append the region to the :code:`account` parameter.
-You might also need to append :code:`cloud` in :code:`region` parameter in the format of :code:`<region>.<cloud>`, or do the
-same when you append it to the :code:`account` parameter.
+Dependes on the region where your account being hosted, you might need to append the region to
+the :code:`account` parameter in the format of :code:`<account>.<region>`.
+You might also need to append :code:`cloud` as well, in the format of :code:`<account>.<region>.<cloud>`.
 
 where:
 
@@ -313,9 +310,8 @@ where:
 .. code-block:: php
 
     $dbh = new PDO("snowflake:account=testaccount.us-east-2.aws", "user", "password");
-    $dbh = new PDO("snowflake:account=testaccount;region=us-east-2.aws", "user", "password");
 
-You can specify the host name for your account directly as shown below instead of using `account` and `region`:
+You can specify the host name for your account directly as shown below instead of using `account`:
 
 .. code-block:: php
 
@@ -356,6 +352,108 @@ where:
 - :code:`<username>` Specifies the login name of the user for the connection.
 - :code:`""` Specifies the password for the specified user. The parameter is required. When using key-pair authentication, specify an empty string.
 
+Using Multi-factor authentication (MFA)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PHP PDO driver supports Multi-factor authentication.
+Guidance can be found in
+`Multi-factor authentication (MFA) <https://docs.snowflake.com/en/user-guide/security-mfa>`_.
+
+To connect to the Snowflake database using Duo-generated passcode instead of the push mechanism,
+Specify the data source name (:code:`dsn`) parameter as shown below:
+
+.. code-block:: php
+
+    $dbh = new PDO("account=<account name>;passcode=<duo_generated_passcode>",
+                    "<username>", "<password>");
+
+where:
+
+- :code:`<account_name>` Specifies your
+  `Snowflake account name <https://docs.snowflake.com/en/user-guide/connecting.html#your-snowflake-account-name>`_.
+- :code:`passcode = <duo_generated_passcode>` Specifies the Duo-generated passcode.
+- :code:`<username>` Specifies the login name of the user for the connection.
+- :code:`<password>` Specifies the password for the specified user.
+
+You can also use passcodeinpassword and set passcode and password concatenated, in the form of <password_string><passcode_string>,
+Specify the data source name (:code:`dsn`) parameter as shown below:
+
+.. code-block:: php
+
+    $dbh = new PDO("account=<account name>;passcodeinpassword=on",
+                    "<username>", "<password><passcode>");
+
+where:
+
+- :code:`<account_name>` Specifies your
+  `Snowflake account name <https://docs.snowflake.com/en/user-guide/connecting.html#your-snowflake-account-name>`_.
+- :code:`passcodeinpassword=on` Specifies the Duo-generated passcode.
+- :code:`<username>` Specifies Duo passcode is embedded in the password.
+- :code:`<password><passcode>` Specifies the password and passcode concatenated.
+
+Using OKTA authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PHP PDO driver supports OKTA Authentication. Guidance can be found in `Native SSO - OKTA only <https://docs.snowflake.com/en/user-guide/admin-security-fed-auth-use#label-native-sso-okta>`_.
+
+To connect to Snowflake database using OKTA Authentication, create a new PDO object and specify the data source name (dsn) parameters as follows:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=$account;disablesamlurlcheck=false;authenticator=<OKTA authenticator URL>", $oktauser, $oktapwd);
+
+where:
+
+- :code:`account` is your snowflake account name
+- :code:`disablesamlurlcheck` specifies whether to disable verification for SAML URLs.
+- :code:`authenticator` is your OKTA authenticator URL
+- :code:`oktauser` is your okta username
+- :code:`oktapwd` is your okta password
+
+By default, the PHP PDO driver verifies SAML URLs. To disable SAML checking for a PDO connection, set :code:`disablesamlurlcheck=true` in the DSN connection string. For example:
+
+.. code-block:: php
+    
+    $dbh = new PDO("snowflake:account=$account;disablesamlurlcheck=true;authenticator=<OKTA authenticator URL>", $oktauser, $oktapwd);
+
+Using OAuth 2.0 authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PHP PDO driver supports OAuth 2.0 Authentication. Guidance can be found in `OAuth Intro <https://docs.snowflake.com/en/user-guide/oauth-intro>`_.
+
+To connect to Snowflake database using OAuth 2.0 Authentication, create a new PDO object and specify the data source name (dsn) parameters as follows:
+
+.. code-block:: php
+
+    $dbh = new PDO($dsn;authenticator=<oauth_authorization_code || oauth_client_credentials>;oauth_client_id=<client_id>;oauth_client_secret=<client_secret>;oauth_scope=<oauth_scope>;
+    oauth_redirect_uri=<redirect_uri>;oauth_token_endpoint=<token_endpoint_url>",$user, "password is not required));
+
+where:
+
+- :code:`$dsn` is your snowflake dsn connection string. The basic fields such as account, user are specified in the dsn.
+- :code:`authenticator` is either :code:`OAUTH_AUTHORIZATION_CODE` or :code:`OAUTH_CLIENT_CREDENTIALS` based on the OAuth flow you are using.
+- :code:`oauth_client_id` is your OAuth client id
+- :code:`oauth_client_secret` is your OAuth client secret
+- :code:`oauth_scope` is the OAuth scope. If your role name is 'custom_user', this field should be 'session:role:custom_user'. If this field is not provided, the driver will use the role figured in the role attribute of the DSN connection string.
+- :code:`oauth_redirect_uri` is the redirect URI configured in your OAuth client application
+- :code:`oauth_token_endpoint` is the OAuth token endpoint URL
+
+By default, the PHP PDO driver enables client temporary credentials storage for OAuth 2.0 and external browser authentication in Windows and macOS. (It is disabled on Linux by default). To control this feature for a PDO connection, set :code:`client_store_temporary_credential=<true|false>` in the DSN connection string. For example:
+
+.. code-block:: php
+    
+    $dbh = new PDO("$dsn;authenticator=<oauth_authorization_code || oauth_client_credentials>;oauth_client_id=<client_id>;oauth_client_secret=<client_secret>;oauth_scope=<oauth_scope>;
+    oauth_redirect_uri=<redirect_uri>;oauth_token_endpoint=<token_endpoint_url>;client_store_temporary_credential=false", $user, $pass);
+
+This option caches OAuth tokens and ID tokens in platform-specific secure storage (Windows Credential Manager on Windows, macOS Keychain on macOS, or file-based cache on Linux).
+
+To enable MFA token caching for :code:`username_password_mfa` authenticator, set :code:`client_request_mfa_token=<true|false>` in the DSN connection string. For example:
+
+.. code-block:: php
+
+    $dbh = new PDO("$dsn;authenticator=username_password_mfa;client_request_mfa_token=true", $user, $pass);
+
+By default, this is enabled on Windows and macOS, but disabled on Linux. MFA token caching requires the Snowflake account to have :code:`ALLOW_CLIENT_MFA_CACHING=TRUE` enabled.
 
 Configuring OCSP Checking
 ----------------------------------------------------------------------
@@ -618,7 +716,7 @@ Locate :code:`pdo.so` under :code:`/usr/lib` and specify it in :code:`phpt` file
     pdo_snowflake.logdir=/tmp
     pdo_snowflake.loglevel=DEBUG
 
-Where is the log files?
+Where are the log files?
 ----------------------------------------------------------------------
 
 The location of log files are specified by the parameters in php.ini:
@@ -627,7 +725,62 @@ The location of log files are specified by the parameters in php.ini:
 
     extension=pdo_snowflake.so
     pdo_snowflake.cacert=/etc/php/8.1/conf.d/cacert.pem
-    pdo_snowflake.logdir=/tmp     ; location of log directory
-    pdo_snowflake.loglevel=DEBUG  ; log level
+    pdo_snowflake.logdir=/tmp            ; location of log directory
+    pdo_snowflake.loglevel=DEBUG         ; log level
 
 where :code:`pdo_snowflake.loglevel` can be :code:`TRACE`, :code:`DEBUG`, :code:`INFO`, :code:`WARN`, :code:`ERROR` and :code:`FATAL`.
+
+Use easy logging while debugging your code
+----------------------------------------------------------------------
+
+When debugging an application, increasing the log level can provide more granular information about what the application is doing. The Easy Logging feature simplifies debugging by letting you change the log level and the log file destination using the configuration file, :code:`sf_client_config.json`.
+
+You typically change log levels only when debugging your application.
+
+:code:`sf_client_config.json` is a JSON configuration file that is used to define the logging parameters: :code:`log_level` and :code:`log_path`, as follows:
+
+   .. code-block:: none
+
+       {
+           "common": {
+               "log_level" : "INFO",
+               "log_path" :  "/some-path/some-directory"
+           }
+       }
+
+where:
+
+- :code:`log_level` is the desired logging level.
+- :code:`log_path` is the location to store the log files.
+
+   .. code-block:: none
+   **Note**
+    The driver will use Easy Logging's settings when :code:`log_level` or :code:`log_path` or both are not specified in php.ini.
+
+Next, edit php.ini to define the value for :code:`pdo_snowflake.clientconfigfile`. :code:`pdo_snowflake.clientconfigfile` specifies the location of the Easy Logging configuration file. This is similar to other settings such as :code:`pdo_snowflake.logdir` and :code:`pdo_snowflake.loglevel`.
+
+.. code-block:: ini
+
+    extension=php_pdo_snowflake.dll
+    pdo_snowflake.cacert=<path to PHP config directory>\cacert.pem
+    ; pdo_snowflake.logdir=C:\path\to\logdir                ; location of log directory
+    ; pdo_snowflake.loglevel=DEBUG                          ; log level
+    pdo_snowflake.clientconfigfile=<path to client config file>/sf_client_config.json
+
+With :code:`logdir` and :code:`loglevel` commented out, Easy Logging picks up the log settings from :code:`clientconfigfile`.
+
+The driver looks for the location of the configuration file in the following order:
+
+#. :code:`pdo_snowflake.clientconfigfile` in php.ini
+#. :code:`SF_CLIENT_CONFIG_FILE` environment variable, containing the full path to the configuration file (e.g. :code:`export SF_CLIENT_CONFIG_FILE=/some_path/some-directory/client_config.json`).
+#. php directory (e.g. where :code:`php.exe` is located).
+#. User’s home directory.
+
+   .. code-block:: none
+   **Note**
+    To enhance security, the driver requires the logging configuration file on Unix-style systems to limit file permissions to allow only the file owner to modify the files (such as :code:`chmod 0600` or :code:`chmod 0644`).
+
+
+   .. code-block:: none
+   **Note**
+    File must be named :code:`sf_client_config.json` for scenario 3 and 4.

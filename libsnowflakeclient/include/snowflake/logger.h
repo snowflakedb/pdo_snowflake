@@ -4,9 +4,6 @@
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the MIT license. See `log.c` for details.
  */
-/*
- * Copyright (c) 2018-2019 Snowflake Computing, Inc. All rights reserved.
- */
 
 #ifndef SNOWFLAKE_LOGGER_H
 #define SNOWFLAKE_LOGGER_H
@@ -47,7 +44,8 @@ typedef enum SF_LOG_LEVEL {
     SF_LOG_INFO,
     SF_LOG_WARN,
     SF_LOG_ERROR,
-    SF_LOG_FATAL
+    SF_LOG_FATAL,
+    SF_LOG_DEFAULT
 } SF_LOG_LEVEL;
 
 #define CXX_LOG_NS "C++"
@@ -94,9 +92,13 @@ void log_masked_va_list(FILE* fp, const char *fmt, va_list args);
 
 SF_LOG_LEVEL log_from_str_to_level(const char *level_in_str);
 
+const char* log_from_level_to_str(SF_LOG_LEVEL level);
+
 void log_set_path(const char* path);
 
 void log_close();
+
+void terminal_mask(char *data, size_t size, char* masked, size_t masked_bufsize);
 
 #if defined(__cplusplus)
 }

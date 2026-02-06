@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2018-2019 Snowflake Computing, Inc. All rights reserved.
- */
-
 #ifndef SNOWFLAKECLIENT_PUTGETPARSERESPONSE_HPP
 #define SNOWFLAKECLIENT_PUTGETPARSERESPONSE_HPP
 
@@ -66,6 +62,8 @@ struct StageInfo
 
   // whether to use regional URL (AWS and GCS only)
   bool useRegionalUrl;
+
+  bool useVirtualUrl; //Required by GCS for the endpoint.
 
   std::string storageAccount; //Required by Azure
 

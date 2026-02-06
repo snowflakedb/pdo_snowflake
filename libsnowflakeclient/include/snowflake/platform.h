@@ -1,7 +1,3 @@
-/*
-* Copyright (c) 2018-2019 Snowflake Computing, Inc. All rights reserved.
-*/
-
 #ifndef SNOWFLAKE_PLATFORM_H
 #define SNOWFLAKE_PLATFORM_H
 
@@ -57,6 +53,9 @@ typedef pthread_mutex_t SF_MUTEX_HANDLE;
 #else
 #define SF_MACRO_DEPRECATED_WARNING(MSG)  _Pragma(MACRO_TO_STRING(GCC warning MSG))
 #endif
+
+// Defined for unused function parameters.
+#define SF_UNUSED(x) (void)(x)
 
 #include "SF_CRTFunctionSafe.h"
 
@@ -154,8 +153,7 @@ void STDCALL sf_memory_error_handler();
 // this should be called by application before any calls of sfclient
 void STDCALL sf_exception_on_memory_failure();
 
-// Defined for unused function parameters.
-#define SF_UNUSED(x) (void)(x)
+void STDCALL sf_get_callers_executable_path(char* out_buf, size_t buf_size);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,3 @@
-/* Copyright (c) 2017-2019 Snowflake Computing Inc. All right reserved.  */
-
 #ifdef HAVE_CONFIG_H
 #endif
 
@@ -587,7 +585,30 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"maxhttpretries",      "7",          0},
         {"retrytimeout",        "300",        0},
         {"ocspfailopen",        "true",       0},
-        {"disableocspchecks",   "false",      0}
+        {"disableocspchecks",   "false",      0},
+        {"passcode",            NULL,         0},
+        {"passcodeinpassword",  "false",      0},
+        {"disablesamlurlcheck", "false",      0},
+        {"crl_check",           "false",      0},
+        {"crl_advisory",        "false",      0},
+        {"crl_allow_no_crl",    "false",      0},
+        {"crl_memory_caching",  "true",       0},
+        {"crl_disk_caching",    "true",       0},
+        {"crl_download_timeout", "120",       0},
+        {"oauth_token_endpoint", NULL,      0},
+        {"oauth_authorization_endpoint", NULL, 0},
+        {"oauth_redirect_uri",  NULL,         0},
+        {"oauth_client_id",     NULL,         0},
+        {"oauth_client_secret", NULL,         0},
+        {"oauth_scope",   NULL,         0},
+        {"single_use_refresh_token", "false", 0},
+#ifdef __LINUX__
+        {"client_store_temporary_credential", "false", 0},
+        {"client_request_mfa_token", "false", 0}
+#else
+        {"client_store_temporary_credential", "true", 0},
+        {"client_request_mfa_token", "true", 0}
+#endif
     };
 
     // Parse the input data parameters
@@ -642,17 +663,11 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         dbh->auto_commit = (unsigned) auto_commit;
     }
 
-    // Set context attributes
-    char version[128];
-    strcpy(version, PHP_VERSION);
-    strcat(version, "-");
-    strcat(version, PDO_SNOWFLAKE_VERSION);
-
-    PDO_LOG_INF("Snowflake PHP PDO Driver: %s", version);
+    PDO_LOG_INF("Snowflake PHP PDO Driver: %s", PDO_SNOWFLAKE_VERSION);
 
     snowflake_set_attribute(H->server, SF_CON_APPLICATION_NAME,
                             PHP_PDO_SNOWFLAKE_NAME);
-    snowflake_set_attribute(H->server, SF_CON_APPLICATION_VERSION, version);
+    snowflake_set_attribute(H->server, SF_CON_APPLICATION_VERSION, PDO_SNOWFLAKE_VERSION);
     snowflake_set_attribute(H->server, SF_CON_USER, dbh->username);
     PDO_LOG_DBG(
         "user: %s", dbh->username);
@@ -833,6 +848,122 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     PDO_LOG_DBG(
         "disableocspchecks: %s",
         vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval);
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_PASSCODE_IDX].optval != NULL) {
+        /* passcode */
+        snowflake_set_attribute(
+            H->server, SF_CON_PASSCODE,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_PASSCODE_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "passcode: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_PASSCODE_IDX].optval != NULL ? "******" : "(NULL)");
+
+    snowflake_set_attribute(
+        H->server, SF_CON_PASSCODE_IN_PASSWORD,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_PASSCODE_IN_PASSWORD_IDX].optval, "true") == 0) ?
+            &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG(
+        "passcodeinpassword: %s",
+        vars[PDO_SNOWFLAKE_CONN_ATTR_PASSCODE_IN_PASSWORD_IDX].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_DISABLE_SAML_URL_CHECK, 
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_DISABLE_SAML_URL_CHECK_IDX].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("disablesamlURLcheck: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_DISABLE_SAML_URL_CHECK_IDX].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_CRL_CHECK,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_CHECK_IDX].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("crl_check: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_DISABLE_SAML_URL_CHECK_IDX].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_CRL_ADVISORY,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_ADVISORY_IDX].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("crl_advisory: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_ADVISORY_IDX].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_CRL_ALLOW_NO_CRL,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_ALLOW_NO_CRL_IDX].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("crl_allow_no_crl: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_ALLOW_NO_CRL_IDX].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_CRL_MEMORY_CACHING,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_MEMORY_CACHING_IDX].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("crl_memory_caching: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_MEMORY_CACHING_IDX].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_CRL_DISK_CACHING,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_DISK_CACHING_IDX].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("crl_disk_caching: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_DISK_CACHING_IDX].optval);
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_DOWNLOAD_TIMEOUT_IDX].optval != NULL) {
+        int_attr_value = strtoll(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_DOWNLOAD_TIMEOUT_IDX].optval, NULL, 10);
+        snowflake_set_attribute(
+            H->server, SF_CON_CRL_DOWNLOAD_TIMEOUT,
+            &int_attr_value);
+        PDO_LOG_DBG(
+            "crl_download_timeout: %d", int_attr_value);
+    }
+
+    snowflake_set_attribute(H->server, SF_CON_OAUTH_AUTHORIZATION_ENDPOINT,
+        vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_AUTHORIZATION_ENDPOINT].optval);
+    PDO_LOG_DBG("oauth_authorization_endpoint: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_AUTHORIZATION_ENDPOINT].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_OAUTH_TOKEN_ENDPOINT,
+        vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_TOKEN_ENDPOINT].optval);
+    PDO_LOG_DBG("oauth_token_endpoint: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_TOKEN_ENDPOINT].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_OAUTH_REDIRECT_URI,
+        vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_REDIRECT_URI].optval);
+    PDO_LOG_DBG("oauth_redirect_url: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_REDIRECT_URI].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_OAUTH_CLIENT_ID,
+        vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_CLIENT_ID].optval);
+    PDO_LOG_DBG("oauth_client_id: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_CLIENT_ID].optval);
+    
+    snowflake_set_attribute(H->server, SF_CON_OAUTH_CLIENT_SECRET,
+        vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_CLIENT_SECRET].optval);
+    PDO_LOG_DBG("oauth_client_secret: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_CLIENT_SECRET].optval!= NULL ? "******" : "(NULL)");
+
+    snowflake_set_attribute(H->server, SF_CON_OAUTH_SCOPE,
+        vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_SCOPE].optval);
+    PDO_LOG_DBG("oauth_scope: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_SCOPE].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_SINGLE_USE_REFRESH_TOKEN,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_SINGLE_USE_REFRESH_TOKEN].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("single_use_refresh_token: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_SINGLE_USE_REFRESH_TOKEN].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_CLIENT_STORE_TEMPORARY_CREDENTIAL,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CLIENT_STORE_TEMPORARY_CREDENTIAL].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("client_store_temporary_credential: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CLIENT_STORE_TEMPORARY_CREDENTIAL].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_CLIENT_REQUEST_MFA_TOKEN,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CLIENT_REQUEST_MFA_TOKEN].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("client_request_mfa_token: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CLIENT_REQUEST_MFA_TOKEN].optval);
+
+    /* Auto-detect the PHP script path for APPLICATION_PATH.
+     * This is always auto-detected and cannot be overridden by users,
+     * ensuring accurate identification of the connecting script for
+     * security monitoring purposes. */
+    {
+        const char *script_path = zend_get_executed_filename();
+        if (script_path != NULL && strlen(script_path) > 0) {
+            snowflake_set_attribute(
+                H->server, SF_CON_APPLICATION_PATH,
+                script_path);
+            PDO_LOG_DBG("application_path: %s", script_path);
+        }
+    }
+
+    int8 ocsp_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval, "true") != 0);
+    int8 crl_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_CHECK_IDX].optval, "true") == 0);
+    
+    if (ocsp_enabled && crl_enabled) {
+        PDO_LOG_ERR("Both OCSP and CRL checks are enabled. Only one revocation check method can be enabled at a time.");
+        
+        strcpy(dbh->error_code, "HY000");
+        zend_throw_exception_ex(
+            php_pdo_get_exception(),
+            1,
+            "SQLSTATE[HY000] [1] Both host certificate revocation check methods (OCSP and CRL) are enabled. "
+            "Please turn off crl_check or toggle OCSP with disableocspchecks.");
+        ret = 0;
+        goto cleanup;
+    }
 
     if (snowflake_connect(H->server) > 0) {
         pdo_snowflake_error(dbh);

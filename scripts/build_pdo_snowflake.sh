@@ -38,6 +38,12 @@ echo ./configure "${CONFIGURE_OPTS[@]}"
 ./configure "${CONFIGURE_OPTS[@]}"
 make
 
+if [[ "aarch64" == $(uname -m) ]]; then
+    ARCH_DIR=aarch64
+else
+    ARCH_DIR=
+fi
+
 # workaround for libtool issue, which cannot keep the order of Link options
 # and --whole-archive is ignored.
 LINK_OPTS=
@@ -56,33 +62,35 @@ if [[ "$PLATFORM" == "linux" ]]; then
         .libs/snowflake_arraylist.o \
         .libs/snowflake_treemap.o \
         .libs/snowflake_rbtree.o \
-        libsnowflakeclient/lib/linux/libsnowflakeclient.a \
-        libsnowflakeclient/deps-build/linux/openssl/lib/libcrypto.a \
-        libsnowflakeclient/deps-build/linux/openssl/lib/libssl.a \
-        libsnowflakeclient/deps-build/linux/curl/lib/libcurl.a \
-        libsnowflakeclient/deps-build/linux/oob/lib/libtelemetry.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-s3.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-core.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-crt-cpp.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-s3.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-auth.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-http.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-mqtt.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-compression.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-checksums.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-cal.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-event-stream.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-sdkutils.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-io.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-common.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libs2n.a \
-        libsnowflakeclient/deps-build/linux/azure/lib/libazure-storage-lite.a \
-        libsnowflakeclient/deps-build/linux/uuid/lib/libuuid.a \
-        libsnowflakeclient/deps-build/linux/arrow/lib/libarrow.a \
-        libsnowflakeclient/deps-build/linux/arrow_deps/lib/libjemalloc_pic.a \
-        libsnowflakeclient/deps-build/linux/boost/lib/libboost_filesystem.a \
-        libsnowflakeclient/deps-build/linux/boost/lib/libboost_regex.a \
-        libsnowflakeclient/deps-build/linux/boost/lib/libboost_system.a \
+        libsnowflakeclient/lib/linux/$ARCH_DIR/libsnowflakeclient.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/openssl/lib/libcrypto.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/openssl/lib/libssl.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/curl/lib/libcurl.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/oob/lib/libtelemetry.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-cpp-sdk-s3.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-cpp-sdk-core.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-cpp-sdk-sts.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-crt-cpp.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-s3.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-auth.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-http.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-mqtt.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-compression.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-checksums.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-cal.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-event-stream.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-sdkutils.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-io.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-common.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libs2n.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/azure/lib/libazure-storage-lite.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/uuid/lib/libuuid.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/arrow/lib/libarrow.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/arrow_deps/lib/libjemalloc_pic.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/boost/lib/libboost_filesystem.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/boost/lib/libboost_regex.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/boost/lib/libboost_system.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/boost/lib/libboost_url.a \
         -O2 \
         -Wl,--whole-archive \
         -Wl,--no-whole-archive \
@@ -90,32 +98,34 @@ if [[ "$PLATFORM" == "linux" ]]; then
         -Wl,pdo_snowflake.so \
         $LINK_OPTS \
         -o .libs/pdo_snowflake.so \
-        libsnowflakeclient/deps-build/linux/openssl/lib/libssl.a \
-        libsnowflakeclient/deps-build/linux/openssl/lib/libcrypto.a \
-        libsnowflakeclient/deps-build/linux/curl/lib/libcurl.a \
-        libsnowflakeclient/deps-build/linux/oob/lib/libtelemetry.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-s3.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-cpp-sdk-core.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-crt-cpp.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-s3.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-auth.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-http.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-mqtt.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-compression.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-checksums.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-cal.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-event-stream.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-sdkutils.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-io.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libaws-c-common.a \
-        libsnowflakeclient/deps-build/linux/aws/lib64/libs2n.a \
-        libsnowflakeclient/deps-build/linux/azure/lib/libazure-storage-lite.a \
-        libsnowflakeclient/deps-build/linux/uuid/lib/libuuid.a \
-        libsnowflakeclient/deps-build/linux/arrow/lib/libarrow.a \
-        libsnowflakeclient/deps-build/linux/arrow_deps/lib/libjemalloc_pic.a \
-        libsnowflakeclient/deps-build/linux/boost/lib/libboost_filesystem.a \
-        libsnowflakeclient/deps-build/linux/boost/lib/libboost_regex.a \
-        libsnowflakeclient/deps-build/linux/boost/lib/libboost_system.a
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/openssl/lib/libssl.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/openssl/lib/libcrypto.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/curl/lib/libcurl.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/oob/lib/libtelemetry.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-cpp-sdk-s3.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-cpp-sdk-core.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-cpp-sdk-sts.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-crt-cpp.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-s3.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-auth.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-http.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-mqtt.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-compression.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-checksums.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-cal.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-event-stream.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-sdkutils.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-io.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-common.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libs2n.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/azure/lib/libazure-storage-lite.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/uuid/lib/libuuid.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/arrow/lib/libarrow.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/arrow_deps/lib/libjemalloc_pic.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/boost/lib/libboost_filesystem.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/boost/lib/libboost_regex.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/boost/lib/libboost_system.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/boost/lib/libboost_url.a
 elif [[ "$PLATFORM" == "darwin" ]]; then
     # Darwin uses -force_load instead
     echo "Linking for Darwin"
@@ -133,6 +143,7 @@ elif [[ "$PLATFORM" == "darwin" ]]; then
         libsnowflakeclient/deps-build/darwin/boost/lib/libboost_filesystem.a \
         libsnowflakeclient/deps-build/darwin/boost/lib/libboost_regex.a \
         libsnowflakeclient/deps-build/darwin/boost/lib/libboost_system.a \
+        libsnowflakeclient/deps-build/darwin/boost/lib/libboost_url.a \
         -Wl,-force_load,libsnowflakeclient/lib/darwin/libsnowflakeclient.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/openssl/lib/libcrypto.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/openssl/lib/libssl.a \
@@ -140,6 +151,7 @@ elif [[ "$PLATFORM" == "darwin" ]]; then
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/oob/lib/libtelemetry.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-cpp-sdk-s3.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-cpp-sdk-core.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-cpp-sdk-sts.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-crt-cpp.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-c-s3.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-c-auth.a \

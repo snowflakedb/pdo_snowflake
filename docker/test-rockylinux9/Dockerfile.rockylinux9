@@ -1,0 +1,55 @@
+FROM rockylinux:9
+
+USER root
+WORKDIR /
+
+# Install Remi repository for multiple PHP versions
+# See: https://rpms.remirepo.net/wizard/
+RUN dnf -y update && \
+    dnf install -y https://rpms.remirepo.net/enterprise/remi-release-9.rpm && \
+    dnf install -y \
+        autoconf \
+        automake \
+        cmake \
+        diffutils \
+        file \
+        gcc \
+        jq \
+        gcc-c++ \
+        libtool \
+        make \
+        python3 \
+        which && \
+    ln -s /usr/bin/python3 /usr/bin/python && \
+    dnf clean all
+
+# PHP version to install (required build arg)
+ARG PHP_VERSION
+
+# Install PHP from Remi repository
+RUN dnf module reset php -y && \
+    dnf module enable php:remi-${PHP_VERSION} -y && \
+    dnf install -y \
+        php \
+        php-devel \
+        php-pdo \
+        php-json && \
+    dnf clean all
+
+# Verify PHP installation
+RUN php --version && \
+    php -m | grep PDO && \
+    php -m | grep json
+
+# Accept user ID as build argument to match host permissions
+ARG USER_ID=1001
+ARG GROUP_ID=1001
+
+# Create user for proper permission testing
+RUN groupadd -g ${GROUP_ID} user && \
+    useradd -u ${USER_ID} -g ${GROUP_ID} -m -s /bin/bash user && \
+    chown -R user:user /home/user
+
+USER user
+WORKDIR /home/user
+

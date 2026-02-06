@@ -44,9 +44,9 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php exit(0); ?>
 --EXPECT--
 Connected to Snowflake
-name: C1, native_type: OBJECT, scale: 0, precision: 0, len: 16777216
-name: C2, native_type: ARRAY, scale: 0, precision: 0, len: 16777216
-name: C3, native_type: VARIANT, scale: 0, precision: 0, len: 16777216
+name: C1, native_type: OBJECT, scale: 0, precision: 0, len: 134217728
+name: C2, native_type: ARRAY, scale: 0, precision: 0, len: 134217728
+name: C3, native_type: VARIANT, scale: 0, precision: 0, len: 134217728
 Array
 (
     [test1] => 1

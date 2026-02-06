@@ -1,5 +1,3 @@
-/* Copyright (c) 2017-2019 Snowflake Computing Inc. All right reserved.  */
-
 #ifndef PHP_PDO_SNOWFLAKE_H
 #define PHP_PDO_SNOWFLAKE_H
 
@@ -11,7 +9,7 @@ extern zend_module_entry pdo_snowflake_module_entry;
 /**
  * PHP PDO Snowflake version for PHP info
  */
-#define PDO_SNOWFLAKE_VERSION "3.1.0"
+#define PDO_SNOWFLAKE_VERSION "3.5.0"
 
 #ifdef PHP_WIN32
 #define PHP_PDO_SNOWFLAKE_API __declspec(dllexport)

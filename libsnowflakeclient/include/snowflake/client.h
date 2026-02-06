@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2018-2019 Snowflake Computing, Inc. All rights reserved.
- */
-
 #ifndef SNOWFLAKE_CLIENT_H
 #define SNOWFLAKE_CLIENT_H
 
@@ -16,9 +12,6 @@ extern "C" {
 #include "logger.h"
 #include "secure_storage.h"
 
-/**
- * API Name
- */
 #define SF_API_NAME "C API"
 
 /**
@@ -53,6 +46,25 @@ extern "C" {
 #define SF_AUTHENTICATOR_PAT "programmatic_access_token"
 
 /**
+ * Workload Identity Federation authenticator
+ */
+#define SF_AUTHENTICATOR_WORKLOAD_IDENTITY "workload_identity"
+
+ /**
+ * Authenticator, oauth_authorization_code
+ */
+#define SF_AUTHENTICATOR_OAUTH_AUTHORIZATION_CODE "oauth_authorization_code"
+
+/**
+* Authenticator, oauth_client_credentials
+*/
+#define SF_AUTHENTICATOR_OAUTH_CLIENT_CREDENTIALS "oauth_client_credentials"
+ /**
+ * Authenticator, SSO token
+ */
+#define SF_AUTHENTICATOR_ID_TOKEN "ID_TOKEN"
+
+/**
  * UUID4 length
  */
 #define SF_UUID4_LEN 37
@@ -68,6 +80,11 @@ extern "C" {
 #define SF_COMMAND_LEN 10
 
 /**
+ * Browser response timeout in seconds
+ */
+#define SF_BROWSER_RESPONSE_TIMEOUT 120
+
+/**
  * Login timeout in seconds
  */
 // make the login timetout defaults to 300 to be inline with retry timeout
@@ -78,6 +95,16 @@ extern "C" {
  * retry timeout in seconds
  */
 #define SF_RETRY_TIMEOUT 300
+
+ /**
+ * network timeout in seconds
+ */
+#define SF_NETWORK_TIMEOUT 90
+
+    /**
+     * CRL download timeout in seconds
+     */
+#define SF_CRL_DOWNLOAD_TIMEOUT 120
 
  /**
  * max retry number
@@ -118,7 +145,8 @@ typedef enum SF_DB_TYPE {
     SF_DB_TYPE_BINARY,
     SF_DB_TYPE_TIME,
     SF_DB_TYPE_BOOLEAN,
-    SF_DB_TYPE_ANY
+    SF_DB_TYPE_DECFLOAT,
+    SF_DB_TYPE_ANY,
 } SF_DB_TYPE;
 
 /**
@@ -171,7 +199,8 @@ typedef enum SF_STATUS {
     SF_STATUS_ERROR_BUFFER_TOO_SMALL = 240023,
     SF_STATUS_ERROR_UNSUPPORTED_QUERY_RESULT_FORMAT = 240024,
     SF_STATUS_ERROR_OTHER = 240025,
-    SF_STATUS_ERROR_FILE_TRANSFER = 240026
+    SF_STATUS_ERROR_FILE_TRANSFER = 240026,
+    SF_STATUS_ERROR_QUERY_CANCELLED = 240027
 } SF_STATUS;
 
 /**
@@ -238,6 +267,11 @@ typedef enum SF_STATUS {
  */
 typedef enum SF_ATTRIBUTE {
     SF_CON_ACCOUNT,
+    /**
+     * SF_CON_REGION is deprecated.
+     * Instead you could specify full server URL using SF_CON_HOST,
+     * or specify region through SF_CON_ACCOUNT with format <account>.<region>
+     */
     SF_CON_REGION,
     SF_CON_USER,
     SF_CON_PASSWORD,
@@ -271,10 +305,12 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_INCLUDE_RETRY_REASON,
     SF_CON_RETRY_TIMEOUT,
     SF_CON_CLIENT_REQUEST_MFA_TOKEN,
+    SF_CON_CLIENT_STORE_TEMPORARY_CREDENTIAL,
     SF_CON_MAX_RETRY,
     SF_CON_MAX_VARCHAR_SIZE,
     SF_CON_MAX_BINARY_SIZE,
     SF_CON_MAX_VARIANT_SIZE,
+    SF_CON_DISABLE_SAML_URL_CHECK,
     SF_CON_OCSP_FAIL_OPEN,
     SF_CON_PUT_TEMPDIR,
     SF_CON_PUT_COMPRESSLV,
@@ -292,7 +328,28 @@ typedef enum SF_ATTRIBUTE {
     SF_RETRY_ON_CURLE_COULDNT_CONNECT_COUNT,
     SF_QUERY_RESULT_TYPE,
     SF_CON_OAUTH_TOKEN,
-    SF_CON_PAT
+    SF_CON_OAUTH_REFRESH_TOKEN,
+    SF_CON_DISABLE_CONSOLE_LOGIN,
+    SF_CON_BROWSER_RESPONSE_TIMEOUT,
+    SF_CON_PAT,
+    SF_CON_OAUTH_TOKEN_ENDPOINT,
+    SF_CON_OAUTH_AUTHORIZATION_ENDPOINT,
+    SF_CON_OAUTH_REDIRECT_URI,
+    SF_CON_OAUTH_CLIENT_ID,
+    SF_CON_OAUTH_CLIENT_SECRET,
+    SF_CON_OAUTH_SCOPE,
+    SF_CON_SINGLE_USE_REFRESH_TOKEN,
+    SF_CON_CRL_CHECK,
+    SF_CON_CRL_ADVISORY,
+    SF_CON_CRL_ALLOW_NO_CRL,
+    SF_CON_CRL_DISK_CACHING,
+    SF_CON_CRL_MEMORY_CACHING,
+    SF_CON_CRL_DOWNLOAD_TIMEOUT,
+    SF_CON_WIF_PROVIDER,
+    SF_CON_WIF_TOKEN,
+    SF_CON_WIF_AZURE_RESOURCE,
+    SF_CON_WORKLOAD_IDENTITY_IMPERSONATION_PATH,
+    SF_CON_APPLICATION_PATH
 } SF_ATTRIBUTE;
 
 /**
@@ -303,7 +360,10 @@ typedef enum SF_GLOBAL_ATTRIBUTE {
     SF_GLOBAL_CA_BUNDLE_FILE,
     SF_GLOBAL_SSL_VERSION,
     SF_GLOBAL_DEBUG,
-    SF_GLOBAL_OCSP_CHECK
+    SF_GLOBAL_OCSP_CHECK,
+    SF_GLOBAL_CLIENT_CONFIG_FILE,
+    SF_GLOBAL_LOG_LEVEL,
+    SF_GLOBAL_LOG_PATH
 } SF_GLOBAL_ATTRIBUTE;
 
 /**
@@ -316,6 +376,26 @@ typedef enum SF_STMT_ATTRIBUTE {
 } SF_STMT_ATTRIBUTE;
 #define SF_MULTI_STMT_COUNT_UNSET (-1)
 #define SF_MULTI_STMT_COUNT_UNLIMITED 0
+
+/**
+ * The query status
+ */
+typedef enum SF_QUERY_STATUS {
+    SF_QUERY_STATUS_ABORTED,
+    SF_QUERY_STATUS_ABORTING,
+    SF_QUERY_STATUS_BLOCKED,
+    SF_QUERY_STATUS_DISCONNECTED,
+    SF_QUERY_STATUS_FAILED_WITH_ERROR,
+    SF_QUERY_STATUS_FAILED_WITH_INCIDENT,
+    SF_QUERY_STATUS_NO_DATA,
+    SF_QUERY_STATUS_RUNNING,
+    SF_QUERY_STATUS_QUEUED,
+    SF_QUERY_STATUS_QUEUED_REPAIRING_WAREHOUSE,
+    SF_QUERY_STATUS_RESTARTED,
+    SF_QUERY_STATUS_RESUMING_WAREHOUSE,
+    SF_QUERY_STATUS_SUCCESS,
+    SF_QUERY_STATUS_UNKNOWN
+} SF_QUERY_STATUS;
 
 /**
  * Snowflake Error
@@ -355,7 +435,14 @@ typedef struct SF_CONNECT {
     char *service_name;
     char *query_result_format;
 
-    /* used when updating parameters */
+    sf_bool crl_check;
+    sf_bool crl_advisory;
+    sf_bool crl_allow_no_crl;
+    sf_bool crl_disk_caching;
+    sf_bool crl_memory_caching;
+    long crl_download_timeout;
+
+  /* used when updating parameters */
     SF_MUTEX_HANDLE mutex_parameters;
 
     char *authenticator;
@@ -375,6 +462,9 @@ typedef struct SF_CONNECT {
 
     // Partner application name
     char * application;
+
+    // Override for APPLICATION_PATH in CLIENT_ENVIRONMENT
+    char * application_path;
 
     // Proxy
     char * proxy;
@@ -398,8 +488,23 @@ typedef struct SF_CONNECT {
     char *token;
     char *master_token;
 
+    // For token cache auth.
+    char* sso_token;
+    char* mfa_token;
+
+    // Oauth authentication
+    char* oauth_authorization_endpoint;
+    char* oauth_token_endpoint;
+    char* oauth_redirect_uri;
+    char* oauth_client_id;
+    char* oauth_client_secret;
+    char* oauth_scope;
+    char* oauth_refresh_token;
+    sf_bool single_use_refresh_token;
+
     int64 login_timeout;
     int64 network_timeout;
+    int64 browser_response_timeout;
     // retry timeout for new retry strategy
     int64 retry_timeout;
 
@@ -429,11 +534,20 @@ typedef struct SF_CONNECT {
     uint64 max_binary_size;
     uint64 max_variant_size;
 
+    sf_bool disable_saml_url_check;
     //token for OAuth authentication
     char *oauth_token;
 
     //programmatic access token
     char *programmatic_access_token;
+
+    // WIF (Workload Identity Federation) configuration
+    char *wif_provider;
+    char *wif_token;
+    char *wif_azure_resource;
+
+    // WIF impersonation path
+    char *workload_identity_impersonation_path;
 
     // put get configurations
     sf_bool use_s3_regional_url;
@@ -455,6 +569,8 @@ typedef struct SF_CONNECT {
     // by the setting from connection attribute
     sf_bool binding_threshold_overridden;
     sf_bool stage_binding_disabled;
+    sf_bool disable_console_login;
+    sf_bool client_store_temporary_credential;
 } SF_CONNECT;
 
 /**
@@ -543,6 +659,8 @@ typedef struct SF_STMT {
     int64 paramset_size;
     sf_bool array_bind_supported;
     int64 affected_rows;
+    sf_bool is_async; // whether the query is async
+    sf_bool is_async_results_fetched;
 
     /**
      * User realloc function used in snowflake_fetch
@@ -699,6 +817,25 @@ SF_STATUS STDCALL snowflake_get_attribute(
 SF_STMT *STDCALL snowflake_stmt(SF_CONNECT *sf);
 
 /**
+ * Creates sf SNOWFLAKE_STMT context for async queries.
+ *
+ * @param sf The SF_CONNECT context.
+ * @param query_id the query id of the async query.
+ *
+ * @return sfstmt SNOWFLAKE_STMT context for async queries.
+ */
+SF_STMT* STDCALL snowflake_init_async_query_result(SF_CONNECT *sf, const char *query_id);
+
+/**
+ * Get the status of a query
+ * 
+ * @param sfstmt The SF_STMT context.
+ * 
+ * @return The query status.
+ */
+SF_QUERY_STATUS STDCALL snowflake_get_query_status(SF_STMT *sfstmt);
+
+/**
  * Frees the memory used by a SF_QUERY_RESULT_CAPTURE struct.
  * Note that this only frees the struct itself, and *not* the underlying
  * capture buffer! The caller is responsible for managing that.
@@ -776,6 +913,14 @@ SF_STATUS STDCALL snowflake_propagate_error(SF_CONNECT *sf, SF_STMT *sfstmt);
  */
 SF_STATUS STDCALL
 snowflake_query(SF_STMT *sfstmt, const char *command, size_t command_size);
+
+/**
+ * Cancels a query given the statement.
+ *
+ * @param sf SNOWFLAKE_STMT context.
+ * @return 0 if success, otherwise an errno is returned.
+ */
+SF_STATUS STDCALL snowflake_cancel_query(SF_STMT* sfstmt);
 
 /**
  * Returns the number of affected rows in the last execution.  This function
@@ -859,6 +1004,14 @@ snowflake_stmt_get_attr(SF_STMT *sfstmt, SF_STMT_ATTRIBUTE type, void **value);
  * @return 0 if success, otherwise an errno is returned.
  */
 SF_STATUS STDCALL snowflake_execute(SF_STMT *sfstmt);
+
+/**
+ * Executes a statement asynchronously.
+ * @param sfstmt SNOWFLAKE_STMT context.
+ *
+ * @return 0 if success, otherwise an errno is returned.
+ */
+SF_STATUS STDCALL snowflake_async_execute(SF_STMT *sfstmt);
 
 /**
  * Executes a statement with capture.
