@@ -339,7 +339,7 @@ Specify the data source name (:code:`dsn`) parameter as shown below:
 
 .. code-block:: php
 
-    $dbh = new PDO("account=<account name>;authenticator=SNOWFLAKE_JWT;priv_key_file=<path>/rsa_key.p8;priv_key_file_pwd=<private_key_passphrase>", 
+    $dbh = new PDO("snowflake:account=<account name>;authenticator=SNOWFLAKE_JWT;priv_key_file=<path>/rsa_key.p8;priv_key_file_pwd=<private_key_passphrase>", 
                     "<username>", "");
 
 where:
