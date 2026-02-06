@@ -671,17 +671,21 @@ static int pdo_snowflake_stmt_next_rowset(pdo_stmt_t *stmt) /* {{{ */
     pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     PDO_LOG_ENTER("pdo_snowflake_stmt_next_rowset");
     SF_STATUS ret = snowflake_next_result(S->stmt);
-    if (ret == SF_STATUS_SUCCESS) {
+    if (ret != SF_STATUS_SUCCESS) {
+        PDO_LOG_DBG("Failed to retrieve data in next rowset");
+        PDO_LOG_RETURN(0);
+    }
+    
     int i;
     stmt->column_count = (int) snowflake_num_fields(S->stmt);
     PDO_LOG_DBG("number of columns: %d", stmt->column_count);
     // won't hit for now but leave it to prevent crash with unexpected query result.
     if (stmt->column_count < 0)
     {
-        PDO_LOG_ERR("Unsupported query type %s.", S->stmt->sql_text);
+        PDO_LOG_ERR("Unexpected query result. column count: %d.", stmt->column_count);
         set_snowflake_error(&S->stmt->error,
                             SF_STATUS_ERROR_GENERAL,
-                            "Unsupported query type.",
+                            "Unexpected query result.",
                             SF_SQLSTATE_GENERAL_ERROR,
                             snowflake_sfqid(S->stmt),
                             __FILE__, __LINE__);
@@ -689,7 +693,6 @@ static int pdo_snowflake_stmt_next_rowset(pdo_stmt_t *stmt) /* {{{ */
         PDO_LOG_RETURN(0);
     }
 
-    //Create an array of string structs
     S->bound_results = ecalloc((size_t) stmt->column_count, sizeof(pdo_snowflake_string));
 
     for(i = 0; i < stmt->column_count; i++) {
@@ -700,11 +703,6 @@ static int pdo_snowflake_stmt_next_rowset(pdo_stmt_t *stmt) /* {{{ */
     _pdo_snowflake_stmt_set_row_count(stmt);
     pdo_snowflake_stmt_describe(stmt, stmt->column_count);
     PDO_LOG_RETURN(1);
-    } else {
-        PDO_LOG_DBG("Failed to retrieve data in next rowset");
-        PDO_LOG_RETURN(0);
-    }
-
 }
 /* }}} */
 
