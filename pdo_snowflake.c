@@ -89,7 +89,7 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
       (zend_long) PDO_SNOWFLAKE_ATTR_QUERY_ID);
 
     REGISTER_PDO_CLASS_CONST_LONG(
-      "PDO_SNOWFLAKE_STMT_MULTI_STMT_COUNT",
+      "SNOWFLAKE_STMT_MULTI_STMT_COUNT",
       (zend_long) PDO_SNOWFLAKE_ATTR_STMT_MULTI_STMT_COUNT);
 
     return php_pdo_register_driver(&pdo_snowflake_driver);

@@ -206,8 +206,12 @@ snowflake_handle_preparer(pdo_dbh_t *dbh, const char *sql, size_t sql_len,
     }
 
     if (H->multi_stmt_count != SF_MULTI_STMT_COUNT_UNSET) {
-        SF_STATUS ret = snowflake_stmt_set_attr(S->stmt, SF_STMT_MULTI_STMT_COUNT, &(H->multi_stmt_count));
+        PDO_LOG_DBG("setting the multi statement count: %d", H->multi_stmt_count);
+
+        int64 multi_stmt_count = H->multi_stmt_count;
+        SF_STATUS ret = snowflake_stmt_set_attr(S->stmt, SF_STMT_MULTI_STMT_COUNT, &multi_stmt_count);
         if (ret != SF_STATUS_SUCCESS) {
+            PDO_LOG_ERR("Failed to set multi statement count: %d", H->multi_stmt_count);
             pdo_snowflake_error_stmt(stmt);
             PDO_LOG_RETURN(0);
         }
@@ -397,16 +401,16 @@ pdo_snowflake_set_attribute(pdo_dbh_t *dbh, zend_long attr, zval *val) /* {{{ */
                     bval ? SF_BOOLEAN_INTERNAL_TRUE_STR
                          : SF_BOOLEAN_INTERNAL_FALSE_STR);
             }
+
             PDO_LOG_RETURN(1);
             break;
         case PDO_SNOWFLAKE_ATTR_STMT_MULTI_STMT_COUNT:
             /* ignore if the new value equals the old one */
             if (H->multi_stmt_count != lval) {
-                H->multi_stmt_count = bval;
+                H->multi_stmt_count = lval;
                 PDO_LOG_DBG(
-                    "PDO_SNOWFLAKE_ATTR_STMT_MULTI_STMT_COUNT value=%s",
-                    bval ? SF_BOOLEAN_INTERNAL_TRUE_STR
-                         : SF_BOOLEAN_INTERNAL_FALSE_STR);
+                    "PDO_SNOWFLAKE_ATTR_STMT_MULTI_STMT_COUNT value=%d",
+                    lval);
             }
             PDO_LOG_RETURN(1);
             break;

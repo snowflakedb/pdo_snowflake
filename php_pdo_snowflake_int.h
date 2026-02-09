@@ -46,7 +46,7 @@ typedef struct {
 typedef struct {
     SF_CONNECT *server;
     char last_qid[SF_UUID4_LEN];
-    int8 multi_stmt_count;
+    int64 multi_stmt_count;
 } pdo_snowflake_db_handle;
 
 typedef struct {
