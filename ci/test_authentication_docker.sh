@@ -8,7 +8,7 @@ set -o pipefail
 
 export THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export REPO_ROOT="$(cd "${THIS_DIR}/.." && pwd)"
-export INTERNAL_REPO=${INTERNAL_REPO:-nexus.int.snowflakecomputing.com:8086}
+export INTERNAL_REPO=${INTERNAL_REPO:-artifactory.ci1.us-west-2.aws-dev.app.snowflake.com/internal-production-docker-snowflake-virtual}
 
 echo "========================================"
 echo "PHP Authentication Tests - Docker Runner"
@@ -18,14 +18,6 @@ echo ""
 # Setup GPG if script exists
 echo "Setting up gpg..."
 source "$THIS_DIR/scripts/setup_gpg.sh"
-
-# Check if running in Jenkins
-if [[ -n "$JENKINS_HOME" ]]; then
-  echo "Running in Jenkins environment"
-  
-  # Login to internal Docker registry
-  source "$THIS_DIR/scripts/login_internal_docker.sh"
-fi
 
 # Decrypt parameters file
 PARAM_FILE="${REPO_ROOT}/.github/workflows/parameters/private/parameters_aws_auth_tests.json"
