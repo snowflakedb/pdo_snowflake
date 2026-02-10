@@ -568,7 +568,7 @@ Or you can enable multiple statements with the ALTER SESSION statement.
 
 .. code-block:: php
 
- alter session set MULTI_STATEMENT_COUNT = <number of the queries to execute> // If you set 0, it means there is no limit for the number of statements in a batch for a given request.;
+ alter session set MULTI_STATEMENT_COUNT = 0 // If you set 0, it enables the multi-statement. If you set 1, it disables the multi-statement.;
 
 If you want to use the setting for the current session or account (rather than specify the number for the request), set PDO::SNOWFLAKE_STMT_MULTI_STMT_COUNT to -1.
 
@@ -577,7 +577,7 @@ If you want to use the setting for the current session or account (rather than s
   <$php
     $dbh = new PDO($dsn, $user, $password);
     $dbh->setAttribute(PDO::SNOWFLAKE_STMT_MULTI_STMT_COUNT, -1); // The default value is -1. Just in case when you have changed it before and want to switch back to the default setting, you can set it to -1.
-    $count = $dbh->exec("alter session set MULTI_STATEMENT_COUNT=4");
+    $count = $dbh->exec("alter session set MULTI_STATEMENT_COUNT=0");
     $sth = $dbh->query("select 1; select 2; select 3; select 4");
     do {
         while ($row=$sth->fetch()) {
