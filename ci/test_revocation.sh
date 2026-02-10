@@ -45,12 +45,11 @@ ENV PATH="/usr/local/go/bin:${PATH}"
 COPY . /build/pdo_snowflake
 WORKDIR /build/pdo_snowflake
 
-# Build and install pdo_snowflake into PHP's system extension directory
+# Build using the project's build script (handles C++ linking correctly)
+# then copy the .so to PHP's extension directory
 RUN export PHP_HOME=/usr && \
-    phpize && \
-    ./configure --enable-pdo_snowflake && \
-    make -j$(nproc) && \
-    make install && \
+    scripts/build_pdo_snowflake.sh && \
+    cp modules/pdo_snowflake.so $(php -r 'echo ini_get("extension_dir");')/ && \
     echo "extension=pdo_snowflake" > /etc/php.d/30-pdo_snowflake.ini
 
 # Verify the extension loads
