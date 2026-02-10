@@ -565,6 +565,7 @@ The following example performs a multiple statement query. The connection is the
   $>
 
 Or you can enable multiple statements with the ALTER SESSION statement.
+
 .. code-block:: php
 
  alter session set MULTI_STATEMENT_COUNT = <number of the queries to execute> // If you set 0, it means there is no limit for the number of statements in a batch for a given request.;
