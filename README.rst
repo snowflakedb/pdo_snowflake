@@ -540,10 +540,14 @@ In this example, we'll use those too.
 
 Performing a multiple statement query
 ----------------------------------------------------------------------
-The following example performs a multiple statement query. The connection is the same as the previous example.
 By default, the Snowflake database expects the driver to prepare and send a single statement for execution.
 You can override this by specifying the number of statements in a batch for a given request or by enabling multiple statements for the current session or account:
-- :code: $dbh->setAttribute(PDO::SNOWFLAKE_STMT_MULTI_STMT_COUNT, <number of the queries to execute>);
+
+.. code-block:: php
+
+ $dbh->setAttribute(PDO::SNOWFLAKE_STMT_MULTI_STMT_COUNT, <number of the queries to execute>);
+
+The following example performs a multiple statement query. The connection is the same as the previous example.
 
 .. code-block:: php
 
@@ -561,8 +565,12 @@ You can override this by specifying the number of statements in a batch for a gi
   $>
 
 Or you can enable multiple statements with the ALTER SESSION statement.
-- :code: alter session set MULTI_STATEMENT_COUNT = <number of the queries to execute> // If you set 0, it means there is no limit for the number of statements in a batch for a given request.;
+.. code-block:: php
+
+ alter session set MULTI_STATEMENT_COUNT = <number of the queries to execute> // If you set 0, it means there is no limit for the number of statements in a batch for a given request.;
+
 If you want to use the setting for the current session or account (rather than specify the number for the request), set PDO::SNOWFLAKE_STMT_MULTI_STMT_COUNT to -1.
+
 .. code-block:: php
 
   <$php
@@ -578,7 +586,6 @@ If you want to use the setting for the current session or account (rather than s
     $dbh = null;
     echo "OK\n";
   $>
-
 
 Setting timeouts
 ----------------------------------------------------------------------
