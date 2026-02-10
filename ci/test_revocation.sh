@@ -2,7 +2,7 @@
 #
 # Test certificate revocation validation using the revocation-validation framework.
 #
-# Runs entirely inside a Docker container based on rockylinux9 with PHP + Go installed.
+# Runs inside a Docker container with PHP + Go installed.
 #
 
 set -o pipefail
@@ -13,7 +13,7 @@ WORKSPACE=${WORKSPACE:-${PDO_ROOT}}
 
 echo "[Info] Starting revocation validation tests"
 
-# Build a Docker image with PHP + Go for running both the build and revocation tests
+# Build a Docker image with PHP + Go + the built extension
 DOCKER_TAG="pdo-revocation-test:latest"
 echo "[Info] Building test Docker image..."
 
@@ -41,13 +41,27 @@ RUN dnf module reset php -y && \
 RUN curl -fsSL https://go.dev/dl/go1.24.0.linux-amd64.tar.gz | tar -C /usr/local -xz
 ENV PATH="/usr/local/go/bin:${PATH}"
 
+# Copy the pdo_snowflake source and build the extension
+COPY . /build/pdo_snowflake
+WORKDIR /build/pdo_snowflake
+
+# Build and install pdo_snowflake into PHP's system extension directory
+RUN export PHP_HOME=/usr && \
+    phpize && \
+    ./configure --enable-pdo_snowflake && \
+    make -j$(nproc) && \
+    make install && \
+    echo "extension=pdo_snowflake" > /etc/php.d/30-pdo_snowflake.ini
+
+# Verify the extension loads
+RUN php -m | grep -i pdo_snowflake && echo "[OK] pdo_snowflake extension loaded"
+
 WORKDIR /work
 DOCKERFILE
 
 echo "[Info] Running revocation tests inside Docker..."
 
 docker run --rm \
-    -v "${PDO_ROOT}:/mnt/host" \
     -v "${WORKSPACE}:/mnt/workspace" \
     -e GITHUB_USER \
     -e GITHUB_TOKEN \
@@ -55,12 +69,8 @@ docker run --rm \
     bash -c '
 set -e
 
-echo "[Info] Building pdo_snowflake extension..."
-cd /mnt/host
-export PHP_HOME=/usr
-scripts/build_pdo_snowflake.sh
-
-echo "[Info] Extension built: $(ls -la modules/pdo_snowflake.so)"
+echo "[Info] PHP version: $(php -v | head -1)"
+echo "[Info] pdo_snowflake loaded: $(php -m | grep pdo_snowflake)"
 
 # Clone revocation-validation framework
 REVOCATION_DIR="/tmp/revocation-validation"
@@ -73,11 +83,15 @@ fi
 
 cd "$REVOCATION_DIR"
 
-echo "[Info] Running tests with Go $(go version)..."
+# Get the system extension directory so the framework uses the installed extension
+PHP_EXT_DIR=$(php -r "echo ini_get(\"extension_dir\");")
+echo "[Info] PHP extension dir: $PHP_EXT_DIR"
+
+echo "[Info] Running tests with $(go version)..."
 
 go run . \
     --client snowflake-php \
-    --php-extension-dir "/mnt/host/modules" \
+    --php-extension-dir "$PHP_EXT_DIR" \
     --output "/mnt/workspace/revocation-results.json" \
     --output-html "/mnt/workspace/revocation-report.html" \
     --log-level debug
