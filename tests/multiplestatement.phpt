@@ -64,6 +64,19 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 
     //Unset multi statement count and test the default behavior.
     $dbh->setAttribute(PDO::SNOWFLAKE_STMT_MULTI_STMT_COUNT, -1);
+    try{
+        $sth = $dbh->query("select 1; select 2; select 3; select 4");
+    }
+    catch(PDOException $e) {
+        echo sprintf("Expected error: %s\n", $e->getMessage());
+    }
+
+    $sth = $dbh->query("select 1");
+    while($row = $sth->fetch()) {
+        echo "Result " . $row["1"] . "\n";
+        echo "Count " . count($row) . "\n";
+    }
+
    //Control the multi statement count through session variable and test the behavior.     
     $count = $dbh->exec("alter session set MULTI_STATEMENT_COUNT=0");
     if ($count == 0) {
@@ -99,6 +112,9 @@ OK. row["3"] is not set.
 Count 1
 Result 4
 Result 4
+Count 2
+Expected error: SQLSTATE[0A000]: Feature not supported: 8 Actual statement count 4 did not match the desired statement count 1.
+Result 1
 Count 2
 Result Table TEST_MULTI_LARGE successfully created.
 Inserted rows: 100000
