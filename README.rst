@@ -568,7 +568,7 @@ Or you can enable multiple statements with the ALTER SESSION statement.
 
 .. code-block:: php
 
- alter session set MULTI_STATEMENT_COUNT = 0 // If you set 0, it enables the multi-statement. If you set 1, it disables the multi-statement.;
+ alter session set MULTI_STATEMENT_COUNT = 0; // If you set 0, it enables the multi-statement. If you set 1, it disables the multi-statement.
 
 If you want to use the setting for the current session or account (rather than specify the number for the request), set PDO::SNOWFLAKE_STMT_MULTI_STMT_COUNT to -1.
 
