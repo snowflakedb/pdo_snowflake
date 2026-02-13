@@ -94,16 +94,14 @@ go run . \
     --output "/mnt/workspace/revocation-results.json" \
     --output-html "/mnt/workspace/revocation-report.html" \
     --log-level debug
+
+# Fix ownership while still root inside container so Jenkins can archive the artifacts
+chmod a+r /mnt/workspace/revocation-results.json /mnt/workspace/revocation-report.html 2>/dev/null || true
 '
 
 EXIT_CODE=$?
 
-# Fix ownership: Docker creates files as root; Jenkins needs to read them for archiving
-for f in "${WORKSPACE}/revocation-results.json" "${WORKSPACE}/revocation-report.html"; do
-    if [ -f "$f" ]; then
-        chmod a+r "$f" 2>/dev/null || true
-        echo "[Info] $(basename "$f"): ${f}"
-    fi
-done
+echo "[Info] Artifacts:"
+ls -la "${WORKSPACE}/revocation-results.json" "${WORKSPACE}/revocation-report.html" 2>/dev/null || true
 
 exit $EXIT_CODE
