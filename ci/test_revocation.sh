@@ -98,11 +98,12 @@ go run . \
 
 EXIT_CODE=$?
 
-if [ -f "${WORKSPACE}/revocation-results.json" ]; then
-    echo "[Info] Results: ${WORKSPACE}/revocation-results.json"
-fi
-if [ -f "${WORKSPACE}/revocation-report.html" ]; then
-    echo "[Info] Report: ${WORKSPACE}/revocation-report.html"
-fi
+# Fix ownership: Docker creates files as root; Jenkins needs to read them for archiving
+for f in "${WORKSPACE}/revocation-results.json" "${WORKSPACE}/revocation-report.html"; do
+    if [ -f "$f" ]; then
+        chmod a+r "$f" 2>/dev/null || true
+        echo "[Info] $(basename "$f"): ${f}"
+    fi
+done
 
 exit $EXIT_CODE
