@@ -1,6 +1,9 @@
 #### For the official PDO Snowflake Release Notes please refer to https://docs.snowflake.com/en/release-notes/clients-drivers/php-pdo
 
 # Changelog
+- v3.6.0
+  - Added support for workload identity federation authentication.
+  
 - v3.5.0
   - Added support for `client_request_mfa_token` connection option to enable MFA token caching for username/password MFA authentication.
   - Deprecate CentOS 7 builds. Rocky 8/RHEL8 is now the minimum system version. (snowflakedb/pdo_snowflake#482)
