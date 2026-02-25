@@ -15,6 +15,11 @@ run_wif_tests() {
   local host="$2"
   local snowflake_host="$3"
   local rsa_key_path="$4"
+  local snowflake_user="$5"
+  local impersonation_path="$6"
+  local snowflake_user_for_impersonation="$7"
+  local provider_lower=$(echo "$cloud_provider" | tr '[:upper:]' '[:lower:]')
+  local test_file="wif_auth_${provider_lower}.phpt"
 
   ssh -i "$rsa_key_path" $SSH_OPTS -p 443 "$host" env WIF_TEST_DIR="$WIF_TEST_DIR" bash << EOF
     set -e
@@ -27,11 +32,22 @@ EOF
 
   scp -P 443 -i "$rsa_key_path" $SSH_OPTS "./modules/pdo_snowflake.so" "$host:$WIF_TEST_DIR/pdo_snowflake.so"
   scp -P 443 -i "$rsa_key_path" $SSH_OPTS "./libsnowflakeclient/cacert.pem" "$host:$WIF_TEST_DIR/cacert.pem"
-  scp -P 443 -i "$rsa_key_path" $SSH_OPTS "./tests/wif_auth.phpt" "$host:$WIF_TEST_DIR/wif_auth.phpt"
+  scp -P 443 -i "$rsa_key_path" $SSH_OPTS "./tests/$test_file" "$host:$WIF_TEST_DIR/$test_file"
+  scp -P 443 -i "$rsa_key_path" $SSH_OPTS "./tests/wif_helper.php" "$host:$WIF_TEST_DIR/wif_helper.php"
   scp -P 443 -i "$rsa_key_path" $SSH_OPTS "./run-tests.php" "$host:$WIF_TEST_DIR/run-tests.php"
 
-
-ssh -i "$rsa_key_path" $SSH_OPTS -p 443 "$host" env BRANCH="$GIT_BRANCH" SNOWFLAKE_TEST_WIF_HOST="$snowflake_host" SNOWFLAKE_TEST_WIF_PROVIDER="$cloud_provider" SNOWFLAKE_TEST_WIF_ACCOUNT="$SNOWFLAKE_TEST_WIF_ACCOUNT" SNOWFLAKE_WIF_TEST_REQUIRED="true" WIF_TEST_DIR="$WIF_TEST_DIR" bash << EOF
+ssh -i "$rsa_key_path" $SSH_OPTS -p 443 "$host" \
+  BRANCH="$GIT_BRANCH" \
+  SNOWFLAKE_TEST_WIF_HOST="$snowflake_host" \
+  SNOWFLAKE_TEST_WIF_PROVIDER="$cloud_provider" \
+  SNOWFLAKE_TEST_WIF_ACCOUNT="$SNOWFLAKE_TEST_WIF_ACCOUNT" \
+  SNOWFLAKE_TEST_WIF_USERNAME="$snowflake_user" \
+  SNOWFLAKE_TEST_WIF_IMPERSONATION_PATH="$impersonation_path" \
+  SNOWFLAKE_TEST_WIF_USERNAME_IMPERSONATION="$snowflake_user_for_impersonation" \
+  SNOWFLAKE_WIF_TEST_REQUIRED="true" \
+  WIF_TEST_DIR="$WIF_TEST_DIR" \
+  TEST_FILE="$test_file" \
+  bash << EOF
     set -e
     set -o pipefail
     docker run \
@@ -42,27 +58,28 @@ ssh -i "$rsa_key_path" $SSH_OPTS -p 443 "$host" env BRANCH="$GIT_BRANCH" SNOWFLA
       -e SNOWFLAKE_TEST_WIF_PROVIDER \
       -e SNOWFLAKE_TEST_WIF_HOST \
       -e SNOWFLAKE_TEST_WIF_ACCOUNT \
+      -e SNOWFLAKE_TEST_WIF_USERNAME \
+      -e SNOWFLAKE_TEST_WIF_IMPERSONATION_PATH \
+      -e SNOWFLAKE_TEST_WIF_USERNAME_IMPERSONATION \
       -e SNOWFLAKE_WIF_TEST_REQUIRED \
+      -e TEST_FILE \
       -v "./$WIF_TEST_DIR":/pdo_tests/tests_dir \
       php:8.2-cli \
         bash -c "
-          echo \"Running tests on branch: \$BRANCH\"
+          echo \"Running \$TEST_FILE on branch: \$BRANCH\"
+          # The statically linked libcurl in libsnowflakeclient expects CA certs at the RHEL path
+          mkdir -p /etc/pki/tls/certs && ln -sf /pdo_tests/tests_dir/cacert.pem /etc/pki/tls/certs/ca-bundle.crt
           cd /pdo_tests/tests_dir
-          if ! php run-tests.php -d extension=/pdo_tests/tests_dir/pdo_snowflake.so wif_auth.phpt; then
+          if ! php run-tests.php -d extension=/pdo_tests/tests_dir/pdo_snowflake.so \$TEST_FILE; then
               echo \"===================Tests failed===================\"
               echo \"Displaying test failure details:\"
-              if [ -f wif_auth.out ]; then
-                echo \"===================wif_auth.out===================\"
-                cat wif_auth.out
-              fi
-              if [ -f wif_auth.log ]; then
-                echo \"===================wif_auth.log===================\"
-                cat wif_auth.log
-              fi
-              if [ -f wif_auth.diff ]; then
-                echo \"===================wif_auth.diff===================\"
-                cat wif_auth.diff
-              fi
+              BASE=\\\$(basename \$TEST_FILE .phpt)
+              for ext in out log diff; do
+                if [ -f \\\$BASE.\\\$ext ]; then
+                  echo \"===================\\\$BASE.\\\$ext===================\"
+                  cat \\\$BASE.\\\$ext
+                fi
+              done
               exit 1
           fi
         "
@@ -74,8 +91,11 @@ run_tests_and_set_result() {
   local host="$2"
   local snowflake_host="$3"
   local rsa_key_path="$4"
+  local snowflake_user="$5"
+  local impersonation_path="$6"
+  local snowflake_user_for_impersonation="$7"
 
-  run_wif_tests "$provider" "$host" "$snowflake_host" "$rsa_key_path"
+  run_wif_tests "$provider" "$host" "$snowflake_host" "$rsa_key_path" "$snowflake_user" "$impersonation_path" "$snowflake_user_for_impersonation"
   local status=$?
 
   if [[ $status -ne 0 ]]; then
@@ -100,12 +120,11 @@ chmod 600 "$RSA_KEY_PATH_GCP"
 
 # Run tests for all cloud providers
 EXIT_STATUS=0
-#set +e  # Don't exit on first failure
-run_tests_and_set_result "AZURE" "$HOST_AZURE" "$SNOWFLAKE_TEST_WIF_HOST_AZURE" "$RSA_KEY_PATH_AWS_AZURE"
-run_tests_and_set_result "AWS" "$HOST_AWS" "$SNOWFLAKE_TEST_WIF_HOST_AWS" "$RSA_KEY_PATH_AWS_AZURE"
-run_tests_and_set_result "GCP" "$HOST_GCP" "$SNOWFLAKE_TEST_WIF_HOST_GCP" "$RSA_KEY_PATH_GCP"
+set +e  # Don't exit on first failure - run all providers
+run_tests_and_set_result "AZURE" "$HOST_AZURE" "$SNOWFLAKE_TEST_WIF_HOST_AZURE" "$RSA_KEY_PATH_AWS_AZURE" "$SNOWFLAKE_TEST_WIF_USERNAME_AZURE" "" ""
+run_tests_and_set_result "AWS" "$HOST_AWS" "$SNOWFLAKE_TEST_WIF_HOST_AWS" "$RSA_KEY_PATH_AWS_AZURE" "$SNOWFLAKE_TEST_WIF_USERNAME_AWS" "$SNOWFLAKE_TEST_WIF_IMPERSONATION_PATH_AWS" "$SNOWFLAKE_TEST_WIF_USERNAME_AWS_IMPERSONATION"
+run_tests_and_set_result "GCP" "$HOST_GCP" "$SNOWFLAKE_TEST_WIF_HOST_GCP" "$RSA_KEY_PATH_GCP" "$SNOWFLAKE_TEST_WIF_USERNAME_GCP" "$SNOWFLAKE_TEST_WIF_IMPERSONATION_PATH_GCP" "$SNOWFLAKE_TEST_WIF_USERNAME_GCP_IMPERSONATION"
 
-set -e  # Re-enable exit on error
+set -e
 echo "Exit status: $EXIT_STATUS"
 exit $EXIT_STATUS
-

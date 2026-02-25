@@ -605,6 +605,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"workload_identity_provider", NULL,  0},
         {"token",               NULL,         0},
         {"workload_identity_azure_resource", NULL, 0},
+        {"workload_identity_impersonation_path", NULL, 0},
 #ifdef __LINUX__
         {"client_store_temporary_credential", "false", 0},
         {"client_request_mfa_token", "false", 0}
@@ -926,6 +927,14 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     PDO_LOG_DBG(
         "workload_identity_azure_resource: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AZURE_RESOURCE_IDX].optval != NULL ? vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AZURE_RESOURCE_IDX].optval : "(NULL)");
 
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_IMPERSONATION_PATH_IDX].optval != NULL) {
+        snowflake_set_attribute(
+            H->server, SF_CON_WORKLOAD_IDENTITY_IMPERSONATION_PATH,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_IMPERSONATION_PATH_IDX].optval);
+    }
+    PDO_LOG_DBG(
+        "workload_identity_impersonation_path: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_IMPERSONATION_PATH_IDX].optval != NULL ? vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_IMPERSONATION_PATH_IDX].optval : "(NULL)");
+
     snowflake_set_attribute(H->server, SF_CON_OAUTH_AUTHORIZATION_ENDPOINT,
         vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_AUTHORIZATION_ENDPOINT].optval);
     PDO_LOG_DBG("oauth_authorization_endpoint: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_OAUTH_AUTHORIZATION_ENDPOINT].optval);
@@ -978,10 +987,10 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
 
     int8 ocsp_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval, "true") != 0);
     int8 crl_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_CHECK_IDX].optval, "true") == 0);
-    
+
     if (ocsp_enabled && crl_enabled) {
         PDO_LOG_ERR("Both OCSP and CRL checks are enabled. Only one revocation check method can be enabled at a time.");
-        
+
         strcpy(dbh->error_code, "HY000");
         zend_throw_exception_ex(
             php_pdo_get_exception(),
