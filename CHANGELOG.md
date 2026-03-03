@@ -3,6 +3,7 @@
 # Changelog
 - v3.6.0
   - Added support for workload identity federation authentication.
+  - Added support for WIF impersonation via `workload_identity_impersonation_path` connection parameter.
   
 - v3.5.0
   - Added support for `client_request_mfa_token` connection option to enable MFA token caching for username/password MFA authentication. (snowflakedb/pdo_snowflake#479)

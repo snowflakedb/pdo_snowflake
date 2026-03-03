@@ -2,7 +2,8 @@
     "name": "snowflakedb/pdo_snowflake",
     "description": "PHP PDO driver for Snowflake",
     "require": {
-        "php": ">=8.1"
+        "php": ">=8.1",
+        "ext-pdo": "*"
     },
     "authors": [
         {
