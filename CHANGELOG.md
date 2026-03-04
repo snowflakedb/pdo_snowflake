@@ -1,6 +1,10 @@
 #### For the official PDO Snowflake Release Notes please refer to https://docs.snowflake.com/en/release-notes/clients-drivers/php-pdo
 
 # Changelog
+- v3.7.0
+  - Updated the `libsnowflakeclient` to v2.7.1 (snowflakedb/pdo_snowflake#489)
+  - Updated the `openssl` to v3.0.19 (snowflakedb/pdo_snowflake#489)
+
 - v3.6.0
   - Added support for workload identity federation authentication.
   - Added support for WIF impersonation via `workload_identity_impersonation_path` connection parameter.
