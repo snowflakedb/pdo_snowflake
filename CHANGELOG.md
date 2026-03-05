@@ -11,7 +11,8 @@
   - Added support for WIF impersonation via `workload_identity_impersonation_path` connection parameter (snowflakedb/pdo_snowflake#456)
   
 - v3.5.0
-  - Added support for `client_request_mfa_token` connection option to enable MFA token caching for username/password MFA authentication.
+  - Added support for `client_request_mfa_token` connection option to enable MFA token caching for username/password MFA authentication. (snowflakedb/pdo_snowflake#479)
+  - Added support for `multiple statement query`. (snowflakedb/pdo_snowflake#484)
   - Deprecate CentOS 7 builds. Rocky 8/RHEL8 is now the minimum system version. (snowflakedb/pdo_snowflake#482)
   - Updated `libsnowflakeclient` to v2.7.0 (snowflakedb/pdo_snowflake#482)
   - Updated `openssl` to v3.0.18 (snowflakedb/pdo_snowflake#482)
