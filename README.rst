@@ -456,6 +456,43 @@ To enable MFA token caching for :code:`username_password_mfa` authenticator, set
 
 By default, this is enabled on Windows and macOS, but disabled on Linux. MFA token caching requires the Snowflake account to have :code:`ALLOW_CLIENT_MFA_CACHING=TRUE` enabled.
 
+Using Workload Identity Federation (WIF) authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PHP PDO driver supports Workload Identity Federation authentication.
+
+To connect to Snowflake database using WIF authentication, create a new PDO object and specify the data source name parameters as follows:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=<account_name>;authenticator=workload_identity;workload_identity_provider=<provider>", "", "");
+
+where:
+
+- :code:`account` is your Snowflake account name
+- :code:`authenticator` is :code:`workload_identity`
+- :code:`workload_identity_provider` is the cloud provider: :code:`AWS`, :code:`AZURE`, or :code:`GCP`
+
+The username and password are not used for WIF authentication; pass empty strings for both.
+
+To use a pre-obtained OIDC token instead of fetching one from the cloud metadata service, set :code:`workload_identity_provider=OIDC` and supply the token via the :code:`token` parameter. For example:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=<account_name>;authenticator=workload_identity;workload_identity_provider=OIDC;token=<oidc_token>", "", "");
+
+To restrict the Azure Managed Identity token to a specific resource, set :code:`workload_identity_azure_resource` in the DSN connection string. For example:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=<account_name>;authenticator=workload_identity;workload_identity_provider=AZURE;workload_identity_azure_resource=<azure_resource_id>", "", "");
+
+To impersonate a service account, set :code:`workload_identity_impersonation_path` in the DSN connection string. For GCP this is the service-account email (e.g. :code:`my-sa@my-project.iam.gserviceaccount.com`); for AWS this is the role ARN or resource path. For example:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=<account_name>;authenticator=workload_identity;workload_identity_provider=GCP;workload_identity_impersonation_path=<service_account_email>", "", "");
+
 Configuring OCSP Checking
 ----------------------------------------------------------------------
 
