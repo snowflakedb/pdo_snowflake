@@ -668,8 +668,40 @@ static int pdo_snowflake_stmt_col_meta(
  */
 static int pdo_snowflake_stmt_next_rowset(pdo_stmt_t *stmt) /* {{{ */
 {
+    pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     PDO_LOG_ENTER("pdo_snowflake_stmt_next_rowset");
-    /* NOP. no multiple statement is supported at the momemnt. */
+    SF_STATUS ret = snowflake_next_result(S->stmt);
+    if (ret != SF_STATUS_SUCCESS) {
+        PDO_LOG_DBG("Failed to retrieve data in next rowset");
+        PDO_LOG_RETURN(0);
+    }
+    
+    int i;
+    stmt->column_count = (int) snowflake_num_fields(S->stmt);
+    PDO_LOG_DBG("number of columns: %d", stmt->column_count);
+    // won't hit for now but leave it to prevent crash with unexpected query result.
+    if (stmt->column_count < 0)
+    {
+        PDO_LOG_ERR("Unexpected query result. column count: %d.", stmt->column_count);
+        set_snowflake_error(&S->stmt->error,
+                            SF_STATUS_ERROR_GENERAL,
+                            "Unexpected query result.",
+                            SF_SQLSTATE_GENERAL_ERROR,
+                            snowflake_sfqid(S->stmt),
+                            __FILE__, __LINE__);
+        pdo_snowflake_error_stmt(stmt);
+        PDO_LOG_RETURN(0);
+    }
+
+    S->bound_results = ecalloc((size_t) stmt->column_count, sizeof(pdo_snowflake_string));
+
+    for(i = 0; i < stmt->column_count; i++) {
+        S->bound_results[i].value = NULL;
+        S->bound_results[i].size = 0;
+    }
+
+    _pdo_snowflake_stmt_set_row_count(stmt);
+    pdo_snowflake_stmt_describe(stmt, stmt->column_count);
     PDO_LOG_RETURN(1);
 }
 /* }}} */

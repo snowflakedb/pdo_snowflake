@@ -575,7 +575,56 @@ In this example, we'll use those too.
     echo "OK\n";
   $>
 
-**Note**: `PUT` and `GET` queries are not supported in the driver.
+
+Performing a multiple statement query
+----------------------------------------------------------------------
+By default, the Snowflake database expects the driver to prepare and send a single statement for execution.
+You can override this by specifying the number of statements in a batch for a given request or by enabling multiple statements for the current session or account:
+
+.. code-block:: php
+
+ $dbh->setAttribute(PDO::SNOWFLAKE_STMT_MULTI_STMT_COUNT, <number of the queries to execute>);
+
+The following example performs a multiple statement query. The connection is the same as the previous example.
+
+.. code-block:: php
+
+  <$php
+    $dbh = new PDO($dsn, $user, $password);
+    $dbh->setAttribute(PDO::SNOWFLAKE_STMT_MULTI_STMT_COUNT, 4); // set the number of statements in a batch for a given request
+    $sth = $dbh->query("select 1; select 2; select 3; select 4");
+    do {
+        while ($row=$sth->fetch()) {
+            echo "RESULT: " . $row[0] . "\n";
+        }
+    } while ($sth->nextRowset()); // move to the next result set until there is no more result set
+    $dbh = null;
+    echo "OK\n";
+  $>
+
+Or you can enable multiple statements with the ALTER SESSION statement.
+
+.. code-block:: php
+
+ alter session set MULTI_STATEMENT_COUNT = 0; // If you set 0, it enables the multi-statement. If you set 1, it disables the multi-statement.
+
+If you want to use the setting for the current session or account (rather than specify the number for the request), set PDO::SNOWFLAKE_STMT_MULTI_STMT_COUNT to -1.
+
+.. code-block:: php
+
+  <$php
+    $dbh = new PDO($dsn, $user, $password);
+    $dbh->setAttribute(PDO::SNOWFLAKE_STMT_MULTI_STMT_COUNT, -1); // The default value is -1. Just in case when you have changed it before and want to switch back to the default setting, you can set it to -1.
+    $count = $dbh->exec("alter session set MULTI_STATEMENT_COUNT=0");
+    $sth = $dbh->query("select 1; select 2; select 3; select 4");
+    do {
+        while ($row=$sth->fetch()) {
+            echo "RESULT: " . $row[0] . "\n";
+        }
+    } while ($sth->nextRowset()); // move to the next result set until there is no more result set
+    $dbh = null;
+    echo "OK\n";
+  $>
 
 Setting timeouts
 ----------------------------------------------------------------------

@@ -205,6 +205,18 @@ snowflake_handle_preparer(pdo_dbh_t *dbh, const char *sql, size_t sql_len,
         PDO_LOG_RETURN(0);
     }
 
+    if (H->multi_stmt_count != SF_MULTI_STMT_COUNT_UNSET) {
+        PDO_LOG_DBG("setting the multi statement count: %d", H->multi_stmt_count);
+
+        int64 multi_stmt_count = H->multi_stmt_count;
+        SF_STATUS ret = snowflake_stmt_set_attr(S->stmt, SF_STMT_MULTI_STMT_COUNT, &multi_stmt_count);
+        if (ret != SF_STATUS_SUCCESS) {
+            PDO_LOG_ERR("Failed to set multi statement count: %d", H->multi_stmt_count);
+            pdo_snowflake_error_stmt(stmt);
+            PDO_LOG_RETURN(0);
+        }
+    }
+
     /* prepare SQL */
     if (snowflake_prepare(S->stmt, sql, sql_len) != SF_STATUS_SUCCESS) {
         pdo_snowflake_error_stmt(stmt);
@@ -374,6 +386,7 @@ static inline int snowflake_handle_autocommit(pdo_dbh_t *dbh) /* {{{ */
 static int
 pdo_snowflake_set_attribute(pdo_dbh_t *dbh, zend_long attr, zval *val) /* {{{ */
 {
+    pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
     zend_long lval = zval_get_long(val);
     zend_bool bval = lval ? (zend_bool) 1 : (zend_bool) 0;
     PDO_LOG_ENTER("pdo_snowflake_set_attribute");
@@ -384,12 +397,24 @@ pdo_snowflake_set_attribute(pdo_dbh_t *dbh, zend_long attr, zval *val) /* {{{ */
             if (dbh->auto_commit ^ bval) {
                 dbh->auto_commit = bval;
                 PDO_LOG_DBG(
-                    "value=%s",
+                    "PDO_ATTR_AUTOCOMMIT: value=%s",
                     bval ? SF_BOOLEAN_INTERNAL_TRUE_STR
                          : SF_BOOLEAN_INTERNAL_FALSE_STR);
             }
+
             PDO_LOG_RETURN(1);
             break;
+        case PDO_SNOWFLAKE_ATTR_STMT_MULTI_STMT_COUNT:
+            /* ignore if the new value equals the old one */
+            if (H->multi_stmt_count != lval) {
+                H->multi_stmt_count = lval;
+                PDO_LOG_DBG(
+                    "PDO_SNOWFLAKE_ATTR_STMT_MULTI_STMT_COUNT value=%d",
+                    lval);
+            }
+            PDO_LOG_RETURN(1);
+            break;
+        
         default:
             PDO_LOG_DBG("unsupported attribute: %ld", attr);
             /* invalid attribute */
@@ -420,6 +445,10 @@ pdo_snowflake_get_attribute(pdo_dbh_t *dbh, zend_long attr,
             break;
         case PDO_SNOWFLAKE_ATTR_QUERY_ID:
             ZVAL_STRINGL(return_value, H->last_qid, strlen(H->last_qid));
+            PDO_LOG_RETURN(1);
+            break;
+        case PDO_SNOWFLAKE_ATTR_STMT_MULTI_STMT_COUNT:
+            ZVAL_LONG(return_value, H->multi_stmt_count);
             PDO_LOG_RETURN(1);
             break;
         default:
@@ -622,6 +651,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
 
     H = pecalloc(1, sizeof(pdo_snowflake_db_handle), dbh->is_persistent);
     H->last_qid[0] = '\0';
+    H->multi_stmt_count = SF_MULTI_STMT_COUNT_UNSET;
 
     //TODO set error stuff
 
@@ -672,6 +702,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     snowflake_set_attribute(H->server, SF_CON_APPLICATION_NAME,
                             PHP_PDO_SNOWFLAKE_NAME);
     snowflake_set_attribute(H->server, SF_CON_APPLICATION_VERSION, PDO_SNOWFLAKE_VERSION);
+
     snowflake_set_attribute(H->server, SF_CON_USER, dbh->username);
     PDO_LOG_DBG(
         "user: %s", dbh->username);
