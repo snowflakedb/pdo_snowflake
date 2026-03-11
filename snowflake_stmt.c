@@ -141,7 +141,14 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
     // won't hit for now but leave it to prevent crash with unexpected query result.
     if (stmt->column_count < 0)
     {
-        PDO_LOG_ERR("Unsupported query type %s.", S->stmt->sql_text);
+        if (S->stmt->connection->log_query_text == SF_BOOLEAN_TRUE) 
+        {
+            PDO_LOG_ERR("Unsupported query type %s.", S->stmt->sql_text);
+        }
+        else
+        {
+            PDO_LOG_ERR("Unsupported query type ****");
+        }
         set_snowflake_error(&S->stmt->error,
                             SF_STATUS_ERROR_GENERAL,
                             "Unsupported query type.",
