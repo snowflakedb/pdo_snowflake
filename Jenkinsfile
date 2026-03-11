@@ -40,7 +40,7 @@ timestamps {
       'Test Revocation Validation': {
         stage('Test Revocation Validation') {
           withCredentials([
-            usernamePassword(credentialsId: 'jenkins-snowflakedb-github-app',
+            usernamePassword(credentialsId: 'jenkins-snowflake-eng-github-app',
               usernameVariable: 'GITHUB_USER',
               passwordVariable: 'GITHUB_TOKEN')
           ]) {
