@@ -75,9 +75,9 @@ echo "[Info] pdo_snowflake loaded: $(php -m | grep pdo_snowflake)"
 REVOCATION_DIR="/tmp/revocation-validation"
 rm -rf "$REVOCATION_DIR"
 if [ -n "$GITHUB_USER" ] && [ -n "$GITHUB_TOKEN" ]; then
-    git clone --depth 1 --branch main "https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/snowflakedb/revocation-validation.git" "$REVOCATION_DIR"
+    git clone --depth 1 --branch main "https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/snowflake-eng/revocation-validation.git" "$REVOCATION_DIR"
 else
-    git clone --depth 1 --branch main "https://github.com/snowflakedb/revocation-validation.git" "$REVOCATION_DIR"
+    git clone --depth 1 --branch main "https://github.com/snowflake-eng/revocation-validation.git" "$REVOCATION_DIR"
 fi
 
 cd "$REVOCATION_DIR"
