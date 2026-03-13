@@ -514,6 +514,7 @@ static int pdo_snowflake_stmt_param_hook(
             }
 
             snowflake_bind_param(S->stmt, v);
+            sf_bool log_param_value = S->stmt->connection->log_query_parameters;
 
             PDO_LOG_DBG("%s", php_zval_type_names[Z_TYPE_P(parameter)]);
             if (Z_TYPE_P(parameter) == IS_NULL) {
@@ -529,38 +530,46 @@ static int pdo_snowflake_stmt_param_hook(
                     v->value = NULL;
                     break;
                 case PDO_PARAM_INT:
-                    PDO_LOG_DBG(
+                if (log_param_value) {
+                     PDO_LOG_DBG(
                       "value: %ld",
                       Z_LVAL_P(parameter));
+                }
                     v->c_type = SF_C_TYPE_INT64;
                     v->len = sizeof(int64);
                     v->value = ecalloc(1, sizeof(int64));
                     *(int64 *) (v->value) = Z_LVAL_P(parameter);
                     break;
                 case PDO_PARAM_STR:
+                    if (log_param_value) {
                     PDO_LOG_DBG(
-                      "value: %.*s, len: %lld",
-                      Z_STRLEN_P(parameter),
-                      Z_STRVAL_P(parameter),
-                      Z_STRLEN_P(parameter));
+                        "value: %.*s, len: %lld",
+                        Z_STRLEN_P(parameter),
+                        Z_STRVAL_P(parameter),
+                        Z_STRLEN_P(parameter));
+                    }
                     v->c_type = SF_C_TYPE_STRING;
                     v->len = Z_STRLEN_P(parameter);
                     v->value = Z_STRVAL_P(parameter);
                     break;
                 case PDO_PARAM_LOB:
-                    PDO_LOG_DBG(
-                      "value: %.*s, len: %lld",
-                      Z_STRLEN_P(parameter),
-                      Z_STRVAL_P(parameter),
-                      Z_STRLEN_P(parameter));
+                    if (log_param_value) {
+                        PDO_LOG_DBG(
+                        "value: %.*s, len: %lld",
+                        Z_STRLEN_P(parameter),
+                        Z_STRVAL_P(parameter),
+                        Z_STRLEN_P(parameter));
+                    }
                     v->c_type = SF_C_TYPE_BINARY;
                     v->len = Z_STRLEN_P(parameter);
                     v->value = Z_STRVAL_P(parameter);
                     break;
                 case PDO_PARAM_BOOL:
-                    PDO_LOG_DBG(
-                      "value: %s",
-                      php_zval_type_names[Z_TYPE_P(parameter)]);
+                    if (log_param_value) {
+                        PDO_LOG_DBG(
+                        "value: %s",
+                        php_zval_type_names[Z_TYPE_P(parameter)]);
+                    }
                     if (Z_TYPE_P(parameter) == IS_FALSE) {
                         v->value = (void *) &SF_BOOLEAN_FALSE;
                     } else {
