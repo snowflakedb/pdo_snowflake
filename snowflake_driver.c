@@ -624,6 +624,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"crl_memory_caching",  "true",       0},
         {"crl_disk_caching",    "true",       0},
         {"crl_download_timeout", "120",       0},
+        {"crl_download_max_size", NULL,     0},
         {"oauth_token_endpoint", NULL,      0},
         {"oauth_authorization_endpoint", NULL, 0},
         {"oauth_redirect_uri",  NULL,         0},
@@ -932,6 +933,15 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
             &int_attr_value);
         PDO_LOG_DBG(
             "crl_download_timeout: %d", int_attr_value);
+    }
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_DOWNLOAD_MAX_SIZE_IDX].optval != NULL) {
+        int_attr_value = strtoll(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_DOWNLOAD_MAX_SIZE_IDX].optval, NULL, 10);
+        snowflake_set_attribute(
+            H->server, SF_CON_CRL_DOWNLOAD_MAX_SIZE,
+            &int_attr_value);
+        PDO_LOG_DBG(
+            "crl_download_max_size: %lld", int_attr_value);
     }
 
     if (vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_PROVIDER_IDX].optval != NULL) {
