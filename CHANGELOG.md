@@ -2,7 +2,7 @@
 
 # Changelog
 - v3.7.0 (TBD)
-  - Added the "query_log_text" and "query_log_parameters" and masking sql logging and parameter loggings. (snowflakedb/pdo_snowflake#494)
+  - Added the "log_query_text" and "log_query_parameters" and masking sql logging and parameter loggings. (snowflakedb/pdo_snowflake#494)
 
 - v3.6.0
   - Updated the `libsnowflakeclient` to v2.7.1 (snowflakedb/pdo_snowflake#489)
