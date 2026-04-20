@@ -14,7 +14,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     $dbh = new PDO($dsn, $user, $password);
     $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
     echo 'Connected to Snowflake' . "\n";
-    $sth = $dbh->query("select seq8(), randstr(1000, random()) from table(generator(rowcount=>20000))") order by 1;
+    $sth = $dbh->query("select seq8(), randstr(1000, random()) from table(generator(rowcount=>20000)) order by 1");
     while($row = $sth->fetch()) {
         if ($row[0] % 10000 == 0) {
             echo "Result :" . $row["0"] . " " . $row["1"] . "\n";
