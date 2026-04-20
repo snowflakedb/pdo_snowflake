@@ -530,7 +530,7 @@ static int pdo_snowflake_stmt_param_hook(
                     v->value = NULL;
                     break;
                 case PDO_PARAM_INT:
-                if (log_param_value) {
+                if (log_param_value == SF_BOOLEAN_TRUE) {
                      PDO_LOG_DBG(
                       "value: %ld",
                       Z_LVAL_P(parameter));
