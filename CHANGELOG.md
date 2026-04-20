@@ -1,8 +1,8 @@
 #### For the official PDO Snowflake Release Notes please refer to https://docs.snowflake.com/en/release-notes/clients-drivers/php-pdo
 
 # Changelog
-- v3.7.0 (TBD)
-  - 
+- v3.7.0
+  - Added support for PHP 8.5 and drop support for PHP 8.1 (snowflakedb/pdo_snowflake#501)
 
 - v3.6.0
   - Updated the `libsnowflakeclient` to v2.7.1 (snowflakedb/pdo_snowflake#489)
