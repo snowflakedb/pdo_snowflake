@@ -34,9 +34,6 @@ struct TransferConfig
 class IFileTransferAgent
 {
 public:
-
-  bool m_logQueryText = false;
-
   virtual ~IFileTransferAgent() {};
   /**
    * Called by external component to execute put/get command
@@ -101,16 +98,6 @@ public:
   * @param maxRetries: max number of retries.
   */
   virtual void setGetMaxRetries(int maxRetries) {};
-
-  virtual void setLogQueryText(bool logQueryText) 
-  {
-      m_logQueryText = logQueryText;
-  };
-
-  virtual const char* getQueryCommand(std::string* command)
-  {
-      return m_logQueryText ? command->c_str() : "****";
-  }
 
 };
 
