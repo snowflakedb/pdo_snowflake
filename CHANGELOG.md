@@ -5,6 +5,7 @@
   - Updated the `libsnowflakeclient` to v2.8.0 (snowflakedb/pdo_snowflake#503)
   - Updated the `openssl` to v3.0.19 (snowflakedb/pdo_snowflake#503)
   - Updated the `libcurl` to v8.19.0 (snowflakedb/pdo_snowflake#503)
+  - Add `crl_download_max_size` parameter that provides the control of the maximum size of the CRL (snowflakedb/pdo_snowflake#495)
   - Added the "log_query_text" and "log_query_parameters" and masking sql logging and parameter loggings. (snowflakedb/pdo_snowflake#494)
 
 - v3.6.0
