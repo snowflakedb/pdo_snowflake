@@ -182,8 +182,13 @@ snowflake_handle_preparer(pdo_dbh_t *dbh, const char *sql, size_t sql_len,
 {
     PDO_LOG_ENTER("snowflake_handle_preparer");
     PDO_LOG_DBG("dbh=%p", dbh);
-    PDO_LOG_DBG("sql=%.*s, len=%ld", (int) sql_len, sql, sql_len);
     pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
+
+    if(H->server->log_query_text == SF_BOOLEAN_TRUE) {
+        PDO_LOG_DBG("sql=%.*s, len=%ld", (int) sql_len, sql, sql_len);
+    } else {
+        PDO_LOG_DBG("sql: ****");
+    }
 
     /* allocate PDO stmt */
     pdo_snowflake_stmt *S = ecalloc(1, sizeof(pdo_snowflake_stmt));
@@ -244,7 +249,11 @@ snowflake_handle_doer(pdo_dbh_t *dbh, const char *sql, size_t sql_len) /* {{{ */
     SF_STATUS query_status;
     const char * qid;
     pdo_snowflake_db_handle *H = (pdo_snowflake_db_handle *) dbh->driver_data;
-    PDO_LOG_DBG("sql: %.*s, len: %d", sql_len, sql, sql_len);
+    if(H->server->log_query_text == SF_BOOLEAN_TRUE) {
+        PDO_LOG_DBG("sql: %.*s, len: %d", (int) sql_len, sql, sql_len);
+    } else {
+        PDO_LOG_DBG("sql: ****");
+    }
     SF_STMT *sfstmt = snowflake_stmt(H->server);
 
     // set realloc function for large size result
@@ -624,6 +633,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"crl_memory_caching",  "true",       0},
         {"crl_disk_caching",    "true",       0},
         {"crl_download_timeout", "120",       0},
+        {"crl_download_max_size", NULL,     0},
         {"oauth_token_endpoint", NULL,      0},
         {"oauth_authorization_endpoint", NULL, 0},
         {"oauth_redirect_uri",  NULL,         0},
@@ -637,11 +647,13 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"workload_identity_impersonation_path", NULL, 0},
 #ifdef __LINUX__
         {"client_store_temporary_credential", "false", 0},
-        {"client_request_mfa_token", "false", 0}
+        {"client_request_mfa_token", "false", 0},
 #else
         {"client_store_temporary_credential", "true", 0},
-        {"client_request_mfa_token", "true", 0}
+        {"client_request_mfa_token", "true", 0},
 #endif
+        {"log_query_text", "false", 0},
+        {"log_query_parameters", "false", 0},
     };
 
     // Parse the input data parameters
@@ -934,6 +946,15 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
             "crl_download_timeout: %d", int_attr_value);
     }
 
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_DOWNLOAD_MAX_SIZE_IDX].optval != NULL) {
+        int_attr_value = strtoll(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_DOWNLOAD_MAX_SIZE_IDX].optval, NULL, 10);
+        snowflake_set_attribute(
+            H->server, SF_CON_CRL_DOWNLOAD_MAX_SIZE,
+            &int_attr_value);
+        PDO_LOG_DBG(
+            "crl_download_max_size: %lld", int_attr_value);
+    }
+
     if (vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_PROVIDER_IDX].optval != NULL) {
         snowflake_set_attribute(
             H->server, SF_CON_WIF_PROVIDER,
@@ -1001,6 +1022,15 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     snowflake_set_attribute(H->server, SF_CON_CLIENT_REQUEST_MFA_TOKEN,
         (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CLIENT_REQUEST_MFA_TOKEN].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
     PDO_LOG_DBG("client_request_mfa_token: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_CLIENT_REQUEST_MFA_TOKEN].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_LOG_QUERY_TEXT,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_LOG_QUERY_TEXT].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("log_query_text: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_LOG_QUERY_TEXT].optval);
+
+    snowflake_set_attribute(H->server, SF_CON_LOG_QUERY_PARAMETERS,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_LOG_QUERY_PARAMETERS].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG("log_query_parameters: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_LOG_QUERY_PARAMETERS].optval);
+    
 
     /* Auto-detect the PHP script path for APPLICATION_PATH.
      * This is always auto-detected and cannot be overridden by users,
