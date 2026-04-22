@@ -1,8 +1,10 @@
 #### For the official PDO Snowflake Release Notes please refer to https://docs.snowflake.com/en/release-notes/clients-drivers/php-pdo
 
 # Changelog
-- v3.7.0 (TBD)
-  - 
+- v3.7.0
+  - Updated the `libsnowflakeclient` to v2.8.0 (snowflakedb/pdo_snowflake#503)
+  - Updated the `openssl` to v3.0.19 (snowflakedb/pdo_snowflake#503)
+  - Updated the `libcurl` to v8.19.0 (snowflakedb/pdo_snowflake#503)
 
 - v3.6.0
   - Updated the `libsnowflakeclient` to v2.7.1 (snowflakedb/pdo_snowflake#489)
