@@ -66,7 +66,7 @@ jobs:
         # have to specify patch version on windows
         # otherwise could get version mismatch issue when running test on github
         # need to keep track on the latest version
-        php-version: ['8.4.16']
+        php-version: ['8.4.16', '8.5.5']
     # The type of runner that the job will run on
     runs-on: windows-latest
     env:
@@ -99,7 +99,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.1', '8.2', '8.3', '8.4']
+        php-version: ['8.2', '8.3', '8.4', '8.5']
         os: [ubuntu-latest, ubuntu-22.04-arm]
     # The type of runner that the job will run on
     runs-on: ${{ matrix.os }}
@@ -128,7 +128,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.1', '8.2', '8.3', '8.4']
+        php-version: ['8.2', '8.3', '8.4', '8.5']
     # The type of runner that the job will run on
     runs-on: macos-latest
     env: 
@@ -157,7 +157,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.1', '8.2', '8.3', '8.4']
+        php-version: ['8.2', '8.3', '8.4', '8.5']
         os: [ubuntu-latest, ubuntu-22.04-arm]
     runs-on: ${{ matrix.os }}
     env:
