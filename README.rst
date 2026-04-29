@@ -656,13 +656,13 @@ Prepare Tests
 
        {
            "testconnection": {
-               "SNOWFLAKE_TEST_USER":      "<your_user>",
-               "SNOWFLAKE_TEST_PASSWORD":  "<your_password>",
-               "SNOWFLAKE_TEST_ACCOUNT":   "<your_account>",
-               "SNOWFLAKE_TEST_WAREHOUSE": "<your_warehouse>",
-               "SNOWFLAKE_TEST_DATABASE":  "<your_database>",
-               "SNOWFLAKE_TEST_SCHEMA":    "<your_schema>",
-               "SNOWFLAKE_TEST_ROLE":      "<your_role>"
+               "SNOWFLAKE_TEST_USER":             "<your_user>",
+               "SNOWFLAKE_TEST_PRIVATE_KEY_FILE": "<absolute_path_to_unencrypted_rsa_key.p8>",
+               "SNOWFLAKE_TEST_ACCOUNT":          "<your_account>",
+               "SNOWFLAKE_TEST_WAREHOUSE":        "<your_warehouse>",
+               "SNOWFLAKE_TEST_DATABASE":         "<your_database>",
+               "SNOWFLAKE_TEST_SCHEMA":           "<your_schema>",
+               "SNOWFLAKE_TEST_ROLE":             "<your_role>"
            }
        }
 
@@ -723,13 +723,13 @@ Prepare Tests
    
        {
            "testconnection": {
-               "SNOWFLAKE_TEST_USER":      "<your_user>",
-               "SNOWFLAKE_TEST_PASSWORD":  "<your_password>",
-               "SNOWFLAKE_TEST_ACCOUNT":   "<your_account>",
-               "SNOWFLAKE_TEST_WAREHOUSE": "<your_warehouse>",
-               "SNOWFLAKE_TEST_DATABASE":  "<your_database>",
-               "SNOWFLAKE_TEST_SCHEMA":    "<your_schema>",
-               "SNOWFLAKE_TEST_ROLE":      "<your_role>"
+               "SNOWFLAKE_TEST_USER":             "<your_user>",
+               "SNOWFLAKE_TEST_PRIVATE_KEY_FILE": "<absolute_path_to_unencrypted_rsa_key.p8>",
+               "SNOWFLAKE_TEST_ACCOUNT":          "<your_account>",
+               "SNOWFLAKE_TEST_WAREHOUSE":        "<your_warehouse>",
+               "SNOWFLAKE_TEST_DATABASE":         "<your_database>",
+               "SNOWFLAKE_TEST_SCHEMA":           "<your_schema>",
+               "SNOWFLAKE_TEST_ROLE":             "<your_role>"
            }
        }
 

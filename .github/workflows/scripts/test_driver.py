@@ -66,9 +66,10 @@ def test_posix():
     print("====> setup parameters and env")
     run_command("cp ./.github/workflows/scripts/parameters.json ./")
     run_command("python ./.github/workflows/scripts/set_secrets.py ./parameters.json")
-    # Source env.sh (with `.`) so its parameters.json-derived exports reach
-    # testenv.ini; drop the multi-line PEM env var before listing.
-    run_command(". ./scripts/env.sh && unset SNOWFLAKE_TEST_PRIVATE_KEY && env | grep SNOWFLAKE_TEST > testenv.ini")
+    # Source env.sh in bash (env.sh uses bashisms: set -o pipefail,
+    # ${BASH_SOURCE[0]}, [[ ... ]]). Sourcing into the default /bin/sh - dash
+    # on Ubuntu - fails. Drop the multi-line PEM env var before listing.
+    run_command("bash -c '. ./scripts/env.sh && unset SNOWFLAKE_TEST_PRIVATE_KEY && env | grep SNOWFLAKE_TEST > testenv.ini'")
 
     print ("====> run test")
     run_test_options = ""
