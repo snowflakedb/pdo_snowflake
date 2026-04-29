@@ -1,11 +1,12 @@
 #common envs
-# Non-docker jobs (linux/mac/windows/code-coverage) authenticate via keypair (JWT).
-# We pull the keypair user and the private-key passphrase from the new
-# *_KEYPAIR secrets, then alias them to the old names so the existing
-# scripts (set_secrets.py, common.php, env.sh) keep working unchanged.
-# SNOWFLAKE_TEST_PASSWORD here is the *private-key passphrase*, not a login
-# password. The Docker (rocky-linux) job overrides these back to the
-# original secrets for its still-password-based flow - see that job below.
+# All build_test jobs (linux/mac/windows/rocky-linux/code-coverage) authenticate
+# via keypair (JWT). We pull the keypair user and the private-key passphrase
+# from the *_KEYPAIR secrets and alias them to the old SNOWFLAKE_TEST_USER /
+# SNOWFLAKE_TEST_PASSWORD names so existing scripts (set_secrets.py, common.php,
+# env.sh) keep working unchanged. SNOWFLAKE_TEST_PASSWORD here is the
+# *private-key passphrase* (priv_key_file_pwd), not a Snowflake login password.
+# Only the Jenkins authentication-tests pipeline still exercises non-keypair
+# auth methods because that's the entire point of those tests.
 env:
   SNOWFLAKE_TEST_USER: ${{ secrets.SNOWFLAKE_TEST_USER_KEYPAIR }}
   SNOWFLAKE_TEST_PASSWORD: ${{ secrets.SNOWFLAKE_TEST_PASSWORD_KEYPAIR }}
@@ -174,11 +175,6 @@ jobs:
       TEST_PHP_EXECUTABLE: /usr/bin/php
       NO_INTERACTION: true
       USE_VALGRIND: 0
-      # Rocky-linux docker still uses password auth; override the
-      # workflow-level keypair-aliased secrets back to the originals.
-      SNOWFLAKE_TEST_USER: ${{ secrets.SNOWFLAKE_TEST_USER }}
-      SNOWFLAKE_TEST_PASSWORD: ${{ secrets.SNOWFLAKE_TEST_PASSWORD }}
-      SNOWFLAKE_TEST_PRIVATE_KEY: ''
     steps:
       - uses: actions/checkout@v4
       - name: Build Driver and Run Tests in Docker
