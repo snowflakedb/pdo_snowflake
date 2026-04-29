@@ -22,22 +22,36 @@ def set_secret_in_file(file, variable, value):
         f.close()
 
 
+def normalize_to_pem(content):
+    """Accept either a full PEM (with -----BEGIN/-----END markers) or just the
+    base64 body, and return a properly framed PKCS#8 PEM string.
+
+    Snowflake JWT keypair auth requires PKCS#8 PEM. GitHub Secrets sometimes
+    hold just the base64 body (e.g. when copy-pasted from `openssl rsa -outform DER | base64`
+    or when the developer trimmed the BEGIN/END lines). Auto-wrap that case so
+    libsnowflakeclient can parse the file.
+    """
+    content = content.replace('\r\n', '\n').replace('\r', '\n').strip()
+    if content.startswith('-----BEGIN'):
+        return content + '\n'
+    body = ''.join(content.split())
+    wrapped = '\n'.join(body[i:i + 64] for i in range(0, len(body), 64))
+    return '-----BEGIN PRIVATE KEY-----\n' + wrapped + '\n-----END PRIVATE KEY-----\n'
+
+
 def write_private_key_file(pem_content):
     """Write the PEM private key (passed via SNOWFLAKE_TEST_PRIVATE_KEY env var)
     to a file inside the repo root and return its absolute path. The file is
     gitignored (rsa_key.p8) and consumed by the PHP tests via
     SNOWFLAKE_TEST_PRIVATE_KEY_FILE in parameters.json / testenv.ini.
 
-    Normalizes line endings to LF only - GitHub's web UI / copy-paste from a
-    Windows clipboard can introduce CRLF, and some PEM parsers (including the
-    one inside libsnowflakeclient) reject keys whose header line contains a
-    stray CR. Also emits diagnostic output so a malformed key fails loudly
+    Normalizes line endings, auto-wraps a bare base64 body in a PKCS#8 PEM
+    header/footer, and emits diagnostic output so a malformed key fails loudly
     instead of silently producing an authenticator init error at PDO connect.
     """
     repo_root = os.environ.get('GITHUB_WORKSPACE') or os.getcwd()
     key_path = os.path.join(repo_root, 'rsa_key.p8')
-    pem_content = pem_content.replace('\r\n', '\n').replace('\r', '\n')
-    pem_content = pem_content.strip() + '\n'
+    pem_content = normalize_to_pem(pem_content)
     with open(key_path, 'w', newline='\n') as f:
         f.write(pem_content)
     try:
