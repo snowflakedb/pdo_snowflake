@@ -8,8 +8,9 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php
     include __DIR__ . "/common.php";
 
-    // full parameters
-    $dbh = new PDO("$dsn;application=phptest;authenticator=snowflake;priv_key_file=tests/p8test.pem;priv_key_file_pwd=test;disablequerycontext=true;includeretryreason=false;logintimeout=250;maxhttpretries=8;retrytimeout=350;ocspfailopen=false;disableocspchecks=true", $user, $password);
+    // full parameters - use JWT (keypair) auth via the global $dsn from common.php;
+    // the extra ;application=... etc. just exercises connection-string parsing.
+    $dbh = new PDO("$dsn;application=phptest;disablequerycontext=true;includeretryreason=false;logintimeout=250;maxhttpretries=8;retrytimeout=350;ocspfailopen=false;disableocspchecks=true", $user, $password);
     // create table for testing autocommit later
     $tablename = "autocommittest" . rand();
     $count = $dbh->exec("create or replace table " . $tablename . "(c1 int)");
