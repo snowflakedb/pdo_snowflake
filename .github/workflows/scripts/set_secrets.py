@@ -27,19 +27,48 @@ def write_private_key_file(pem_content):
     to a file inside the repo root and return its absolute path. The file is
     gitignored (rsa_key.p8) and consumed by the PHP tests via
     SNOWFLAKE_TEST_PRIVATE_KEY_FILE in parameters.json / testenv.ini.
+
+    Normalizes line endings to LF only - GitHub's web UI / copy-paste from a
+    Windows clipboard can introduce CRLF, and some PEM parsers (including the
+    one inside libsnowflakeclient) reject keys whose header line contains a
+    stray CR. Also emits diagnostic output so a malformed key fails loudly
+    instead of silently producing an authenticator init error at PDO connect.
     """
     repo_root = os.environ.get('GITHUB_WORKSPACE') or os.getcwd()
     key_path = os.path.join(repo_root, 'rsa_key.p8')
+    pem_content = pem_content.replace('\r\n', '\n').replace('\r', '\n')
+    pem_content = pem_content.strip() + '\n'
     with open(key_path, 'w', newline='\n') as f:
         f.write(pem_content)
-        if not pem_content.endswith('\n'):
-            f.write('\n')
     try:
         os.chmod(key_path, 0o600)
     except OSError:
         # chmod on Windows may not honor 0o600; safe to ignore in CI
         pass
+
+    # Diagnostic output - only echo the PEM header / footer lines themselves
+    # because those are public boilerplate (e.g. "-----BEGIN PRIVATE KEY-----"
+    # is identical for every PEM in the world). The base64 body in between
+    # is the actual secret and is NEVER printed - we only show its line count
+    # and the on-disk file size.
+    lines = pem_content.split('\n')
+    first_line = lines[0] if lines else ''
+    last_nonblank = next((line for line in reversed(lines) if line), '')
+    starts_ok = first_line.startswith('-----BEGIN') and first_line.endswith('-----')
+    ends_ok = last_nonblank.startswith('-----END') and last_nonblank.endswith('-----')
     print('Wrote private key to ' + key_path)
+    print('  size:        ' + str(os.path.getsize(key_path)) + ' bytes')
+    print('  total lines: ' + str(sum(1 for line in lines if line)))
+    print('  header:      ' + (first_line if starts_ok else '<redacted - not a PEM header>'))
+    print('  footer:      ' + (last_nonblank if ends_ok else '<redacted - not a PEM footer>'))
+    if not starts_ok:
+        print('[ERROR] private key does not start with a "-----BEGIN ...-----" header.')
+        print('[ERROR] check that the SNOWFLAKE_TEST_PRIVATE_KEY GitHub secret holds')
+        print('[ERROR] the full PEM contents (header + base64 body + footer).')
+        sys.exit(1)
+    if not ends_ok:
+        print('[ERROR] private key does not end with a "-----END ...-----" footer.')
+        sys.exit(1)
     return key_path
 
 
