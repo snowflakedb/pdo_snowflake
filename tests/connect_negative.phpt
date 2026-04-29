@@ -8,9 +8,18 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php
     include __DIR__ . "/common.php";
 
+    // The negative tests below intentionally feed malformed DSNs to
+    // exercise the driver's parameter-validation paths. Some of those
+    // paths require a non-empty password so that the *intended* check
+    // (missing account / invalid app name / invalid authenticator)
+    // is what fires first - otherwise the now-empty $password from
+    // common.php would short-circuit to "240005 missing password"
+    // before the actual scenario is reached. The "no password" test
+    // below explicitly passes "" to exercise that branch.
+
     // no account
     try {
-        $dbh = new PDO("snowflake:", $user, $password);
+        $dbh = new PDO("snowflake:", $user, "dummy");
         echo "Fail. Must fail to connect.\n";
     } catch(PDOException $e) {
         echo sprintf("Expected error code: %d for missing account\n", $e->getCode());
@@ -18,7 +27,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 
     // no user
     try {
-        $dbh = new PDO("snowflake:account=$account", "", $password);
+        $dbh = new PDO("snowflake:account=$account", "", "dummy");
         echo "Fail. Must fail to connect.\n";
     } catch(PDOException $e) {
         echo sprintf("Expected error code: %d for missing user\n", $e->getCode());
@@ -34,7 +43,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 
     // invalid applicaation name
     try {
-        $dbh = new PDO("snowflake:account=$account;application=1234invalidapp", $user, $password);
+        $dbh = new PDO("snowflake:account=$account;application=1234invalidapp", $user, "dummy");
         echo "Fail. Must fail to connect.\n";
     } catch(PDOException $e) {
         echo sprintf("Expected error code: %d for invalid application name\n", $e->getCode());
@@ -42,7 +51,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 
     // invalid authenticator
     try {
-        $dbh = new PDO("snowflake:account=$account;authenticator=invalid_authenticator;", $user, $password);
+        $dbh = new PDO("snowflake:account=$account;authenticator=invalid_authenticator;", $user, "dummy");
         echo "Fail. Must fail to connect.\n";
     } catch(PDOException $e) {
         // check the error message to be more specific for the expected error
@@ -84,7 +93,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     // use an invalid(unreachable) proxy to trigger login timeout
     $starttime = time();
     try {
-        $dbh = new PDO("$dsn;proxy=172.123.111.222;logintimeout=4", $user, $password);
+        $dbh = new PDO("$dsn;proxy=172.123.111.222;logintimeout=4", $user, "dummy");
         echo "Fail. Must fail to connect.\n";
     } catch(PDOException $e) {
         $spendtime = time() - $starttime;
