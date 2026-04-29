@@ -1,15 +1,9 @@
 #common envs
-# All build_test jobs (linux/mac/windows/rocky-linux/code-coverage) authenticate
-# via keypair (JWT). We pull the keypair user and the private-key passphrase
-# from the *_KEYPAIR secrets and alias them to the old SNOWFLAKE_TEST_USER /
-# SNOWFLAKE_TEST_PASSWORD names so existing scripts (set_secrets.py, common.php,
-# env.sh) keep working unchanged. SNOWFLAKE_TEST_PASSWORD here is the
-# *private-key passphrase* (priv_key_file_pwd), not a Snowflake login password.
-# Only the Jenkins authentication-tests pipeline still exercises non-keypair
-# auth methods because that's the entire point of those tests.
+# All build_test jobs authenticate via keypair (JWT) using an unencrypted
+# private key. Only the Jenkins authentication-tests pipeline still exercises
+# non-keypair auth methods because that's the entire point of those tests.
 env:
   SNOWFLAKE_TEST_USER: ${{ secrets.SNOWFLAKE_TEST_USER_KEYPAIR }}
-  SNOWFLAKE_TEST_PASSWORD: ${{ secrets.SNOWFLAKE_TEST_PASSWORD_KEYPAIR }}
   SNOWFLAKE_TEST_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_TEST_PRIVATE_KEY }}
   SNOWFLAKE_TEST_ACCOUNT: ${{ secrets.SNOWFLAKE_TEST_ACCOUNT }}
   SNOWFLAKE_TEST_WAREHOUSE: ${{ secrets.SNOWFLAKE_TEST_WAREHOUSE }}

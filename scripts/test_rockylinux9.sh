@@ -8,8 +8,7 @@
 #
 # Required environment variables:
 #   - SNOWFLAKE_TEST_USER          (keypair-auth username)
-#   - SNOWFLAKE_TEST_PRIVATE_KEY   (PEM contents of the keypair private key)
-#   - SNOWFLAKE_TEST_PASSWORD      (private-key passphrase / priv_key_file_pwd)
+#   - SNOWFLAKE_TEST_PRIVATE_KEY   (PEM contents of the unencrypted keypair private key)
 #   - SNOWFLAKE_TEST_ACCOUNT
 #   - SNOWFLAKE_TEST_WAREHOUSE
 #   - SNOWFLAKE_TEST_DATABASE

@@ -7,8 +7,7 @@
 #
 # Required environment variables (set by GHA workflow):
 #   - SNOWFLAKE_TEST_USER          (keypair-auth username)
-#   - SNOWFLAKE_TEST_PRIVATE_KEY   (PEM contents of the keypair private key)
-#   - SNOWFLAKE_TEST_PASSWORD      (private-key passphrase / priv_key_file_pwd)
+#   - SNOWFLAKE_TEST_PRIVATE_KEY   (PEM contents of the unencrypted keypair private key)
 #   - SNOWFLAKE_TEST_ACCOUNT
 #   - SNOWFLAKE_TEST_WAREHOUSE
 #   - SNOWFLAKE_TEST_DATABASE
@@ -46,7 +45,6 @@ popd
 echo "[INFO] Starting Rocky Linux 9 Docker container"
 docker run --network=host \
     -e SNOWFLAKE_TEST_USER \
-    -e SNOWFLAKE_TEST_PASSWORD \
     -e SNOWFLAKE_TEST_PRIVATE_KEY \
     -e SNOWFLAKE_TEST_ACCOUNT \
     -e SNOWFLAKE_TEST_WAREHOUSE \
