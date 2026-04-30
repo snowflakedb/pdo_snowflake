@@ -7,8 +7,8 @@
 # Python scripts as the Ubuntu Linux tests.
 #
 # Required environment variables:
-#   - SNOWFLAKE_TEST_USER
-#   - SNOWFLAKE_TEST_PASSWORD
+#   - SNOWFLAKE_TEST_USER          (keypair-auth username)
+#   - SNOWFLAKE_TEST_PRIVATE_KEY   (PEM contents of the unencrypted keypair private key)
 #   - SNOWFLAKE_TEST_ACCOUNT
 #   - SNOWFLAKE_TEST_WAREHOUSE
 #   - SNOWFLAKE_TEST_DATABASE

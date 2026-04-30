@@ -16,7 +16,8 @@ test_schema = 'TRAVIS_JOB_{0}'.format(travis_job_id)
 params = {
     'account': os.getenv("SNOWFLAKE_TEST_ACCOUNT"),
     'user': os.getenv("SNOWFLAKE_TEST_USER"),
-    'password': os.getenv("SNOWFLAKE_TEST_PASSWORD"),
+    'private_key_file': os.getenv("SNOWFLAKE_TEST_PRIVATE_KEY_FILE"),
+    'authenticator': 'SNOWFLAKE_JWT',
     'database': os.getenv("SNOWFLAKE_TEST_DATABASE"),
     'role': os.getenv("SNOWFLAKE_TEST_ROLE"),
 }
