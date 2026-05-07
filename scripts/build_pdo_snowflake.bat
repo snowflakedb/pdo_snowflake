@@ -82,10 +82,7 @@ if %ERRORLEVEL% NEQ 0 goto :error
 :: Move libsnowflakeclient
 copy ^
     "%pdodir%\libsnowflakeclient\lib\%build_dir%\snowflakeclient.lib" ^
-    "%depsdir%\lib\libsnowflakeclient_a.lib" ^
-    /v /y
-if %ERRORLEVEL% NEQ 0 goto :error
-rmdir /S /Q "%depsdir%\include\libsnowflakeclient"
+    "%depsdir%\lib\libsnowflakeclient_a.lib"
 if %ERRORLEVEL% NEQ 0 goto :error
 xcopy ^
     "%pdodir%\libsnowflakeclient\include\snowflake" ^
