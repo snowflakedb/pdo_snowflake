@@ -99,7 +99,7 @@ def main(argv):
     SNOWFLAKE_TEST_PRIVATE_KEY_FILE = write_private_key_file(SNOWFLAKE_TEST_PRIVATE_KEY)
 
     set_secret_in_file(file, "[SNOWFLAKE_TEST_USER]",             SNOWFLAKE_TEST_USER)
-    set_secret_in_file(file, "[SNOWFLAKE_TEST_PRIVATE_KEY_FILE]", SNOWFLAKE_TEST_PRIVATE_KEY_FILE)
+    set_secret_in_file(file, "[SNOWFLAKE_TEST_PRIVATE_KEY_FILE]", "\"${SNOWFLAKE_TEST_PRIVATE_KEY_FILE}\"")
     set_secret_in_file(file, "[SNOWFLAKE_TEST_ACCOUNT]",          SNOWFLAKE_TEST_ACCOUNT)
     set_secret_in_file(file, "[SNOWFLAKE_TEST_WAREHOUSE]",        SNOWFLAKE_TEST_WAREHOUSE)
     set_secret_in_file(file, "[SNOWFLAKE_TEST_DATABASE]",         SNOWFLAKE_TEST_DATABASE)
