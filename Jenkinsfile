@@ -7,7 +7,7 @@ properties([
 ])
 
 timestamps {
-  node('regular-memory-node') {
+  node('regular-memory-node-snowos') {
     stage('checkout') {
       checkout scm
     }
