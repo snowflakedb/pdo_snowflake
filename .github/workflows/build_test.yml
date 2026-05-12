@@ -71,7 +71,7 @@ jobs:
         # need to keep track on the latest version
         php-version: ['8.4.16', '8.5.5']
     # The type of runner that the job will run on
-    runs-on: windows-latest
+    runs-on: windows-2022
     env:
       ARCH: x64
       TARGET: Release
