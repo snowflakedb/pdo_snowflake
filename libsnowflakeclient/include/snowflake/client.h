@@ -118,6 +118,16 @@ extern "C" {
 #define SF_CRL_DOWNLOAD_MAX_SIZE_DEFAULT (20 * 1024 * 1024)
 
 /**
+* SPCS TOKEN DEFAULT PATH
+*/
+#define SF_DEFAULT_SPCS_TOKEN_PATH "/snowflake/session/spcs_token"
+
+/**
+* SPCS TOKEN ENVIRONMENT VARIABLE
+*/
+#define SF_SPCS_ENV_VAR "SNOWFLAKE_RUNNING_INSIDE_SPCS"
+
+/**
  * CRL configuration parameters.
  */
 typedef struct SF_CRL_CONFIG {
@@ -803,6 +813,11 @@ SF_STATUS STDCALL snowflake_global_get_attribute(
 SF_CONNECT *STDCALL snowflake_init();
 
 /**
+* Load config from toml file and return a SF_CONNECT struct pointer.
+*/
+SF_CONNECT* STDCALL snowflake_load_toml_config();
+
+/**
  * Purge a SNOWFLAKE connection context
  *
  * @param sf SNOWFLAKE context. The data will be freed from memory.
@@ -865,6 +880,14 @@ SF_STMT* STDCALL snowflake_init_async_query_result(SF_CONNECT *sf, const char *q
  * @return The query status.
  */
 SF_QUERY_STATUS STDCALL snowflake_get_query_status(SF_STMT *sfstmt);
+
+/**
+ * Load TOML file for configuration and parse it as a DSN string.
+ * Wrapper for load_toml_config_as_dsn in SnowflakeCommon.cpp.
+ *
+ * @return char* DSN string if success, NULL otherwise.
+ */
+char* STDCALL snowflake_load_toml_as_dsn();
 
 /**
  * Frees the memory used by a SF_QUERY_RESULT_CAPTURE struct.

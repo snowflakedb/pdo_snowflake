@@ -595,6 +595,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     int ret = 0;
     int64 int_attr_value = 0;
     int8 int8_attr_value = 0;
+    sf_bool is_toml_config_loaded = SF_BOOLEAN_FALSE;
     /* NOTE: the parameters are referenced by index, so if you change
      * the order of parameters, ensure changing the index of vars
      * in php_pdo_snowflake_int.h
@@ -602,6 +603,8 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     struct pdo_data_src_parser vars[] = {
         {"host",                NULL,         0},
         {"port",                "443",        0},
+        {"user",                NULL,         0},
+        {"pwd",                 NULL,         0},
         {"account",             NULL,         0},
         {"region",              NULL,         0},
         {"database",            NULL,         0},
@@ -656,6 +659,29 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"log_query_parameters", "false", 0},
     };
 
+
+    if (dbh->data_source_len == 0) {
+        PDO_LOG_DBG("Loading connection parameters from TOML config");
+        char* toml_config_dsn = snowflake_load_toml_as_dsn();
+
+        if (toml_config_dsn == NULL) {
+            PDO_LOG_ERR("Failed to load TOML config");
+            goto cleanup;
+        }
+        PDO_LOG_DBG("DSN loaded from TOML config: %s", toml_config_dsn);
+        is_toml_config_loaded = SF_BOOLEAN_TRUE;
+
+         pefree((char*)dbh->data_source, dbh->is_persistent);
+        PDO_LOG_DBG("FREE dbh->data_source: %p", dbh->data_source);
+
+         dbh->data_source = pestrdup(toml_config_dsn, dbh->is_persistent);
+            PDO_LOG_DBG("dbh->data_source set to: %s", dbh->data_source);
+         dbh->data_source_len = strlen(dbh->data_source);
+            PDO_LOG_DBG("dbh->data_source_len set to: %d", dbh->data_source_len);
+
+        free(toml_config_dsn);
+    }
+
     // Parse the input data parameters
     php_pdo_parse_data_source(dbh->data_source, dbh->data_source_len, vars,
                               sizeof(vars) /
@@ -668,7 +694,6 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     //TODO set error stuff
 
     /* allocate an environment */
-
     /* handle for the server */
     if (!(H->server = snowflake_init())) {
         pdo_snowflake_error(dbh);
@@ -708,6 +733,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         /* autocommit */
         dbh->auto_commit = (unsigned) auto_commit;
     }
+    
 
     PDO_LOG_INF("Snowflake PHP PDO Driver: %s", PDO_SNOWFLAKE_VERSION);
 
@@ -715,12 +741,25 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
                             PHP_PDO_SNOWFLAKE_NAME);
     snowflake_set_attribute(H->server, SF_CON_APPLICATION_VERSION, PDO_SNOWFLAKE_VERSION);
 
-    snowflake_set_attribute(H->server, SF_CON_USER, dbh->username);
-    PDO_LOG_DBG(
-        "user: %s", dbh->username);
-    snowflake_set_attribute(H->server, SF_CON_PASSWORD, dbh->password);
-    PDO_LOG_DBG(
-        "password: %s", dbh->password != NULL ? "******" : "(NULL)");
+    if (is_toml_config_loaded) 
+    {
+       snowflake_set_attribute(H->server, SF_CON_USER, vars[PDO_SNOWFLAKE_CONN_ATTR_USER_IDX].optval);
+        PDO_LOG_DBG(
+            "user: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_USER_IDX].optval);
+        snowflake_set_attribute(H->server, SF_CON_PASSWORD, vars[PDO_SNOWFLAKE_CONN_ATTR_PASSWORD_IDX].optval);
+        PDO_LOG_DBG(
+            "password: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_PASSWORD_IDX].optval != NULL ? "******" : "(NULL)");
+    }
+    else
+    {
+        snowflake_set_attribute(H->server, SF_CON_USER, dbh->username);
+        PDO_LOG_DBG(
+            "user: %s", dbh->username);
+        snowflake_set_attribute(H->server, SF_CON_PASSWORD, dbh->password);
+        PDO_LOG_DBG(
+            "password: %s", dbh->password != NULL ? "******" : "(NULL)");
+    }
+
     snowflake_set_attribute(
         H->server, SF_CON_HOST, vars[PDO_SNOWFLAKE_CONN_ATTR_HOST_IDX].optval);
     PDO_LOG_DBG(
