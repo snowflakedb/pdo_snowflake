@@ -118,6 +118,16 @@ extern "C" {
 #define SF_CRL_DOWNLOAD_MAX_SIZE_DEFAULT (20 * 1024 * 1024)
 
 /**
+* SPCS TOKEN DEFAULT PATH
+*/
+#define SF_DEFAULT_SPCS_TOKEN_PATH "/snowflake/session/spcs_token"
+
+/**
+* SPCS TOKEN ENVIRONMENT VARIABLE
+*/
+#define SF_SPCS_ENV_VAR "SNOWFLAKE_RUNNING_INSIDE_SPCS"
+
+/**
  * CRL configuration parameters.
  */
 typedef struct SF_CRL_CONFIG {
