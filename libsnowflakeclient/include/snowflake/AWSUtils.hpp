@@ -23,20 +23,6 @@ namespace Snowflake {
       public:
         virtual boost::optional<std::string> getEC2Region() = 0;
         virtual Aws::Auth::AWSCredentials getCredentials() = 0;
-        // Calls STS:AssumeRole with the given credentials and target role
-        // ARN. Returns temporary credentials on success, or boost::none on
-        // failure. Used by the WIF role-assumption (impersonation) chain.
-        virtual boost::optional<Aws::Auth::AWSCredentials> assumeRole(
-            const Aws::Auth::AWSCredentials& currentCreds,
-            const std::string& roleArn) = 0;
-        // Calls AWS STS GetWebIdentityToken for outbound identity federation
-        // (SNOW-2919437). Returns the signed JWT on success, or boost::none on
-        // any failure (HTTP error, signing failure, malformed response).
-        virtual boost::optional<std::string> getWebIdentityToken(
-            const Aws::Auth::AWSCredentials& creds,
-            const std::string& region,
-            const std::string& audience,
-            const std::string& signingAlgorithm) = 0;
         virtual ~ISdkWrapper() = default;
         static ISdkWrapper* getInstance();
       };
