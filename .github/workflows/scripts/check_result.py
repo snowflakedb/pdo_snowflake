@@ -5,18 +5,16 @@ import fileinput
 
 
 def read_test_dir(outputdir):
-    allfiles= []
+    if not os.path.isdir(outputdir):
+        print("[ERROR] test output directory not found: " + outputdir)
+        sys.exit(1)
     resultfiles = []
-    try:
-        for (dirpath, dirnames, filenames) in os.walk(outputdir):
-            allfiles.extend(filenames)
-        for file in allfiles:
-            filename, file_extension = os.path.splitext(file)
-            if file_extension == '.out' or file_extension == '.log':
+    for (dirpath, dirnames, filenames) in os.walk(outputdir):
+        for file in filenames:
+            _, file_extension = os.path.splitext(file)
+            if file_extension in ('.out', '.log', '.diff'):
                 resultfiles.append(file)
-        return resultfiles
-    except:
-        return resultfiles
+    return resultfiles
 
 
 def main(argv):
