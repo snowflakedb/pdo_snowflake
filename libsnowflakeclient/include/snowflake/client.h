@@ -877,6 +877,14 @@ SF_STMT* STDCALL snowflake_init_async_query_result(SF_CONNECT *sf, const char *q
 SF_QUERY_STATUS STDCALL snowflake_get_query_status(SF_STMT *sfstmt);
 
 /**
+ * Load TOML file for configuration and parse it as a DSN string.
+ * Wrapper for load_toml_config_as_dsn in SnowflakeCommon.cpp.
+ *
+ * @return char* DSN string if success, NULL otherwise.
+ */
+char* STDCALL snowflake_load_toml_as_dsn();
+
+/**
  * Frees the memory used by a SF_QUERY_RESULT_CAPTURE struct.
  * Note that this only frees the struct itself, and *not* the underlying
  * capture buffer! The caller is responsible for managing that.
