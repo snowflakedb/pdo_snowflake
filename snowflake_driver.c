@@ -603,8 +603,6 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     struct pdo_data_src_parser vars[] = {
         {"host",                NULL,         0},
         {"port",                "443",        0},
-        {"user",                NULL,         0},
-        {"pwd",                 NULL,         0},
         {"account",             NULL,         0},
         {"region",              NULL,         0},
         {"database",            NULL,         0},
@@ -657,6 +655,8 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
 #endif
         {"log_query_text", "false", 0},
         {"log_query_parameters", "false", 0},
+        {"user",                NULL,         0},
+        {"pwd",                 NULL,         0},
     };
 
 
@@ -733,7 +733,6 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         /* autocommit */
         dbh->auto_commit = (unsigned) auto_commit;
     }
-    
 
     PDO_LOG_INF("Snowflake PHP PDO Driver: %s", PDO_SNOWFLAKE_VERSION);
 
