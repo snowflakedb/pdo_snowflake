@@ -660,7 +660,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     };
 
 
-    if (dbh->data_source_len == 0) {
+    if (dbh->data_source_len == 0 && (dbh->username == NULL && dbh->password == NULL)) {
         PDO_LOG_DBG("Loading connection parameters from TOML config");
         char* toml_config_dsn = snowflake_load_toml_as_dsn();
 
