@@ -671,13 +671,13 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         PDO_LOG_DBG("DSN loaded from TOML config: %s", toml_config_dsn);
         is_toml_config_loaded = SF_BOOLEAN_TRUE;
 
-         pefree((char*)dbh->data_source, dbh->is_persistent);
+        pefree((char*)dbh->data_source, dbh->is_persistent);
         PDO_LOG_DBG("FREE dbh->data_source: %p", dbh->data_source);
 
-         dbh->data_source = pestrdup(toml_config_dsn, dbh->is_persistent);
-            PDO_LOG_DBG("dbh->data_source set to: %s", dbh->data_source);
-         dbh->data_source_len = strlen(dbh->data_source);
-            PDO_LOG_DBG("dbh->data_source_len set to: %d", dbh->data_source_len);
+        dbh->data_source = pestrdup(toml_config_dsn, dbh->is_persistent);
+        PDO_LOG_DBG("dbh->data_source set to: %s", dbh->data_source);
+        dbh->data_source_len = strlen(dbh->data_source);
+        PDO_LOG_DBG("dbh->data_source_len set to: %d", dbh->data_source_len);
 
         free(toml_config_dsn);
     }
@@ -742,12 +742,17 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
 
     if (is_toml_config_loaded) 
     {
-       snowflake_set_attribute(H->server, SF_CON_USER, vars[PDO_SNOWFLAKE_CONN_ATTR_USER_IDX].optval);
-        PDO_LOG_DBG(
-            "user: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_USER_IDX].optval);
-        snowflake_set_attribute(H->server, SF_CON_PASSWORD, vars[PDO_SNOWFLAKE_CONN_ATTR_PASSWORD_IDX].optval);
-        PDO_LOG_DBG(
-            "password: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_PASSWORD_IDX].optval != NULL ? "******" : "(NULL)");
+        if (vars[PDO_SNOWFLAKE_CONN_ATTR_USER_IDX].optval != NULL) {
+            snowflake_set_attribute(H->server, SF_CON_USER, vars[PDO_SNOWFLAKE_CONN_ATTR_USER_IDX].optval);
+            PDO_LOG_DBG(
+                "user: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_USER_IDX].optval);
+        }
+
+        if (vars[PDO_SNOWFLAKE_CONN_ATTR_PASSWORD_IDX].optval != NULL) {
+            snowflake_set_attribute(H->server, SF_CON_PASSWORD, vars[PDO_SNOWFLAKE_CONN_ATTR_PASSWORD_IDX].optval);
+            PDO_LOG_DBG(
+                "password: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_PASSWORD_IDX].optval != NULL ? "******" : "(NULL)");
+        }
     }
     else
     {
