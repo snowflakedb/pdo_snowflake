@@ -818,7 +818,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
             vars[PDO_SNOWFLAKE_CONN_ATTR_PRIV_KEY_FILE_PWD_IDX].optval);
     }
     PDO_LOG_DBG(
-        "priv_key_file_pwd: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_PRIV_KEY_FILE_PWD_IDX].optval);
+        "priv_key_file_pwd: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_PRIV_KEY_FILE_PWD_IDX].optval != NULL ? "******" : "(NULL)");
 
     if (vars[PDO_SNOWFLAKE_CONN_ATTR_PROXY_IDX].optval != NULL) {
         /* proxy */
