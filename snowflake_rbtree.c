@@ -200,10 +200,16 @@ int STDCALL pdo_rbtree_insert(RedBlackTree **T, void *param, char *name)
   }
   node = *T;
 
-  if (!node->elem)
+  /*
+   * Detect the empty root by key == NULL rather than elem == NULL. A node may
+   * be "tombstoned" (elem == NULL) by pdo_rbtree_remove() while still holding a
+   * valid owned key that is used for in-tree navigation; treating such a node
+   * as the empty root would clobber its key and corrupt the BST ordering.
+   */
+  if (!node->key)
   {
     node->elem = param;
-    node->key = name;
+    node->key = estrdup(name);
     retval = 0;
     goto done;
   }
@@ -212,10 +218,9 @@ int STDCALL pdo_rbtree_insert(RedBlackTree **T, void *param, char *name)
     cmp = strcmp(name, node->key);
     if (cmp == 0)
     {
-      /* Key Exists */
-      /* Update*/
+      /* Key exists: update the element only. The node already owns an
+       * identical copy of the key (see estrdup below), so leave it in place. */
       //PDO_LOG_DBG("pdo_rbtree_insert: Duplicate param found, Overwrite\n");
-      node->key = name;
       node->elem = param;
       retval = 0;
       goto done;
@@ -236,7 +241,7 @@ int STDCALL pdo_rbtree_insert(RedBlackTree **T, void *param, char *name)
           //PDO_LOG_ERR("pdo_rbtree_insert : Not able to allocate new rbtree node \n");
           goto done;
         }
-        node->right->key = name;
+        node->right->key = estrdup(name);
         node->right->elem = param;
         node->right->parent = node;
         node->right->color = RED;
@@ -260,7 +265,7 @@ int STDCALL pdo_rbtree_insert(RedBlackTree **T, void *param, char *name)
           retval = 0;
           goto done;
         }
-        node->left->key = name;
+        node->left->key = estrdup(name);
         node->left->elem = param;
         node->left->parent = node;
         node->left->color = RED;
@@ -279,7 +284,12 @@ void * STDCALL pdo_rbtree_search_node(RedBlackTree *tree, char *key)
   RedBlackNode *node = tree;
   int cmp = 0;
 
-  if (!tree || !tree->elem || !key)
+  /*
+   * An empty tree is identified by a NULL root key (see pdo_rbtree_insert).
+   * Do not short-circuit on tree->elem: the root may be tombstoned
+   * (elem == NULL) while its descendants still hold live elements.
+   */
+  if (!tree || !key || !tree->key)
   {
     return NULL;
   }
@@ -288,6 +298,7 @@ void * STDCALL pdo_rbtree_search_node(RedBlackTree *tree, char *key)
     cmp = strcmp(key, node->key);
     if (cmp == 0)
     {
+      /* A tombstoned node has elem == NULL, which is reported as "not found". */
       return node->elem;
     }
     else if(cmp < 0)
@@ -320,5 +331,43 @@ void STDCALL pdo_rbtree_deallocate(RedBlackNode *node)
   pdo_rbtree_deallocate(node->right);
   node->left = NULL;
   node->right = NULL;
+  /* The node owns its key (estrdup on insert); release it here. */
+  if (node->key)
+  {
+    efree(node->key);
+    node->key = NULL;
+  }
   efree(node);
+}
+
+/*
+ * Tombstone the entry for `key`: clear node->elem so a stale (caller-freed)
+ * element is never returned by a later search, while keeping the node and its
+ * owned key in place for in-tree navigation. The key is released later in
+ * pdo_rbtree_deallocate. Returns 1 if a matching node was found and cleared.
+ *
+ * Note: the node is intentionally retained (not unlinked) to avoid red-black
+ * rebalancing here; param stores are short-lived and bounded by the number of
+ * distinct parameter names, so retained tombstones are not a concern.
+ */
+int STDCALL pdo_rbtree_remove(RedBlackTree *tree, char *key)
+{
+  RedBlackNode *node = tree;
+  int cmp = 0;
+
+  if (!tree || !key || !tree->key)
+  {
+    return 0;
+  }
+  while (node)
+  {
+    cmp = strcmp(key, node->key);
+    if (cmp == 0)
+    {
+      node->elem = NULL;
+      return 1;
+    }
+    node = (cmp < 0) ? node->left : node->right;
+  }
+  return 0;
 }
