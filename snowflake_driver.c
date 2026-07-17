@@ -312,32 +312,6 @@ static char *pdo_snowflake_last_insert_id(pdo_dbh_t *dbh, const char *name,
 /* }}} */
 
 /**
- * Turn an unquoted string into a quoted string for use in a query.
- *
- * Not implemented as Snowflake supports server side binding.
- *
- * @param dbh Pointer to the database handle initialized by the handle factory
- * @param unquoted Pointer to a character string containing the string to be quoted.
- * @param unquotedlen The length of the string to be quoted.
- * @param quoted Pointer to the address where a pointer to the newly quoted
- * string will be returned.
- * @param quotedlen The length of the new string.
- * @param paramtype A driver specific hint for driver that have alternate
- * quoting styles
- * @return 1 if success or 0 if error occurs
- */
-static int snowflake_handle_quoter(pdo_dbh_t *dbh, const char *unquoted,
-                                   size_t unquotedlen, char **quoted,
-                                   size_t *quotedlen,
-                                   enum pdo_param_type paramtype) /* {{{ */
-{
-    PDO_LOG_ENTER("snowflake_handle_quoter");
-    /* NOT SUPPORTED */
-    PDO_LOG_RETURN(0);
-}
-/* }}} */
-
-/**
  * Begin a database transaction.
  * @param dbh Pointer to the database handle initialized by the handle factory
  * @return 1 if success or 0 if error occurs
@@ -492,7 +466,7 @@ static struct pdo_dbh_methods snowflake_methods = {
     snowflake_handle_closer,
     snowflake_handle_preparer,
     snowflake_handle_doer,
-    snowflake_handle_quoter,
+    NULL, /* quoter not supported; PDO core raises IM001 */
     snowflake_handle_begin,
     snowflake_handle_commit,
     snowflake_handle_rollback,
@@ -517,12 +491,6 @@ static bool snowflake_handle_preparer_newif(pdo_dbh_t *dbh, zend_string *sql, pd
 static zend_long snowflake_handle_doer_newif(pdo_dbh_t *dbh, const zend_string *sql)
 {
     return snowflake_handle_doer(dbh, ZSTR_VAL(sql), ZSTR_LEN(sql));
-}
-static zend_string* snowflake_handle_quoter_newif(pdo_dbh_t *dbh, const zend_string *unquoted, enum pdo_param_type paramtype)
-{
-    PDO_LOG_ENTER("snowflake_handle_quoter");
-    /* NOT SUPPORTED */
-    PDO_LOG_RETURN(0);
 }
 static bool snowflake_handle_begin_newif(pdo_dbh_t *dbh)
 {
@@ -558,7 +526,7 @@ static struct pdo_dbh_methods snowflake_methods = {
     snowflake_handle_closer_newif,
     snowflake_handle_preparer_newif,
     snowflake_handle_doer_newif,
-    snowflake_handle_quoter_newif,
+    NULL, /* quoter not supported; PDO core raises IM001 */
     snowflake_handle_begin_newif,
     snowflake_handle_commit_newif,
     snowflake_handle_rollback_newif,
