@@ -118,6 +118,21 @@ extern "C" {
 #define SF_CRL_DOWNLOAD_MAX_SIZE_DEFAULT (20 * 1024 * 1024)
 
 /**
+* SPCS TOKEN DEFAULT PATH
+*/
+#define SF_DEFAULT_SPCS_TOKEN_PATH "/snowflake/session/spcs_token"
+
+/**
+* SPCS TOKEN ENVIRONMENT VARIABLE
+*/
+#define SF_SPCS_ENV_VAR "SNOWFLAKE_RUNNING_INSIDE_SPCS"
+
+/**
+* DEFAULT WIF AUDIENCE
+*/
+#define SF_SNOWFLAKE_WIF_AUDIENCE "snowflakecomputing.com"
+
+/**
  * CRL configuration parameters.
  */
 typedef struct SF_CRL_CONFIG {
@@ -382,6 +397,7 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_APPLICATION_PATH,
     SF_CON_LOG_QUERY_TEXT,
     SF_CON_LOG_QUERY_PARAMETERS,
+    SF_CON_WIF_AUDIENCE,
 } SF_ATTRIBUTE;
 
 /**
@@ -602,6 +618,8 @@ typedef struct SF_CONNECT {
     //the option to enable capturing the query info in the logs
     sf_bool log_query_text;
     sf_bool log_query_parameters;
+
+    char* wif_audience;
 } SF_CONNECT;
 
 /**
@@ -819,6 +837,17 @@ SF_STATUS STDCALL snowflake_term(SF_CONNECT *sf);
 SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf);
 
 /**
+ * Creates a new session and connects to Snowflake using TOML configuration.
+ *
+ * The caller owns the returned handle and is responsible for releasing it
+ * with snowflake_term(), mirroring the ownership contract of snowflake_init().
+ *
+ * @return A connected SF_CONNECT handle on success. Returns NULL if the
+ *         connection fails, or if the TOML configuration is empty or missing.
+ */
+SF_CONNECT* STDCALL snowflake_connect_with_toml();
+
+/**
  * Sets the attribute to the session.
  *
  * @param sf SNOWFLAKE context.
@@ -865,6 +894,14 @@ SF_STMT* STDCALL snowflake_init_async_query_result(SF_CONNECT *sf, const char *q
  * @return The query status.
  */
 SF_QUERY_STATUS STDCALL snowflake_get_query_status(SF_STMT *sfstmt);
+
+/**
+ * Load TOML file for configuration and parse it as a DSN string.
+ * Wrapper for load_toml_config_as_dsn in SnowflakeCommon.cpp.
+ *
+ * @return char* DSN string if success, NULL otherwise.
+ */
+char* STDCALL snowflake_load_toml_as_dsn();
 
 /**
  * Frees the memory used by a SF_QUERY_RESULT_CAPTURE struct.

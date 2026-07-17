@@ -10,6 +10,7 @@
   - Added support for PHP 8.5 and drop support for PHP 8.1 (snowflakedb/pdo_snowflake#501)
   - Fixed misleading error message when building the driver on Windows. (snowflakedb/pdo_snowflake#507)
   - Updated the `libsnowflakeclient` to v2.9.1 (snowflakedb/pdo_snowflake#511)
+  - Added support for the toml file connection. (snowflakedb/pdo_snowflake#510)
 
 - v3.7.0
   - Updated the `libsnowflakeclient` to v2.8.0 (snowflakedb/pdo_snowflake#503)

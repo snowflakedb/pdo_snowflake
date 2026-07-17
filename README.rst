@@ -493,6 +493,48 @@ To impersonate a service account, set :code:`workload_identity_impersonation_pat
 
     $dbh = new PDO("snowflake:account=<account_name>;authenticator=workload_identity;workload_identity_provider=GCP;workload_identity_impersonation_path=<service_account_email>", "", "");
 
+Using a TOML Configuration File
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PHP PDO driver supports reading connection parameters from a TOML configuration file
+(:code:`config.toml` or :code:`connections.toml`). This allows you to share connection
+definitions across Snowflake developer tools without hardcoding credentials in your PHP code.
+
+For details on how to create and manage the TOML configuration file, see
+`Managing Snowflake connections <https://docs.snowflake.com/en/developer-guide/snowflake-cli/connecting/configure-connections>`_.
+
+To connect to the Snowflake database using a TOML configuration file, create a new :code:`PDO`
+object, as explained in the
+`PHP PDO documentation <https://www.php.net/manual/en/pdo.connections.php>`_.
+Specify the data source name (:code:`dsn`) as :code:`snowflake:` with no additional parameters,
+and pass :code:`null` (or an empty string) for both the username and password:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:", null, null);
+
+When the driver receives an empty DSN, it automatically loads the connection parameters from
+the TOML configuration file.
+
+The TOML file supports the same connection parameters as the DSN. For example, the following
+TOML entry is equivalent to specifying the parameters directly in the DSN string:
+
+.. code-block:: toml
+
+    [connections.myconnection]
+    account = "<account_name>"
+    user = "<username>"
+    password = "<password>"
+    warehouse = "<warehouse>"
+    database = "<database>"
+    schema = "<schema>"
+
+where:
+
+- :code:`<account_name>` Specifies your
+  `Snowflake account name <https://docs.snowflake.com/en/user-guide/connecting.html#your-snowflake-account-name>`_.
+- :code:`<username>` Specifies the login
+
 Configuring OCSP Checking
 ----------------------------------------------------------------------
 
