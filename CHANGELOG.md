@@ -1,6 +1,10 @@
 #### For the official PDO Snowflake Release Notes please refer to https://docs.snowflake.com/en/release-notes/clients-drivers/php-pdo
 
 # Changelog
+
+- v4.0.1
+  - `PDO::quote()` now raises IM001 (driver does not support quoting).
+
 - v4.0.0
   - Added support for PHP 8.5 and drop support for PHP 8.1 (snowflakedb/pdo_snowflake#501)
   - Fixed misleading error message when building the driver on Windows. (snowflakedb/pdo_snowflake#507)
