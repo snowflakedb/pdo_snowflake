@@ -10,6 +10,7 @@ if (PHP_PDO_SNOWFLAKE != "no") {
     pdo_snowflake_src_files = " pdo_snowflake.c snowflake_driver.c snowflake_stmt.c snowflake_paramstore.c snowflake_arraylist.c snowflake_treemap.c snowflake_rbtree.c ";
 
     if (CHECK_LIB('libsnowflakeclient_a.lib', 'pdo_snowflake') && CHECK_LIB('libcurl_a.lib', 'pdo_snowflake') && 
+            CHECK_LIB('idn2.lib', 'pdo_snowflake') &&
             CHECK_LIB('libssl_a.lib', 'pdo_snowflake') && CHECK_LIB('libcrypto_a.lib', 'pdo_snowflake') && CHECK_LIB('zlib_a.lib', 'pdo_snowflake') && CHECK_LIB('libtelemetry_a.lib', 'pdo_snowflake') &&
             CHECK_LIB('arrow_static.lib', 'pdo_snowflake') && CHECK_LIB('libboost_url.lib', 'pdo_snowflake') && CHECK_LIB('libboost_filesystem.lib', 'pdo_snowflake') && CHECK_LIB('libboost_regex.lib', 'pdo_snowflake') && CHECK_LIB('libboost_system.lib', 'pdo_snowflake') &&
             CHECK_LIB('aws-cpp-sdk-sts.lib', 'pdo_snowflake') && CHECK_LIB('aws-cpp-sdk-s3.lib', 'pdo_snowflake') && CHECK_LIB('aws-cpp-sdk-core.lib', 'pdo_snowflake') &&
