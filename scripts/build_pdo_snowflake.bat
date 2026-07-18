@@ -100,7 +100,7 @@ xcopy ^
 if %ERRORLEVEL% NEQ 0 goto :error
 
 cd %phpsrcdir%
-buildconf --force && configure --disable-all --enable-cli --enable-pdo --with-pdo_snowflake=shared && nmake
+buildconf --force && configure --disable-all --enable-cli --enable-pdo --with-pdo_snowflake=shared --with-extra-libs=normaliz.lib && nmake
 
 :success
 :: Go back to where you came from
