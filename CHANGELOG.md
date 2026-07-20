@@ -2,7 +2,7 @@
 
 # Changelog
 
-- v4.0.1
+- v4.1.0
   - Fixed a use-after-free in the named-parameter store on parameter rebind/teardown. (SNOW-3649747)
   - `PDO::quote()` now raises IM001 (driver does not support quoting).
   - Updated the `libsnowflakeclient` to v2.9.2 (snowflakedb/pdo_snowflake#521)
