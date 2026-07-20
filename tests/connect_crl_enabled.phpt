@@ -4,6 +4,12 @@ pdo_snowflake - connect with CRL enabled and OCSP disabled
 pdo_snowflake.logdir=sflog
 pdo_snowflake.loglevel=DEBUG
 pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
+--SKIPIF--
+<?php
+if (PHP_OS_FAMILY === 'Windows') {
+    die('skip putenv not working well on Windows');
+}
+?>
 --FILE--
 <?php
     include __DIR__ . "/common.php";
