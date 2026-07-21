@@ -18,6 +18,7 @@ if (PHP_PDO_SNOWFLAKE != "no") {
             CHECK_LIB('aws-checksums.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-cal.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-event-stream.lib', 'pdo_snowflake') &&
             CHECK_LIB('aws-c-sdkutils.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-io.lib', 'pdo_snowflake') && CHECK_LIB('aws-c-common.lib', 'pdo_snowflake') &&
             CHECK_LIB('azure-storage-lite.lib', 'pdo_snowflake') &&
+            CHECK_LIB('iphlpapi.lib', 'pdo_snowflake') &&
             CHECK_LIB('Userenv.lib', 'pdo_snowflake') && CHECK_LIB('Version.lib', 'pdo_snowflake') && CHECK_LIB('Secur32.lib', 'pdo_snowflake') &&
             CHECK_LIB('Ncrypt.lib', 'pdo_snowflake') && CHECK_LIB('Shlwapi.lib', 'pdo_snowflake') && CHECK_LIB('Iphlpapi.lib', 'pdo_snowflake') &&
             CHECK_HEADER_ADD_INCLUDE('snowflake\\client.h', 'CFLAGS_PDO_SNOWFLAKE', configure_module_dirname + '\\libsnowflakeclient\\include')) {
