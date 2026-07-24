@@ -626,6 +626,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"user",                NULL,         0},
         {"pwd",                 NULL,         0},
         {"wif_audience",        NULL,         0},
+        {"wif_host",        NULL,             0},
     };
 
 
@@ -1049,6 +1050,14 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
             vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AUDIENCE_IDX].optval);
         PDO_LOG_DBG(
             "wif_audience: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AUDIENCE_IDX].optval);
+    }
+  
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_HOST_IDX].optval != NULL) {
+        snowflake_set_attribute(
+            H->server, SF_CON_WIF_HOST,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_HOST_IDX].optval);
+        PDO_LOG_DBG(
+            "wif_host: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_HOST_IDX].optval);
     }
 
     /* Auto-detect the PHP script path for APPLICATION_PATH.
