@@ -6,6 +6,7 @@
   - Fixed a use-after-free in the named-parameter store on parameter rebind/teardown. (SNOW-3649747)
   - `PDO::quote()` now raises IM001 (driver does not support quoting).
   - Updated the `libsnowflakeclient` to v2.9.2 (snowflakedb/pdo_snowflake#521)
+  - Added a connection parameter: wif_audience (snowflakedb/pdo_snowflake#523)
 
 - v4.0.0
   - Added support for PHP 8.5 and drop support for PHP 8.1 (snowflakedb/pdo_snowflake#501)
