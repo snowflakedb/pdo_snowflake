@@ -109,17 +109,35 @@ int STDCALL pdo_sf_treemap_extract_node(TREE_MAP *tree_map, int idx, char *key, 
 
 int STDCALL pdo_sf_treemap_set(TREE_MAP *tree_map, void *param, char *key)
 {
+  unsigned long index;
 
-  if (!tree_map || !param || !key)
+  if (!tree_map || !key)
   {
-    /* Handle error 
-    ** return or goto done;
-    */
-    //PDO_LOG_ERR("pdo_sf_treemap_set: Tree Map || Param || key passed is NULL\n");
+    //PDO_LOG_ERR("pdo_sf_treemap_set: Tree Map || key passed is NULL\n");
     return 0;
   }
 
-  return pdo_sf_treemap_insert_node(pdo_sf_treemap_get_index(key), tree_map, param, key);
+  index = pdo_sf_treemap_get_index(key);
+
+  /*
+   * A NULL param means "clear this slot". The NAMED store must actually remove
+   * the entry here: previously this early-returned, leaving the rbtree node
+   * pointing at an element the caller is about to free, which the next lookup
+   * or statement teardown would dereference (use-after-free, CWE-416). This
+   * mirrors the POSITIONAL path, where pdo_sf_array_list_set(.., NULL, ..)
+   * already clears the slot.
+   */
+  if (!param)
+  {
+    TREE_MAP *idx_cur = &tree_map[index];
+    if (idx_cur->tree)
+    {
+      return pdo_rbtree_remove(idx_cur->tree, key);
+    }
+    return 0;
+  }
+
+  return pdo_sf_treemap_insert_node(index, tree_map, param, key);
 }
 
 void * STDCALL pdo_sf_treemap_get(TREE_MAP *tree_map, char *key)

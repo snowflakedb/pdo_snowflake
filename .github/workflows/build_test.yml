@@ -1,7 +1,10 @@
 #common envs
+# All build_test jobs authenticate via keypair (JWT) using an unencrypted
+# private key. Only the Jenkins authentication-tests pipeline still exercises
+# non-keypair auth methods because that's the entire point of those tests.
 env:
-  SNOWFLAKE_TEST_USER: ${{ secrets.SNOWFLAKE_TEST_USER }}
-  SNOWFLAKE_TEST_PASSWORD: ${{ secrets.SNOWFLAKE_TEST_PASSWORD }}
+  SNOWFLAKE_TEST_USER: ${{ secrets.SNOWFLAKE_TEST_USER_KEYPAIR }}
+  SNOWFLAKE_TEST_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_TEST_PRIVATE_KEY }}
   SNOWFLAKE_TEST_ACCOUNT: ${{ secrets.SNOWFLAKE_TEST_ACCOUNT }}
   SNOWFLAKE_TEST_WAREHOUSE: ${{ secrets.SNOWFLAKE_TEST_WAREHOUSE }}
   SNOWFLAKE_TEST_DATABASE: ${{ secrets.SNOWFLAKE_TEST_DATABASE }}
@@ -66,9 +69,9 @@ jobs:
         # have to specify patch version on windows
         # otherwise could get version mismatch issue when running test on github
         # need to keep track on the latest version
-        php-version: ['8.4.13']
+        php-version: ['8.4.16', '8.5.5']
     # The type of runner that the job will run on
-    runs-on: windows-latest
+    runs-on: windows-2022
     env:
       ARCH: x64
       TARGET: Release
@@ -99,7 +102,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.1', '8.2', '8.3', '8.4']
+        php-version: ['8.2', '8.3', '8.4', '8.5']
         os: [ubuntu-latest, ubuntu-22.04-arm]
     # The type of runner that the job will run on
     runs-on: ${{ matrix.os }}
@@ -128,7 +131,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.1', '8.2', '8.3', '8.4']
+        php-version: ['8.2', '8.3', '8.4', '8.5']
     # The type of runner that the job will run on
     runs-on: macos-latest
     env: 
@@ -151,6 +154,26 @@ jobs:
         
         - name: test driver
           run: python ./.github/workflows/scripts/test_driver.py
+
+  build_test_rockylinux9:
+    name: build_test_rockylinux9 (${{ matrix.php-version }}, ${{ matrix.os == 'ubuntu-latest' && 'x64' || 'arm64' }})
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.2', '8.3', '8.4', '8.5']
+        os: [ubuntu-latest, ubuntu-22.04-arm]
+    runs-on: ${{ matrix.os }}
+    env:
+      PHP_VERSION: ${{ matrix.php-version }}
+      PHP_HOME: /usr
+      TEST_PHP_EXECUTABLE: /usr/bin/php
+      NO_INTERACTION: true
+      USE_VALGRIND: 0
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Driver and Run Tests in Docker
+        run: ./scripts/test_rockylinux9_docker.sh
+        shell: bash
 
   code-coverage:
     # The type of runner that the job will run on

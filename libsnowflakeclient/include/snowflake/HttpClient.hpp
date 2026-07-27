@@ -18,7 +18,12 @@ namespace Snowflake {
         return std::string(buffer.begin(), buffer.end());
       }
 
+      std::string getHeader() const {
+          return std::string(headerBuffer.begin(), headerBuffer.end());
+      }
+
       std::vector<char> buffer;
+      std::vector<char> headerBuffer;
     };
 
     struct HttpRequest {
@@ -45,10 +50,14 @@ namespace Snowflake {
 
       boost::urls::url url;
       std::map <std::string, std::string> headers;
+      std::string body{};
     };
 
     struct HttpClientConfig {
       long connectTimeoutInSeconds;
+      long connectTimeoutInMilliSeconds = 0;
+      long requestTimeoutInSeconds = 0;
+      long requestTimeoutInMilliSeconds = 0;
     };
 
     class IHttpClient {

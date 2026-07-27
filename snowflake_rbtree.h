@@ -37,6 +37,8 @@ int STDCALL pdo_rbtree_insert(RedBlackTree **T, void *param, char *key);
 
 void * STDCALL pdo_rbtree_search_node(RedBlackTree *tree, char *key);
 
+int STDCALL pdo_rbtree_remove(RedBlackTree *tree, char *key);
+
 void STDCALL pdo_rbtree_deallocate(RedBlackNode *node);
 
 #ifdef __cplusplus

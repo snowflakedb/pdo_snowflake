@@ -45,6 +45,26 @@ extern "C" {
  */
 #define SF_AUTHENTICATOR_PAT "programmatic_access_token"
 
+/**
+ * Workload Identity Federation authenticator
+ */
+#define SF_AUTHENTICATOR_WORKLOAD_IDENTITY "workload_identity"
+
+ /**
+ * Authenticator, oauth_authorization_code
+ */
+#define SF_AUTHENTICATOR_OAUTH_AUTHORIZATION_CODE "oauth_authorization_code"
+
+/**
+* Authenticator, oauth_client_credentials
+*/
+#define SF_AUTHENTICATOR_OAUTH_CLIENT_CREDENTIALS "oauth_client_credentials"
+
+/**
+* Authenticator, username/password with MFA token caching
+*/
+#define SF_AUTHENTICATOR_USR_PWD_MFA "username_password_mfa"
+
  /**
  * Authenticator, SSO token
  */
@@ -82,10 +102,48 @@ extern "C" {
  */
 #define SF_RETRY_TIMEOUT 300
 
+ /**
+ * network timeout in seconds
+ */
+#define SF_NETWORK_TIMEOUT 90
+
     /**
      * CRL download timeout in seconds
      */
 #define SF_CRL_DOWNLOAD_TIMEOUT 120
+
+    /**
+     * CRL download max size in bytes (20 MB)
+     */
+#define SF_CRL_DOWNLOAD_MAX_SIZE_DEFAULT (20 * 1024 * 1024)
+
+/**
+* SPCS TOKEN DEFAULT PATH
+*/
+#define SF_DEFAULT_SPCS_TOKEN_PATH "/snowflake/session/spcs_token"
+
+/**
+* SPCS TOKEN ENVIRONMENT VARIABLE
+*/
+#define SF_SPCS_ENV_VAR "SNOWFLAKE_RUNNING_INSIDE_SPCS"
+
+/**
+* DEFAULT WIF AUDIENCE
+*/
+#define SF_SNOWFLAKE_WIF_AUDIENCE "snowflakecomputing.com"
+
+/**
+ * CRL configuration parameters.
+ */
+typedef struct SF_CRL_CONFIG {
+    sf_bool check;
+    sf_bool advisory;
+    sf_bool allow_no_crl; // allow certificates without CRL URL
+    sf_bool disk_caching;
+    sf_bool memory_caching;
+    long download_timeout;
+    long download_max_size;
+} SF_CRL_CONFIG;
 
  /**
  * max retry number
@@ -107,6 +165,11 @@ extern "C" {
  */
 #define PRIVATELINK_HOSTNAME_SUFFIX ".privatelink.snowflakecomputing."
 
+ /**
+  * Platform detection timeout in milliseconds
+  */
+#define SF_PLATFORM_DETECTION_TIMEOUT 200
+
 /**
  * Snowflake Data types
  *
@@ -126,7 +189,8 @@ typedef enum SF_DB_TYPE {
     SF_DB_TYPE_BINARY,
     SF_DB_TYPE_TIME,
     SF_DB_TYPE_BOOLEAN,
-    SF_DB_TYPE_ANY
+    SF_DB_TYPE_DECFLOAT,
+    SF_DB_TYPE_ANY,
 } SF_DB_TYPE;
 
 /**
@@ -308,15 +372,32 @@ typedef enum SF_ATTRIBUTE {
     SF_RETRY_ON_CURLE_COULDNT_CONNECT_COUNT,
     SF_QUERY_RESULT_TYPE,
     SF_CON_OAUTH_TOKEN,
+    SF_CON_OAUTH_REFRESH_TOKEN,
     SF_CON_DISABLE_CONSOLE_LOGIN,
     SF_CON_BROWSER_RESPONSE_TIMEOUT,
     SF_CON_PAT,
+    SF_CON_OAUTH_TOKEN_ENDPOINT,
+    SF_CON_OAUTH_AUTHORIZATION_ENDPOINT,
+    SF_CON_OAUTH_REDIRECT_URI,
+    SF_CON_OAUTH_CLIENT_ID,
+    SF_CON_OAUTH_CLIENT_SECRET,
+    SF_CON_OAUTH_SCOPE,
+    SF_CON_SINGLE_USE_REFRESH_TOKEN,
     SF_CON_CRL_CHECK,
     SF_CON_CRL_ADVISORY,
     SF_CON_CRL_ALLOW_NO_CRL,
     SF_CON_CRL_DISK_CACHING,
     SF_CON_CRL_MEMORY_CACHING,
-    SF_CON_CRL_DOWNLOAD_TIMEOUT
+    SF_CON_CRL_DOWNLOAD_TIMEOUT,
+    SF_CON_CRL_DOWNLOAD_MAX_SIZE,
+    SF_CON_WIF_PROVIDER,
+    SF_CON_WIF_TOKEN,
+    SF_CON_WIF_AZURE_RESOURCE,
+    SF_CON_WORKLOAD_IDENTITY_IMPERSONATION_PATH,
+    SF_CON_APPLICATION_PATH,
+    SF_CON_LOG_QUERY_TEXT,
+    SF_CON_LOG_QUERY_PARAMETERS,
+    SF_CON_WIF_AUDIENCE,
 } SF_ATTRIBUTE;
 
 /**
@@ -402,12 +483,7 @@ typedef struct SF_CONNECT {
     char *service_name;
     char *query_result_format;
 
-    sf_bool crl_check;
-    sf_bool crl_advisory;
-    sf_bool crl_allow_no_crl;
-    sf_bool crl_disk_caching;
-    sf_bool crl_memory_caching;
-    long crl_download_timeout;
+    SF_CRL_CONFIG crl_config;
 
   /* used when updating parameters */
     SF_MUTEX_HANDLE mutex_parameters;
@@ -429,6 +505,9 @@ typedef struct SF_CONNECT {
 
     // Partner application name
     char * application;
+
+    // Override for APPLICATION_PATH in CLIENT_ENVIRONMENT
+    char * application_path;
 
     // Proxy
     char * proxy;
@@ -455,6 +534,16 @@ typedef struct SF_CONNECT {
     // For token cache auth.
     char* sso_token;
     char* mfa_token;
+
+    // Oauth authentication
+    char* oauth_authorization_endpoint;
+    char* oauth_token_endpoint;
+    char* oauth_redirect_uri;
+    char* oauth_client_id;
+    char* oauth_client_secret;
+    char* oauth_scope;
+    char* oauth_refresh_token;
+    sf_bool single_use_refresh_token;
 
     int64 login_timeout;
     int64 network_timeout;
@@ -495,6 +584,14 @@ typedef struct SF_CONNECT {
     //programmatic access token
     char *programmatic_access_token;
 
+    // WIF (Workload Identity Federation) configuration
+    char *wif_provider;
+    char *wif_token;
+    char *wif_azure_resource;
+
+    // WIF impersonation path
+    char *workload_identity_impersonation_path;
+
     // put get configurations
     sf_bool use_s3_regional_url;
     sf_bool put_use_urand_dev;
@@ -517,6 +614,12 @@ typedef struct SF_CONNECT {
     sf_bool stage_binding_disabled;
     sf_bool disable_console_login;
     sf_bool client_store_temporary_credential;
+
+    //the option to enable capturing the query info in the logs
+    sf_bool log_query_text;
+    sf_bool log_query_parameters;
+
+    char* wif_audience;
 } SF_CONNECT;
 
 /**
@@ -734,6 +837,17 @@ SF_STATUS STDCALL snowflake_term(SF_CONNECT *sf);
 SF_STATUS STDCALL snowflake_connect(SF_CONNECT *sf);
 
 /**
+ * Creates a new session and connects to Snowflake using TOML configuration.
+ *
+ * The caller owns the returned handle and is responsible for releasing it
+ * with snowflake_term(), mirroring the ownership contract of snowflake_init().
+ *
+ * @return A connected SF_CONNECT handle on success. Returns NULL if the
+ *         connection fails, or if the TOML configuration is empty or missing.
+ */
+SF_CONNECT* STDCALL snowflake_connect_with_toml();
+
+/**
  * Sets the attribute to the session.
  *
  * @param sf SNOWFLAKE context.
@@ -780,6 +894,14 @@ SF_STMT* STDCALL snowflake_init_async_query_result(SF_CONNECT *sf, const char *q
  * @return The query status.
  */
 SF_QUERY_STATUS STDCALL snowflake_get_query_status(SF_STMT *sfstmt);
+
+/**
+ * Load TOML file for configuration and parse it as a DSN string.
+ * Wrapper for load_toml_config_as_dsn in SnowflakeCommon.cpp.
+ *
+ * @return char* DSN string if success, NULL otherwise.
+ */
+char* STDCALL snowflake_load_toml_as_dsn();
 
 /**
  * Frees the memory used by a SF_QUERY_RESULT_CAPTURE struct.

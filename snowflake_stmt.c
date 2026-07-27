@@ -141,7 +141,14 @@ static int pdo_snowflake_stmt_execute_prepared(pdo_stmt_t *stmt) /* {{{ */
     // won't hit for now but leave it to prevent crash with unexpected query result.
     if (stmt->column_count < 0)
     {
-        PDO_LOG_ERR("Unsupported query type %s.", S->stmt->sql_text);
+        if (S->stmt->connection->log_query_text == SF_BOOLEAN_TRUE) 
+        {
+            PDO_LOG_ERR("Unsupported query type %s.", S->stmt->sql_text);
+        }
+        else
+        {
+            PDO_LOG_ERR("Unsupported query type ****");
+        }
         set_snowflake_error(&S->stmt->error,
                             SF_STATUS_ERROR_GENERAL,
                             "Unsupported query type.",
@@ -507,6 +514,7 @@ static int pdo_snowflake_stmt_param_hook(
             }
 
             snowflake_bind_param(S->stmt, v);
+            sf_bool log_param_value = S->stmt->connection->log_query_parameters;
 
             PDO_LOG_DBG("%s", php_zval_type_names[Z_TYPE_P(parameter)]);
             if (Z_TYPE_P(parameter) == IS_NULL) {
@@ -522,38 +530,46 @@ static int pdo_snowflake_stmt_param_hook(
                     v->value = NULL;
                     break;
                 case PDO_PARAM_INT:
-                    PDO_LOG_DBG(
+                if (log_param_value == SF_BOOLEAN_TRUE) {
+                     PDO_LOG_DBG(
                       "value: %ld",
                       Z_LVAL_P(parameter));
+                }
                     v->c_type = SF_C_TYPE_INT64;
                     v->len = sizeof(int64);
                     v->value = ecalloc(1, sizeof(int64));
                     *(int64 *) (v->value) = Z_LVAL_P(parameter);
                     break;
                 case PDO_PARAM_STR:
+                    if (log_param_value) {
                     PDO_LOG_DBG(
-                      "value: %.*s, len: %lld",
-                      Z_STRLEN_P(parameter),
-                      Z_STRVAL_P(parameter),
-                      Z_STRLEN_P(parameter));
+                        "value: %.*s, len: %lld",
+                        Z_STRLEN_P(parameter),
+                        Z_STRVAL_P(parameter),
+                        Z_STRLEN_P(parameter));
+                    }
                     v->c_type = SF_C_TYPE_STRING;
                     v->len = Z_STRLEN_P(parameter);
                     v->value = Z_STRVAL_P(parameter);
                     break;
                 case PDO_PARAM_LOB:
-                    PDO_LOG_DBG(
-                      "value: %.*s, len: %lld",
-                      Z_STRLEN_P(parameter),
-                      Z_STRVAL_P(parameter),
-                      Z_STRLEN_P(parameter));
+                    if (log_param_value) {
+                        PDO_LOG_DBG(
+                        "value: %.*s, len: %lld",
+                        Z_STRLEN_P(parameter),
+                        Z_STRVAL_P(parameter),
+                        Z_STRLEN_P(parameter));
+                    }
                     v->c_type = SF_C_TYPE_BINARY;
                     v->len = Z_STRLEN_P(parameter);
                     v->value = Z_STRVAL_P(parameter);
                     break;
                 case PDO_PARAM_BOOL:
-                    PDO_LOG_DBG(
-                      "value: %s",
-                      php_zval_type_names[Z_TYPE_P(parameter)]);
+                    if (log_param_value) {
+                        PDO_LOG_DBG(
+                        "value: %s",
+                        php_zval_type_names[Z_TYPE_P(parameter)]);
+                    }
                     if (Z_TYPE_P(parameter) == IS_FALSE) {
                         v->value = (void *) &SF_BOOLEAN_FALSE;
                     } else {
@@ -668,8 +684,40 @@ static int pdo_snowflake_stmt_col_meta(
  */
 static int pdo_snowflake_stmt_next_rowset(pdo_stmt_t *stmt) /* {{{ */
 {
+    pdo_snowflake_stmt *S = (pdo_snowflake_stmt *) stmt->driver_data;
     PDO_LOG_ENTER("pdo_snowflake_stmt_next_rowset");
-    /* NOP. no multiple statement is supported at the momemnt. */
+    SF_STATUS ret = snowflake_next_result(S->stmt);
+    if (ret != SF_STATUS_SUCCESS) {
+        PDO_LOG_DBG("Failed to retrieve data in next rowset");
+        PDO_LOG_RETURN(0);
+    }
+    
+    int i;
+    stmt->column_count = (int) snowflake_num_fields(S->stmt);
+    PDO_LOG_DBG("number of columns: %d", stmt->column_count);
+    // won't hit for now but leave it to prevent crash with unexpected query result.
+    if (stmt->column_count < 0)
+    {
+        PDO_LOG_ERR("Unexpected query result. column count: %d.", stmt->column_count);
+        set_snowflake_error(&S->stmt->error,
+                            SF_STATUS_ERROR_GENERAL,
+                            "Unexpected query result.",
+                            SF_SQLSTATE_GENERAL_ERROR,
+                            snowflake_sfqid(S->stmt),
+                            __FILE__, __LINE__);
+        pdo_snowflake_error_stmt(stmt);
+        PDO_LOG_RETURN(0);
+    }
+
+    S->bound_results = ecalloc((size_t) stmt->column_count, sizeof(pdo_snowflake_string));
+
+    for(i = 0; i < stmt->column_count; i++) {
+        S->bound_results[i].value = NULL;
+        S->bound_results[i].size = 0;
+    }
+
+    _pdo_snowflake_stmt_set_row_count(stmt);
+    pdo_snowflake_stmt_describe(stmt, stmt->column_count);
     PDO_LOG_RETURN(1);
 }
 /* }}} */

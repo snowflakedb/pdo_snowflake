@@ -1,5 +1,6 @@
 # This script is to build the snowflake driver in github action
 import os
+import re
 import sys
 import subprocess
 
@@ -23,6 +24,27 @@ def run_command_no_exit(cmd):
         print(line.strip().decode('utf-8'))
     for line in result.stderr:
         print(line.strip().decode('utf-8'))
+
+
+def run_command_capture(cmd):
+    print(cmd)
+    result = subprocess.Popen(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, shell=True)
+    lines = []
+    for line in result.stdout:
+        decoded = line.rstrip().decode('utf-8', 'replace')
+        print(decoded)
+        lines.append(decoded)
+    result.wait()
+    return result.returncode, "\n".join(lines)
+
+
+def assert_no_test_failures(test_output):
+    match = re.search(r'Tests failed\s*:\s*(\d+)', test_output)
+    failed = int(match.group(1)) if match else 0
+    has_failed_summary = re.search(r'(?m)^=*\s*FAILED TEST SUMMARY', test_output) is not None
+    if failed > 0 or has_failed_summary:
+        print("[ERROR] run-tests.php reported %d failing test(s)" % failed)
+        exit(1)
 
 
 def test_windows():
@@ -49,9 +71,10 @@ def test_windows():
 
     print ("====> run test")
     run_tests_file = os.path.join("D:\\php-sdk\\phpmaster", vs, arch, "php-src", "run-tests.php")
-    run_command_no_exit("php.exe " + run_tests_file + " .\\tests -d extension=pdo_snowflake || ver>null")
+    rc, test_output = run_command_capture("php.exe " + run_tests_file + " .\\tests -d extension=pdo_snowflake || ver>null")
     print ("====> parse test results")
     run_command("python .\\.github\\workflows\\scripts\\check_result.py .\\tests")
+    assert_no_test_failures(test_output)
 
 
 
@@ -66,15 +89,19 @@ def test_posix():
     print("====> setup parameters and env")
     run_command("cp ./.github/workflows/scripts/parameters.json ./")
     run_command("python ./.github/workflows/scripts/set_secrets.py ./parameters.json")
-    run_command("./scripts/env.sh && env | grep SNOWFLAKE_TEST > testenv.ini")
+    # Source env.sh in bash (env.sh uses bashisms: set -o pipefail,
+    # ${BASH_SOURCE[0]}, [[ ... ]]). Sourcing into the default /bin/sh - dash
+    # on Ubuntu - fails. Drop the multi-line PEM env var before listing.
+    run_command("bash -c '. ./scripts/env.sh && unset SNOWFLAKE_TEST_PRIVATE_KEY && env | grep SNOWFLAKE_TEST > testenv.ini'")
 
     print ("====> run test")
     run_test_options = ""
     if use_valgrind == 'true' or use_valgrind == '1':
         run_test_options = run_test_options + ' -m'
-    run_command_no_exit("php -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' ./run-tests.php -d extension=modules/pdo_snowflake.so" + run_test_options)
+    rc, test_output = run_command_capture("php -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' ./run-tests.php -d extension=modules/pdo_snowflake.so" + run_test_options)
     print ("====> parse test results")
     run_command("python ./.github/workflows/scripts/check_result.py ./tests")
+    assert_no_test_failures(test_output)
 
     coverage = os.environ.get('REPORT_COVERAGE', 'undef')
     if coverage == 'true' or coverage == '1':

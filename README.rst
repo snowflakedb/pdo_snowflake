@@ -27,6 +27,7 @@ To build the Snowflake PHP PDO Driver, the following software must be installed:
 
   - gcc 8.3 or higher. **Note**: on certain OS (e.g. Centos 7) the preinstalled gcc/libstdc++ version is below the required minimum. For Centos 7, this is 4.8.5, which is below the requirement. Building and using the PHP PDO driver might be unsuccessful on such OS's until the prerequisite is fulfilled, i.e. libraries upgraded to at least the minimum version.
   - cmake 2.8 or higher
+  - which
 
 - On macOS:
 
@@ -339,7 +340,7 @@ Specify the data source name (:code:`dsn`) parameter as shown below:
 
 .. code-block:: php
 
-    $dbh = new PDO("account=<account name>;authenticator=SNOWFLAKE_JWT;priv_key_file=<path>/rsa_key.p8;priv_key_file_pwd=<private_key_passphrase>", 
+    $dbh = new PDO("snowflake:account=<account name>;authenticator=SNOWFLAKE_JWT;priv_key_file=<path>/rsa_key.p8;priv_key_file_pwd=<private_key_passphrase>", 
                     "<username>", "");
 
 where:
@@ -415,6 +416,124 @@ By default, the PHP PDO driver verifies SAML URLs. To disable SAML checking for 
 .. code-block:: php
     
     $dbh = new PDO("snowflake:account=$account;disablesamlurlcheck=true;authenticator=<OKTA authenticator URL>", $oktauser, $oktapwd);
+
+Using OAuth 2.0 authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PHP PDO driver supports OAuth 2.0 Authentication. Guidance can be found in `OAuth Intro <https://docs.snowflake.com/en/user-guide/oauth-intro>`_.
+
+To connect to Snowflake database using OAuth 2.0 Authentication, create a new PDO object and specify the data source name (dsn) parameters as follows:
+
+.. code-block:: php
+
+    $dbh = new PDO($dsn;authenticator=<oauth_authorization_code || oauth_client_credentials>;oauth_client_id=<client_id>;oauth_client_secret=<client_secret>;oauth_scope=<oauth_scope>;
+    oauth_redirect_uri=<redirect_uri>;oauth_token_endpoint=<token_endpoint_url>",$user, "password is not required));
+
+where:
+
+- :code:`$dsn` is your snowflake dsn connection string. The basic fields such as account, user are specified in the dsn.
+- :code:`authenticator` is either :code:`OAUTH_AUTHORIZATION_CODE` or :code:`OAUTH_CLIENT_CREDENTIALS` based on the OAuth flow you are using.
+- :code:`oauth_client_id` is your OAuth client id
+- :code:`oauth_client_secret` is your OAuth client secret
+- :code:`oauth_scope` is the OAuth scope. If your role name is 'custom_user', this field should be 'session:role:custom_user'. If this field is not provided, the driver will use the role figured in the role attribute of the DSN connection string.
+- :code:`oauth_redirect_uri` is the redirect URI configured in your OAuth client application
+- :code:`oauth_token_endpoint` is the OAuth token endpoint URL
+
+By default, the PHP PDO driver enables client temporary credentials storage for OAuth 2.0 and external browser authentication in Windows and macOS. (It is disabled on Linux by default). To control this feature for a PDO connection, set :code:`client_store_temporary_credential=<true|false>` in the DSN connection string. For example:
+
+.. code-block:: php
+    
+    $dbh = new PDO("$dsn;authenticator=<oauth_authorization_code || oauth_client_credentials>;oauth_client_id=<client_id>;oauth_client_secret=<client_secret>;oauth_scope=<oauth_scope>;
+    oauth_redirect_uri=<redirect_uri>;oauth_token_endpoint=<token_endpoint_url>;client_store_temporary_credential=false", $user, $pass);
+
+This option caches OAuth tokens and ID tokens in platform-specific secure storage (Windows Credential Manager on Windows, macOS Keychain on macOS, or file-based cache on Linux).
+
+To enable MFA token caching for :code:`username_password_mfa` authenticator, set :code:`client_request_mfa_token=<true|false>` in the DSN connection string. For example:
+
+.. code-block:: php
+
+    $dbh = new PDO("$dsn;authenticator=username_password_mfa;client_request_mfa_token=true", $user, $pass);
+
+By default, this is enabled on Windows and macOS, but disabled on Linux. MFA token caching requires the Snowflake account to have :code:`ALLOW_CLIENT_MFA_CACHING=TRUE` enabled.
+
+Using Workload Identity Federation (WIF) authentication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PHP PDO driver supports Workload Identity Federation authentication.
+
+To connect to Snowflake database using WIF authentication, create a new PDO object and specify the data source name parameters as follows:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=<account_name>;authenticator=workload_identity;workload_identity_provider=<provider>", "", "");
+
+where:
+
+- :code:`account` is your Snowflake account name
+- :code:`authenticator` is :code:`workload_identity`
+- :code:`workload_identity_provider` is the cloud provider: :code:`AWS`, :code:`AZURE`, or :code:`GCP`
+
+The username and password are not used for WIF authentication; pass empty strings for both.
+
+To use a pre-obtained OIDC token instead of fetching one from the cloud metadata service, set :code:`workload_identity_provider=OIDC` and supply the token via the :code:`token` parameter. For example:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=<account_name>;authenticator=workload_identity;workload_identity_provider=OIDC;token=<oidc_token>", "", "");
+
+To restrict the Azure Managed Identity token to a specific resource, set :code:`workload_identity_azure_resource` in the DSN connection string. For example:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=<account_name>;authenticator=workload_identity;workload_identity_provider=AZURE;workload_identity_azure_resource=<azure_resource_id>", "", "");
+
+To impersonate a service account, set :code:`workload_identity_impersonation_path` in the DSN connection string. For GCP this is the service-account email (e.g. :code:`my-sa@my-project.iam.gserviceaccount.com`); for AWS this is the role ARN or resource path. For example:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=<account_name>;authenticator=workload_identity;workload_identity_provider=GCP;workload_identity_impersonation_path=<service_account_email>", "", "");
+
+Using a TOML Configuration File
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PHP PDO driver supports reading connection parameters from a TOML configuration file
+(:code:`config.toml` or :code:`connections.toml`). This allows you to share connection
+definitions across Snowflake developer tools without hardcoding credentials in your PHP code.
+
+For details on how to create and manage the TOML configuration file, see
+`Managing Snowflake connections <https://docs.snowflake.com/en/developer-guide/snowflake-cli/connecting/configure-connections>`_.
+
+To connect to the Snowflake database using a TOML configuration file, create a new :code:`PDO`
+object, as explained in the
+`PHP PDO documentation <https://www.php.net/manual/en/pdo.connections.php>`_.
+Specify the data source name (:code:`dsn`) as :code:`snowflake:` with no additional parameters,
+and pass :code:`null` (or an empty string) for both the username and password:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:", null, null);
+
+When the driver receives an empty DSN, it automatically loads the connection parameters from
+the TOML configuration file.
+
+The TOML file supports the same connection parameters as the DSN. For example, the following
+TOML entry is equivalent to specifying the parameters directly in the DSN string:
+
+.. code-block:: toml
+
+    [connections.myconnection]
+    account = "<account_name>"
+    user = "<username>"
+    password = "<password>"
+    warehouse = "<warehouse>"
+    database = "<database>"
+    schema = "<schema>"
+
+where:
+
+- :code:`<account_name>` Specifies your
+  `Snowflake account name <https://docs.snowflake.com/en/user-guide/connecting.html#your-snowflake-account-name>`_.
+- :code:`<username>` Specifies the login
 
 Configuring OCSP Checking
 ----------------------------------------------------------------------
@@ -498,7 +617,56 @@ In this example, we'll use those too.
     echo "OK\n";
   $>
 
-**Note**: `PUT` and `GET` queries are not supported in the driver.
+
+Performing a multiple statement query
+----------------------------------------------------------------------
+By default, the Snowflake database expects the driver to prepare and send a single statement for execution.
+You can override this by specifying the number of statements in a batch for a given request or by enabling multiple statements for the current session or account:
+
+.. code-block:: php
+
+ $dbh->setAttribute(PDO::SNOWFLAKE_STMT_MULTI_STMT_COUNT, <number of the queries to execute>);
+
+The following example performs a multiple statement query. The connection is the same as the previous example.
+
+.. code-block:: php
+
+  <$php
+    $dbh = new PDO($dsn, $user, $password);
+    $dbh->setAttribute(PDO::SNOWFLAKE_STMT_MULTI_STMT_COUNT, 4); // set the number of statements in a batch for a given request
+    $sth = $dbh->query("select 1; select 2; select 3; select 4");
+    do {
+        while ($row=$sth->fetch()) {
+            echo "RESULT: " . $row[0] . "\n";
+        }
+    } while ($sth->nextRowset()); // move to the next result set until there is no more result set
+    $dbh = null;
+    echo "OK\n";
+  $>
+
+Or you can enable multiple statements with the ALTER SESSION statement.
+
+.. code-block:: php
+
+ alter session set MULTI_STATEMENT_COUNT = 0; // If you set 0, it enables the multi-statement. If you set 1, it disables the multi-statement.
+
+If you want to use the setting for the current session or account (rather than specify the number for the request), set PDO::SNOWFLAKE_STMT_MULTI_STMT_COUNT to -1.
+
+.. code-block:: php
+
+  <$php
+    $dbh = new PDO($dsn, $user, $password);
+    $dbh->setAttribute(PDO::SNOWFLAKE_STMT_MULTI_STMT_COUNT, -1); // The default value is -1. Just in case when you have changed it before and want to switch back to the default setting, you can set it to -1.
+    $count = $dbh->exec("alter session set MULTI_STATEMENT_COUNT=0");
+    $sth = $dbh->query("select 1; select 2; select 3; select 4");
+    do {
+        while ($row=$sth->fetch()) {
+            echo "RESULT: " . $row[0] . "\n";
+        }
+    } while ($sth->nextRowset()); // move to the next result set until there is no more result set
+    $dbh = null;
+    echo "OK\n";
+  $>
 
 Setting timeouts
 ----------------------------------------------------------------------
@@ -530,13 +698,13 @@ Prepare Tests
 
        {
            "testconnection": {
-               "SNOWFLAKE_TEST_USER":      "<your_user>",
-               "SNOWFLAKE_TEST_PASSWORD":  "<your_password>",
-               "SNOWFLAKE_TEST_ACCOUNT":   "<your_account>",
-               "SNOWFLAKE_TEST_WAREHOUSE": "<your_warehouse>",
-               "SNOWFLAKE_TEST_DATABASE":  "<your_database>",
-               "SNOWFLAKE_TEST_SCHEMA":    "<your_schema>",
-               "SNOWFLAKE_TEST_ROLE":      "<your_role>"
+               "SNOWFLAKE_TEST_USER":             "<your_user>",
+               "SNOWFLAKE_TEST_PRIVATE_KEY_FILE": "<absolute_path_to_unencrypted_rsa_key.p8>",
+               "SNOWFLAKE_TEST_ACCOUNT":          "<your_account>",
+               "SNOWFLAKE_TEST_WAREHOUSE":        "<your_warehouse>",
+               "SNOWFLAKE_TEST_DATABASE":         "<your_database>",
+               "SNOWFLAKE_TEST_SCHEMA":           "<your_schema>",
+               "SNOWFLAKE_TEST_ROLE":             "<your_role>"
            }
        }
 
@@ -597,13 +765,13 @@ Prepare Tests
    
        {
            "testconnection": {
-               "SNOWFLAKE_TEST_USER":      "<your_user>",
-               "SNOWFLAKE_TEST_PASSWORD":  "<your_password>",
-               "SNOWFLAKE_TEST_ACCOUNT":   "<your_account>",
-               "SNOWFLAKE_TEST_WAREHOUSE": "<your_warehouse>",
-               "SNOWFLAKE_TEST_DATABASE":  "<your_database>",
-               "SNOWFLAKE_TEST_SCHEMA":    "<your_schema>",
-               "SNOWFLAKE_TEST_ROLE":      "<your_role>"
+               "SNOWFLAKE_TEST_USER":             "<your_user>",
+               "SNOWFLAKE_TEST_PRIVATE_KEY_FILE": "<absolute_path_to_unencrypted_rsa_key.p8>",
+               "SNOWFLAKE_TEST_ACCOUNT":          "<your_account>",
+               "SNOWFLAKE_TEST_WAREHOUSE":        "<your_warehouse>",
+               "SNOWFLAKE_TEST_DATABASE":         "<your_database>",
+               "SNOWFLAKE_TEST_SCHEMA":           "<your_schema>",
+               "SNOWFLAKE_TEST_ROLE":             "<your_role>"
            }
        }
 

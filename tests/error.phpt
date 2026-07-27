@@ -47,7 +47,10 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     $dbh = null; // Ensure closing db.
 
     try {
-        $dbh = new PDO($dsn, $user, "HAHAHAH");
+        // Override priv_key_file in the DSN to point at something that cannot
+        // be opened. Last value wins in the connection string, so this forces
+        // an authenticator-init failure regardless of what $dsn already has.
+        $dbh = new PDO("$dsn;priv_key_file=/nonexistent.p8", $user, "");
     } catch (PDOException $e) {
         echo 'Connection failed: ' . $e->getMessage() . "\n";
     }
@@ -69,6 +72,6 @@ syntax error line 1 at position 16 unexpected 'dual'. in %s on line 21
 Connected to Snowflake
 sqlstate: 42000
 Snowflake Error: 1003
-Connection failed: SQLSTATE[08001] [390100] Incorrect username or password was specified.
+Connection failed: SQLSTATE[HY000] [240000] authenticator initialization failed%A
 ===DONE===
 
