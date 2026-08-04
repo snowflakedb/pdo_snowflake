@@ -31,7 +31,7 @@ jobs:
       WIF_SSH_KEY_GCP: ${{ secrets.WIF_SSH_KEY_GCP }}
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
