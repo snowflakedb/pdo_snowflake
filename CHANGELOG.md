@@ -2,6 +2,9 @@
 
 # Changelog
 
+- Unreleased
+  - Added a connection parameter: workload_identity_aws_use_outbound_token (SNOW-3680367)
+
 - v4.1.0
   - Fixed a use-after-free in the named-parameter store on parameter rebind/teardown. (SNOW-3649747)
   - `PDO::quote()` now raises IM001 (driver does not support quoting).
