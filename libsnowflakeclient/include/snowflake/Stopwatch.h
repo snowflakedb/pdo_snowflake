@@ -7,11 +7,22 @@ extern "C" {
 
 typedef struct Stopwatch
 {
+#ifdef __cplusplus
+  /* Default member initializers protect C++ callers from uninitialized use
+   * (SNOW-4007740); rationale and regression coverage live in
+   * tests/test_unit_stopwatch.cpp. C callers must still init at the call site. */
+  bool isStarted = false;
+
+  long startTime = 0;
+
+  long elapsedTime = 0;
+#else
   bool isStarted;
 
   long startTime;
 
   long elapsedTime;
+#endif
 } Stopwatch;
 
   void stopwatch_start(Stopwatch* s);

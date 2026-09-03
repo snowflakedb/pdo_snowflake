@@ -128,11 +128,6 @@ extern "C" {
 #define SF_SPCS_ENV_VAR "SNOWFLAKE_RUNNING_INSIDE_SPCS"
 
 /**
-* DEFAULT WIF AUDIENCE
-*/
-#define SF_SNOWFLAKE_WIF_AUDIENCE "snowflakecomputing.com"
-
-/**
  * CRL configuration parameters.
  */
 typedef struct SF_CRL_CONFIG {
@@ -397,7 +392,24 @@ typedef enum SF_ATTRIBUTE {
     SF_CON_APPLICATION_PATH,
     SF_CON_LOG_QUERY_TEXT,
     SF_CON_LOG_QUERY_PARAMETERS,
-    SF_CON_WIF_AUDIENCE,
+    /**
+    * Overrides the STS/IAM endpoint used for Workload Identity Federation.
+    * May be given as either a bare hostname (e.g. "sts.us-gov-east-1.amazonaws.com")
+    * or a full base URL (e.g. "https://iamcredentials.privategoogleapis.com/v1") --
+    * the value is normalized internally to whatever format the configured
+    * provider requires:
+    *   - AWS: requires a bare host. If a full URL is given, the host is
+    *          extracted automatically.
+    *   - GCP: requires a full base URL. If a bare host is given, "/v1" is
+    *          appended automatically; a full URL is used as-is.
+    */
+    SF_CON_WIF_HOST,
+    /**
+    * When set to SF_BOOLEAN_TRUE, AWS WIF uses STS:GetWebIdentityToken (JWT).
+    * Defaults to SF_BOOLEAN_FALSE, which uses the GetCallerIdentity
+    * presigned-URL credential format.
+    */
+    SF_CON_WIF_AWS_USE_OUTBOUND_TOKEN,
 } SF_ATTRIBUTE;
 
 /**
@@ -619,7 +631,8 @@ typedef struct SF_CONNECT {
     sf_bool log_query_text;
     sf_bool log_query_parameters;
 
-    char* wif_audience;
+    char* wif_host;
+    sf_bool wif_aws_use_outbound_token;
 } SF_CONNECT;
 
 /**
