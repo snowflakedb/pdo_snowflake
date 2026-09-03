@@ -3,7 +3,7 @@
 # Changelog
 
 - Upcoming release
-  -
+  - 
 
 - v4.2.0
   - Migrated azure sdk to Azure SDK for C++ (snowflakedb/pdo_snowflake#530)
