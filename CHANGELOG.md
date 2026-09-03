@@ -10,13 +10,13 @@
   - Updated the `libsnowflakeclient` to v2.10.0 (snowflakedb/pdo_snowflake#530)
   - Removed `wif_audience` configuration (snowflakedb/pdo_snowflake#530)
   - Added a connection parameter: workload_identity_aws_use_outbound_token (snowflakedb/pdo_snowflake#526)
+  - Added a connection parameter: wif_host (snowflakedb/pdo_snowflake#524)
 
 - v4.1.0
   - Fixed a use-after-free in the named-parameter store on parameter rebind/teardown. (SNOW-3649747)
   - `PDO::quote()` now raises IM001 (driver does not support quoting).
   - Updated the `libsnowflakeclient` to v2.9.2 (snowflakedb/pdo_snowflake#521)
   - Added a connection parameter: wif_audience (snowflakedb/pdo_snowflake#523)
-  - Added a connection parameter: wif_host (snowflakedb/pdo_snowflake#524)
 
 - v4.0.0
   - Added support for PHP 8.5 and drop support for PHP 8.1 (snowflakedb/pdo_snowflake#501)
