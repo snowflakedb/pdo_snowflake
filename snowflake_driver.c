@@ -625,7 +625,6 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"log_query_parameters", "false", 0},
         {"user",                NULL,         0},
         {"pwd",                 NULL,         0},
-        {"wif_audience",        NULL,         0},
         {"workload_identity_aws_use_outbound_token", "false", 0},
     };
 
