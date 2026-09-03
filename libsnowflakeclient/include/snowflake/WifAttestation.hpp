@@ -80,18 +80,34 @@ namespace Client {
     boost::optional<std::string> token;
     boost::optional<std::string> snowflakeEntraResource;
     boost::optional<std::string> workloadIdentityImpersonationPath;
-    boost::optional<std::string> audience;
     IHttpClient* httpClient = NULL;
     AwsUtils::ISdkWrapper* awsSdkWrapper = NULL;
 
+    boost::optional<std::string> wifHost;
+
+    // When true, AWS WIF uses STS:GetWebIdentityToken (JWT) instead of the
+    // legacy GetCallerIdentity presigned-URL credential format.
+    bool awsUseOutboundToken = false;
+
     SF_STATUS configureWIFAttestation(SF_CONNECT* conn);
 
-    std::string getAudience() const {
-      return audience.value_or(SF_SNOWFLAKE_WIF_AUDIENCE);
+    std::string getWifHost() const {
+      return wifHost.value_or("");
     }
+
+    std::string getWifHostForAws() const;
+
+    std::string getWifHostForGcp() const;
   };
 
   boost::optional<Attestation> createAttestation(AttestationConfig& config);
+
+  // Suffix-anchored allowlist that restricts Workload Identity attestation
+  // to recognized Snowflake hosts before any cloud credential is fetched.
+  // See WifAttestation.cpp for the exact suffix rule and the
+  // SNOWFLAKE_WIF_ALLOWED_HOST_SUFFIXES environment override, which is read only
+  // from the process environment.
+  bool isSnowflakeHostForWorkloadIdentity(const std::string& host);
 }
 
 }

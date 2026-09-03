@@ -1044,14 +1044,6 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_LOG_QUERY_PARAMETERS].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
     PDO_LOG_DBG("log_query_parameters: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_LOG_QUERY_PARAMETERS].optval);
 
-    if (vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AUDIENCE_IDX].optval != NULL) {
-        snowflake_set_attribute(
-            H->server, SF_CON_WIF_AUDIENCE,
-            vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AUDIENCE_IDX].optval);
-        PDO_LOG_DBG(
-            "wif_audience: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AUDIENCE_IDX].optval);
-    }
-
     snowflake_set_attribute(
         H->server, SF_CON_WIF_AWS_USE_OUTBOUND_TOKEN,
         (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AWS_USE_OUTBOUND_TOKEN_IDX].optval, "true") == 0) ?
