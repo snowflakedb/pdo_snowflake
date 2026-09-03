@@ -83,7 +83,10 @@ if [[ "$PLATFORM" == "linux" ]]; then
         libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-io.a \
         libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-common.a \
         libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libs2n.a \
-        libsnowflakeclient/deps-build/linux/$ARCH_DIR/azure/lib/libazure-storage-lite.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/xml2/lib/libxml2.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/azure/lib/libazure-core.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/azure/lib/libazure-storage-blobs.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/azure/lib/libazure-storage-common.a \
         libsnowflakeclient/deps-build/linux/$ARCH_DIR/uuid/lib/libuuid.a \
         libsnowflakeclient/deps-build/linux/$ARCH_DIR/arrow/lib/libarrow.a \
         libsnowflakeclient/deps-build/linux/$ARCH_DIR/arrow_deps/lib/libjemalloc_pic.a \
@@ -118,7 +121,10 @@ if [[ "$PLATFORM" == "linux" ]]; then
         libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-io.a \
         libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libaws-c-common.a \
         libsnowflakeclient/deps-build/linux/$ARCH_DIR/aws/lib64/libs2n.a \
-        libsnowflakeclient/deps-build/linux/$ARCH_DIR/azure/lib/libazure-storage-lite.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/xml2/lib/libxml2.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/azure/lib/libazure-core.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/azure/lib/libazure-storage-blobs.a \
+        libsnowflakeclient/deps-build/linux/$ARCH_DIR/azure/lib/libazure-storage-common.a \
         libsnowflakeclient/deps-build/linux/$ARCH_DIR/uuid/lib/libuuid.a \
         libsnowflakeclient/deps-build/linux/$ARCH_DIR/arrow/lib/libarrow.a \
         libsnowflakeclient/deps-build/linux/$ARCH_DIR/arrow_deps/lib/libjemalloc_pic.a \
@@ -164,7 +170,10 @@ elif [[ "$PLATFORM" == "darwin" ]]; then
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-c-sdkutils.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-c-io.a \
         -Wl,-force_load,libsnowflakeclient/deps-build/darwin/aws/lib/libaws-c-common.a \
-        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/azure/lib/libazure-storage-lite.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/xml2/lib/libxml2.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/azure/lib/libazure-core.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/azure/lib/libazure-storage-blobs.a \
+        -Wl,-force_load,libsnowflakeclient/deps-build/darwin/azure/lib/libazure-storage-common.a \
         $LINK_OPTS \
         -o .libs/pdo_snowflake.so
 fi
