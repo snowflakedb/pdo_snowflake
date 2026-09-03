@@ -625,7 +625,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"log_query_parameters", "false", 0},
         {"user",                NULL,         0},
         {"pwd",                 NULL,         0},
-        {"wif_audience",        NULL,         0},
+        {"workload_identity_aws_use_outbound_token", "false", 0},
     };
 
 
@@ -1042,6 +1042,14 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     snowflake_set_attribute(H->server, SF_CON_LOG_QUERY_PARAMETERS,
         (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_LOG_QUERY_PARAMETERS].optval, "true") == 0)? &SF_BOOLEAN_TRUE :  &SF_BOOLEAN_FALSE);
     PDO_LOG_DBG("log_query_parameters: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_LOG_QUERY_PARAMETERS].optval);
+
+    snowflake_set_attribute(
+        H->server, SF_CON_WIF_AWS_USE_OUTBOUND_TOKEN,
+        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AWS_USE_OUTBOUND_TOKEN_IDX].optval, "true") == 0) ?
+            &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
+    PDO_LOG_DBG(
+        "workload_identity_aws_use_outbound_token: %s",
+        vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AWS_USE_OUTBOUND_TOKEN_IDX].optval);
 
     /* Auto-detect the PHP script path for APPLICATION_PATH.
      * This is always auto-detected and cannot be overridden by users,

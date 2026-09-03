@@ -493,6 +493,12 @@ To impersonate a service account, set :code:`workload_identity_impersonation_pat
 
     $dbh = new PDO("snowflake:account=<account_name>;authenticator=workload_identity;workload_identity_provider=GCP;workload_identity_impersonation_path=<service_account_email>", "", "");
 
+For AWS WIF, set :code:`workload_identity_aws_use_outbound_token=true` to use the STS GetWebIdentityToken (JWT) credential format instead of the default GetCallerIdentity presigned-URL format. For example:
+
+.. code-block:: php
+
+    $dbh = new PDO("snowflake:account=<account_name>;authenticator=workload_identity;workload_identity_provider=AWS;workload_identity_aws_use_outbound_token=true", "", "");
+
 Using a TOML Configuration File
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

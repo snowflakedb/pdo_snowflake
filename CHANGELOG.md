@@ -9,6 +9,7 @@
   - Migrated azure sdk to Azure SDK for C++ (snowflakedb/pdo_snowflake#530)
   - Updated the `libsnowflakeclient` to v2.10.0 (snowflakedb/pdo_snowflake#530)
   - Removed `wif_audience` configuration (snowflakedb/pdo_snowflake#530)
+  - Added a connection parameter: workload_identity_aws_use_outbound_token (snowflakedb/pdo_snowflake#526)
 
 - v4.1.0
   - Fixed a use-after-free in the named-parameter store on parameter rebind/teardown. (SNOW-3649747)
