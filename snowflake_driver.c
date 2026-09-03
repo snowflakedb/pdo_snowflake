@@ -626,6 +626,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"user",                NULL,         0},
         {"pwd",                 NULL,         0},
         {"workload_identity_aws_use_outbound_token", "false", 0},
+        {"wif_host",        NULL,             0},
     };
 
 
@@ -1050,6 +1051,14 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
     PDO_LOG_DBG(
         "workload_identity_aws_use_outbound_token: %s",
         vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_AWS_USE_OUTBOUND_TOKEN_IDX].optval);
+
+    if (vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_HOST_IDX].optval != NULL) {
+        snowflake_set_attribute(
+            H->server, SF_CON_WIF_HOST,
+            vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_HOST_IDX].optval);
+        PDO_LOG_DBG(
+            "wif_host: %s", vars[PDO_SNOWFLAKE_CONN_ATTR_WIF_HOST_IDX].optval);
+    }
 
     /* Auto-detect the PHP script path for APPLICATION_PATH.
      * This is always auto-detected and cannot be overridden by users,
