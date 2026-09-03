@@ -116,7 +116,17 @@ extern "C" {
         }
         return NULL;
 #else
-        return sf_copy(out_dest, in_destSize, in_src, in_sizeToCopy);
+        /*
+         * check string length to prevent reading out of the boundary of source
+         * string. The caller need to ensure either pass in a proper source
+         * length in in_sizeToCopy, or the source string is well null terminated.
+         */
+        size_t copylen = strnlen(in_src, in_sizeToCopy) + 1;
+        if (copylen > in_sizeToCopy)
+        {
+          copylen = in_sizeToCopy;
+        }
+        return sf_copy(out_dest, in_destSize, in_src, copylen);
 #endif
     }
 
