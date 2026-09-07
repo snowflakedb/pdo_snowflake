@@ -2,7 +2,7 @@
 
 # Changelog
 
-- Upcoming release
+- Upcoming release....
   - 
 
 - v4.2.0
