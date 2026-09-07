@@ -1,5 +1,5 @@
 #### For the official PDO Snowflake Release Notes please refer to https://docs.snowflake.com/en/release-notes/clients-drivers/php-pdo
-
+...
 # Changelog
 
 - Upcoming release
