@@ -49,3 +49,8 @@ callgrind.out.*
 configure.ac
 vendor/
 sflog/
+ci/wif/parameters/parameters_wif.json
+ci/wif/artifacts/pdo_snowflake.so
+ci/wif/artifacts/run-tests.php
+ci/wif/artifacts/cacert.pem
+

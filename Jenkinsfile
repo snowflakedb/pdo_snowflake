@@ -9,7 +9,9 @@ properties([
 timestamps {
   node('regular-memory-node-snowos') {
     stage('checkout') {
-      checkout scm
+      scmInfo = checkout scm
+      env.GIT_BRANCH = scmInfo.GIT_BRANCH
+      env.GIT_COMMIT = scmInfo.GIT_COMMIT
     }
 
     stage('Authenticate Artifactory') {
@@ -34,6 +36,21 @@ timestamps {
             }
           } finally {
             junit testResults: '**/AuthenticationTests/junit-results.xml', allowEmptyResults: true
+          }
+        }
+      },
+      'Test WIF': {
+        stage('Test WIF') {
+          withCredentials([
+            string(credentialsId: 'sfctest0-parameters-secret', variable: 'PARAMETERS_SECRET'),
+            file(credentialsId: 'wif-vm-ssh-key-aws-azure', variable: 'WIF_SSH_KEY_AWS_AZURE_FILE'),
+            file(credentialsId: 'wif-vm-ssh-key-gcp', variable: 'WIF_SSH_KEY_GCP_FILE')
+          ]) {
+            sh '''\
+            |#!/bin/bash -e
+            |chmod +x $WORKSPACE/ci/test_wif.sh
+            |$WORKSPACE/ci/test_wif.sh
+            '''.stripMargin()
           }
         }
       },
