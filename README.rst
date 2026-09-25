@@ -618,9 +618,6 @@ bundle. Although the option is passed when creating a PDO connection, it is
 not limited to that connection. It may affect other PDO Snowflake connections
 in the same PHP process.
 
-Applications that use different CA bundles concurrently should avoid changing
-this setting between connections or provide their own synchronization.
-
 Performing a Simple Query
 ----------------------------------------------------------------------
 
