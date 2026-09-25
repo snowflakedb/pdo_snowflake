@@ -591,6 +591,35 @@ directives on the connection string. Example:
 
 Syntax is the same as is documented for the `Snowflake ODBC driver <https://docs.snowflake.com/en/user-guide/odbc-parameters.html#using-connection-parameters>`_
 
+Custom CA bundle
+----------------------------------------------------------------------
+
+A custom CA bundle can be configured globally in ``php.ini``:
+
+.. code-block:: ini
+
+    pdo_snowflake.cacert=/path/to/ca-bundle.pem
+
+It can also be supplied through the PDO constructor options:
+
+.. code-block:: php
+
+    $dbh = new PDO(
+        $dsn,
+        $user,
+        $password,
+        [
+            PDO::SNOWFLAKE_ATTR_SSL_CAPATH => "/path/to/ca-bundle.pem",
+        ]
+    );
+
+``PDO::SNOWFLAKE_ATTR_SSL_CAPATH`` sets the Snowflake client's global CA
+bundle. Although the option is passed when creating a PDO connection, it is
+not limited to that connection. It may affect other PDO Snowflake connections
+in the same PHP process.
+
+Applications that use different CA bundles concurrently should avoid changing
+this setting between connections or provide their own synchronization.
 
 Performing a Simple Query
 ----------------------------------------------------------------------
