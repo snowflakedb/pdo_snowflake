@@ -3,7 +3,8 @@
 # Changelog
 
 - Upcoming release
-  - 
+  - Fixed `PDO::SNOWFLAKE_ATTR_SSL_CAPATH` not being applied to `SF_GLOBAL_CA_BUNDLE_FILE`
+  -
 
 - v4.2.0
   - Migrated azure sdk to Azure SDK for C++ (snowflakedb/pdo_snowflake#530)

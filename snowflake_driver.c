@@ -697,6 +697,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
             snowflake_global_set_attribute(SF_GLOBAL_SSL_VERSION, &ssl_version);
         }
         if (ca_bundle_file) {
+            snowflake_global_set_attribute(SF_GLOBAL_CA_BUNDLE_FILE, ZSTR_VAL(ca_bundle_file));
             zend_string_release(ca_bundle_file);
         }
 
