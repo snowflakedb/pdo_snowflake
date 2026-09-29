@@ -3,7 +3,7 @@
 # Changelog
 
 - Upcoming release
-  - 
+  - OCSP checking is now disabled by default. Set `ocspfailopen=true` (fail-open) or `ocspfailopen=false` (fail-closed) to enable it. `disableocspchecks=false` is not an opt-in. `disableocspchecks=true` disables fail-open, including `ocspfailopen=true`. Fail-closed stays on. A later default-off connection does not overwrite a prior OCSP opt-in in the same PHP process. Fail-open does not overwrite fail-closed.
 
 - v4.2.0
   - Migrated azure sdk to Azure SDK for C++ (snowflakedb/pdo_snowflake#530)

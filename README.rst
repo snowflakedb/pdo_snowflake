@@ -544,21 +544,36 @@ where:
 Configuring OCSP Checking
 ----------------------------------------------------------------------
 
-By default, OCSP (Online Certificate Status Protocol) checking is enabled and is set per PDO connection.
+By default, OCSP (Online Certificate Status Protocol) checking is disabled.
+Set :code:`ocspfailopen` to enable it. Values must be :code:`true` or
+:code:`false` (case-insensitive). Any other value is ignored.
 
-To disable OCSP checking for a PDO connection, set :code:`disableocspchecks=true` in the DSN connection string. For example:
+- :code:`ocspfailopen=true` enables OCSP with fail-open behavior.
+- :code:`ocspfailopen=false` enables OCSP with fail-close behavior.
+- :code:`disableocspchecks=false` is the old default and does not enable
+  OCSP.
+- :code:`disableocspchecks=true` turns fail-open off, including
+  :code:`ocspfailopen=true`. :code:`ocspfailopen=false` (fail-closed)
+  stays on.
+
+OCSP checking is process-global
+(:code:`SF_GLOBAL_OCSP_CHECK`). A later default DSN (no
+:code:`ocspfailopen`) does not turn OCSP off for earlier opt-in handles
+in the same PHP process. Fail-open does not overwrite a prior fail-closed
+opt-in. :code:`disableocspchecks=true` still only disables fail-open.
+
+The same keys in a TOML connection file count as explicit. For more details
+see `Fail-Open or Fail-Close behavior <https://docs.snowflake.com/en/user-guide/ocsp#fail-open-or-fail-close-behavior>`_.
 
 .. code-block:: php
 
-    $dbh = new PDO("snowflake:account=testaccount;disableocspchecks=true", "user", "password");
-
-By default, OCSP checking uses fail-open approach. For more details see `Fail-Open or Fail-Close behavior <https://docs.snowflake.com/en/user-guide/ocsp#fail-open-or-fail-close-behavior>`_.
-
-To switch to use fail-close approach, set :code:`ocspfailopen=false` in the DSN connection string. For example:
-
-.. code-block:: php
-
+    $dbh = new PDO("snowflake:account=testaccount;ocspfailopen=true", "user", "password");
     $dbh = new PDO("snowflake:account=testaccount;ocspfailopen=false", "user", "password");
+
+:code:`insecure_mode=true` still skips OCSP for that connection. Any OCSP
+flags on the same DSN are ignored and logged. OCSP and CRL cannot be enabled
+at the same time; :code:`crl_check=true` alone is valid because OCSP is off
+by default.
 
 Proxy
 ----------------------------------------------------------------------
