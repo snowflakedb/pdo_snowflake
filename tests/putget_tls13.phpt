@@ -4,7 +4,7 @@ pdo_snowflake - put get query with TLS 1.3
 pdo_snowflake.logdir=sflog
 pdo_snowflake.loglevel=DEBUG
 pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
-pdo_snowflake.min_tls_version=TLSv1_3
+pdo_snowflake.MIN_TLS_VERSION=TLSv1_3
 --FILE--
 <?php
     include __DIR__ . "/common.php";

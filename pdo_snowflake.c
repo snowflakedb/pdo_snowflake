@@ -83,9 +83,9 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
     if (min_tls_version != NULL) {
       int32 tls_version = 0;
       // not allowed older than TLS 1.2
-      if (strcasecmp(min_tls_version, "TLSv1_2") == 0)){
+      if (strcasecmp(min_tls_version, "TLSv1_2") == 0) {
         tls_version = CURL_SSLVERSION_TLSv1_2;
-      } else if (strcasecmp(min_tls_version, "TLSv1_3") == 0)){
+      } else if (strcasecmp(min_tls_version, "TLSv1_3") == 0) {
         tls_version = CURL_SSLVERSION_TLSv1_3;
       }
       if (tls_version > 0){
