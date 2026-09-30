@@ -3,7 +3,9 @@
 # Changelog
 
 - Upcoming release
-  - 
+  - Removed `PDO::SNOWFLAKE_ATTR_SSL_CAPATH` constant. Custom CA bundles must be
+    configured through the `pdo_snowflake.cacert` INI setting in `php.ini`.
+    his is a breaking change for applications using the PDO constructor option.
 
 - v4.2.0
   - Migrated azure sdk to Azure SDK for C++ (snowflakedb/pdo_snowflake#530)

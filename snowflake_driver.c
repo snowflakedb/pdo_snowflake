@@ -674,8 +674,6 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
 
     if (driver_options) {
         //TODO Set other non-essential parameters, i.e. timeout, emulate, etc.
-        zend_string *ca_bundle_file = pdo_attr_strval(
-            driver_options, PDO_SNOWFLAKE_ATTR_SSL_CAPATH, NULL);
         // TODO create function to set SSL Version
         zend_long ssl_version = pdo_attr_lval(
             driver_options, PDO_SNOWFLAKE_ATTR_SSL_VERSION, -1);
@@ -695,9 +693,6 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         if (ssl_version != -1) {
             /* TODO: not allowed older than TLS 1.2 */
             snowflake_global_set_attribute(SF_GLOBAL_SSL_VERSION, &ssl_version);
-        }
-        if (ca_bundle_file) {
-            zend_string_release(ca_bundle_file);
         }
 
         /* autocommit */
