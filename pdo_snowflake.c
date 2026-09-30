@@ -80,11 +80,6 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
 
     zend_declare_class_constant_long(
       php_pdo_get_dbh_ce(),
-      "SNOWFLAKE_ATTR_SSL_CAPATH",
-      sizeof("SNOWFLAKE_ATTR_SSL_CAPATH")-1,
-      (zend_long) PDO_SNOWFLAKE_ATTR_SSL_CAPATH);
-    zend_declare_class_constant_long(
-      php_pdo_get_dbh_ce(),
       "SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS",
       sizeof("SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS")-1,
       (zend_long) PDO_SNOWFLAKE_ATTR_SSL_VERIFY_CERTIFICATE_REVOCATION_STATUS);

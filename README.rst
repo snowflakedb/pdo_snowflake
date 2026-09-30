@@ -326,6 +326,23 @@ where:
 
 - :code:`<account_identifier>` is your account identifier. For information about account identifiers, see `Account identifiers <https://docs.snowflake.com/en/user-guide/admin-account-identifier>`_.
 
+Configuring Custom CA Bundle
+----------------------------------------------------------------------
+
+The custom CA bundle can be configured only through the ``pdo_snowflake.cacert``
+INI setting in ``php.ini``:
+
+.. code-block:: ini
+
+    extension=pdo_snowflake.so
+    pdo_snowflake.cacert=/etc/php/8.1/conf.d/cacert.pem
+
+The CA bundle is applied globally to the Snowflake client and affects all PDO
+connections in the PHP process.
+
+**Note:** Per-connection CA bundle configuration through PDO constructor options
+is not supported. Use the INI setting instead.
+
 Using Key Pair Authentication
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
