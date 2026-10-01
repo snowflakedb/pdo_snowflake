@@ -3,7 +3,7 @@
 # Changelog
 
 - Upcoming release
-  - 
+  - Added a global configuration: min_tls_version (snowflakedb/pdo_snowflake#535)
 
 - v4.2.0
   - Migrated azure sdk to Azure SDK for C++ (snowflakedb/pdo_snowflake#530)
