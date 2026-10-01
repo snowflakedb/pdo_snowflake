@@ -8,6 +8,7 @@
 #include  "../../cpp/lib/AuthenticationWebBrowserRunner.hpp"
 #include  "../../cpp/lib/AuthenticationChallengeProvider.hpp"
 #include "authenticator.h" 
+#include <chrono>
 #include <future>
 
 #define SOCKET_BUFFER_SIZE 20000
@@ -86,6 +87,8 @@ namespace Snowflake::Client
             int m_port = 0; // port to listen, 0 for random port to be used
             int m_real_port = 0; // actual port used when randomly picked
             int m_timeout = SF_BROWSER_RESPONSE_TIMEOUT;
+            bool m_timeout_deadline_set = false;
+            std::chrono::steady_clock::time_point m_timeout_deadline;
 
             std::string m_host = "127.0.0.1";
             std::string m_path;
@@ -278,6 +281,8 @@ namespace Snowflake::Client
             virtual ~AuthWebServer();
 
             int start(std::string host, int port, std::string path) override;
+            bool receive() override;
+            void setExpectedOrigin(const SFURL& expectedOrigin);
             void startAccept(std::string state) override {
                 SF_UNUSED(state);
             };
@@ -287,13 +292,25 @@ namespace Snowflake::Client
 
             bool m_consent_cache_id_token;
             std::string m_origin;
+            SFURL m_expected_origin;
 
 
             void respond(std::string queryParameters);
             void respondJson(picojson::value& json);
+            void respondSuccess(const std::string& body);
 
             std::string unquote(std::string src);
             std::vector<std::pair<std::string, std::string>> splitQuery(std::string query);
+            bool requestOriginAllowed(
+                const std::string& method,
+                const std::string& request);
+            bool originMatchesExpected(const std::string& origin) const;
+            static bool extractHeader(
+                const std::string& request,
+                const std::string& name,
+                std::string& value);
+            static std::string extractBody(const std::string& request);
+            static bool isCorsPostPreflight(const std::string& request);
         private:
             bool parseAndRespondOptionsRequest(std::string response) override;
             void parseAndRespondPostRequest(std::string response) override;

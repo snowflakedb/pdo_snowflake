@@ -2,8 +2,11 @@
 
 # Changelog
 
-- Upcoming release
+- v4.3.0
   - OCSP checking is now disabled by default. Set `ocspfailopen=true` (fail-open) or `ocspfailopen=false` (fail-closed) to enable it. `disableocspchecks=false` is not an opt-in. `disableocspchecks=true` disables fail-open, including `ocspfailopen=true`. Fail-closed stays on. A later default-off connection does not overwrite a prior OCSP opt-in in the same PHP process. Fail-open does not overwrite fail-closed.
+  - Updated the `libsnowflakeclient` to v2.11.1.
+  - Improved external-browser callback handling by matching Origin headers to the configured Snowflake account origin, accepting same-origin POST token callbacks, and keeping the listener open for tokenless GET requests.
+  - Fixed Okta SAML post-back URL decoding to size the destination to the source string and to stop when the form action markup is missing or unclosed.
 
 - v4.2.0
   - Migrated azure sdk to Azure SDK for C++ (snowflakedb/pdo_snowflake#530)
