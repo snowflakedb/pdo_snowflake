@@ -7,6 +7,7 @@
   - Updated the `libsnowflakeclient` to v2.11.1.
   - Improved external-browser callback handling by matching Origin headers to the configured Snowflake account origin, accepting same-origin POST token callbacks, and keeping the listener open for tokenless GET requests.
   - Fixed Okta SAML post-back URL decoding to size the destination to the source string and to stop when the form action markup is missing or unclosed.
+  - Added a global configuration: min_tls_version (snowflakedb/pdo_snowflake#535)
 
 - v4.2.0
   - Migrated azure sdk to Azure SDK for C++ (snowflakedb/pdo_snowflake#530)

@@ -21,6 +21,7 @@
  */
 ZEND_BEGIN_MODULE_GLOBALS(pdo_snowflake)
     char *cacert; /* location of cacert.pem */
+    char* min_tls_version; /* minimum TLS version */
     char *logdir; /* log directory */
     char *loglevel; /* log level */
     char *debug; /* debug flag. This dumps all logs on screen */
