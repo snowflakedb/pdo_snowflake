@@ -235,7 +235,7 @@ Installing the Driver on Linux and macOS
    where:
 
    - :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the previous step.
-   - :code:`min_tls_version` is optional setting minimum TLS version. Can be set to :code:`TLSv1_2` or :code:`TLSv1_3`, or unset for default behavior(currently TLS v1.2).
+   - :code:`min_tls_version` is optional setting for minimum TLS version. Can be set to :code:`TLSv1_2` or :code:`TLSv1_3`, or unset for default behavior (currently TLS v1.2).
 
 #. If you are using PHP with an application server or web server (e.g. Apache or nginx), restart the server.
 
@@ -273,7 +273,7 @@ Installing the Driver on Windows
    where:
 
    - :code:`<path to PHP config directory>` is the path to the directory where you copied the :code:`cacert.pem` file in the previous step.
-   - :code:`min_tls_version` is optional setting minimum TLS version. Can be set to :code:`TLSv1_2` or :code:`TLSv1_3`, or unset for default behavior(currently TLS v1.2).
+   - :code:`min_tls_version` is optional setting for minimum TLS version. Can be set to :code:`TLSv1_2` or :code:`TLSv1_3`, or unset for default behavior (currently TLS v1.2).
 
 #. If you are using PHP with an application server or web server (e.g. Apache or nginx), restart the server.
 
