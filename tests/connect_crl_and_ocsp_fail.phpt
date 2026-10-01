@@ -9,7 +9,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     include __DIR__ . "/common.php";
 
     try {
-        $dbh = new PDO("{$dsn};disableocspchecks=false;crl_check=true;crl_advisory=false;crl_disk_caching=true", $user, $password);
+        $dbh = new PDO("{$dsn};ocspfailopen=true;crl_check=true;crl_advisory=false;crl_disk_caching=true", $user, $password);
         echo "FAIL: Connection should have failed\n";
     } catch(PDOException $e) {
         if (strpos($e->getMessage(), "Both host certificate revocation check methods") !== false) {
@@ -29,4 +29,3 @@ Expected error caught
 Error code: 1
 OK
 ===DONE===
-

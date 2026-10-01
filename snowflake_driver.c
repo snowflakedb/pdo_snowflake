@@ -542,6 +542,31 @@ static struct pdo_dbh_methods snowflake_methods = {
 #endif
 /* }}} */
 
+/* Process-global OCSP latch. SF_GLOBAL_OCSP_CHECK is shared by every handle
+ * in the PHP process. Default-off must not overwrite an earlier opt-in;
+ * fail-open must not overwrite fail-closed. */
+enum {
+    PDO_SF_OCSP_LATCH_OFF = 0,
+    PDO_SF_OCSP_LATCH_FAIL_OPEN,
+    PDO_SF_OCSP_LATCH_FAIL_CLOSED
+};
+static int pdo_sf_ocsp_latch = PDO_SF_OCSP_LATCH_OFF;
+
+/* Returns 1 if val is "true", 0 if "false" (case-insensitive), -1 otherwise. */
+static int pdo_snowflake_parse_bool(const char *val)
+{
+    if (val == NULL) {
+        return -1;
+    }
+    if (strcasecmp(val, "true") == 0) {
+        return 1;
+    }
+    if (strcasecmp(val, "false") == 0) {
+        return 0;
+    }
+    return -1;
+}
+
 /**
  * Create a database handle. For most databases this involves establishing a
  * connection to the database. In some cases, a persistent connection may be
@@ -591,8 +616,8 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         {"logintimeout",        "300",        0},
         {"maxhttpretries",      "7",          0},
         {"retrytimeout",        "300",        0},
-        {"ocspfailopen",        "true",       0},
-        {"disableocspchecks",   "false",      0},
+        {"ocspfailopen",        NULL,         0},
+        {"disableocspchecks",   NULL,         0},
         {"passcode",            NULL,         0},
         {"passcodeinpassword",  "false",      0},
         {"disablesamlurlcheck", "false",      0},
@@ -887,20 +912,86 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
             "retryimeout: %d", int_attr_value);
     }
 
-    snowflake_set_attribute(
-        H->server, SF_CON_OCSP_FAIL_OPEN,
-        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_FAIL_OPEN_IDX].optval, "true") == 0) ?
-            &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
-    PDO_LOG_DBG(
-        "ocspfailopen: %s",
-        vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_FAIL_OPEN_IDX].optval);
+    {
+        const char *ocsp_fail_open_raw =
+            vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_FAIL_OPEN_IDX].optval;
+        const char *ocsp_disable_raw =
+            vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval;
+        const char *insecure_mode_raw =
+            vars[PDO_SNOWFLAKE_CONN_ATTR_INSECURE_MODE_IDX].optval;
+        int fail_open_parsed = pdo_snowflake_parse_bool(ocsp_fail_open_raw);
+        int disable_parsed = pdo_snowflake_parse_bool(ocsp_disable_raw);
+        int insecure_parsed = pdo_snowflake_parse_bool(insecure_mode_raw);
+        int fail_open = 1;
+        int write_global = 0;
+        int global_value = 0;
 
-    snowflake_global_set_attribute(SF_GLOBAL_OCSP_CHECK,
-        (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval, "true") == 0) ?
-            &SF_BOOLEAN_FALSE : &SF_BOOLEAN_TRUE);
-    PDO_LOG_DBG(
-        "disableocspchecks: %s",
-        vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval);
+        if (fail_open_parsed >= 0) {
+            fail_open = fail_open_parsed;
+            /* Opt-in is only explicit ocspfailopen. disableocspchecks=false
+             * is the old default and is not an opt-in. disableocspchecks=true
+             * still disables fail-open. Fail-closed stays on. */
+            if (fail_open_parsed == 1 && disable_parsed == 1) {
+                PDO_LOG_INF(
+                    "ocspfailopen=true is ignored because disableocspchecks=true");
+            }
+        }
+        if (insecure_parsed == 1 && fail_open_parsed >= 0) {
+            PDO_LOG_INF(
+                "OCSP flags are ignored because insecure_mode=true");
+        }
+
+        /* Default-off and insecure_mode do not write SF_GLOBAL_OCSP_CHECK. */
+        if (insecure_parsed != 1 && fail_open_parsed >= 0) {
+            if (fail_open_parsed == 0) {
+                pdo_sf_ocsp_latch = PDO_SF_OCSP_LATCH_FAIL_CLOSED;
+                write_global = 1;
+                global_value = 1;
+            } else if (disable_parsed == 1) {
+                if (pdo_sf_ocsp_latch == PDO_SF_OCSP_LATCH_FAIL_OPEN) {
+                    pdo_sf_ocsp_latch = PDO_SF_OCSP_LATCH_OFF;
+                    write_global = 1;
+                    global_value = 0;
+                } else if (pdo_sf_ocsp_latch == PDO_SF_OCSP_LATCH_FAIL_CLOSED) {
+                    write_global = 1;
+                    global_value = 1;
+                }
+            } else {
+                if (pdo_sf_ocsp_latch != PDO_SF_OCSP_LATCH_FAIL_CLOSED) {
+                    pdo_sf_ocsp_latch = PDO_SF_OCSP_LATCH_FAIL_OPEN;
+                }
+                write_global = 1;
+                global_value = 1;
+            }
+        } else if (insecure_parsed != 1 && disable_parsed == 1) {
+            if (pdo_sf_ocsp_latch == PDO_SF_OCSP_LATCH_FAIL_OPEN) {
+                pdo_sf_ocsp_latch = PDO_SF_OCSP_LATCH_OFF;
+                write_global = 1;
+                global_value = 0;
+            }
+        } else if (insecure_parsed != 1 && fail_open_parsed < 0 &&
+                   pdo_sf_ocsp_latch != PDO_SF_OCSP_LATCH_OFF) {
+            PDO_LOG_INF(
+                "default OCSP-off DSN does not overwrite process OCSP opt-in");
+        }
+
+        snowflake_set_attribute(
+            H->server, SF_CON_OCSP_FAIL_OPEN,
+            fail_open ? &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
+        if (write_global) {
+            snowflake_global_set_attribute(
+                SF_GLOBAL_OCSP_CHECK,
+                global_value ? &SF_BOOLEAN_TRUE : &SF_BOOLEAN_FALSE);
+        }
+        PDO_LOG_DBG(
+            "ocspfailopen: %s (parsed=%d)",
+            ocsp_fail_open_raw != NULL ? ocsp_fail_open_raw : "(unset)",
+            fail_open);
+        PDO_LOG_DBG(
+            "disableocspchecks: %s (latch=%d write_global=%d)",
+            ocsp_disable_raw != NULL ? ocsp_disable_raw : "(unset)",
+            pdo_sf_ocsp_latch, write_global);
+    }
 
     if (vars[PDO_SNOWFLAKE_CONN_ATTR_PASSCODE_IDX].optval != NULL) {
         /* passcode */
@@ -1067,10 +1158,9 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
         }
     }
 
-    int8 ocsp_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_OCSP_DISABLE_IDX].optval, "true") != 0);
     int8 crl_enabled = (strcasecmp(vars[PDO_SNOWFLAKE_CONN_ATTR_CRL_CHECK_IDX].optval, "true") == 0);
 
-    if (ocsp_enabled && crl_enabled) {
+    if (pdo_sf_ocsp_latch != PDO_SF_OCSP_LATCH_OFF && crl_enabled) {
         PDO_LOG_ERR("Both OCSP and CRL checks are enabled. Only one revocation check method can be enabled at a time.");
 
         strcpy(dbh->error_code, "HY000");
@@ -1078,7 +1168,7 @@ pdo_snowflake_handle_factory(pdo_dbh_t *dbh, zval *driver_options) /* {{{ */
             php_pdo_get_exception(),
             1,
             "SQLSTATE[HY000] [1] Both host certificate revocation check methods (OCSP and CRL) are enabled. "
-            "Please turn off crl_check or toggle OCSP with disableocspchecks.");
+            "Please turn off crl_check or disable OCSP (unset ocspfailopen).");
         ret = 0;
         goto cleanup;
     }

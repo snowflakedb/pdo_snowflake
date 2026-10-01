@@ -1,5 +1,5 @@
 --TEST--
-pdo_snowflake - connect with CRL enabled and OCSP defaults should fail
+pdo_snowflake - connect with both CRL and OCSP (ocspfailopen) enabled should fail
 --INI--
 pdo_snowflake.logdir=sflog
 pdo_snowflake.loglevel=DEBUG
@@ -9,10 +9,9 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     include __DIR__ . "/common.php";
 
     try {
-        $dbh = new PDO("{$dsn};crl_check=true;crl_advisory=false;crl_disk_caching=true", $user, $password);
+        $dbh = new PDO("{$dsn};ocspfailopen=true;crl_check=true;crl_advisory=false;crl_disk_caching=true", $user, $password);
         echo "FAIL: Connection should have failed\n";
     } catch(PDOException $e) {
-        // Verify the error message contains the expected text
         if (strpos($e->getMessage(), "Both host certificate revocation check methods") !== false) {
             echo "Expected error caught\n";
             echo "Error code: " . $e->getCode() . "\n";
@@ -20,7 +19,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
             echo "Unexpected error: " . $e->getMessage() . "\n";
         }
     }
-    
+
     echo "OK\n";
 ?>
 ===DONE===
@@ -30,4 +29,3 @@ Expected error caught
 Error code: 1
 OK
 ===DONE===
-

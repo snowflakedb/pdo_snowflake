@@ -97,6 +97,10 @@ static PHP_MINIT_FUNCTION(pdo_snowflake) {
         (debug && strncasecmp(debug, "true", 4) == 0) ?
         SF_BOOLEAN_TRUE : SF_BOOLEAN_FALSE;
     snowflake_global_set_attribute(SF_GLOBAL_DEBUG, &debug_bool);
+    {
+        sf_bool ocsp_off = SF_BOOLEAN_FALSE;
+        snowflake_global_set_attribute(SF_GLOBAL_OCSP_CHECK, &ocsp_off);
+    }
 
     zend_declare_class_constant_long(
       php_pdo_get_dbh_ce(),
