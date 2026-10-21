@@ -3,6 +3,8 @@
 # Changelog
 
 - Next release
+
+- v4.3.1
   - Updated the `libsnowflakeclient` to v2.12.0.
   - Updated the bundled Mozilla CA certificate list.
 
