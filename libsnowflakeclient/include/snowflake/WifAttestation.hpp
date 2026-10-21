@@ -80,6 +80,7 @@ namespace Client {
     boost::optional<std::string> token;
     boost::optional<std::string> snowflakeEntraResource;
     boost::optional<std::string> workloadIdentityImpersonationPath;
+    long tlsVersion = 0;
     IHttpClient* httpClient = NULL;
     AwsUtils::ISdkWrapper* awsSdkWrapper = NULL;
 

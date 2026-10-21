@@ -2,6 +2,10 @@
 
 # Changelog
 
+- Next release
+  - Updated the `libsnowflakeclient` to v2.12.0.
+  - Updated the bundled Mozilla CA certificate list.
+
 - v4.3.0
   - OCSP checking is now disabled by default. Set `ocspfailopen=true` (fail-open) or `ocspfailopen=false` (fail-closed) to enable it. `disableocspchecks=false` is not an opt-in. `disableocspchecks=true` disables fail-open, including `ocspfailopen=true`. Fail-closed stays on. A later default-off connection does not overwrite a prior OCSP opt-in in the same PHP process. Fail-open does not overwrite fail-closed.
   - Updated the `libsnowflakeclient` to v2.11.1.

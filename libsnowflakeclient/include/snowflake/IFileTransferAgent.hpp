@@ -22,13 +22,15 @@ struct TransferConfig
     useS3regionalUrl(false),
     compressLevel(-1),
     proxy(NULL),
-    getSizeThreshold(0) {}
+    getSizeThreshold(0),
+    tlsVersion(0) {}
   char * caBundleFile;
   char * tempDir;
   bool useS3regionalUrl;
   int compressLevel;
   Util::Proxy * proxy;
   long getSizeThreshold;
+  long tlsVersion;
 };
 
 class IFileTransferAgent

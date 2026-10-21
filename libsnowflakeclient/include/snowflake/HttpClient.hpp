@@ -58,12 +58,15 @@ namespace Snowflake {
       long connectTimeoutInMilliSeconds = 0;
       long requestTimeoutInSeconds = 0;
       long requestTimeoutInMilliSeconds = 0;
+      long tlsVersion = 0;
     };
 
     class IHttpClient {
     public:
       virtual boost::optional<HttpResponse> run(HttpRequest req) = 0;
       virtual ~IHttpClient() = default;
+      virtual void setTlsVersion(long) {}
+      virtual std::string getNegotiatedTLSVersion() { return ""; }
 
       static IHttpClient* createSimple(const HttpClientConfig&);
       static IHttpClient* getInstance();
