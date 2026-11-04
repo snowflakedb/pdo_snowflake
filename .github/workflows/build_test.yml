@@ -175,6 +175,28 @@ jobs:
         run: ./scripts/test_rockylinux9_docker.sh
         shell: bash
 
+  build_test_debian13:
+    name: build_test_debian13 (${{ matrix.php-version }}, ${{ matrix.os == 'ubuntu-latest' && 'x64' || 'arm64' }})
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.5']
+        os: [ubuntu-latest, ubuntu-22.04-arm]
+    runs-on: ${{ matrix.os }}
+    env:
+      PHP_VERSION: ${{ matrix.php-version }}
+      PHP_HOME: /usr/local
+      TEST_PHP_EXECUTABLE: /usr/local/bin/php
+      NO_INTERACTION: true
+      USE_VALGRIND: 0
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build Driver and Run Tests in Docker
+        run: ./scripts/test_debian13_docker.sh
+        shell: bash
+
   code-coverage:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
