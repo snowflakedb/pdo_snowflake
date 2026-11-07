@@ -8,8 +8,8 @@ PHP PDO driver for Snowflake
 .. image:: http://img.shields.io/:license-Apache%202-brightgreen.svg
     :target: http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Snowflake provides a driver that uses the 
-`PHP Data Objects (PDO) extension <https://www.php.net/manual/en/book.pdo.php>`_.
+Snowflake provides a driver that uses the
+`PHP Data Objects (PDO) extension <https://www.php.net/manual/en/book.pdo.php>`_
 to connect to the Snowflake database.
 
 .. contents::
