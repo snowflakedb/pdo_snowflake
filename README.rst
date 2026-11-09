@@ -189,7 +189,7 @@ To build the PHP driver for Windows:
 
    .. code-block:: batch
 
-       C:\php\php.exe -dextension=ext\php_pdo_snowflake.dll -m
+       C:\php\php.exe -dextension=".\ext\php_pdo_snowflake.dll" -m
 
    :code:`pdo_snowflake` should appear in the output from the command.
 
