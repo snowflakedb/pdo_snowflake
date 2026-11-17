@@ -101,13 +101,14 @@ def test_posix():
     rc, test_output = run_command_capture("php -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' ./run-tests.php -d extension=modules/pdo_snowflake.so" + run_test_options)
     print ("====> parse test results")
     run_command("python ./.github/workflows/scripts/check_result.py ./tests")
-    assert_no_test_failures(test_output)
 
     coverage = os.environ.get('REPORT_COVERAGE', 'undef')
     if coverage == 'true' or coverage == '1':
         print ("====> run code coverage")
         run_command("lcov -c -d .libs --output-file main_coverage.info")
         run_command("genhtml main_coverage.info --output-directory php_coverage_report")
+
+    assert_no_test_failures(test_output)
 
 def main():
     current_os = os.name

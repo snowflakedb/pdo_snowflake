@@ -204,7 +204,15 @@ jobs:
         - name: test driver
           run: python ./.github/workflows/scripts/test_driver.py
 
+        - name: Upload coverage artifact
+          if: ${{ !cancelled() && github.repository_owner != 'snowflakedb' }}
+          uses: ./.github/actions/upload-coverage-artifact
+          with:
+            name: php
+            path: main_coverage.info
+
         - name: Upload coverage reports to Codecov
+          if: ${{ github.repository_owner == 'snowflakedb' }}
           uses: codecov/codecov-action@v5
           with:
             # without the token code cov may fail because of Github limits https://github.com/codecov/codecov-action/issues/557
