@@ -1,0 +1,31 @@
+ARG PHP_VERSION=8.5
+FROM php:${PHP_VERSION}-cli-trixie
+
+USER root
+WORKDIR /
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        $PHPIZE_DEPS \
+        cmake \
+        jq \
+        python3 \
+        python-is-python3 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Verify PHP installation
+RUN php --version && \
+    php -m | grep PDO && \
+    php -m | grep json
+
+# Accept user ID as build argument to match host permissions
+ARG USER_ID=1001
+ARG GROUP_ID=1001
+
+# Create user for proper permission testing
+RUN groupadd -g ${GROUP_ID} user && \
+    useradd -u ${USER_ID} -g ${GROUP_ID} -m -s /bin/bash user && \
+    chown -R user:user /home/user
+
+USER user
+WORKDIR /home/user
