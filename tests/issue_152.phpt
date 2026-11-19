@@ -12,7 +12,7 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
     $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
     echo 'Connected to Snowflake' . "\n";
 
-    $dbh->query('USE '.$database);
+    $dbh->query('USE SCHEMA '.$database.'.'.$schema);
     $dbh->query('USE WAREHOUSE '.$warehouse);
 
     $query = $dbh->prepare("CREATE OR REPLACE TABLE obfuscated_table_name (daily_input number(38,6))");

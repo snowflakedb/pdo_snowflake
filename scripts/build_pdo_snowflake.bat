@@ -21,6 +21,9 @@ set pdodir=%scriptdir%\..
 set phpsrcdir="%php_sdk_dir%\phpmaster\%vc_version%\%arch%\php-src"
 set depsdir="%php_sdk_dir%\phpmaster\%vc_version%\%arch%\deps"
 
+:: The VS18 linker can use the vendored VS17 libraries.
+if "%vc_version%"=="vs18" set build_dir=%arcdir%\vs17
+
 :: Move libsnowflakeclient and dependency libraries to dependencies directory
 
 :: Move Arrow
@@ -91,8 +94,9 @@ xcopy ^
 if %ERRORLEVEL% NEQ 0 goto :error
 
 :: Move PDO code to PHP sourc directory
-rmdir /S /Q "%phpsrcdir%\ext\pdo_snowflake"
-if %ERRORLEVEL% NEQ 0 goto :error
+if exist "%phpsrcdir%\ext\pdo_snowflake" (
+    rmdir /S /Q "%phpsrcdir%\ext\pdo_snowflake" || goto :error
+)
 xcopy ^
     "%pdodir%" ^
     "%phpsrcdir%\ext\pdo_snowflake\" ^
@@ -100,7 +104,8 @@ xcopy ^
 if %ERRORLEVEL% NEQ 0 goto :error
 
 cd %phpsrcdir%
-buildconf --force && configure --disable-all --enable-cli --enable-pdo --with-pdo_snowflake=shared && nmake
+call buildconf --force && call configure --disable-all --enable-cli --enable-pdo --with-pdo_snowflake=shared && nmake
+if errorlevel 1 goto :error
 
 :success
 :: Go back to where you came from

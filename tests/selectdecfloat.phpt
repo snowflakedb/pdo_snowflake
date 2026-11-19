@@ -71,6 +71,10 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
         }
     }
 
+    // Snowflake can send DECFLOAT results as TEXT, so check the stored type separately.
+    $columns = $dbh->query("describe table t")->fetchAll(PDO::FETCH_NUM);
+    echo "Stored type: ", $columns[1][1], "\n";
+
     /* SELECT */
     $sth = $dbh->query("select * from t order by 1");
 
@@ -92,8 +96,9 @@ pdo_snowflake.cacert=libsnowflakeclient/cacert.pem
 <?php exit(0); ?>
 --EXPECTF--
 Connected to Snowflake
+Stored type: DECFLOAT(38)
 name: C1, native_type: FIXED, scale: 0, precision: 38, len: 0
-name: C2, native_type: DECFLOAT, scale: 0, precision: 38, len: 50
+name: C2, native_type: %r(?:DECFLOAT, scale: 0, precision: 38, len: 50|TEXT, scale: 0, precision: 0, len: 134217728)%r
 Results in String
 C1: 1, C2: 123.456
 C1: 2, C2: 123456789012345678901234567890123456.78

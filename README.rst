@@ -36,7 +36,7 @@ To build the Snowflake PHP PDO Driver, the following software must be installed:
 
 To install and use the Snowflake PHP PDO Driver, you must have the following software installed:
 
-- PHP 8.4, 8.3, 8.2 or 8.1 (Note: support for PHP 8.0 or lower is deprecated)
+- PHP 8.6, 8.5, 8.4, 8.3 or 8.2
 - the :code:`php-pdo` extension
 - the :code:`php-json` extension
 
@@ -87,20 +87,21 @@ Building the Driver on Linux and macOS
 Building the Driver on Windows
 ------------------------------
 
-.. |win-vs-version| replace:: VS16 
-.. |win-php-version| replace:: 8.1.28
+.. |win-vs-version| replace:: VS18
+.. |win-php-version| replace:: 8.6.0
 
 
 **Note**: Snowflake supports only thread-safe versions of PHP.
 
-You must install Microsoft Visual Studio 2019 (VS16) or 2022 (VS17) with the C++ development installer option.
+Install the Visual Studio C++ development tools that match your PHP binaries. PHP 8.6 requires
+Visual Studio 2026 (VS18); the build scripts also accept Visual Studio 2022 (VS17) and 2019 (VS16) for older builds.
 
 To build the PHP driver for Windows:
 
 #. Download and install PHP:
 
-   #. Download the PHP version binaries from `<https://windows.php.net/downloads/releases/>`_,
-      such as `<https://windows.php.net/downloads/releases/php-8.1.28-Win32-vs16-x64.zip>`_.
+   #. Download the PHP version binaries from `the PHP for Windows downloads page <https://www.php.net/downloads.php?os=windows>`_,
+      such as ``php-8.6.0-Win32-vs18-x64.zip``.
 
       .. note::
 
@@ -130,7 +131,7 @@ To build the PHP driver for Windows:
 
    - :code:`<arch>` is your CPU architecture (Currently, the driver only supports :code:`x64`).
    - :code:`<build>` is the type of binary that you want to build (:code:`Release` or :code:`Debug`).
-   - :code:`<visual studio version>` is the version of Visual Studio that you are using (Currently, the driver only supports :code:`VS16` and :code:`VS17`).
+   - :code:`<visual studio version>` is the version of Visual Studio that matches your PHP binaries (:code:`VS16`, :code:`VS17`, or :code:`VS18`).
    - :code:`<path to PHP SDK>` is the path to the directory where the PHP SDK should be downloaded.
      **Do not create this directory.** The script creates this directory for you when downloading the PHP SDK.
 
@@ -138,7 +139,7 @@ To build the PHP driver for Windows:
 
    .. parsed-literal::
 
-       .\\scripts\\setup_php_sdk.bat x64 Release VS16 C:\\php-sdk
+       .\\scripts\\setup_php_sdk.bat x64 Release VS18 C:\\php-sdk
 
 #. Download and build the PHP source code.
 
@@ -151,7 +152,7 @@ To build the PHP driver for Windows:
    For :code:`<arch>`, :code:`<build>`, :code:`<visual studio version>`, and :code:`<path to PHP SDK>`, specify the same values
    that you used in the previous step.
 
-   For :code:`<full PHP version>`, specify the full version number of the PHP binary you installed (e.g. :code:`8.1.28`).
+   For :code:`<full PHP version>`, specify the full version number of the PHP binary you installed (e.g. :code:`8.6.0`).
 
    For example:
 
@@ -176,7 +177,7 @@ To build the PHP driver for Windows:
 
    .. parsed-literal::
 
-       C:\\php-sdk\\phpmaster\\vs16\\x64\\php-src\\x64\\Release_TS
+       C:\\php-sdk\\phpmaster\\vs18\\x64\\php-src\\x64\\Release_TS
 
    to the PHP extension directory. Usually, the PHP extension directory is the :code:`ext` subdirectory in the
    directory where PHP is installed. To find the PHP extension directory, run:
@@ -244,7 +245,7 @@ Installing the Driver on Windows
 
    .. parsed-literal::
 
-       C:\\php-sdk\\phpmaster\\vs16\\x64\\php-src\\x64\\Release_TS
+       C:\\php-sdk\\phpmaster\\vs18\\x64\\php-src\\x64\\Release_TS
 
    to the PHP extension directory. Usually, the PHP extension directory is the :code:`ext` subdirectory in the
    directory where PHP is installed. To find the PHP extension directory, run:
@@ -821,7 +822,7 @@ To run the tests, do the following:
 where:
 
 - :code:`<arch>` is your CPU architecture (Currently :code:`x64` is the only supported one).
-- :code:`<visual studio version>` is the version of Visual Studio that you are using (Currently :code:`VS16` and :code:`VS17` are supported).
+- :code:`<visual studio version>` is the version of Visual Studio that matches your PHP binaries (:code:`VS16`, :code:`VS17`, or :code:`VS18`).
 - :code:`<path to PHP SDK>` is the path to the directory where the PHP SDK should be downloaded.
 
 Additional Notes

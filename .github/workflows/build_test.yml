@@ -66,16 +66,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # have to specify patch version on windows
-        # otherwise could get version mismatch issue when running test on github
-        # need to keep track on the latest version
-        php-version: ['8.4.16', '8.5.5']
-    # The type of runner that the job will run on
-    runs-on: windows-2022
+        # Pin PHP patch versions so the runtime and source build match.
+        include:
+          - php-version: '8.4.16'
+            os: windows-2022
+            vs: VS17
+          - php-version: '8.5.5'
+            os: windows-2022
+            vs: VS17
+          - php-version: '8.6.0'
+            os: windows-2025-vs2026
+            vs: VS18
+    runs-on: ${{ matrix.os }}
     env:
       ARCH: x64
       TARGET: Release
-      VS: VS17
+      VS: ${{ matrix.vs }}
       PHP: ${{ matrix.php-version }}
       TEST_PHP_EXECUTABLE: c:\tools\php\php.exe
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -102,7 +108,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.2', '8.3', '8.4', '8.5']
+        php-version: ['8.2', '8.3', '8.4', '8.5', '8.6']
         os: [ubuntu-latest, ubuntu-22.04-arm]
     # The type of runner that the job will run on
     runs-on: ${{ matrix.os }}
@@ -131,7 +137,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.2', '8.3', '8.4', '8.5']
+        php-version: ['8.2', '8.3', '8.4', '8.5', '8.6']
     # The type of runner that the job will run on
     runs-on: macos-latest
     env: 
@@ -160,7 +166,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.2', '8.3', '8.4', '8.5']
+        php-version: ['8.2', '8.3', '8.4', '8.5', '8.6']
         os: [ubuntu-latest, ubuntu-22.04-arm]
     runs-on: ${{ matrix.os }}
     env:

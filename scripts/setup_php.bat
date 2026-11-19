@@ -21,9 +21,10 @@ cd %php_sdk_dir%
 call phpsdk_buildtree phpmaster
 if not exist "%php_sdk_dir%\phpmaster\%vc_version%\%arch%\php-src" git clone https://github.com/php/php-src.git
 cd php-src
-git checkout tags/php-%php_full_version%
-call phpsdk_deps --update --branch %php_major_minor_version%
-buildconf && configure --disable-all --enable-cli && nmake
+git checkout tags/php-%php_full_version% || goto :error
+call phpsdk_deps --update --branch %php_major_minor_version% || goto :error
+call buildconf && call configure --disable-all --enable-cli && nmake
+if errorlevel 1 goto :error
 
 :success
 :: Go back to where you came from
