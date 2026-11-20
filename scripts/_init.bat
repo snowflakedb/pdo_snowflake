@@ -67,8 +67,14 @@ if "%vs_version%"=="VS17" (
     set vc_version=vs17
 )
 
+if "%vs_version%"=="VS18" (
+    set cmake_generator=Visual Studio 18 2026
+    set vsdir=vs18
+    set vc_version=vs18
+)
+
 if "%cmake_generator%"=="" (
-    echo Specify the visual studio version used. [VS16, VS17]
+    echo Specify the visual studio version used. [VS16, VS17, VS18]
     goto :error
 )
 

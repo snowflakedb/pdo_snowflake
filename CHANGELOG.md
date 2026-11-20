@@ -3,6 +3,7 @@
 # Changelog
 
 - Next release
+  - Added support for PHP 8.6.
 
 - v4.3.1
   - Updated the `libsnowflakeclient` to v2.12.0.
